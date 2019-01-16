@@ -4,7 +4,6 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 module.exports = {
   entry: {
     main: path.resolve(__dirname, 'src/index.ts'),
-    example: path.resolve(__dirname, 'src/examples/example.ts'),
   },
   module: {
     rules: [

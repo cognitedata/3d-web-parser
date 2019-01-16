@@ -19,11 +19,5 @@ module.exports = merge(common, {
     },
   },
   plugins: [
-    new HtmlWebpackPlugin({
-      filename: 'index.html',
-      template: path.resolve('src/examples/index.html'),
-      inject: 'body',
-      chunks: ['example'],
-    }),
   ],
 });
