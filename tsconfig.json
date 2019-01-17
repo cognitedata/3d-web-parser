@@ -6,6 +6,7 @@
     "declarationDir": "./dist/",
     "outDir": "./dist/",
     "strict": true,
+    "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -13,6 +14,7 @@
     "strictNullChecks": true,
     "sourceMap": true,
     "downlevelIteration": true,
+    "resolveJsonModule": true,
     "moduleResolution": "node",
     "lib": ["dom", "es2015"]
   },

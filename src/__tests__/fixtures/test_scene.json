@@ -1,0 +1,1408 @@
+{
+  "path": "0/",
+  "geometries": [
+    {
+      "type": "ring",
+      "primitiveInfo": {
+        "ring": {
+          "center": {
+            "x": -900,
+            "y": 1800
+          },
+          "normal": {
+            "x": -0.5116638541221619,
+            "y": 0.7969608306884766,
+            "z": 0.32101961970329285
+          },
+          "innerRadius": 50,
+          "outerRadius": 100
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 15066597
+              },
+              "nodeId": "4193286036825456",
+              "treeIndex": "2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "circle",
+      "primitiveInfo": {
+        "circle": {
+          "center": {
+            "x": -300,
+            "y": 1800
+          },
+          "normal": {
+            "x": -0.5116637945175171,
+            "y": 0.7969608306884766,
+            "z": 0.32101958990097046
+          },
+          "radius": 100
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 10066253
+              },
+              "nodeId": "4927721408335070",
+              "treeIndex": "3"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ellipsoid",
+      "primitiveInfo": {
+        "ellipsoid": {
+          "center": {
+            "x": -900,
+            "y": 1500
+          },
+          "normal": {
+            "x": -0.5116638541221619,
+            "y": 0.7969608306884766,
+            "z": 0.32101961970329285
+          },
+          "verticalRadius": 50,
+          "horizontalRadius": 100.00000762939453
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 5066086
+              },
+              "nodeId": "8530481810909552",
+              "treeIndex": "4"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ellipsoidSegment",
+      "primitiveInfo": {
+        "ellipsoidSegment": {
+          "center": {
+            "x": -300,
+            "y": 1500
+          },
+          "normal": {
+            "x": -0.5116638541221619,
+            "y": 0.7969608306884766,
+            "z": 0.32101961970329285
+          },
+          "verticalRadius": 50.000003814697266,
+          "horizontalRadius": 100.00000762939453,
+          "isClosed": true,
+          "height": 43.75
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 5066086
+              },
+              "nodeId": "3818057089900293",
+              "treeIndex": "5"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sphere",
+      "primitiveInfo": {
+        "sphere": {
+          "center": {
+            "x": -900,
+            "y": 1200,
+            "z": -0.00003044911500182934
+          },
+          "radius": 100
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 6710861
+              },
+              "nodeId": "8007302534636448",
+              "treeIndex": "6"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sphericalSegment",
+      "primitiveInfo": {
+        "sphericalSegment": {
+          "center": {
+            "x": -300,
+            "y": 1200
+          },
+          "normal": {
+            "x": -0.5116638541221619,
+            "y": 0.7969608306884766,
+            "z": 0.32101961970329285
+          },
+          "radius": 100.00000762939453,
+          "isClosed": true,
+          "height": 93.75
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 6710861
+              },
+              "nodeId": "8004407005032616",
+              "treeIndex": "7"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "torus",
+      "primitiveInfo": {
+        "torusSegment": {
+          "center": {
+            "x": -900,
+            "y": 900
+          },
+          "normal": {
+            "x": -0.5116640329360962,
+            "y": 0.796960711479187,
+            "z": 0.3210195302963257
+          },
+          "radius": 100.00000762939453,
+          "isClosed": true,
+          "arcAngle": 6.2831854820251465,
+          "tubeRadius": 25
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 3394662
+              },
+              "nodeId": "2644423686904824",
+              "treeIndex": "8"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "torusSegment",
+      "primitiveInfo": {
+        "torusSegment": {
+          "center": {
+            "x": -300,
+            "y": 900
+          },
+          "normal": {
+            "x": -0.5116638541221619,
+            "y": 0.7969608306884766,
+            "z": 0.32101961970329285
+          },
+          "radius": 100,
+          "isClosed": true,
+          "angle": 2.987352132797241,
+          "arcAngle": 4.5160393714904785,
+          "tubeRadius": 25
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 3394662
+              },
+              "nodeId": "7932678724305442",
+              "treeIndex": "9"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "eccentricCone",
+      "primitiveInfo": {
+        "eccentricCone": {
+          "centerB": {
+            "x": -804.85986328125,
+            "y": 556.2943725585938,
+            "z": -51.363162994384766
+          },
+          "centerA": {
+            "x": -995.14013671875,
+            "y": 643.7056274414062,
+            "z": 51.363162994384766
+          },
+          "radiusB": 100,
+          "radiusA": 50,
+          "isClosed": true,
+          "normalA": {
+            "x": 0.5116638541221619,
+            "y": -0.7969608306884766,
+            "z": -0.32101961970329285
+          }
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 65280
+              },
+              "nodeId": "2187923877408136",
+              "treeIndex": "10"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "generalCylinder",
+      "primitiveInfo": {
+        "generalCylinder": {
+          "centerB": {
+            "x": -248.8336181640625,
+            "y": 520.3038940429688,
+            "z": -32.101959228515625
+          },
+          "centerA": {
+            "x": -351.1663818359375,
+            "y": 679.6961059570312,
+            "z": 32.101959228515625
+          },
+          "radiusB": 100.00000762939453,
+          "radiusA": 100.00000762939453,
+          "slopeB": 0.46364763379096985,
+          "slopeA": 0.46364763379096985,
+          "zAngleB": 4.058148384094238,
+          "zAngleA": 0.9165557026863098,
+          "arcAngle": 6.2831854820251465,
+          "isClosed": true
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 15014426
+              },
+              "nodeId": "2415362775030829",
+              "treeIndex": "11"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "cylinder",
+      "primitiveInfo": {
+        "cylinder": {
+          "radius": 100,
+          "centerB": {
+            "x": -848.8336181640625,
+            "y": 220.30392456054688,
+            "z": -32.10196304321289
+          },
+          "centerA": {
+            "x": -951.1663818359375,
+            "y": 379.6960754394531,
+            "z": 32.10196304321289
+          }
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 16776960
+              },
+              "nodeId": "8285508716851544",
+              "treeIndex": "12"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "cone",
+      "primitiveInfo": {
+        "cone": {
+          "centerB": {
+            "x": -248.8336181640625,
+            "y": 220.30392456054688,
+            "z": -32.10196304321289
+          },
+          "centerA": {
+            "x": -351.1663818359375,
+            "y": 379.6960754394531,
+            "z": 32.10196304321289
+          },
+          "radiusB": 100,
+          "radiusA": 50
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 255
+              },
+              "nodeId": "7579136510512963",
+              "treeIndex": "13"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "generalCylinder",
+      "primitiveInfo": {
+        "generalCylinder": {
+          "centerB": {
+            "x": -848.8336181640625,
+            "y": -79.69608306884766,
+            "z": -32.101959228515625
+          },
+          "centerA": {
+            "x": -951.1663818359375,
+            "y": 79.69608306884766,
+            "z": 32.101959228515625
+          },
+          "radiusB": 100,
+          "radiusA": 50,
+          "zAngleB": 6.2831854820251465,
+          "zAngleA": 6.2831854820251465,
+          "arcAngle": 6.2831854820251465,
+          "thickness": 19.999998092651367
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 8401741
+              },
+              "nodeId": "3324695548217003",
+              "treeIndex": "14"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "generalCylinder",
+      "primitiveInfo": {
+        "generalCylinder": {
+          "centerB": {
+            "x": -248.8336181640625,
+            "y": -79.69608306884766,
+            "z": -32.101959228515625
+          },
+          "centerA": {
+            "x": -351.1663818359375,
+            "y": 79.69608306884766,
+            "z": 32.101959228515625
+          },
+          "radiusB": 100,
+          "radiusA": 50,
+          "zAngleB": 6.2831854820251465,
+          "zAngleA": 6.2831854820251465,
+          "angle": 2.987351894378662,
+          "arcAngle": 4.5160393714904785,
+          "thickness": 20,
+          "isClosed": true
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 5072461
+              },
+              "nodeId": "6480064506649552",
+              "treeIndex": "15"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "generalCylinder",
+      "primitiveInfo": {
+        "generalCylinder": {
+          "centerB": {
+            "x": -848.8336181640625,
+            "y": -379.6960754394531,
+            "z": -32.101959228515625
+          },
+          "centerA": {
+            "x": -951.1663818359375,
+            "y": -220.30392456054688,
+            "z": 32.101959228515625
+          },
+          "radiusB": 100,
+          "radiusA": 100,
+          "slopeB": 0.25,
+          "slopeA": 0.3499999940395355,
+          "zAngleB": 0.4165557324886322,
+          "zAngleA": 5.699740886688232,
+          "arcAngle": 6.2831854820251465,
+          "thickness": 19.999998092651367
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 15014426
+              },
+              "nodeId": "4155661413047577",
+              "treeIndex": "16"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "generalCylinder",
+      "primitiveInfo": {
+        "generalCylinder": {
+          "centerB": {
+            "x": -248.8336181640625,
+            "y": -379.6960754394531,
+            "z": -32.101959228515625
+          },
+          "centerA": {
+            "x": -351.1663818359375,
+            "y": -220.30392456054688,
+            "z": 32.101959228515625
+          },
+          "radiusB": 100,
+          "radiusA": 100,
+          "slopeB": 0.2499999850988388,
+          "slopeA": 0.34999996423721313,
+          "zAngleB": 0.4165556728839874,
+          "zAngleA": 5.699740886688232,
+          "angle": 2.987351894378662,
+          "arcAngle": 4.5160393714904785,
+          "thickness": 20.000001907348633,
+          "isClosed": true
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 15014426
+              },
+              "nodeId": "8638470700573495",
+              "treeIndex": "17"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "extrudedRing",
+      "primitiveInfo": {
+        "extrudedRing": {
+          "centerB": {
+            "x": -848.8336181640625,
+            "y": -679.6961059570312,
+            "z": -32.101959228515625
+          },
+          "centerA": {
+            "x": -951.1663818359375,
+            "y": -520.3038940429688,
+            "z": 32.101959228515625
+          },
+          "innerRadius": 80,
+          "outerRadius": 100
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 8453965
+              },
+              "nodeId": "1103032623594453",
+              "treeIndex": "18"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "extrudedRingSegment",
+      "primitiveInfo": {
+        "extrudedRingSegment": {
+          "centerB": {
+            "x": -248.8336181640625,
+            "y": -679.6961059570312,
+            "z": -32.101959228515625
+          },
+          "centerA": {
+            "x": -351.1663818359375,
+            "y": -520.3038940429688,
+            "z": 32.101959228515625
+          },
+          "innerRadius": 80,
+          "outerRadius": 100,
+          "isClosed": true,
+          "angle": 2.987351894378662,
+          "arcAngle": 4.5160393714904785
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 8453965
+              },
+              "nodeId": "6695309608123949",
+              "treeIndex": "19"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "nut",
+      "primitiveInfo": {
+        "nut": {
+          "radius": 100.00000762939453,
+          "centerB": {
+            "x": -848.8336181640625,
+            "y": -979.6961059570312,
+            "z": -32.101966857910156
+          },
+          "centerA": {
+            "x": -951.1663818359375,
+            "y": -820.3038940429688,
+            "z": 32.10196304321289
+          },
+          "rotationAngle": 0.39295694231987
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 65535
+              },
+              "nodeId": "3601169241620568",
+              "treeIndex": "20"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "box",
+      "primitiveInfo": {
+        "box": {
+          "angle": 0.628318190574646,
+          "delta": {
+            "x": 200,
+            "y": 200,
+            "z": 200.0000457763672
+          },
+          "center": {
+            "x": -300,
+            "y": -900
+          },
+          "normal": {
+            "x": 0.44840124249458313,
+            "y": -0.07101960480213165,
+            "z": 0.8910064697265625
+          }
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 16711935
+              },
+              "nodeId": "8546365700000318",
+              "treeIndex": "21"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ring",
+      "primitiveInfo": {
+        "ring": {
+          "center": {
+            "x": -600,
+            "y": 1800
+          },
+          "normal": {
+            "z": 1
+          },
+          "innerRadius": 50,
+          "outerRadius": 100
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 15066597
+              },
+              "nodeId": "7157291638274035",
+              "treeIndex": "23"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "circle",
+      "primitiveInfo": {
+        "circle": {
+          "center": {
+            "y": 1800
+          },
+          "normal": {
+            "z": 1
+          },
+          "radius": 100
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 10066253
+              },
+              "nodeId": "2691158358651519",
+              "treeIndex": "24"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ellipsoid",
+      "primitiveInfo": {
+        "ellipsoid": {
+          "center": {
+            "x": -600,
+            "y": 1500
+          },
+          "normal": {
+            "z": 1
+          },
+          "verticalRadius": 50,
+          "horizontalRadius": 100
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 5066086
+              },
+              "nodeId": "4150546738748431",
+              "treeIndex": "25"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ellipsoidSegment",
+      "primitiveInfo": {
+        "ellipsoidSegment": {
+          "center": {
+            "y": 1500
+          },
+          "normal": {
+            "z": 1
+          },
+          "verticalRadius": 50.000003814697266,
+          "horizontalRadius": 100,
+          "height": 43.75
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 5066086
+              },
+              "nodeId": "8186808761207534",
+              "treeIndex": "26"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sphere",
+      "primitiveInfo": {
+        "sphere": {
+          "center": {
+            "x": -600,
+            "y": 1200
+          },
+          "radius": 99.99999237060547
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 6710861
+              },
+              "nodeId": "3141803436446226",
+              "treeIndex": "27"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sphericalSegment",
+      "primitiveInfo": {
+        "sphericalSegment": {
+          "center": {
+            "y": 1200
+          },
+          "normal": {
+            "z": 1
+          },
+          "radius": 100,
+          "height": 93.75
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 6710861
+              },
+              "nodeId": "2690484134334975",
+              "treeIndex": "28"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "torus",
+      "primitiveInfo": {
+        "torusSegment": {
+          "center": {
+            "x": -600,
+            "y": 900
+          },
+          "normal": {
+            "z": 1
+          },
+          "radius": 100.00000762939453,
+          "isClosed": true,
+          "arcAngle": 6.2831854820251465,
+          "tubeRadius": 25
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 3394662
+              },
+              "nodeId": "6997572252700040",
+              "treeIndex": "29"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "torusSegment",
+      "primitiveInfo": {
+        "torusSegment": {
+          "center": {
+            "y": 900
+          },
+          "normal": {
+            "z": 1
+          },
+          "radius": 100,
+          "isClosed": true,
+          "angle": 2.070796489715576,
+          "arcAngle": 4.5160393714904785,
+          "tubeRadius": 24.999998092651367
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 3394662
+              },
+              "nodeId": "3147717013143260",
+              "treeIndex": "30"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "eccentricCone",
+      "primitiveInfo": {
+        "eccentricCone": {
+          "centerB": {
+            "x": -570,
+            "y": 600,
+            "z": -100
+          },
+          "centerA": {
+            "x": -630,
+            "y": 600,
+            "z": 100
+          },
+          "radiusB": 100,
+          "radiusA": 50,
+          "normalA": {
+            "z": -1
+          }
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 65280
+              },
+              "nodeId": "6526356297437232",
+              "treeIndex": "31"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "generalCylinder",
+      "primitiveInfo": {
+        "generalCylinder": {
+          "centerB": {
+            "y": 600,
+            "z": -100
+          },
+          "centerA": {
+            "y": 600,
+            "z": 100
+          },
+          "radiusB": 100,
+          "radiusA": 100,
+          "slopeB": 0.46364763379096985,
+          "slopeA": 0.46364763379096985,
+          "zAngleB": 3.1415927410125732,
+          "zAngleA": 6.2831854820251465,
+          "arcAngle": 6.2831854820251465
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 15014426
+              },
+              "nodeId": "7880077115026400",
+              "treeIndex": "32"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "cylinder",
+      "primitiveInfo": {
+        "cylinder": {
+          "radius": 100,
+          "centerB": {
+            "x": -600,
+            "y": 300,
+            "z": -100
+          },
+          "centerA": {
+            "x": -600,
+            "y": 300,
+            "z": 100
+          },
+          "isClosed": true
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 16776960
+              },
+              "nodeId": "8525480825635383",
+              "treeIndex": "33"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "cone",
+      "primitiveInfo": {
+        "cone": {
+          "centerB": {
+            "y": 300,
+            "z": -100
+          },
+          "centerA": {
+            "y": 300,
+            "z": 100
+          },
+          "radiusB": 100,
+          "radiusA": 50,
+          "isClosed": true
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 255
+              },
+              "nodeId": "6578815370668864",
+              "treeIndex": "34"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "generalCylinder",
+      "primitiveInfo": {
+        "generalCylinder": {
+          "centerB": {
+            "x": -600,
+            "z": -100
+          },
+          "centerA": {
+            "x": -600,
+            "z": 100
+          },
+          "radiusB": 100,
+          "radiusA": 50,
+          "zAngleB": 6.2831854820251465,
+          "zAngleA": 6.2831854820251465,
+          "arcAngle": 6.2831854820251465,
+          "thickness": 19.999998092651367
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 8401741
+              },
+              "nodeId": "848677030769583",
+              "treeIndex": "35"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "generalCylinder",
+      "primitiveInfo": {
+        "generalCylinder": {
+          "centerB": {
+            "z": -100
+          },
+          "centerA": {
+            "z": 100
+          },
+          "radiusB": 100,
+          "radiusA": 50,
+          "zAngleB": 6.2831854820251465,
+          "zAngleA": 6.2831854820251465,
+          "angle": 2.070796489715576,
+          "arcAngle": 4.5160393714904785,
+          "thickness": 20,
+          "isClosed": true
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 5072461
+              },
+              "nodeId": "3465546571964085",
+              "treeIndex": "36"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "generalCylinder",
+      "primitiveInfo": {
+        "generalCylinder": {
+          "centerB": {
+            "x": -600,
+            "y": -300,
+            "z": -100
+          },
+          "centerA": {
+            "x": -600,
+            "y": -300,
+            "z": 100
+          },
+          "radiusB": 100,
+          "radiusA": 100,
+          "slopeB": 0.25,
+          "slopeA": 0.3499999940395355,
+          "zAngleB": 5.7831854820251465,
+          "zAngleA": 4.7831854820251465,
+          "arcAngle": 6.2831854820251465,
+          "thickness": 19.999998092651367
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 15014426
+              },
+              "nodeId": "8932063710052863",
+              "treeIndex": "37"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "generalCylinder",
+      "primitiveInfo": {
+        "generalCylinder": {
+          "centerB": {
+            "y": -300,
+            "z": -100
+          },
+          "centerA": {
+            "y": -300,
+            "z": 100
+          },
+          "radiusB": 100,
+          "radiusA": 100,
+          "slopeB": 0.25,
+          "slopeA": 0.3499999940395355,
+          "zAngleB": 5.7831854820251465,
+          "zAngleA": 4.7831854820251465,
+          "angle": 2.070796489715576,
+          "arcAngle": 4.5160393714904785,
+          "thickness": 20,
+          "isClosed": true
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 15014426
+              },
+              "nodeId": "3982242177445105",
+              "treeIndex": "38"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "extrudedRing",
+      "primitiveInfo": {
+        "extrudedRing": {
+          "centerB": {
+            "x": -600,
+            "y": -600,
+            "z": -100
+          },
+          "centerA": {
+            "x": -600,
+            "y": -600,
+            "z": 100
+          },
+          "innerRadius": 80,
+          "outerRadius": 100
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 8453965
+              },
+              "nodeId": "3460679891755732",
+              "treeIndex": "39"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "extrudedRingSegment",
+      "primitiveInfo": {
+        "extrudedRingSegment": {
+          "centerB": {
+            "y": -600,
+            "z": -100
+          },
+          "centerA": {
+            "y": -600,
+            "z": 100
+          },
+          "innerRadius": 80,
+          "outerRadius": 100,
+          "isClosed": true,
+          "angle": 2.070796489715576,
+          "arcAngle": 4.5160393714904785
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 8453965
+              },
+              "nodeId": "7419787634793590",
+              "treeIndex": "40"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "nut",
+      "primitiveInfo": {
+        "nut": {
+          "radius": 100,
+          "centerB": {
+            "x": -600,
+            "y": -900,
+            "z": -100
+          },
+          "centerA": {
+            "x": -600,
+            "y": -900,
+            "z": 100
+          },
+          "rotationAngle": 0.5235989689826965
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 65535
+              },
+              "nodeId": "5315636859543832",
+              "treeIndex": "41"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "box",
+      "primitiveInfo": {
+        "box": {
+          "delta": {
+            "x": 200,
+            "y": 200,
+            "z": 200
+          },
+          "center": {
+            "y": -900
+          },
+          "normal": {
+            "z": 1
+          }
+        }
+      },
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 16711935
+              },
+              "nodeId": "7323216077184074",
+              "treeIndex": "42"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "triangleMesh",
+      "file": [
+        {
+          "type": "ctm",
+          "fileId": "6"
+        }
+      ],
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 8395417
+              },
+              "nodeId": "4655185550308983",
+              "treeIndex": "1"
+            }
+          ],
+          "triangleCount": "2914"
+        }
+      ]
+    },
+    {
+      "type": "triangleMesh",
+      "file": [
+        {
+          "type": "ctm",
+          "fileId": "7"
+        }
+      ],
+      "nodes": [
+        {
+          "properties": [
+            {
+              "color": {
+                "rgb": 8395417
+              },
+              "nodeId": "5296358832625303",
+              "treeIndex": "22",
+              "transformMatrix": [
+                -44.84012985229492,
+                7.101961135864258,
+                -89.10065460205078,
+                -73.28958892822266,
+                -59.98413848876953,
+                32.10200500488281,
+                -51.1663818359375,
+                79.69608306884766,
+                32.101959228515625,
+                -600,
+                -1200,
+                0
+              ]
+            },
+            {
+              "color": {
+                "rgb": 8395417
+              },
+              "nodeId": "8825358722174586",
+              "treeIndex": "43",
+              "transformMatrix": [
+                -0.00001855141090345569,
+                99.99999237060547,
+                0.0000034764796055242186,
+                -100,
+                -0.000018551412722445093,
+                -0.000006848021257610526,
+                -0.000004875314061791869,
+                -0.000003476480287645245,
+                100,
+                -300,
+                -1200,
+                -3.887663524437812e-7
+              ]
+            }
+          ],
+          "triangleCount": "742"
+        }
+      ],
+      "isInstanced": true
+    }
+  ],
+  "boundingBox": {
+    "min": {
+      "x": -1049.1103515625,
+      "y": -1417.06298828125,
+      "z": -153.30462646484375
+    },
+    "max": {
+      "x": 124.62141418457031,
+      "y": 1900,
+      "z": 505.2911071777344
+    }
+  }
+}
