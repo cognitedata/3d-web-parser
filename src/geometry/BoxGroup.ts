@@ -36,12 +36,12 @@ export default class BoxGroup extends PlaneGroup {
     angle: number,
     delta: THREE.Vector3,
   ) {
-    this.nodeId[this.count] = nodeId;
-    this.treeIndex[this.count] = treeIndex;
+    this.setNodeId(nodeId, this.count);
+    this.setTreeIndex(treeIndex, this.count);
     this.setColor(color, this.count);
     this.setVector(center, this.center, this.count);
     this.setVector(normal, this.normal, this.count);
-    this.angle[this.count] = angle;
+    this.setAngle(angle, this.count);
     this.setVector(delta, this.delta, this.count);
     this.count += 1;
   }
