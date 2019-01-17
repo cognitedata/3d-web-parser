@@ -5,15 +5,16 @@ describe('CircleGroup', () => {
   test('constructor', () => {
     const group = new CircleGroup(2);
     expect(group.radius.length).toBe(2);
+    expect(CircleGroup.type).toBe('Circle');
   });
 
   test('(set/get)Radius', () => {
     const group = new CircleGroup(2);
 
-    const radius1 = 1.0;
+    const radius = 1.0;
 
-    group.setRadius(radius1, 0);
-    expect(group.getRadius(0)).toBeCloseTo(radius1);
+    group.setRadius(radius, 0);
+    expect(group.getRadius(0)).toBeCloseTo(radius);
   });
 
   test('add', () => {

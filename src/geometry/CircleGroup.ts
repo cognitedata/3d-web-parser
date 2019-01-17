@@ -25,12 +25,12 @@ export default class CircleGroup extends PlaneGroup {
     normal: THREE.Vector3,
     radius: number,
   ) {
-    this.nodeId[this.count] = nodeId;
-    this.treeIndex[this.count] = treeIndex;
+    this.setNodeId(nodeId, this.count);
+    this.setTreeIndex(treeIndex, this.count);
     this.setColor(color, this.count);
     this.setVector(center, this.center, this.count);
     this.setVector(normal, this.normal, this.count);
-    this.radius[this.count] = radius;
+    this.setRadius(radius, this.count);
     this.count += 1;
   }
 }
