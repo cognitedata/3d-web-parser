@@ -11,7 +11,6 @@ describe('PlaneGroup', () => {
   test('(set/get)Center', () => {
     const group = new PlaneGroup(2);
 
-    // Test with THREE.Vector3
     const center1 = new THREE.Vector3(1, 2, 3);
     group.setCenter(center1, 0);
 
@@ -23,12 +22,11 @@ describe('PlaneGroup', () => {
   test('(set/get)Normal', () => {
     const group = new PlaneGroup(2);
 
-    // Test with THREE.Vector3
-    const normal1 = new THREE.Vector3(1, 2, 3);
-    group.setNormal(normal1, 0);
+    const normal = new THREE.Vector3(1, 2, 3);
+    group.setNormal(normal, 0);
 
     const target = new THREE.Vector3();
     group.getNormal(target, 0);
-    expect(target).toEqual(normal1);
+    expect(target).toEqual(normal);
   });
 });
