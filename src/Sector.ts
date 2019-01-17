@@ -30,7 +30,7 @@ export default class Sector {
   *traverseChilds(): IterableIterator<Sector> {
     yield this;
     for (const child of this.children) {
-      yield *child.traverseChilds();
+      yield* child.traverseChilds();
     }
   }
 }

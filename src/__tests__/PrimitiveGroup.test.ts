@@ -14,12 +14,12 @@ describe('PrimitiveGroup', () => {
 
   test('setVector', () => {
     const group = new NonAbstractPrimitiveGroup(0);
-    
+
     const array = new Float32Array(6);
     {
       // Test with THREE.Vector3
-      const vector1 = new THREE.Vector3(1,2,3);
-      const vector2 = new THREE.Vector3(10,20,30);
+      const vector1 = new THREE.Vector3(1, 2, 3);
+      const vector2 = new THREE.Vector3(10, 20, 30);
       group.setVector(vector1, array, 0);
       group.setVector(vector2, array, 1);
       expect(array[0]).toBeCloseTo(vector1.x);
@@ -32,9 +32,9 @@ describe('PrimitiveGroup', () => {
 
     {
       // Test with THREE.Vector2
-      const vector1 = new THREE.Vector2(5,6);
-      const vector2 = new THREE.Vector2(11,21);
-      const vector3 = new THREE.Vector2(51,61);
+      const vector1 = new THREE.Vector2(5, 6);
+      const vector2 = new THREE.Vector2(11, 21);
+      const vector3 = new THREE.Vector2(51, 61);
       group.setVector(vector1, array, 0);
       group.setVector(vector2, array, 1);
       group.setVector(vector3, array, 2);
@@ -49,12 +49,12 @@ describe('PrimitiveGroup', () => {
 
   test('getVector', () => {
     const group = new NonAbstractPrimitiveGroup(0);
-    
+
     const array = new Float32Array(6);
     {
       // Test with THREE.Vector3
-      const vector1 = new THREE.Vector3(1,2,3);
-      const vector2 = new THREE.Vector3(10,20,30);
+      const vector1 = new THREE.Vector3(1, 2, 3);
+      const vector2 = new THREE.Vector3(10, 20, 30);
       group.setVector(vector1, array, 0);
       group.setVector(vector2, array, 1);
       const target = new THREE.Vector3();
@@ -66,9 +66,9 @@ describe('PrimitiveGroup', () => {
 
     {
       // Test with THREE.Vector2
-      const vector1 = new THREE.Vector2(1,2);
-      const vector2 = new THREE.Vector2(10,20);
-      const vector3 = new THREE.Vector2(100,200);
+      const vector1 = new THREE.Vector2(1, 2);
+      const vector2 = new THREE.Vector2(10, 20);
+      const vector3 = new THREE.Vector2(100, 200);
       group.setVector(vector1, array, 0);
       group.setVector(vector2, array, 1);
       group.setVector(vector3, array, 2);
@@ -126,7 +126,7 @@ describe('PrimitiveGroup', () => {
     color1.setRGB(0.1, 0.2, 0.3);
     const color2 = new THREE.Color();
     color2.setRGB(0.4, 0.5, 0.6);
-    
+
     group.setColor(color1, 0);
     expect(group.color[0]).toBeCloseTo(color1.r);
     expect(group.color[1]).toBeCloseTo(color1.g);
@@ -147,15 +147,15 @@ describe('PrimitiveGroup', () => {
     color1.setRGB(0.1, 0.2, 0.3);
     const color2 = new THREE.Color();
     color2.setRGB(0.4, 0.5, 0.6);
-    
+
     group.setColor(color1, 0);
     const target = new THREE.Color();
     group.getColor(target, 0);
-    
+
     expect(target.r).toBeCloseTo(color1.r);
     expect(target.g).toBeCloseTo(color1.g);
     expect(target.b).toBeCloseTo(color1.b);
-    
+
     group.setColor(color2, 1);
     group.getColor(target, 0);
     expect(target.r).toBeCloseTo(color1.r);

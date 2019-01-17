@@ -1,4 +1,4 @@
-import PrimitiveGroup from "./PrimitiveGroup";
+import PrimitiveGroup from './PrimitiveGroup';
 
 export default class PlaneGroup extends PrimitiveGroup {
   center: Float32Array;
@@ -12,7 +12,7 @@ export default class PlaneGroup extends PrimitiveGroup {
   setCenter(source: THREE.Vector3, index: number) {
     this.setVector(source, this.center, index);
   }
-  
+
   getCenter(target: THREE.Vector3, index: number) {
     return this.getVector(this.center, target, index);
   }

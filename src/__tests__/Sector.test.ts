@@ -48,17 +48,35 @@ describe('Sectors', () => {
     const child = new Sector(childMin, childMax);
 
     parent.addChild(child);
-    expect(parent.max.clone().sub(parent.min).length())
-      .toBeGreaterThanOrEqual(child.max.clone().sub(child.min).length());
+    expect(
+      parent.max
+        .clone()
+        .sub(parent.min)
+        .length(),
+    ).toBeGreaterThanOrEqual(
+      child.max
+        .clone()
+        .sub(child.min)
+        .length(),
+    );
   });
 
   test('traverse childs', async () => {
     const rootSector = new Sector(new THREE.Vector3(), new THREE.Vector3());
-    const rootFirstSector = new Sector(new THREE.Vector3(), new THREE.Vector3());
+    const rootFirstSector = new Sector(
+      new THREE.Vector3(),
+      new THREE.Vector3(),
+    );
     rootSector.addChild(rootFirstSector);
-    const rootSecondSector = new Sector(new THREE.Vector3(), new THREE.Vector3());
+    const rootSecondSector = new Sector(
+      new THREE.Vector3(),
+      new THREE.Vector3(),
+    );
     rootSector.addChild(rootSecondSector);
-    const rootSecondFirstSector = new Sector(new THREE.Vector3(), new THREE.Vector3());
+    const rootSecondFirstSector = new Sector(
+      new THREE.Vector3(),
+      new THREE.Vector3(),
+    );
     rootSecondSector.addChild(rootSecondFirstSector);
     const expected = [
       rootSector,

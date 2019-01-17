@@ -1,5 +1,3 @@
 export default class GeometryGroup {
-    constructor() {
-
-    }
+  constructor() {}
 }
