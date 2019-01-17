@@ -127,4 +127,12 @@ export default class GeneralCylinderGroup extends CylinderGroup {
 
     this.count += 1;
   }
+
+  computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
+    return outputMatrix;
+  }
+
+  computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
+    return box;
+  }
 }
