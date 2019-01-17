@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import CircleGroup from '../geometry/CircleGroup';
 
-describe('PlaneGroup', () => {
+describe('CircleGroup', () => {
   test('constructor', () => {
     const group = new CircleGroup(2);
     expect(group.radius.length).toBe(2);
@@ -11,14 +11,9 @@ describe('PlaneGroup', () => {
     const group = new CircleGroup(2);
 
     const radius1 = 1.0;
-    const radius2 = 10.0;
 
     group.setRadius(radius1, 0);
     expect(group.getRadius(0)).toBeCloseTo(radius1);
-
-    group.setRadius(radius2, 1);
-    expect(group.getRadius(0)).toBeCloseTo(radius1);
-    expect(group.getRadius(1)).toBeCloseTo(radius2);
   });
 
   test('add', () => {
