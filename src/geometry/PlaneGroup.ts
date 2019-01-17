@@ -2,7 +2,7 @@
 
 import PrimitiveGroup from './PrimitiveGroup';
 
-export default class PlaneGroup extends PrimitiveGroup {
+export default abstract class PlaneGroup extends PrimitiveGroup {
   public center: Float32Array;
   public normal: Float32Array;
   constructor(capacity: number) {

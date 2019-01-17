@@ -3,7 +3,15 @@
 import * as THREE from 'three';
 import BaseCylinderGroup from '../geometry/BaseCylinderGroup';
 import { expectVector3Equal } from '../TestUtils';
-class NonAbstractBaseCylinderGroup extends BaseCylinderGroup {}
+class NonAbstractBaseCylinderGroup extends BaseCylinderGroup {
+  computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
+    return outputMatrix;
+  }
+
+  computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
+    return box;
+  }
+}
 
 describe('CylinderGroup', () => {
   test('constructor', () => {

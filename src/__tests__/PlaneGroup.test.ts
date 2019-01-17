@@ -2,16 +2,24 @@
 
 import * as THREE from 'three';
 import PlaneGroup from '../geometry/PlaneGroup';
+class NonAbstractPlaneGroup extends PlaneGroup {
+  computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
+    return outputMatrix;
+  }
 
+  computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
+    return box;
+  }
+}
 describe('PlaneGroup', () => {
   test('constructor', () => {
-    const group = new PlaneGroup(2);
+    const group = new NonAbstractPlaneGroup(2);
     expect(group.center.length).toBe(6);
     expect(group.normal.length).toBe(6);
   });
 
   test('(set/get)Center', () => {
-    const group = new PlaneGroup(2);
+    const group = new NonAbstractPlaneGroup(2);
 
     const center = new THREE.Vector3(1, 2, 3);
     group.setCenter(center, 0);
@@ -22,7 +30,7 @@ describe('PlaneGroup', () => {
   });
 
   test('(set/get)Normal', () => {
-    const group = new PlaneGroup(2);
+    const group = new NonAbstractPlaneGroup(2);
 
     const normal = new THREE.Vector3(1, 2, 3);
     group.setNormal(normal, 0);
