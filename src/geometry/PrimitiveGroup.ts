@@ -30,8 +30,8 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     this.hasCustomTransformAttributes = false;
   }
 
-  setVector<T extends TypedArray>(
-    source: THREE.Vector2 | THREE.Vector3,
+  setVector<T extends TypedArray, U extends THREEVector>(
+    source: U,
     target: T,
     index: number,
   ) {
@@ -48,11 +48,11 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     }
   }
 
-  getVector<T extends TypedArray>(
+  getVector<T extends TypedArray, U extends THREEVector>(
     array: T,
-    target: THREE.Vector2 | THREE.Vector3,
+    target: U,
     index: number,
-  ): THREE.Vector2 | THREE.Vector3 {
+  ): U {
     // @ts-ignore
     if (target.isVector2) {
       // @ts-ignore
