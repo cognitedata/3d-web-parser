@@ -5,6 +5,19 @@ import Sector from './Sector';
 import { Vector3 } from 'three';
 import { getParentPath } from './PathExtractor';
 
+interface ProtobufGeometry {
+  type: string;
+}
+
+function geometryCounter(geometryArray: ProtobufGeometry[], type: string): number {
+  return geometryArray.reduce((total, geometry) => { return geometry.type === type ? total + 1 : total; }, 0);
+}
+
+export function parseCircles(geometryArray: ProtobufGeometry[]) {
+  const count = geometryCounter(geometryArray, 'circle');
+  // count
+}
+
 export default async function(protobufData: Uint8Array) {
   const protobufDecoder = new ProtobufDecoder();
 
