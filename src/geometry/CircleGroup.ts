@@ -35,4 +35,7 @@ export default class CircleGroup extends PlaneGroup {
     this.setRadius(radius, this.count);
     this.count += 1;
   }
+
+  computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {}
+  computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {}
 }
