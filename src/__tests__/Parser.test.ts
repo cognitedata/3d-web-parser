@@ -15,5 +15,7 @@ describe('Parser', () => {
     // validate bounding box
     const { boundingBox } = TestScene;
     expectBoundingBoxEqual(rootSector, boundingBox);
+    expect(rootSector.parent).toBe(undefined);
+    expect(rootSector.children.length).toBe(0);
   });
 });

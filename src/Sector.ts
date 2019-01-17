@@ -9,13 +9,13 @@ export default class Sector {
   public depth: number;
   public children: Sector[];
   public parent: undefined | Sector;
-  public geometries: GeometryGroup;
+  public geometries: GeometryGroup[];
   public readonly object3d: THREE.Object3D;
 
   constructor(min: THREE.Vector3, max: THREE.Vector3) {
     this.min = min;
     this.max = max;
-    this.geometries = {};
+    this.geometries = [];
     this.depth = 0;
     this.object3d = new THREE.Object3D();
     this.object3d.frustumCulled = false;

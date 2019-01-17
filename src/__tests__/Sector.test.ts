@@ -16,6 +16,8 @@ describe('Sectors', () => {
 
     expect(sector.depth).toBe(0);
     expect(sector.object3d.frustumCulled).toBe(false);
+
+    expect(sector.geometries.length).toBe(0);
   });
 
   test('add child', () => {
