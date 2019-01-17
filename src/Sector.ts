@@ -1,14 +1,17 @@
+// Polyfill Symbol.asyncIterator
+(Symbol as any).asyncIterator = Symbol.asyncIterator || Symbol('Symbol.asyncIterator');
+
 import * as THREE from 'three';
 import GeometryGroup from './geometry/GeometryGroup';
 
 export default class Sector {
   public readonly min: THREE.Vector3;
   public readonly max: THREE.Vector3;
-  public geometries: GeometryGroup;
   public depth: number;
-  public readonly object3d: THREE.Object3D;
+  public children: Sector[];
   public parent: undefined | Sector;
-  public children: Array<Sector>;
+  public geometries: GeometryGroup;
+  public readonly object3d: THREE.Object3D;
 
   constructor(min: THREE.Vector3, max: THREE.Vector3) {
     this.min = min;
@@ -23,28 +26,14 @@ export default class Sector {
   addChild(child: Sector) {
     child.parent = this;
     this.children.push(child);
+    child.depth = this.depth + 1;
+    this.object3d.add(child.object3d);
   }
-}
 
-export function traverseSectors(sector, callback) {
-  const stop = callback(sector);
-  if (!stop) {
-    const { children } = sector;
-    if (children != null) {
-      for (let i = 0; i < children.length; i++)
-        traverseSectors(children[i], callback);
+  *traverseChilds(): IterableIterator<Sector> {
+    yield this;
+    for (const child of this.children) {
+      yield *child.traverseChilds();
     }
   }
-}
-
-export function traverseGeometries(sector, callback) {
-  traverseSectors(sector, curSector => {
-    const { geometries } = curSector;
-    if (geometries) {
-      Object.values(geometries).forEach(items => {
-        items.forEach(callback);
-      });
-    }
-    return false;
-  });
 }

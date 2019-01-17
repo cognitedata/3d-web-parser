@@ -9,12 +9,14 @@
   ],
   "author": "Anders Hafreager (anders.hafreager@cognite.com)",
   "license": "Apache-2.0",
-  "types": "dist/index.d.ts",
   "files": [
-    "dist/main.js",
-    "dist/main.js.map",
+    "dist/index.js",
+    "dist/index.es.js",
     "dist/index.d.ts"
   ],
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "types": "dist/index.d.ts",
   "keywords": [
     "cognite",
     "THREE",
@@ -23,19 +25,26 @@
     "typescript"
   ],
   "scripts": {
+    "clean": "rm -rf dist",
     "prepublishOnly": "yarn build",
     "test": "jest --config=jest.config.js",
     "lint": "tslint -c tslint.json -p tsconfig.json",
-    "build": "webpack -p --color --progress --config webpack.prod.js",
-    "start": "webpack-dev-server --color --progress --config webpack.dev.js"
+    "lint:fix": "prettier \"src/**/*.ts\" --write && tslint -c tslint.json -p tsconfig.json --fix",
+    "build": "yarn clean && rollup -c && yarn esCheck",
+    "watch": "rollup -cw",
+    "prepush": "yarn lint && yarn test",
+    "esCheck": "es-check es5 './dist/index.js'"
   },
   "devDependencies": {
     "@types/jest": "^23.3.12",
     "@types/node": "^10.12.12",
     "@types/three": "^0.93.9",
     "clean-webpack-plugin": "^1.0.0",
+    "es-check": "^5.0.0",
     "jest": "^23.6.0",
     "prettier": "^1.15.2",
+    "rollup": "^1.1.0",
+    "rollup-plugin-typescript2": "^0.19.0",
     "three": "^0.98.0",
     "ts-jest": "^23.10.5",
     "ts-loader": "^5.3.0",

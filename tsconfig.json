@@ -12,8 +12,9 @@
     "noImplicitAny": true,
     "strictNullChecks": true,
     "sourceMap": true,
+    "downlevelIteration": true,
     "moduleResolution": "node",
-    "lib": ["es5", "dom", "es2015.core"]
+    "lib": ["dom", "es2018", "esnext.asynciterable", "esnext"]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
