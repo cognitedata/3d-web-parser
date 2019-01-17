@@ -9,6 +9,14 @@ export default class CircleGroup extends PlaneGroup {
     this.radius = new Float32Array(capacity);
   }
 
+  setRadius(radius: number, index: number) {
+    this.radius[index] = radius;
+  }
+
+  getRadius(index: number): number {
+    return this.radius[index];
+  }
+
   add(
     nodeId: number,
     treeIndex: number,
@@ -19,18 +27,10 @@ export default class CircleGroup extends PlaneGroup {
   ) {
     this.nodeId[this.count] = nodeId;
     this.treeIndex[this.count] = treeIndex;
-    this.radius[this.count] = radius;
+    this.setColor(color, this.count);
     this.setVector(center, this.center, this.count);
     this.setVector(normal, this.normal, this.count);
-    this.setColor(color, this.count);
+    this.radius[this.count] = radius;
     this.count += 1;
-  }
-
-  setRadius(radius: number, index: number) {
-    this.radius[index] = radius;
-  }
-
-  getRadius(index: number): number {
-    return this.radius[index];
   }
 }
