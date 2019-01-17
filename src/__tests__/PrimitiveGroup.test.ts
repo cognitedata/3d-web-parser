@@ -4,17 +4,12 @@ class NonAbstractPrimitiveGroup extends PrimitiveGroup {}
 
 describe('PrimitiveGroup', () => {
   test('constructor', () => {
-    class NonAbstractPrimitiveGroup extends PrimitiveGroup {}
-
-    const group = new NonAbstractPrimitiveGroup(1);
+    const group = new NonAbstractPrimitiveGroup(2);
     expect(group.count).toBe(0);
-    expect(group.capacity).toBe(1);
-  });
-
-  test('constructor', () => {
-    const group = new NonAbstractPrimitiveGroup(1);
-    expect(group.count).toBe(0);
-    expect(group.capacity).toBe(1);
+    expect(group.capacity).toBe(2);
+    expect(group.nodeId.length).toBe(2);
+    expect(group.treeIndex.length).toBe(2);
+    expect(group.color.length).toBe(6);
   });
 
   test('setVector', () => {
@@ -156,8 +151,12 @@ describe('PrimitiveGroup', () => {
     group.setColor(color1, 0);
     const target = new THREE.Color();
     group.getColor(target, 0);
-    expect(target).toEqual(color1);
+    expect(target.r).toBeCloseTo(color1.r);
+    expect(target.g).toBeCloseTo(color1.g);
+    expect(target.b).toBeCloseTo(color1.b);
     group.getColor(target, 1);
-    expect(target).toEqual(color2);
+    expect(target.r).toBeCloseTo(color2.r);
+    expect(target.g).toBeCloseTo(color2.g);
+    expect(target.b).toBeCloseTo(color2.b);
   });
 });
