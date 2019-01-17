@@ -111,8 +111,8 @@ export default class GeneralCylinderGroup extends CylinderGroup {
     this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
     this.setColor(color, this.count);
-    this.setVector(centerA, this.centerA, this.count);
-    this.setVector(centerB, this.centerB, this.count);
+    this.setCenterA(centerA, this.count);
+    this.setCenterB(centerB, this.count);
     this.setRadius(radius, this.count);
     this.setHeightA(heightA, this.count);
     this.setHeightB(heightB, this.count);

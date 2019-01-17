@@ -84,8 +84,8 @@ export default class GeneralRingGroup extends PlaneGroup {
     this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
     this.setColor(color, this.count);
-    this.setVector(center, this.center, this.count);
-    this.setVector(normal, this.normal, this.count);
+    this.setCenter(center, this.count);
+    this.setNormal(normal, this.count);
     this.setXRadius(xRadius, this.count);
     this.setYRadius(yRadius, this.count);
     this.setLocalXAxis(localXAxis, this.count);

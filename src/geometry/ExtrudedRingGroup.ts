@@ -72,8 +72,8 @@ export default class ExtrudedRingGroup extends BaseCylinderGroup {
     this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
     this.setColor(color, this.count);
-    this.setVector(centerA, this.centerA, this.count);
-    this.setVector(centerB, this.centerB, this.count);
+    this.setCenterA(centerA, this.count);
+    this.setCenterB(centerB, this.count);
     this.setInnerRadius(innerRadius, this.count);
     this.setOuterRadius(outerRadius, this.count);
     this.setIsClosed(isClosed, this.count);

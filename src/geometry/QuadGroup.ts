@@ -47,9 +47,10 @@ export default class QuadGroup extends PrimitiveGroup {
     this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
     this.setColor(color, this.count);
-    this.setVector(vertex1, this.vertex1, this.count);
-    this.setVector(vertex2, this.vertex2, this.count);
-    this.setVector(vertex3, this.vertex3, this.count);
+    this.setVertex1(vertex1, this.count);
+    this.setVertex2(vertex2, this.count);
+    this.setVertex3(vertex3, this.count);
+
     this.count += 1;
   }
 
