@@ -151,6 +151,13 @@ describe('PrimitiveGroup', () => {
     group.setColor(color1, 0);
     const target = new THREE.Color();
     group.getColor(target, 0);
+    
+    expect(target.r).toBeCloseTo(color1.r);
+    expect(target.g).toBeCloseTo(color1.g);
+    expect(target.b).toBeCloseTo(color1.b);
+    
+    group.setColor(color2, 1);
+    group.getColor(target, 0);
     expect(target.r).toBeCloseTo(color1.r);
     expect(target.g).toBeCloseTo(color1.g);
     expect(target.b).toBeCloseTo(color1.b);
