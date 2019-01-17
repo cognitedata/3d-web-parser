@@ -27,12 +27,16 @@ describe('Sectors', () => {
 
     parent.addChild(child1);
     expect(child1.parent).toBe(parent);
+    expect(child1.depth).toBe(parent.depth+1);
     expect(parent.children.length).toBe(1);
+    expect(parent.object3d.children[0]).toBe(child1.object3d);
 
     const child2 = new Sector(min, max);
     parent.addChild(child2);
     expect(child2.parent).toBe(parent);
+    expect(child2.depth).toBe(parent.depth+1);
     expect(parent.children.length).toBe(2);
+    expect(parent.object3d.children[1]).toBe(child2.object3d);
 
   });
 
