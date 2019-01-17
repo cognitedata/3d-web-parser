@@ -9,8 +9,8 @@ export default class CircleGroup extends PlaneGroup {
     this.radius = new Float32Array(capacity);
   }
 
-  setRadius(radius: number, index: number) {
-    this.radius[index] = radius;
+  setRadius(value: number, index: number) {
+    this.radius[index] = value;
   }
 
   getRadius(index: number): number {

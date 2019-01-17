@@ -11,16 +11,16 @@ export default class BoxGroup extends PlaneGroup {
     this.delta = new Float32Array(3 * capacity);
   }
 
-  setAngle(angle: number, index: number) {
-    this.angle[index] = angle;
+  setAngle(value: number, index: number) {
+    this.angle[index] = value;
   }
 
   getAngle(index: number): number {
     return this.angle[index];
   }
 
-  setDelta(delta: THREE.Vector3, index: number) {
-    this.setVector(delta, this.delta, index);
+  setDelta(value: THREE.Vector3, index: number) {
+    this.setVector(value, this.delta, index);
   }
 
   getDelta(target: THREE.Vector3, index: number): THREE.Vector3 {

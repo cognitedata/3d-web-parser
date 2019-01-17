@@ -12,16 +12,16 @@ export default class EllipsoidGroup extends PlaneGroup {
     this.vRadius = new Float32Array(capacity);
   }
 
-  setHRadius(hRadius: number, index: number) {
-    this.hRadius[index] = hRadius;
+  setHRadius(value: number, index: number) {
+    this.hRadius[index] = value;
   }
 
   getHRadius(index: number): number {
     return this.hRadius[index];
   }
 
-  setVRadius(vRadius: number, index: number) {
-    this.vRadius[index] = vRadius;
+  setVRadius(value: number, index: number) {
+    this.vRadius[index] = value;
   }
 
   getVRadius(index: number): number {

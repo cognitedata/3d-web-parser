@@ -89,12 +89,12 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     return target;
   }
 
-  setNodeId(nodeId: number, index: number) {
-    this.nodeId[index] = nodeId;
+  setNodeId(value: number, index: number) {
+    this.nodeId[index] = value;
   }
 
-  setTreeIndex(treeIndex: number, index: number) {
-    this.treeIndex[index] = treeIndex;
+  setTreeIndex(value: number, index: number) {
+    this.treeIndex[index] = value;
   }
 
   getNodeId(index: number): number {
