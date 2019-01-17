@@ -27,7 +27,7 @@ describe('BoxGroup', () => {
     const group = new BoxGroup(1);
 
     const delta = new THREE.Vector3(1, 2, 3);
-    const target = new THREE.Vector3(1, 2, 3);
+    const target = new THREE.Vector3();
 
     group.setDelta(delta, 0);
     expect(group.getDelta(target, 0)).toEqual(delta);
@@ -40,7 +40,7 @@ describe('BoxGroup', () => {
     const treeIndex = 1;
     const color = new THREE.Color(0.5, 0.5, 0.5);
     const center = new THREE.Vector3(1, 2, 3);
-    const normal = new THREE.Vector3(1, 2, 3);
+    const normal = new THREE.Vector3(4, 5, 6);
     const angle = 10.0;
     const delta = new THREE.Vector3(10, 10, 10);
 
