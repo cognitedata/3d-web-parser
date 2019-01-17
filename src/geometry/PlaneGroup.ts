@@ -1,8 +1,8 @@
 import PrimitiveGroup from './PrimitiveGroup';
 
 export default class PlaneGroup extends PrimitiveGroup {
-  center: Float32Array;
-  normal: Float32Array;
+  public center: Float32Array;
+  public normal: Float32Array;
   constructor(capacity: number) {
     super(capacity);
     this.center = new Float32Array(3 * capacity);

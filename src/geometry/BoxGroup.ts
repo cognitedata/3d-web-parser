@@ -3,24 +3,24 @@ import PlaneGroup from './PlaneGroup';
 
 export default class BoxGroup extends PlaneGroup {
   static type = 'Box';
-  angle: Float32Array;
-  delta: Float32Array;
+  public angle: Float32Array;
+  public delta: Float32Array;
   constructor(capacity: number) {
     super(capacity);
     this.angle = new Float32Array(capacity);
     this.delta = new Float32Array(3 * capacity);
   }
 
-  setAngle(angle: number, index: number) {
-    this.angle[index] = angle;
+  setAngle(value: number, index: number) {
+    this.angle[index] = value;
   }
 
   getAngle(index: number): number {
     return this.angle[index];
   }
 
-  setDelta(delta: THREE.Vector3, index: number) {
-    this.setVector(delta, this.delta, index);
+  setDelta(value: THREE.Vector3, index: number) {
+    this.setVector(value, this.delta, index);
   }
 
   getDelta(target: THREE.Vector3, index: number): THREE.Vector3 {
@@ -39,10 +39,10 @@ export default class BoxGroup extends PlaneGroup {
     this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
     this.setColor(color, this.count);
-    this.setVector(center, this.center, this.count);
-    this.setVector(normal, this.normal, this.count);
+    this.setCenter(center, this.count);
+    this.setNormal(normal, this.count);
     this.setAngle(angle, this.count);
-    this.setVector(delta, this.delta, this.count);
+    this.setDelta(delta, this.count);
     this.count += 1;
   }
 }

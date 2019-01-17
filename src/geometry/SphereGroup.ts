@@ -1,12 +1,21 @@
-import * as THREE from 'three';
-import PlaneGroup from './PlaneGroup';
+import PrimitiveGroup from './PrimitiveGroup';
 
-export default class CircleGroup extends PlaneGroup {
-  static type = 'Circle';
+export default class SphereGroup extends PrimitiveGroup {
+  static type = 'Sphere';
+  public center: Float32Array;
   public radius: Float32Array;
   constructor(capacity: number) {
     super(capacity);
+    this.center = new Float32Array(3 * capacity);
     this.radius = new Float32Array(capacity);
+  }
+
+  setCenter(source: THREE.Vector3, index: number) {
+    this.setVector(source, this.center, index);
+  }
+
+  getCenter(target: THREE.Vector3, index: number) {
+    return this.getVector(this.center, target, index);
   }
 
   setRadius(value: number, index: number) {
@@ -22,15 +31,14 @@ export default class CircleGroup extends PlaneGroup {
     treeIndex: number,
     color: THREE.Color,
     center: THREE.Vector3,
-    normal: THREE.Vector3,
     radius: number,
   ) {
     this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
     this.setColor(color, this.count);
     this.setCenter(center, this.count);
-    this.setNormal(normal, this.count);
     this.setRadius(radius, this.count);
     this.count += 1;
   }
+
 }

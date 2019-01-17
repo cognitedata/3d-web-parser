@@ -1,12 +1,14 @@
 import * as THREE from 'three';
 import PlaneGroup from './PlaneGroup';
 
-export default class CircleGroup extends PlaneGroup {
-  static type = 'Circle';
+export default class TorusGroup extends PlaneGroup {
+  static type = 'Torus';
   public radius: Float32Array;
+  public tubeRadius: Float32Array;
   constructor(capacity: number) {
     super(capacity);
     this.radius = new Float32Array(capacity);
+    this.tubeRadius = new Float32Array(capacity);
   }
 
   setRadius(value: number, index: number) {
@@ -17,6 +19,14 @@ export default class CircleGroup extends PlaneGroup {
     return this.radius[index];
   }
 
+  setTubeRadius(value: number, index: number) {
+    this.tubeRadius[index] = value;
+  }
+
+  getTubeRadius(index: number): number {
+    return this.tubeRadius[index];
+  }
+
   add(
     nodeId: number,
     treeIndex: number,
@@ -24,6 +34,7 @@ export default class CircleGroup extends PlaneGroup {
     center: THREE.Vector3,
     normal: THREE.Vector3,
     radius: number,
+    tubeRadius: number,
   ) {
     this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
@@ -31,6 +42,7 @@ export default class CircleGroup extends PlaneGroup {
     this.setCenter(center, this.count);
     this.setNormal(normal, this.count);
     this.setRadius(radius, this.count);
+    this.setTubeRadius(tubeRadius, this.count);
     this.count += 1;
   }
 }

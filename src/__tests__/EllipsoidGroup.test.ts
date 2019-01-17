@@ -30,7 +30,7 @@ describe('EllipsoidGroup', () => {
     const treeIndex = 1;
     const color = new THREE.Color(0.5, 0.5, 0.5);
     const center = new THREE.Vector3(1, 2, 3);
-    const normal = new THREE.Vector3(1, 2, 3);
+    const normal = new THREE.Vector3(4, 5, 6);
     const hRadius = 10.0;
     const vRadius = 10.0;
 

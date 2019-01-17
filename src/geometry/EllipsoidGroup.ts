@@ -3,8 +3,8 @@ import PlaneGroup from './PlaneGroup';
 
 export default class EllipsoidGroup extends PlaneGroup {
   static type = 'Ellipsoid';
-  hRadius: Float32Array;
-  vRadius: Float32Array;
+  public hRadius: Float32Array;
+  public vRadius: Float32Array;
 
   constructor(capacity: number) {
     super(capacity);
@@ -12,16 +12,16 @@ export default class EllipsoidGroup extends PlaneGroup {
     this.vRadius = new Float32Array(capacity);
   }
 
-  setHRadius(hRadius: number, index: number) {
-    this.hRadius[index] = hRadius;
+  setHRadius(value: number, index: number) {
+    this.hRadius[index] = value;
   }
 
   getHRadius(index: number): number {
     return this.hRadius[index];
   }
 
-  setVRadius(vRadius: number, index: number) {
-    this.vRadius[index] = vRadius;
+  setVRadius(value: number, index: number) {
+    this.vRadius[index] = value;
   }
 
   getVRadius(index: number): number {
@@ -40,8 +40,8 @@ export default class EllipsoidGroup extends PlaneGroup {
     this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
     this.setColor(color, this.count);
-    this.setVector(center, this.center, this.count);
-    this.setVector(normal, this.normal, this.count);
+    this.setCenter(center, this.count);
+    this.setNormal(normal, this.count);
     this.setHRadius(hRadius, this.count);
     this.setVRadius(vRadius, this.count);
     this.count += 1;

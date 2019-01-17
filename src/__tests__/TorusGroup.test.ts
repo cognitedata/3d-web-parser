@@ -1,15 +1,16 @@
 import * as THREE from 'three';
-import CircleGroup from '../geometry/CircleGroup';
+import TorusGroup from '../geometry/TorusGroup';
 
-describe('CircleGroup', () => {
+describe('TorusGroup', () => {
   test('constructor', () => {
-    const group = new CircleGroup(2);
+    const group = new TorusGroup(2);
     expect(group.radius.length).toBe(2);
-    expect(CircleGroup.type).toBe('Circle');
+    expect(group.tubeRadius.length).toBe(2);
+    expect(TorusGroup.type).toBe('Torus');
   });
 
   test('(set/get)Radius', () => {
-    const group = new CircleGroup(2);
+    const group = new TorusGroup(2);
 
     const radius = 1.0;
 
@@ -17,8 +18,17 @@ describe('CircleGroup', () => {
     expect(group.getRadius(0)).toBeCloseTo(radius);
   });
 
+  test('(set/get)TubeRadius', () => {
+    const group = new TorusGroup(2);
+
+    const tubeRadius = 1.0;
+
+    group.setTubeRadius(tubeRadius, 0);
+    expect(group.getTubeRadius(0)).toBeCloseTo(tubeRadius);
+  });
+
   test('add', () => {
-    const group = new CircleGroup(2);
+    const group = new TorusGroup(2);
 
     const nodeId = 1;
     const treeIndex = 1;
@@ -26,8 +36,9 @@ describe('CircleGroup', () => {
     const center = new THREE.Vector3(1, 2, 3);
     const normal = new THREE.Vector3(4, 5, 6);
     const radius = 10.0;
+    const tubeRadius = 20.0;
 
-    group.add(nodeId, treeIndex, color, center, normal, radius);
+    group.add(nodeId, treeIndex, color, center, normal, radius, tubeRadius);
     const targetVector = new THREE.Vector3();
     const targetColor = new THREE.Color();
 
@@ -52,5 +63,6 @@ describe('CircleGroup', () => {
     expect(targetVector.z).toBeCloseTo(normal.z);
 
     expect(group.getRadius(0)).toBeCloseTo(radius);
+    expect(group.getTubeRadius(0)).toBeCloseTo(tubeRadius);
   });
 });

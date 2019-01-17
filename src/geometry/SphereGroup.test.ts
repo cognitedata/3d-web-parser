@@ -1,15 +1,27 @@
 import * as THREE from 'three';
-import CircleGroup from '../geometry/CircleGroup';
+import SphereGroup from '../geometry/SphereGroup';
 
-describe('CircleGroup', () => {
+describe('SphereGroup', () => {
   test('constructor', () => {
-    const group = new CircleGroup(2);
+    const group = new SphereGroup(2);
+    expect(group.center.length).toBe(6);
     expect(group.radius.length).toBe(2);
-    expect(CircleGroup.type).toBe('Circle');
+    expect(SphereGroup.type).toBe('Sphere');
+  });
+
+  test('(set/get)Center', () => {
+    const group = new SphereGroup(2);
+
+    const center = new THREE.Vector3(1, 2, 3);
+    group.setCenter(center, 0);
+
+    const target = new THREE.Vector3();
+    group.getCenter(target, 0);
+    expect(target).toEqual(center);
   });
 
   test('(set/get)Radius', () => {
-    const group = new CircleGroup(2);
+    const group = new SphereGroup(2);
 
     const radius = 1.0;
 
@@ -18,16 +30,15 @@ describe('CircleGroup', () => {
   });
 
   test('add', () => {
-    const group = new CircleGroup(2);
+    const group = new SphereGroup(2);
 
     const nodeId = 1;
     const treeIndex = 1;
     const color = new THREE.Color(0.5, 0.5, 0.5);
-    const center = new THREE.Vector3(1, 2, 3);
-    const normal = new THREE.Vector3(4, 5, 6);
-    const radius = 10.0;
+    const center = new THREE.Vector3(10.1, 20.5, 30.5);
+    const radius = 1.5;
 
-    group.add(nodeId, treeIndex, color, center, normal, radius);
+    group.add(nodeId, treeIndex, color, center, radius);
     const targetVector = new THREE.Vector3();
     const targetColor = new THREE.Color();
 
@@ -46,11 +57,6 @@ describe('CircleGroup', () => {
     expect(targetVector.y).toBeCloseTo(center.y);
     expect(targetVector.z).toBeCloseTo(center.z);
 
-    group.getNormal(targetVector, 0);
-    expect(targetVector.x).toBeCloseTo(normal.x);
-    expect(targetVector.y).toBeCloseTo(normal.y);
-    expect(targetVector.z).toBeCloseTo(normal.z);
-
-    expect(group.getRadius(0)).toBeCloseTo(radius);
+    expect(group.getRadius(0)).toBe(radius);
   });
 });
