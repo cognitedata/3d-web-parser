@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 const fs = require('fs');
 import ProtobufDecoder from '../ProtobufDecoder';
 import * as TestScene from './fixtures/test_scene.json';

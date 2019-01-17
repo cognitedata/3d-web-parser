@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import PrimitiveGroup from './PrimitiveGroup';
 
 export default class SphereGroup extends PrimitiveGroup {

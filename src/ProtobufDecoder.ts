@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import { Root, Reader } from 'protobufjs';
 import * as WebSceneProto from './proto/web_scene.json';
 
