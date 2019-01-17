@@ -43,6 +43,7 @@
     "es-check": "^5.0.0",
     "jest": "^23.6.0",
     "prettier": "^1.15.2",
+    "protobufjs": "^6.8.8",
     "rollup": "^1.1.0",
     "rollup-plugin-typescript2": "^0.19.0",
     "three": "^0.98.0",

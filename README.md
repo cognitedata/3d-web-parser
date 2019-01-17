@@ -27,3 +27,7 @@ $ yarn test
 ```
 
 We use `jest` to run tests, see [their documentation](https://github.com/facebook/jest) for more information.
+
+## Update protobuf schema
+
+- Run `yarn run pbjs -t json -o src/proto/web_scene.json {path to web_scene.proto}`

@@ -1,0 +1,747 @@
+{
+  "nested": {
+    "cognite": {
+      "nested": {
+        "data": {
+          "nested": {
+            "threed": {
+              "nested": {
+                "web": {
+                  "options": {
+                    "java_package": "com.cognite.threedapi.data.web",
+                    "csharp_namespace": "Cognite.Data.Threed.Web",
+                    "go_package": "github.com/cognitedata/3d-data/proto"
+                  },
+                  "nested": {
+                    "WebScene": {
+                      "fields": {
+                        "nodes": {
+                          "rule": "repeated",
+                          "type": "WebNode",
+                          "id": 1
+                        }
+                      }
+                    },
+                    "WebNode": {
+                      "fields": {
+                        "id": {
+                          "type": "int64",
+                          "id": 1
+                        },
+                        "path": {
+                          "type": "string",
+                          "id": 2
+                        },
+                        "geometries": {
+                          "rule": "repeated",
+                          "type": "Geometry",
+                          "id": 3
+                        },
+                        "boundingBox": {
+                          "type": "BoundingBox",
+                          "id": 4
+                        }
+                      }
+                    },
+                    "Geometry": {
+                      "fields": {
+                        "type": {
+                          "type": "string",
+                          "id": 1
+                        },
+                        "nodeId": {
+                          "type": "int64",
+                          "id": 2,
+                          "options": {
+                            "deprecated": true
+                          }
+                        },
+                        "file": {
+                          "rule": "repeated",
+                          "type": "GeometryFile",
+                          "id": 3
+                        },
+                        "properties": {
+                          "type": "GeometryProperties",
+                          "id": 4,
+                          "options": {
+                            "deprecated": true
+                          }
+                        },
+                        "primitiveInfo": {
+                          "type": "PrimitiveInfo",
+                          "id": 5
+                        },
+                        "nodes": {
+                          "rule": "repeated",
+                          "type": "NodeMapping",
+                          "id": 6
+                        },
+                        "isInstanced": {
+                          "type": "bool",
+                          "id": 7
+                        }
+                      }
+                    },
+                    "GeometryProperties": {
+                      "fields": {
+                        "nodeId": {
+                          "type": "int64",
+                          "id": 3
+                        },
+                        "treeIndex": {
+                          "type": "int64",
+                          "id": 4
+                        },
+                        "color": {
+                          "type": "Color",
+                          "id": 1
+                        },
+                        "transformMatrix": {
+                          "rule": "repeated",
+                          "type": "float",
+                          "id": 5
+                        }
+                      }
+                    },
+                    "NodeMapping": {
+                      "fields": {
+                        "fromVertex": {
+                          "type": "int64",
+                          "id": 1,
+                          "options": {
+                            "deprecated": true
+                          }
+                        },
+                        "toVertex": {
+                          "type": "int64",
+                          "id": 2,
+                          "options": {
+                            "deprecated": true
+                          }
+                        },
+                        "triangleOffset": {
+                          "type": "int64",
+                          "id": 5
+                        },
+                        "triangleCount": {
+                          "type": "int64",
+                          "id": 6
+                        },
+                        "nodeId": {
+                          "type": "int64",
+                          "id": 3,
+                          "options": {
+                            "deprecated": true
+                          }
+                        },
+                        "properties": {
+                          "rule": "repeated",
+                          "type": "GeometryProperties",
+                          "id": 4
+                        }
+                      }
+                    },
+                    "GeometryFile": {
+                      "fields": {
+                        "type": {
+                          "type": "string",
+                          "id": 1
+                        },
+                        "fileId": {
+                          "type": "int64",
+                          "id": 2
+                        }
+                      }
+                    },
+                    "Color": {
+                      "fields": {
+                        "rgb": {
+                          "type": "fixed32",
+                          "id": 1
+                        }
+                      }
+                    },
+                    "Vector3": {
+                      "fields": {
+                        "x": {
+                          "type": "float",
+                          "id": 1
+                        },
+                        "y": {
+                          "type": "float",
+                          "id": 2
+                        },
+                        "z": {
+                          "type": "float",
+                          "id": 3
+                        }
+                      }
+                    },
+                    "BoundingBox": {
+                      "fields": {
+                        "min": {
+                          "type": "Vector3",
+                          "id": 1
+                        },
+                        "max": {
+                          "type": "Vector3",
+                          "id": 2
+                        }
+                      }
+                    },
+                    "PrimitiveInfo": {
+                      "oneofs": {
+                        "kind": {
+                          "oneof": [
+                            "box",
+                            "circle",
+                            "cone",
+                            "cylinder",
+                            "eccentricCone",
+                            "extrudedRing",
+                            "extrudedRingSegment",
+                            "nut",
+                            "sphere",
+                            "sphericalSegment",
+                            "torusSegment",
+                            "ring",
+                            "ellipsoid",
+                            "ellipsoidSegment",
+                            "generalCylinder",
+                            "jsonPrimitiveInfo"
+                          ]
+                        }
+                      },
+                      "fields": {
+                        "box": {
+                          "type": "BoxPrimitiveInfo",
+                          "id": 2
+                        },
+                        "circle": {
+                          "type": "CirclePrimitiveInfo",
+                          "id": 3
+                        },
+                        "cone": {
+                          "type": "ConePrimitiveInfo",
+                          "id": 4
+                        },
+                        "cylinder": {
+                          "type": "CylinderPrimitiveInfo",
+                          "id": 5
+                        },
+                        "eccentricCone": {
+                          "type": "EccentricConePrimitiveInfo",
+                          "id": 6
+                        },
+                        "extrudedRing": {
+                          "type": "ExtrudedRingPrimitiveInfo",
+                          "id": 7
+                        },
+                        "extrudedRingSegment": {
+                          "type": "ExtrudedRingSegmentPrimitiveInfo",
+                          "id": 8
+                        },
+                        "nut": {
+                          "type": "NutPrimitiveInfo",
+                          "id": 13
+                        },
+                        "sphere": {
+                          "type": "SpherePrimitiveInfo",
+                          "id": 9
+                        },
+                        "sphericalSegment": {
+                          "type": "SphericalSegmentPrimitiveInfo",
+                          "id": 10
+                        },
+                        "torusSegment": {
+                          "type": "TorusSegmentPrimitiveInfo",
+                          "id": 11
+                        },
+                        "ring": {
+                          "type": "RingPrimitiveInfo",
+                          "id": 12
+                        },
+                        "ellipsoid": {
+                          "type": "EllipsoidPrimitiveInfo",
+                          "id": 14
+                        },
+                        "ellipsoidSegment": {
+                          "type": "EllipsoidSegmentPrimitiveInfo",
+                          "id": 15
+                        },
+                        "generalCylinder": {
+                          "type": "GeneralCylinderPrimitiveInfo",
+                          "id": 16
+                        },
+                        "jsonPrimitiveInfo": {
+                          "type": "google.protobuf.Struct",
+                          "id": 18999
+                        }
+                      },
+                      "reserved": [
+                        [
+                          1,
+                          1
+                        ]
+                      ]
+                    },
+                    "BoxPrimitiveInfo": {
+                      "fields": {
+                        "angle": {
+                          "type": "float",
+                          "id": 1
+                        },
+                        "delta": {
+                          "type": "Vector3",
+                          "id": 2
+                        },
+                        "center": {
+                          "type": "Vector3",
+                          "id": 3
+                        },
+                        "normal": {
+                          "type": "Vector3",
+                          "id": 4
+                        }
+                      }
+                    },
+                    "CirclePrimitiveInfo": {
+                      "fields": {
+                        "center": {
+                          "type": "Vector3",
+                          "id": 3
+                        },
+                        "normal": {
+                          "type": "Vector3",
+                          "id": 4
+                        },
+                        "radius": {
+                          "type": "float",
+                          "id": 5
+                        }
+                      }
+                    },
+                    "ConePrimitiveInfo": {
+                      "fields": {
+                        "centerB": {
+                          "type": "Vector3",
+                          "id": 6
+                        },
+                        "centerA": {
+                          "type": "Vector3",
+                          "id": 7
+                        },
+                        "radiusB": {
+                          "type": "float",
+                          "id": 8
+                        },
+                        "radiusA": {
+                          "type": "float",
+                          "id": 9
+                        },
+                        "isClosed": {
+                          "type": "bool",
+                          "id": 10
+                        }
+                      }
+                    },
+                    "CylinderPrimitiveInfo": {
+                      "fields": {
+                        "radius": {
+                          "type": "float",
+                          "id": 5
+                        },
+                        "isClosed": {
+                          "type": "bool",
+                          "id": 10
+                        },
+                        "centerB": {
+                          "type": "Vector3",
+                          "id": 6
+                        },
+                        "centerA": {
+                          "type": "Vector3",
+                          "id": 7
+                        }
+                      }
+                    },
+                    "EccentricConePrimitiveInfo": {
+                      "fields": {
+                        "isClosed": {
+                          "type": "bool",
+                          "id": 10
+                        },
+                        "centerB": {
+                          "type": "Vector3",
+                          "id": 6
+                        },
+                        "centerA": {
+                          "type": "Vector3",
+                          "id": 7
+                        },
+                        "radiusB": {
+                          "type": "float",
+                          "id": 8
+                        },
+                        "radiusA": {
+                          "type": "float",
+                          "id": 9
+                        },
+                        "normalB": {
+                          "type": "Vector3",
+                          "id": 11,
+                          "options": {
+                            "deprecated": true
+                          }
+                        },
+                        "normalA": {
+                          "type": "Vector3",
+                          "id": 12
+                        }
+                      }
+                    },
+                    "ExtrudedRingPrimitiveInfo": {
+                      "fields": {
+                        "centerB": {
+                          "type": "Vector3",
+                          "id": 6
+                        },
+                        "centerA": {
+                          "type": "Vector3",
+                          "id": 7
+                        },
+                        "innerRadius": {
+                          "type": "float",
+                          "id": 8
+                        },
+                        "outerRadius": {
+                          "type": "float",
+                          "id": 9
+                        }
+                      }
+                    },
+                    "ExtrudedRingSegmentPrimitiveInfo": {
+                      "fields": {
+                        "isClosed": {
+                          "type": "bool",
+                          "id": 10
+                        },
+                        "angle": {
+                          "type": "float",
+                          "id": 13
+                        },
+                        "arcAngle": {
+                          "type": "float",
+                          "id": 14
+                        },
+                        "centerB": {
+                          "type": "Vector3",
+                          "id": 6
+                        },
+                        "centerA": {
+                          "type": "Vector3",
+                          "id": 7
+                        },
+                        "innerRadius": {
+                          "type": "float",
+                          "id": 8
+                        },
+                        "outerRadius": {
+                          "type": "float",
+                          "id": 9
+                        }
+                      }
+                    },
+                    "MeshPrimitiveInfo": {
+                      "fields": {}
+                    },
+                    "NutPrimitiveInfo": {
+                      "fields": {
+                        "radius": {
+                          "type": "float",
+                          "id": 5
+                        },
+                        "centerB": {
+                          "type": "Vector3",
+                          "id": 6
+                        },
+                        "centerA": {
+                          "type": "Vector3",
+                          "id": 7
+                        },
+                        "rotationAngle": {
+                          "type": "float",
+                          "id": 13
+                        }
+                      }
+                    },
+                    "SpherePrimitiveInfo": {
+                      "fields": {
+                        "center": {
+                          "type": "Vector3",
+                          "id": 3
+                        },
+                        "radius": {
+                          "type": "float",
+                          "id": 5
+                        }
+                      }
+                    },
+                    "SphericalSegmentPrimitiveInfo": {
+                      "fields": {
+                        "center": {
+                          "type": "Vector3",
+                          "id": 3
+                        },
+                        "normal": {
+                          "type": "Vector3",
+                          "id": 4
+                        },
+                        "radius": {
+                          "type": "float",
+                          "id": 5
+                        },
+                        "height": {
+                          "type": "float",
+                          "id": 16
+                        },
+                        "isClosed": {
+                          "type": "bool",
+                          "id": 10
+                        }
+                      }
+                    },
+                    "TorusSegmentPrimitiveInfo": {
+                      "fields": {
+                        "angle": {
+                          "type": "float",
+                          "id": 13
+                        },
+                        "arcAngle": {
+                          "type": "float",
+                          "id": 14
+                        },
+                        "center": {
+                          "type": "Vector3",
+                          "id": 3
+                        },
+                        "normal": {
+                          "type": "Vector3",
+                          "id": 4
+                        },
+                        "radius": {
+                          "type": "float",
+                          "id": 5
+                        },
+                        "tubeRadius": {
+                          "type": "float",
+                          "id": 17
+                        },
+                        "isClosed": {
+                          "type": "bool",
+                          "id": 10
+                        }
+                      }
+                    },
+                    "RingPrimitiveInfo": {
+                      "fields": {
+                        "center": {
+                          "type": "Vector3",
+                          "id": 3
+                        },
+                        "normal": {
+                          "type": "Vector3",
+                          "id": 4
+                        },
+                        "innerRadius": {
+                          "type": "float",
+                          "id": 8
+                        },
+                        "outerRadius": {
+                          "type": "float",
+                          "id": 9
+                        }
+                      }
+                    },
+                    "EllipsoidPrimitiveInfo": {
+                      "fields": {
+                        "center": {
+                          "type": "Vector3",
+                          "id": 3
+                        },
+                        "normal": {
+                          "type": "Vector3",
+                          "id": 4
+                        },
+                        "verticalRadius": {
+                          "type": "float",
+                          "id": 8
+                        },
+                        "horizontalRadius": {
+                          "type": "float",
+                          "id": 9
+                        }
+                      }
+                    },
+                    "EllipsoidSegmentPrimitiveInfo": {
+                      "fields": {
+                        "center": {
+                          "type": "Vector3",
+                          "id": 3
+                        },
+                        "normal": {
+                          "type": "Vector3",
+                          "id": 4
+                        },
+                        "height": {
+                          "type": "float",
+                          "id": 16
+                        },
+                        "isClosed": {
+                          "type": "bool",
+                          "id": 10
+                        },
+                        "verticalRadius": {
+                          "type": "float",
+                          "id": 8
+                        },
+                        "horizontalRadius": {
+                          "type": "float",
+                          "id": 9
+                        }
+                      }
+                    },
+                    "GeneralCylinderPrimitiveInfo": {
+                      "fields": {
+                        "centerB": {
+                          "type": "Vector3",
+                          "id": 1
+                        },
+                        "centerA": {
+                          "type": "Vector3",
+                          "id": 2
+                        },
+                        "radiusB": {
+                          "type": "float",
+                          "id": 3
+                        },
+                        "radiusA": {
+                          "type": "float",
+                          "id": 4
+                        },
+                        "slopeB": {
+                          "type": "float",
+                          "id": 5
+                        },
+                        "slopeA": {
+                          "type": "float",
+                          "id": 6
+                        },
+                        "zAngleB": {
+                          "type": "float",
+                          "id": 7
+                        },
+                        "zAngleA": {
+                          "type": "float",
+                          "id": 8
+                        },
+                        "angle": {
+                          "type": "float",
+                          "id": 9
+                        },
+                        "arcAngle": {
+                          "type": "float",
+                          "id": 10
+                        },
+                        "thickness": {
+                          "type": "float",
+                          "id": 11
+                        },
+                        "isClosed": {
+                          "type": "bool",
+                          "id": 12
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "google": {
+      "nested": {
+        "protobuf": {
+          "nested": {
+            "Struct": {
+              "fields": {
+                "fields": {
+                  "keyType": "string",
+                  "type": "Value",
+                  "id": 1
+                }
+              }
+            },
+            "Value": {
+              "oneofs": {
+                "kind": {
+                  "oneof": [
+                    "nullValue",
+                    "numberValue",
+                    "stringValue",
+                    "boolValue",
+                    "structValue",
+                    "listValue"
+                  ]
+                }
+              },
+              "fields": {
+                "nullValue": {
+                  "type": "NullValue",
+                  "id": 1
+                },
+                "numberValue": {
+                  "type": "double",
+                  "id": 2
+                },
+                "stringValue": {
+                  "type": "string",
+                  "id": 3
+                },
+                "boolValue": {
+                  "type": "bool",
+                  "id": 4
+                },
+                "structValue": {
+                  "type": "Struct",
+                  "id": 5
+                },
+                "listValue": {
+                  "type": "ListValue",
+                  "id": 6
+                }
+              }
+            },
+            "NullValue": {
+              "values": {
+                "NULL_VALUE": 0
+              }
+            },
+            "ListValue": {
+              "fields": {
+                "values": {
+                  "rule": "repeated",
+                  "type": "Value",
+                  "id": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
