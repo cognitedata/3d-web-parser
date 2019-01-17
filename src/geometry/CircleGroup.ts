@@ -3,7 +3,7 @@ import PlaneGroup from './PlaneGroup';
 
 export default class CircleGroup extends PlaneGroup {
   static type = 'Circle';
-  radius: Float32Array;
+  public radius: Float32Array;
   constructor(capacity: number) {
     super(capacity);
     this.radius = new Float32Array(capacity);

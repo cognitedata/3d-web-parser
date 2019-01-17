@@ -7,12 +7,12 @@ type THREEVector = THREE.Vector2 | THREE.Vector3;
 export default abstract class PrimitiveGroup extends GeometryGroup {
   static type: string;
 
-  count: number;
-  capacity: number;
-  nodeId: Float64Array;
-  treeIndex: Float32Array;
-  color: Float32Array;
-  hasCustomTransformAttributes: boolean;
+  public count: number;
+  public capacity: number;
+  public nodeId: Float64Array;
+  public treeIndex: Float32Array;
+  public color: Float32Array;
+  public hasCustomTransformAttributes: boolean;
   // _parents: BasePrimitive[];
   // _children: BasePrimitive[];
   // abstract: boolean;

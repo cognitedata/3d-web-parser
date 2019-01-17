@@ -3,12 +3,12 @@ import PlaneGroup from './PlaneGroup';
 
 export default class GeneralRingGroup extends PlaneGroup {
   static type = 'GeneralRing';
-  xRadius: Float32Array;
-  yRadius: Float32Array;
-  localXAxis: Float32Array;
-  thickness: Float32Array;
-  angle: Float32Array;
-  arcAngle: Float32Array;
+  public xRadius: Float32Array;
+  public yRadius: Float32Array;
+  public localXAxis: Float32Array;
+  public thickness: Float32Array;
+  public angle: Float32Array;
+  public arcAngle: Float32Array;
 
   constructor(capacity: number) {
     super(capacity);

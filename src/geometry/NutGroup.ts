@@ -3,8 +3,8 @@ import BaseCylinderGroup from './BaseCylinderGroup';
 
 export default class NutGroup extends BaseCylinderGroup {
     static type = 'Nut';
-    radius: Float32Array;
-    rotationAngle: Float32Array;
+    public radius: Float32Array;
+    public rotationAngle: Float32Array;
   constructor(capacity: number) {
     super(capacity);
     this.radius = new Float32Array(capacity);

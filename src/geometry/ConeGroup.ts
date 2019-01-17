@@ -3,11 +3,11 @@ import BaseCylinderGroup from './BaseCylinderGroup';
 
 export default class ConeGroup extends BaseCylinderGroup {
     static type = 'Cone';
-    radiusA: Float32Array;
-    radiusB: Float32Array;
-    isClosed: Uint8Array;
-    angle: Float32Array;
-    arcAngle: Float32Array;
+    public radiusA: Float32Array;
+    public radiusB: Float32Array;
+    public isClosed: Uint8Array;
+    public angle: Float32Array;
+    public arcAngle: Float32Array;
   constructor(capacity: number) {
     super(capacity);
     this.radiusA = new Float32Array(capacity);

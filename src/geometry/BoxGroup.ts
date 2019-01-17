@@ -3,8 +3,8 @@ import PlaneGroup from './PlaneGroup';
 
 export default class BoxGroup extends PlaneGroup {
   static type = 'Box';
-  angle: Float32Array;
-  delta: Float32Array;
+  public angle: Float32Array;
+  public delta: Float32Array;
   constructor(capacity: number) {
     super(capacity);
     this.angle = new Float32Array(capacity);

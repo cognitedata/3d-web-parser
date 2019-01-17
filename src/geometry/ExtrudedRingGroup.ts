@@ -3,11 +3,11 @@ import BaseCylinderGroup from './BaseCylinderGroup';
 
 export default class ExtrudedRingGroup extends BaseCylinderGroup {
     static type = 'ExtrudedRing';
-    innerRadius: Float32Array;
-    outerRadius: Float32Array;
-    angle: Float32Array;
-    arcAngle: Float32Array;
-    isClosed: Uint8Array;
+    public innerRadius: Float32Array;
+    public outerRadius: Float32Array;
+    public angle: Float32Array;
+    public arcAngle: Float32Array;
+    public isClosed: Uint8Array;
   constructor(capacity: number) {
     super(capacity);
     this.innerRadius = new Float32Array(capacity);

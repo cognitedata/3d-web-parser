@@ -3,8 +3,8 @@ import BaseCylinderGroup from './BaseCylinderGroup';
 
 export default class CylinderGroup extends BaseCylinderGroup {
     static type = 'Cylinder';
-    radius: Float32Array;
-    isClosed: Uint8Array;
+    public radius: Float32Array;
+    public isClosed: Uint8Array;
   constructor(capacity: number) {
     super(capacity);
     this.radius = new Float32Array(capacity);

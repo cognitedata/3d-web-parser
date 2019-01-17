@@ -3,10 +3,10 @@ import BaseCylinderGroup from './BaseCylinderGroup';
 
 export default class EccentricConeGroup extends BaseCylinderGroup {
     static type = 'EccentricCone';
-    radiusA: Float32Array;
-    radiusB: Float32Array;
-    normal: Float32Array;
-    isClosed: Uint8Array;
+    public radiusA: Float32Array;
+    public radiusB: Float32Array;
+    public normal: Float32Array;
+    public isClosed: Uint8Array;
   constructor(capacity: number) {
     super(capacity);
     this.radiusA = new Float32Array(capacity);

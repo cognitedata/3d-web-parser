@@ -3,8 +3,8 @@ import PlaneGroup from './PlaneGroup';
 
 export default class EllipsoidGroup extends PlaneGroup {
   static type = 'Ellipsoid';
-  hRadius: Float32Array;
-  vRadius: Float32Array;
+  public hRadius: Float32Array;
+  public vRadius: Float32Array;
 
   constructor(capacity: number) {
     super(capacity);

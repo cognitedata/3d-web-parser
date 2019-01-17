@@ -3,8 +3,8 @@ import PlaneGroup from './PlaneGroup';
 
 export default class TorusGroup extends PlaneGroup {
   static type = 'Torus';
-  radius: Float32Array;
-  tubeRadius: Float32Array;
+  public radius: Float32Array;
+  public tubeRadius: Float32Array;
   constructor(capacity: number) {
     super(capacity);
     this.radius = new Float32Array(capacity);
