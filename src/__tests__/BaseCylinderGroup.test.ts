@@ -2,6 +2,7 @@
 
 import * as THREE from 'three';
 import BaseCylinderGroup from '../geometry/BaseCylinderGroup';
+import { expectVector3Equal } from '../TestUtils';
 class NonAbstractBaseCylinderGroup extends BaseCylinderGroup {}
 
 describe('CylinderGroup', () => {
@@ -18,9 +19,7 @@ describe('CylinderGroup', () => {
     const target = new THREE.Vector3();
     group.setCenterA(center, 0);
     group.getCenterA(target, 0);
-    expect(target.x).toBeCloseTo(center.x);
-    expect(target.y).toBeCloseTo(center.y);
-    expect(target.z).toBeCloseTo(center.z);
+    expectVector3Equal(target, center);
   });
 
   test('(set/get)CenterB', () => {
@@ -30,8 +29,6 @@ describe('CylinderGroup', () => {
     const target = new THREE.Vector3();
     group.setCenterB(center, 0);
     group.getCenterB(target, 0);
-    expect(target.x).toBeCloseTo(center.x);
-    expect(target.y).toBeCloseTo(center.y);
-    expect(target.z).toBeCloseTo(center.z);
+    expectVector3Equal(target, center);
   });
 });

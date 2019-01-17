@@ -2,6 +2,7 @@
 
 import * as THREE from 'three';
 import ConeGroup from '../geometry/ConeGroup';
+import { expectColorEqual, expectVector3Equal } from '../TestUtils';
 
 describe('ConeGroup', () => {
   test('constructor', () => {
@@ -67,19 +68,13 @@ describe('ConeGroup', () => {
     expect(group.getTreeIndex(0)).toBe(treeIndex);
 
     group.getColor(targetColor, 0);
-    expect(targetColor.r).toBeCloseTo(color.r);
-    expect(targetColor.g).toBeCloseTo(color.g);
-    expect(targetColor.b).toBeCloseTo(color.b);
+    expectColorEqual(targetColor, color);
 
     group.getCenterA(targetVector, 0);
-    expect(targetVector.x).toBeCloseTo(centerA.x);
-    expect(targetVector.y).toBeCloseTo(centerA.y);
-    expect(targetVector.z).toBeCloseTo(centerA.z);
+    expectVector3Equal(targetVector, centerA);
 
     group.getCenterB(targetVector, 0);
-    expect(targetVector.x).toBeCloseTo(centerB.x);
-    expect(targetVector.y).toBeCloseTo(centerB.y);
-    expect(targetVector.z).toBeCloseTo(centerB.z);
+    expectVector3Equal(targetVector, centerB);
 
     expect(group.getRadiusA(0)).toBeCloseTo(radiusA);
     expect(group.getRadiusB(0)).toBeCloseTo(radiusB);

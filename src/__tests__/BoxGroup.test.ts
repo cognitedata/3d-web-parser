@@ -2,6 +2,7 @@
 
 import * as THREE from 'three';
 import BoxGroup from '../geometry/BoxGroup';
+import { expectVector3Equal, expectColorEqual } from '../TestUtils';
 
 describe('BoxGroup', () => {
   test('constructor', () => {
@@ -56,26 +57,17 @@ describe('BoxGroup', () => {
     expect(group.getTreeIndex(0)).toBe(treeIndex);
 
     group.getColor(targetColor, 0);
-    expect(targetColor.r).toBeCloseTo(color.r);
-    expect(targetColor.g).toBeCloseTo(color.g);
-    expect(targetColor.b).toBeCloseTo(color.b);
+    expectColorEqual(targetColor, color);
 
     group.getCenter(targetVector, 0);
-    expect(targetVector.x).toBeCloseTo(center.x);
-    expect(targetVector.y).toBeCloseTo(center.y);
-    expect(targetVector.z).toBeCloseTo(center.z);
+    expectVector3Equal(targetVector, center);
 
     group.getNormal(targetVector, 0);
-    expect(targetVector.x).toBeCloseTo(normal.x);
-    expect(targetVector.y).toBeCloseTo(normal.y);
-    expect(targetVector.z).toBeCloseTo(normal.z);
+    expectVector3Equal(targetVector, normal);
 
     expect(group.getAngle(0)).toBeCloseTo(angle);
 
     group.getDelta(targetVector, 0);
-    expect(targetVector.x).toBeCloseTo(delta.x);
-    expect(targetVector.y).toBeCloseTo(delta.y);
-    expect(targetVector.z).toBeCloseTo(delta.z);
-
+    expectVector3Equal(targetVector, delta);
   });
 });
