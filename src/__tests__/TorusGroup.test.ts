@@ -2,6 +2,7 @@
 
 import * as THREE from 'three';
 import TorusGroup from '../geometry/TorusGroup';
+import { expectColorEqual, expectVector3Equal } from '../TestUtils';
 
 describe('TorusGroup', () => {
   test('constructor', () => {
@@ -50,19 +51,13 @@ describe('TorusGroup', () => {
     expect(group.getTreeIndex(0)).toBe(treeIndex);
 
     group.getColor(targetColor, 0);
-    expect(targetColor.r).toBeCloseTo(color.r);
-    expect(targetColor.g).toBeCloseTo(color.g);
-    expect(targetColor.b).toBeCloseTo(color.b);
+    expectColorEqual(targetColor, color);
 
     group.getCenter(targetVector, 0);
-    expect(targetVector.x).toBeCloseTo(center.x);
-    expect(targetVector.y).toBeCloseTo(center.y);
-    expect(targetVector.z).toBeCloseTo(center.z);
+    expectVector3Equal(targetVector, center);
 
     group.getNormal(targetVector, 0);
-    expect(targetVector.x).toBeCloseTo(normal.x);
-    expect(targetVector.y).toBeCloseTo(normal.y);
-    expect(targetVector.z).toBeCloseTo(normal.z);
+    expectVector3Equal(targetVector, normal);
 
     expect(group.getRadius(0)).toBeCloseTo(radius);
     expect(group.getTubeRadius(0)).toBeCloseTo(tubeRadius);

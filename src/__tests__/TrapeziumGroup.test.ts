@@ -2,6 +2,7 @@
 
 import * as THREE from 'three';
 import TrapeziumGroup from '../geometry/TrapeziumGroup';
+import { expectColorEqual, expectVector3Equal } from '../TestUtils';
 
 describe('TrapeziumGroup', () => {
   test('constructor', () => {
@@ -78,28 +79,18 @@ describe('TrapeziumGroup', () => {
     expect(group.getTreeIndex(0)).toBe(treeIndex);
 
     group.getColor(targetColor, 0);
-    expect(targetColor.r).toBeCloseTo(color.r);
-    expect(targetColor.g).toBeCloseTo(color.g);
-    expect(targetColor.b).toBeCloseTo(color.b);
+    expectColorEqual(targetColor, color);
 
     group.getVertex1(targetVector, 0);
-    expect(targetVector.x).toBeCloseTo(vertex1.x);
-    expect(targetVector.y).toBeCloseTo(vertex1.y);
-    expect(targetVector.z).toBeCloseTo(vertex1.z);
+    expectVector3Equal(targetVector, vertex1);
 
     group.getVertex2(targetVector, 0);
-    expect(targetVector.x).toBeCloseTo(vertex2.x);
-    expect(targetVector.y).toBeCloseTo(vertex2.y);
-    expect(targetVector.z).toBeCloseTo(vertex2.z);
+    expectVector3Equal(targetVector, vertex2);
 
     group.getVertex3(targetVector, 0);
-    expect(targetVector.x).toBeCloseTo(vertex3.x);
-    expect(targetVector.y).toBeCloseTo(vertex3.y);
-    expect(targetVector.z).toBeCloseTo(vertex3.z);
+    expectVector3Equal(targetVector, vertex3);
 
     group.getVertex4(targetVector, 0);
-    expect(targetVector.x).toBeCloseTo(vertex4.x);
-    expect(targetVector.y).toBeCloseTo(vertex4.y);
-    expect(targetVector.z).toBeCloseTo(vertex4.z);
+    expectVector3Equal(targetVector, vertex4);
   });
 });

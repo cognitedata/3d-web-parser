@@ -2,6 +2,7 @@
 
 import * as THREE from 'three';
 import GeneralRingGroup from '../geometry/GeneralRingGroup';
+import { expectColorEqual, expectVector3Equal } from '../TestUtils';
 
 describe('GeneralRingGroup', () => {
   test('constructor', () => {
@@ -87,27 +88,19 @@ describe('GeneralRingGroup', () => {
     expect(group.getTreeIndex(0)).toBe(treeIndex);
 
     group.getColor(targetColor, 0);
-    expect(targetColor.r).toBeCloseTo(color.r);
-    expect(targetColor.g).toBeCloseTo(color.g);
-    expect(targetColor.b).toBeCloseTo(color.b);
+    expectColorEqual(targetColor, color);
 
     group.getCenter(targetVector, 0);
-    expect(targetVector.x).toBeCloseTo(center.x);
-    expect(targetVector.y).toBeCloseTo(center.y);
-    expect(targetVector.z).toBeCloseTo(center.z);
+    expectVector3Equal(targetVector, center);
 
     group.getNormal(targetVector, 0);
-    expect(targetVector.x).toBeCloseTo(normal.x);
-    expect(targetVector.y).toBeCloseTo(normal.y);
-    expect(targetVector.z).toBeCloseTo(normal.z);
+    expectVector3Equal(targetVector, normal);
 
     expect(group.getXRadius(0)).toBeCloseTo(xRadius);
     expect(group.getYRadius(0)).toBeCloseTo(yRadius);
 
     group.getLocalXAxis(targetVector, 0);
-    expect(targetVector.x).toBeCloseTo(localXAxis.x);
-    expect(targetVector.y).toBeCloseTo(localXAxis.y);
-    expect(targetVector.z).toBeCloseTo(localXAxis.z);
+    expectVector3Equal(targetVector, localXAxis);
 
     expect(group.getThickness(0)).toBeCloseTo(thickness);
     expect(group.getAngle(0)).toBeCloseTo(angle);

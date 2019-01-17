@@ -2,7 +2,15 @@
 
 import * as THREE from 'three';
 import PrimitiveGroup from '../geometry/PrimitiveGroup';
-class NonAbstractPrimitiveGroup extends PrimitiveGroup {}
+import { expectColorEqual } from '../TestUtils';
+class NonAbstractPrimitiveGroup extends PrimitiveGroup {
+  computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
+    return new THREE.Matrix4();
+  }
+  computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
+    return new THREE.Box3();
+  }
+}
 
 describe('PrimitiveGroup', () => {
   test('constructor', () => {
@@ -154,18 +162,12 @@ describe('PrimitiveGroup', () => {
     const target = new THREE.Color();
     group.getColor(target, 0);
 
-    expect(target.r).toBeCloseTo(color1.r);
-    expect(target.g).toBeCloseTo(color1.g);
-    expect(target.b).toBeCloseTo(color1.b);
+    expectColorEqual(target, color1);
 
     group.setColor(color2, 1);
     group.getColor(target, 0);
-    expect(target.r).toBeCloseTo(color1.r);
-    expect(target.g).toBeCloseTo(color1.g);
-    expect(target.b).toBeCloseTo(color1.b);
+    expectColorEqual(target, color1);
     group.getColor(target, 1);
-    expect(target.r).toBeCloseTo(color2.r);
-    expect(target.g).toBeCloseTo(color2.g);
-    expect(target.b).toBeCloseTo(color2.b);
+    expectColorEqual(target, color2);
   });
 });
