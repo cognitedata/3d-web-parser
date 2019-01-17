@@ -1,7 +1,8 @@
 import * as THREE from 'three';
-import CylinderGroup from './CylinderGroup';
+import BaseCylinderGroup from './BaseCylinderGroup';
 
-export default class ConeGroup extends CylinderGroup {
+export default class ConeGroup extends BaseCylinderGroup {
+    static type = 'Cone';
     radiusA: Float32Array;
     radiusB: Float32Array;
     isClosed: Uint8Array;
