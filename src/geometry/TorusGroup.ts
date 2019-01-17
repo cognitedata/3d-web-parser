@@ -1,0 +1,48 @@
+import * as THREE from 'three';
+import PlaneGroup from './PlaneGroup';
+
+export default class TorusGroup extends PlaneGroup {
+  static type = 'Torus';
+  radius: Float32Array;
+  tubeRadius: Float32Array;
+  constructor(capacity: number) {
+    super(capacity);
+    this.radius = new Float32Array(capacity);
+    this.tubeRadius = new Float32Array(capacity);
+  }
+
+  setRadius(value: number, index: number) {
+    this.radius[index] = value;
+  }
+
+  getRadius(index: number): number {
+    return this.radius[index];
+  }
+
+  setTubeRadius(value: number, index: number) {
+    this.tubeRadius[index] = value;
+  }
+
+  getTubeRadius(index: number): number {
+    return this.tubeRadius[index];
+  }
+
+  add(
+    nodeId: number,
+    treeIndex: number,
+    color: THREE.Color,
+    center: THREE.Vector3,
+    normal: THREE.Vector3,
+    radius: number,
+    tubeRadius: number,
+  ) {
+    this.setNodeId(nodeId, this.count);
+    this.setTreeIndex(treeIndex, this.count);
+    this.setColor(color, this.count);
+    this.setVector(center, this.center, this.count);
+    this.setVector(normal, this.normal, this.count);
+    this.setRadius(radius, this.count);
+    this.setTubeRadius(tubeRadius, this.count);
+    this.count += 1;
+  }
+}
