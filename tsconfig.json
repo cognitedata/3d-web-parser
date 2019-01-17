@@ -14,7 +14,7 @@
     "sourceMap": true,
     "downlevelIteration": true,
     "moduleResolution": "node",
-    "lib": ["dom", "es2018", "esnext.asynciterable", "esnext"]
+    "lib": ["dom", "es2015"]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

@@ -1,6 +1,3 @@
-// Polyfill Symbol.asyncIterator
-(Symbol as any).asyncIterator = Symbol.asyncIterator || Symbol('Symbol.asyncIterator');
-
 import * as THREE from 'three';
 import GeometryGroup from './geometry/GeometryGroup';
 
