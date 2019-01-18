@@ -1,21 +1,20 @@
 // Copyright 2019 Cognite AS
 
 import ProtobufDecoder from './ProtobufDecoder';
+import * as WebSceneProto from './proto/web_scene.json';
+import * as THREE from 'three';
 import Sector from './Sector';
 import { Vector3 } from 'three';
 import { getParentPath } from './PathExtractor';
+import CircleGroup from './geometry/CircleGroup';
+import GeometryGroup from './geometry/GeometryGroup';
+import parseCircles from './parsers/parseCircles';
 
-interface ProtobufGeometry {
-  type: string;
-}
-
-function geometryCounter(geometryArray: ProtobufGeometry[], type: string): number {
-  return geometryArray.reduce((total, geometry) => { return geometry.type === type ? total + 1 : total; }, 0);
-}
-
-export function parseCircles(geometryArray: ProtobufGeometry[]) {
-  const count = geometryCounter(geometryArray, 'circle');
-  // count
+function parseGeometries(geometries: any[]) {
+  const geometryGroups = [];
+  geometryGroups.push(parseCircles(geometries));
+  geometryGroups.push(null);
+  return geometryGroups.filter(Boolean);
 }
 
 export default async function(protobufData: Uint8Array) {
@@ -28,6 +27,8 @@ export default async function(protobufData: Uint8Array) {
     const boundingBoxMax = new Vector3(boundingBox.max.x, boundingBox.max.y, boundingBox.max.z);
     const sector = new Sector(boundingBoxMin, boundingBoxMax);
     nodes[path] = sector;
+    const geometries = parseGeometries(webNode.geometries);
+    // console.log('Geometries: ', webNode.geometries);
 
     // attach to parent
     const parentPath = getParentPath(path);
