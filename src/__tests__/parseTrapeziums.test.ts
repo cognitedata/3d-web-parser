@@ -1,48 +1,49 @@
 // Copyright 2019 Cognite AS
 import * as THREE from 'three';
-import parseBoxes from '../parsers/parseBoxes';
+import parseTrapeziums from '../parsers/parseTrapeziums';
 import { expectVector3Equal, expectColorEqual } from '../TestUtils';
-import BoxGroup from '../geometry/BoxGroup';
+import TrapeziumGroup from '../geometry/TrapeziumGroup';
 
-describe('parseBoxes', () => {
-  test('parseBoxes', () => {
+describe('parseTrapeziums', () => {
+  test('parseTrapeziums', () => {
     const nodeId = 1234;
     const treeIndex = 123;
     const color = new THREE.Color(1.0, 0.3, 0.4);
-    const center = new THREE.Vector3(1.0, 2.0, 0.0);
-    const normal = new THREE.Vector3(5.0, 10.0, 3.0);
-    const delta = new THREE.Vector3(12, 15.1, 10.32);
-    const angle = 1.0;
+    const vertex1 = new THREE.Vector3(1.0, 2.0, 3.0);
+    const vertex2 = new THREE.Vector3(4.0, 5.0, 6.0);
+    const vertex3 = new THREE.Vector3(7.0, 8.0, 9.0);
+    const vertex4 = new THREE.Vector3(10.0, 11.0, 12.0);
 
     const geometries = [
       {
-        type: 'box',
+        type: 'trapezium',
         nodes: [{ properties: [{
           nodeId: nodeId,
           treeIndex: treeIndex,
           color: { rgb: color.getHex() },
         }] }],
         primitiveInfo: {
-          box: {
-            center: { x: center.x, y: center.y, z: center.z },
-            normal: { x: normal.x, y: normal.y, z: normal.z },
-            delta: { x: delta.x, y: delta.y, z: delta.z },
-            angle: angle,
+          trapezium: {
+            vertex1: { x: vertex1.x, y: vertex1.y, z: vertex1.z },
+            vertex2: { x: vertex2.x, y: vertex2.y, z: vertex2.z },
+            vertex3: { x: vertex3.x, y: vertex3.y, z: vertex3.z },
+            vertex4: { x: vertex4.x, y: vertex4.y, z: vertex4.z },
           },
         },
       },
     ];
 
-    let group: BoxGroup;
+    let group: TrapeziumGroup;
     // @ts-ignore
-    group = parseBoxes(geometries);
+    group = parseTrapeziums(geometries);
     expect(group.capacity).toBe(1);
-    expectColorEqual(group.getColor(new THREE.Color(), 0), color);
-    expectVector3Equal(group.getCenter(new THREE.Vector3(), 0), center);
-    expectVector3Equal(group.getNormal(new THREE.Vector3(), 0), normal);
-    expectVector3Equal(group.getDelta(new THREE.Vector3(), 0), delta);
-    expect(group.getAngle(0)).toBeCloseTo(angle);
     expect(group.getNodeId(0)).toBe(nodeId);
     expect(group.getTreeIndex(0)).toBe(treeIndex);
+    expectColorEqual(group.getColor(new THREE.Color(), 0), color);
+
+    expectVector3Equal(group.getVertex1(new THREE.Vector3(), 0), vertex1);
+    expectVector3Equal(group.getVertex2(new THREE.Vector3(), 0), vertex2);
+    expectVector3Equal(group.getVertex3(new THREE.Vector3(), 0), vertex3);
+    expectVector3Equal(group.getVertex4(new THREE.Vector3(), 0), vertex4);
   });
 });
