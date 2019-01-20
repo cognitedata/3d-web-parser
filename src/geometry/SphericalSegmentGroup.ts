@@ -44,8 +44,8 @@ export default class SphericalSegmentGroup extends SphereGroup {
     treeIndex: number,
     color: THREE.Color,
     center: THREE.Vector3,
-    radius: number,
     normal: THREE.Vector3,
+    radius: number,
     height: number,
     isClosed: boolean,
   ) {

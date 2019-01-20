@@ -1,53 +1,46 @@
 import * as THREE from 'three';
-import CircleGroup from '../geometry/CircleGroup';
+import EllipsoidSegmentGroup from '../geometry/EllipsoidSegmentGroup';
 import { parsePrimitiveColor, parsePrimitiveInfo, parsePrimitiveNodeId, parsePrimitiveTreeIndex } from './parseUtils';
-
+const type = 'ellipsoidSegments';
 const color = new THREE.Color();
 const vector1 = new THREE.Vector3();
 const vector2 = new THREE.Vector3();
 const vector3 = new THREE.Vector3();
 
-function countCircles(geometries: any[]): number {
-  const numCircles = geometries.reduce(
-    (total, geometry) => { return geometry.type === 'circle' ? total + 1 : total; }, 0);
-
-  const numExtraCircles = geometries.reduce((total, geometry) => {
-    if (['cylinder', 'cone', 'eccentricCone'].indexOf(geometry.type) > 0) {
-      // Found one of them
-      const type = Object.keys(geometry.primitiveInfo)[0];
-      const isClosed = geometry.primitiveInfo[type].isClosed;
-      return total + 2;
-    }
-    return total;
-  }, 0);
-
-  return numCircles + numExtraCircles;
+function count(geometries: any[]): number {
+  return geometries.reduce(
+    (total, geometry) => { return [type, 'ellipsoid'].indexOf(geometry.type) > -1 ? total + 1 : total; }, 0);
 }
 
-export default function parseCircles(geometries: any[]): CircleGroup|null {
-  const numCircles = countCircles(geometries);
-  if (numCircles === 0) {
+export default function parse(geometries: any[]): EllipsoidSegmentGroup|null {
+  const group = new EllipsoidSegmentGroup(count(geometries));
+  if (group.capacity === 0) {
     return null;
   }
-  const circles = geometries.filter(object => object.type === 'circle');
-  // const circles = geometries.filter(object => object.type === 'circle');
+  const objects = geometries.filter(geometry => [type, 'ellipsoid'].indexOf(geometry.type) > -1);
 
-  const count = circles.length;
-  const group = new CircleGroup(count);
+  objects.forEach(geometry => {
+    const primitiveInfo = parsePrimitiveInfo(geometry.primitiveInfo);
 
-  circles.forEach(circle => {
-    const primitiveInfo = parsePrimitiveInfo(circle.primitiveInfo);
+    const nodeId = parsePrimitiveNodeId(geometry);
+    const treeIndex = parsePrimitiveTreeIndex(geometry);
+    const center = geometry.primitiveInfo[geometry.type].center;
+    const normal = geometry.primitiveInfo[geometry.type].normal;
+    const hRadius = geometry.primitiveInfo[geometry.type].horizontalRadius;
+    const vRadius = geometry.primitiveInfo[geometry.type].verticalRadius;
+    let height = 2 * vRadius;
+    let isClosed = false;
 
-    const nodeId = parsePrimitiveNodeId(circle);
-    const treeIndex = parsePrimitiveTreeIndex(circle);
-    const center = circle.primitiveInfo.circle.center;
-    const normal = circle.primitiveInfo.circle.normal;
-    const radius = circle.primitiveInfo.circle.radius;
+    if (geometry.type === 'ellipsoidSegment') {
+      // ellipsoidSegment has two more properties
+      height = geometry.primitiveInfo[geometry.type].height;
+      isClosed = geometry.primitiveInfo[geometry.type].isClosed;
+    }
+
     vector1.set(center.x, center.y, center.z);
     vector2.set(normal.x, normal.y, normal.z);
-    console.log('Color thing: ', parsePrimitiveColor(circle));
-    color.setHex(parsePrimitiveColor(circle));
-    group.add(nodeId, treeIndex, color, vector1, vector2, radius);
+    color.setHex(parsePrimitiveColor(geometry));
+    group.add(nodeId, treeIndex, color, vector1, vector2, hRadius, vRadius, height, isClosed);
   });
   return group;
 }

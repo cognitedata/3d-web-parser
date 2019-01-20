@@ -24,7 +24,7 @@ function count(geometries: any[]): number {
   return numCircles + numExtraCircles;
 }
 
-export default function parseCircles(geometries: any[]): CircleGroup|null {
+export default function parse(geometries: any[]): CircleGroup|null {
   const group = new CircleGroup(count(geometries));
   if (group.capacity === 0) {
     return null;
@@ -37,12 +37,13 @@ export default function parseCircles(geometries: any[]): CircleGroup|null {
 
     const nodeId = parsePrimitiveNodeId(geometry);
     const treeIndex = parsePrimitiveTreeIndex(geometry);
+    color.setHex(parsePrimitiveColor(geometry));
+
     const center = geometry.primitiveInfo.circle.center;
     const normal = geometry.primitiveInfo.circle.normal;
     const radius = geometry.primitiveInfo.circle.radius;
     vector1.set(center.x, center.y, center.z);
     vector2.set(normal.x, normal.y, normal.z);
-    color.setHex(parsePrimitiveColor(geometry));
 
     group.add(nodeId, treeIndex, color, vector1, vector2, radius);
   });

@@ -23,6 +23,8 @@ export default function parseBoxes(geometries: any[]): BoxGroup|null {
 
     const nodeId = parsePrimitiveNodeId(geometry);
     const treeIndex = parsePrimitiveTreeIndex(geometry);
+    color.setHex(parsePrimitiveColor(geometry));
+
     const center = geometry.primitiveInfo.box.center;
     const normal = geometry.primitiveInfo.box.normal;
     const delta = geometry.primitiveInfo.box.delta;
@@ -31,7 +33,6 @@ export default function parseBoxes(geometries: any[]): BoxGroup|null {
     vector1.set(center.x, center.y, center.z);
     vector2.set(normal.x, normal.y, normal.z);
     vector3.set(delta.x, delta.y, delta.z);
-    color.setHex(parsePrimitiveColor(geometry));
 
     group.add(nodeId, treeIndex, color, vector1, vector2, angle, vector3);
   });
