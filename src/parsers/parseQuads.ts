@@ -1,53 +1,90 @@
 import * as THREE from 'three';
-import CircleGroup from '../geometry/CircleGroup';
+import QuadGroup from '../geometry/QuadGroup';
 import { parsePrimitiveColor, parsePrimitiveInfo, parsePrimitiveNodeId, parsePrimitiveTreeIndex } from './parseUtils';
+import { zAxis } from '../constants';
 
 const color = new THREE.Color();
-const vector1 = new THREE.Vector3();
-const vector2 = new THREE.Vector3();
-const vector3 = new THREE.Vector3();
+const vertex = new THREE.Vector3();
+const vertex1 = new THREE.Vector3();
+const vertex2 = new THREE.Vector3();
+const vertex3 = new THREE.Vector3();
+const centerA = new THREE.Vector3();
+const centerB = new THREE.Vector3();
+const normal = new THREE.Vector3();
+const axisRotation = new THREE.Quaternion();
 
-function countCircles(geometries: any[]): number {
-  const numCircles = geometries.reduce(
-    (total, geometry) => { return geometry.type === 'circle' ? total + 1 : total; }, 0);
-
-  const numExtraCircles = geometries.reduce((total, geometry) => {
-    if (['cylinder', 'cone', 'eccentricCone'].indexOf(geometry.type) > 0) {
-      // Found one of them
-      const type = Object.keys(geometry.primitiveInfo)[0];
-      const isClosed = geometry.primitiveInfo[type].isClosed;
-      return total + 2;
-    }
-    return total;
-  }, 0);
-
-  return numCircles + numExtraCircles;
+interface MatchingGeometries {
+  count: number;
+  geometries: any[];
 }
 
-export default function parseCircles(geometries: any[]): CircleGroup|null {
-  const numCircles = countCircles(geometries);
-  if (numCircles === 0) {
+function findMatchingGeometries(geometries: any[]): MatchingGeometries {
+  const matchingGeometries: MatchingGeometries = {
+    count: 0,
+    geometries: [],
+  };
+
+  geometries.forEach(geometry => {
+    if (geometry.type === 'extrudedRing'
+        && geometry.primitiveInfo.extrudedRing.arcAngle < 2 * Math.PI
+        && geometry.primitiveInfo.extrudedRing.isClosed) {
+          matchingGeometries.geometries.push(geometry);
+          matchingGeometries.count += 2;
+      }
+  });
+
+  return matchingGeometries;
+}
+
+export default function parse(geometries: any[]): QuadGroup|null {
+  const matchingGeometries = findMatchingGeometries(geometries);
+  const group = new QuadGroup(matchingGeometries.count);
+  if (group.capacity === 0) {
     return null;
   }
-  const circles = geometries.filter(object => object.type === 'circle');
-  // const circles = geometries.filter(object => object.type === 'circle');
 
-  const count = circles.length;
-  const group = new CircleGroup(count);
+  matchingGeometries.geometries.forEach(geometry => {
+    // Only extruded rings will produce quads
+    const primitiveInfo = geometry.primitiveInfo[geometry.type];
+    const nodeId = parsePrimitiveNodeId(geometry);
+    const treeIndex = parsePrimitiveTreeIndex(geometry);
+    color.setHex(parsePrimitiveColor(geometry));
 
-  circles.forEach(circle => {
-    const primitiveInfo = parsePrimitiveInfo(circle.primitiveInfo);
+    const angle = primitiveInfo.angle;
+    const innerRadius = primitiveInfo.innerRadius;
+    const outerRadius = primitiveInfo.outerRadius;
+    const arcAngle = geometry.primitiveInfo[geometry.type].arcAngle;
+    centerA.set(primitiveInfo.centerA.x, primitiveInfo.centerA.y, primitiveInfo.centerA.z);
+    centerB.set(primitiveInfo.centerB.x, primitiveInfo.centerB.y, primitiveInfo.centerB.z);
 
-    const nodeId = parsePrimitiveNodeId(circle);
-    const treeIndex = parsePrimitiveTreeIndex(circle);
-    const center = circle.primitiveInfo.circle.center;
-    const normal = circle.primitiveInfo.circle.normal;
-    const radius = circle.primitiveInfo.circle.radius;
-    vector1.set(center.x, center.y, center.z);
-    vector2.set(normal.x, normal.y, normal.z);
-    console.log('Color thing: ', parsePrimitiveColor(circle));
-    color.setHex(parsePrimitiveColor(circle));
-    group.add(nodeId, treeIndex, color, vector1, vector2, radius);
+    normal.copy(centerA).sub(centerB).normalize();
+    axisRotation.setFromUnitVectors(zAxis, normal);
+
+    [false, true].forEach(isSecondQuad => {
+      const finalAngle = angle + Number(isSecondQuad) * arcAngle;
+      vertex
+        .set(Math.cos(finalAngle), Math.sin(finalAngle), 0)
+        .applyQuaternion(axisRotation)
+        .normalize();
+      vertex1.copy(vertex)
+        .multiplyScalar(innerRadius)
+        .add(centerA);
+      vertex2.copy(vertex)
+        .multiplyScalar(outerRadius)
+        .add(centerB);
+      vertex3.copy(vertex)
+        .clone()
+        .multiplyScalar(innerRadius)
+        .add(centerB);
+
+      if (isSecondQuad) {
+        // swap the order of vertex1 and vertex2 to flip the normal
+        group.add(nodeId, treeIndex, color, vertex2, vertex1, vertex3);
+      } else {
+        group.add(nodeId, treeIndex, color, vertex1, vertex2, vertex3);
+      }
+
+    });
   });
   return group;
 }
