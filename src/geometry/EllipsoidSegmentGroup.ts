@@ -1,16 +1,18 @@
 // Copyright 2019 Cognite AS
 
 import * as THREE from 'three';
-import EllipsoidGroup from './EllipsoidGroup';
+import PlaneGroup from './PlaneGroup';
 
-export default class EllipsoidSegmentGroup extends EllipsoidGroup {
+export default class EllipsoidSegmentGroup extends PlaneGroup {
   static type = 'EllipsoidSegment';
+  public horizontalRadius: Float32Array;
+  public verticalRadius: Float32Array;
   public height: Float32Array;
-  public isClosed: Uint8Array;
   constructor(capacity: number) {
     super(capacity);
     this.height = new Float32Array(capacity);
-    this.isClosed = new Uint8Array(capacity);
+    this.horizontalRadius = new Float32Array(capacity);
+    this.verticalRadius = new Float32Array(capacity);
   }
 
   setHeight(value: number, index: number) {
@@ -21,12 +23,20 @@ export default class EllipsoidSegmentGroup extends EllipsoidGroup {
     return this.height[index];
   }
 
-  setIsClosed(value: boolean, index: number) {
-    this.isClosed[index] = value ? 1 : 0;
+  setHorizontalRadius(value: number, index: number) {
+    this.horizontalRadius[index] = value;
   }
 
-  getIsClosed(index: number): boolean {
-    return this.isClosed[index] === 1 ? true : false;
+  getHorizontalRadius(index: number): number {
+    return this.horizontalRadius[index];
+  }
+
+  setVerticalRadius(value: number, index: number) {
+    this.verticalRadius[index] = value;
+  }
+
+  getVerticalRadius(index: number): number {
+    return this.verticalRadius[index];
   }
 
   // @ts-ignore
@@ -36,20 +46,18 @@ export default class EllipsoidSegmentGroup extends EllipsoidGroup {
     color: THREE.Color,
     center: THREE.Vector3,
     normal: THREE.Vector3,
-    hRadius: number,
-    vRadius: number,
+    horizontalRadius: number,
+    verticalRadius: number,
     height: number,
-    isClosed: boolean,
   ) {
     this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
     this.setColor(color, this.count);
     this.setCenter(center, this.count);
     this.setNormal(normal, this.count);
-    this.setHRadius(hRadius, this.count);
-    this.setVRadius(vRadius, this.count);
+    this.setHorizontalRadius(horizontalRadius, this.count);
+    this.setVerticalRadius(verticalRadius, this.count);
     this.setHeight(height, this.count);
-    this.setIsClosed(isClosed, this.count);
     this.count += 1;
   }
 
