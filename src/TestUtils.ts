@@ -23,10 +23,22 @@ export function expectVector3Equal(a: Vector3, b: Vector3) {
   expect(a.z).toBeCloseTo(b.z);
 }
 
+export function expectVector3Valid(a: Vector3) {
+  expect(a.x).toBeDefined();
+  expect(a.y).toBeDefined();
+  expect(a.z).toBeDefined();
+}
+
 export function expectColorEqual(a: Color, b: Color) {
   expect(a.r).toBeCloseTo(b.r);
   expect(a.g).toBeCloseTo(b.g);
   expect(a.b).toBeCloseTo(b.b);
+}
+
+export function expectColorValid(a: Color) {
+  expect(a.r).toBeDefined();
+  expect(a.g).toBeDefined();
+  expect(a.b).toBeDefined();
 }
 
 export function expectBoundingBoxEqual(a: BoundingBox, b: BoundingBox) {
