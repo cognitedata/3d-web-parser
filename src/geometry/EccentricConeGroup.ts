@@ -8,12 +8,10 @@ export default class EccentricConeGroup extends BaseCylinderGroup {
     public radiusA: Float32Array;
     public radiusB: Float32Array;
     public normal: Float32Array;
-    public isClosed: Uint8Array;
   constructor(capacity: number) {
     super(capacity);
     this.radiusA = new Float32Array(capacity);
     this.radiusB = new Float32Array(capacity);
-    this.isClosed = new Uint8Array(capacity);
     this.normal = new Float32Array(3 * capacity);
   }
 
@@ -33,14 +31,6 @@ export default class EccentricConeGroup extends BaseCylinderGroup {
     return this.radiusB[index];
   }
 
-  setIsClosed(value: boolean, index: number) {
-    this.isClosed[index] = value ? 1 : 0;
-  }
-
-  getIsClosed(index: number): boolean {
-    return this.isClosed[index] === 1 ? true : false;
-  }
-
   setNormal(source: THREE.Vector3, index: number) {
     this.setVector(source, this.normal, index);
   }
@@ -58,7 +48,6 @@ export default class EccentricConeGroup extends BaseCylinderGroup {
     radiusA: number,
     radiusB: number,
     normal: THREE.Vector3,
-    isClosed: boolean,
   ) {
     this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
@@ -68,7 +57,6 @@ export default class EccentricConeGroup extends BaseCylinderGroup {
     this.setRadiusA(radiusA, this.count);
     this.setRadiusB(radiusB, this.count);
     this.setNormal(normal, this.count);
-    this.setIsClosed(isClosed, this.count);
 
     this.count += 1;
   }
