@@ -1,48 +1,52 @@
 import * as THREE from 'three';
 import TorusSegmentGroup from '../geometry/TorusSegmentGroup';
-import { parsePrimitiveColor, parsePrimitiveInfo, parsePrimitiveNodeId, parsePrimitiveTreeIndex } from './parseUtils';
-const type = 'torusSegment';
-const types = [type, 'torus'];
-const color = new THREE.Color();
-const vector1 = new THREE.Vector3();
-const vector2 = new THREE.Vector3();
-const vector3 = new THREE.Vector3();
+import { MatchingGeometries, parsePrimitiveColor, parsePrimitiveNodeId, parsePrimitiveTreeIndex } from './parseUtils';
 
-function count(geometries: any[]): number {
-  return geometries.reduce(
-    (total, geometry) => { return types.indexOf(geometry.type) > -1 ? total + 1 : total; }, 0);
+const color = new THREE.Color();
+const center = new THREE.Vector3();
+const normal = new THREE.Vector3();
+
+function findMatchingGeometries(geometries: any[]): MatchingGeometries {
+  const matchingGeometries: MatchingGeometries = {
+    count: 0,
+    geometries: [],
+  };
+
+  geometries.forEach(geometry => {
+    if (geometry.type === 'torus' || geometry.type === 'torusSegment') {
+      matchingGeometries.geometries.push(geometry);
+      matchingGeometries.count += 1;
+    }
+  });
+
+  return matchingGeometries;
 }
 
 export default function parse(geometries: any[]): TorusSegmentGroup|null {
-  const group = new TorusSegmentGroup(count(geometries));
+  const matchingGeometries = findMatchingGeometries(geometries);
+  const group = new TorusSegmentGroup(matchingGeometries.count);
   if (group.capacity === 0) {
     return null;
   }
-  const objects = geometries.filter(geometry => types.indexOf(geometry.type) > -1);
 
-  objects.forEach(geometry => {
-    const primitiveInfo = parsePrimitiveInfo(geometry.primitiveInfo);
+  matchingGeometries.geometries.forEach(geometry => {
+    const primitiveInfo = geometry.primitiveInfo[geometry.type];
 
     const nodeId = parsePrimitiveNodeId(geometry);
     const treeIndex = parsePrimitiveTreeIndex(geometry);
     color.setHex(parsePrimitiveColor(geometry));
 
-    const center = geometry.primitiveInfo[geometry.type].center;
-    const normal = geometry.primitiveInfo[geometry.type].radius;
-    const radius = geometry.primitiveInfo[geometry.type].radius;
-    const tubeRadius = geometry.primitiveInfo[geometry.type].tubeRadius;
-    let angle = 0.0;
-    let arcAngle = 2 * Math.PI;
+    center.set(primitiveInfo.center.x, primitiveInfo.center.y, primitiveInfo.center.z);
+    normal.set(primitiveInfo.normal.x, primitiveInfo.normal.y, primitiveInfo.normal.z);
 
-    if (geometry.type === 'torusSegment') {
-      // torusSegment has two more properties
-      angle = geometry.primitiveInfo[geometry.type].angle;
-      arcAngle = geometry.primitiveInfo[geometry.type].arcAngle;
-    }
+    const {
+      radius,
+      tubeRadius,
+      angle = 0.0,
+      arcAngle = 2 * Math.PI,
+    } = primitiveInfo;
 
-    vector1.set(center.x, center.y, center.z);
-    vector2.set(normal.x, normal.y, normal.z);
-    group.add(nodeId, treeIndex, color, vector1, vector2, radius, tubeRadius, angle, arcAngle);
+    group.add(nodeId, treeIndex, color, center, normal, radius, tubeRadius, angle, arcAngle);
   });
   return group;
 }
