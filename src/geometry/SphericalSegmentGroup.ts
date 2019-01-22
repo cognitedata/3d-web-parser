@@ -1,17 +1,36 @@
 // Copyright 2019 Cognite AS
 
-import SphereGroup from './SphereGroup';
+import PrimitiveGroup from './PrimitiveGroup';
 
-export default class SphericalSegmentGroup extends SphereGroup {
+export default class SphericalSegmentGroup extends PrimitiveGroup {
   static type = 'SphericalSegment';
+  public center: Float32Array;
+  public radius: Float32Array;
   public normal: Float32Array;
   public height: Float32Array;
-  public isClosed: Uint8Array;
+
   constructor(capacity: number) {
     super(capacity);
+    this.center = new Float32Array(3 * capacity);
+    this.radius = new Float32Array(capacity);
     this.normal = new Float32Array(3 * capacity);
     this.height = new Float32Array(capacity);
-    this.isClosed = new Uint8Array(capacity);
+  }
+
+  setCenter(source: THREE.Vector3, index: number) {
+    this.setVector(source, this.center, index);
+  }
+
+  getCenter(target: THREE.Vector3, index: number) {
+    return this.getVector(this.center, target, index);
+  }
+
+  setRadius(value: number, index: number) {
+    this.radius[index] = value;
+  }
+
+  getRadius(index: number): number {
+    return this.radius[index];
   }
 
   setNormal(source: THREE.Vector3, index: number) {
@@ -30,14 +49,6 @@ export default class SphericalSegmentGroup extends SphereGroup {
     return this.height[index];
   }
 
-  setIsClosed(value: boolean, index: number) {
-    this.isClosed[index] = value ? 1 : 0;
-  }
-
-  getIsClosed(index: number): boolean {
-    return this.isClosed[index] === 1 ? true : false;
-  }
-
   // @ts-ignore
   add(
     nodeId: number,
@@ -47,7 +58,6 @@ export default class SphericalSegmentGroup extends SphereGroup {
     normal: THREE.Vector3,
     radius: number,
     height: number,
-    isClosed: boolean,
   ) {
     this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
@@ -56,7 +66,6 @@ export default class SphericalSegmentGroup extends SphereGroup {
     this.setRadius(radius, this.count);
     this.setNormal(normal, this.count);
     this.setHeight(height, this.count);
-    this.setIsClosed(isClosed, this.count);
     this.count += 1;
   }
 
