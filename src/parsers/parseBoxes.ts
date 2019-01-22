@@ -1,24 +1,41 @@
 import * as THREE from 'three';
 import BoxGroup from '../geometry/BoxGroup';
-import { parsePrimitiveColor, parsePrimitiveInfo, parsePrimitiveNodeId, parsePrimitiveTreeIndex } from './parseUtils';
-const type = 'box';
+import { MatchingGeometries,
+  parsePrimitiveColor,
+  parsePrimitiveInfo,
+  parsePrimitiveNodeId,
+  parsePrimitiveTreeIndex,
+} from './parseUtils';
+
 const color = new THREE.Color();
 const vector1 = new THREE.Vector3();
 const vector2 = new THREE.Vector3();
 const vector3 = new THREE.Vector3();
 
-function count(geometries: any[]): number {
-  return geometries.reduce( (total, geometry) => { return geometry.type === type ? total + 1 : total; }, 0);
+function findMatchingGeometries(geometries: any[]): MatchingGeometries {
+  const matchingGeometries: MatchingGeometries = {
+    count: 0,
+    geometries: [],
+  };
+
+  geometries.forEach(geometry => {
+    if (geometry.type === 'box') {
+      matchingGeometries.geometries.push(geometry);
+      matchingGeometries.count += 1;
+    }
+  });
+
+  return matchingGeometries;
 }
 
 export default function parseBoxes(geometries: any[]): BoxGroup|null {
-  const group = new BoxGroup(count(geometries));
+  const matchingGeometries = findMatchingGeometries(geometries);
+  const group = new BoxGroup(matchingGeometries.count);
   if (group.capacity === 0) {
     return null;
   }
 
-  const objects = geometries.filter(geometry => geometry.type === type);
-  objects.forEach(geometry => {
+  matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = parsePrimitiveInfo(geometry.primitiveInfo);
 
     const nodeId = parsePrimitiveNodeId(geometry);
