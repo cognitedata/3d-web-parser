@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import QuadGroup from '../geometry/QuadGroup';
-import { parsePrimitiveColor, parsePrimitiveInfo, parsePrimitiveNodeId, parsePrimitiveTreeIndex } from './parseUtils';
+import { MatchingGeometries, parsePrimitiveColor, parsePrimitiveNodeId, parsePrimitiveTreeIndex } from './parseUtils';
 import { zAxis } from '../constants';
 
 const color = new THREE.Color();
@@ -12,11 +12,6 @@ const centerA = new THREE.Vector3();
 const centerB = new THREE.Vector3();
 const normal = new THREE.Vector3();
 const axisRotation = new THREE.Quaternion();
-
-interface MatchingGeometries {
-  count: number;
-  geometries: any[];
-}
 
 function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   const matchingGeometries: MatchingGeometries = {
@@ -50,10 +45,13 @@ export default function parse(geometries: any[]): QuadGroup|null {
     const treeIndex = parsePrimitiveTreeIndex(geometry);
     color.setHex(parsePrimitiveColor(geometry));
 
-    const angle = primitiveInfo.angle;
-    const innerRadius = primitiveInfo.innerRadius;
-    const outerRadius = primitiveInfo.outerRadius;
-    const arcAngle = geometry.primitiveInfo[geometry.type].arcAngle;
+    const {
+      angle,
+      innerRadius,
+      outerRadius,
+      arcAngle,
+    } = primitiveInfo;
+
     centerA.set(primitiveInfo.centerA.x, primitiveInfo.centerA.y, primitiveInfo.centerA.z);
     centerB.set(primitiveInfo.centerB.x, primitiveInfo.centerB.y, primitiveInfo.centerB.z);
 
