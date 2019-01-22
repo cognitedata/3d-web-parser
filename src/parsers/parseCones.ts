@@ -69,8 +69,9 @@ export default function parse(geometries: any[]): ConeGroup|null {
       const arcAngle  = primitiveInfo.arcAngle;
 
       group.add(nodeId, treeIndex, color, centerA, centerB, radiusA, radiusB, angle, arcAngle);
+
       if (primitiveInfo.thickness > 0) {
-        // Create the inner cylinder if it has a thickness
+        // Create the inner cone if it has a thickness
         radiusA -= primitiveInfo.thickness;
         radiusB -= primitiveInfo.thickness;
         group.add(nodeId, treeIndex, color, centerA, centerB, radiusA, radiusB, angle, arcAngle);
