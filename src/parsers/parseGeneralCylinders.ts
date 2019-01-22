@@ -1,53 +1,71 @@
 import * as THREE from 'three';
-import CircleGroup from '../geometry/CircleGroup';
-import { parsePrimitiveColor, parsePrimitiveInfo, parsePrimitiveNodeId, parsePrimitiveTreeIndex } from './parseUtils';
+import GeneralCylinderGroup from '../geometry/GeneralCylinderGroup';
+import { MatchingGeometries, parsePrimitiveColor, parsePrimitiveNodeId, parsePrimitiveTreeIndex } from './parseUtils';
 
 const color = new THREE.Color();
-const vector1 = new THREE.Vector3();
-const vector2 = new THREE.Vector3();
-const vector3 = new THREE.Vector3();
+const centerA = new THREE.Vector3();
+const centerB = new THREE.Vector3();
 
-function countCircles(geometries: any[]): number {
-  const numCircles = geometries.reduce(
-    (total, geometry) => { return geometry.type === 'circle' ? total + 1 : total; }, 0);
+function findMatchingGeometries(geometries: any[]): MatchingGeometries {
+  const matchingGeometries: MatchingGeometries = {
+    count: 0,
+    geometries: [],
+  };
 
-  const numExtraCircles = geometries.reduce((total, geometry) => {
-    if (['cylinder', 'cone', 'eccentricCone'].indexOf(geometry.type) > 0) {
-      // Found one of them
-      const type = Object.keys(geometry.primitiveInfo)[0];
-      const isClosed = geometry.primitiveInfo[type].isClosed;
-      return total + 2;
+  geometries.forEach(geometry => {
+    if (geometry.type === 'generalCylinder') {
+      matchingGeometries.geometries.push(geometry);
+      matchingGeometries.count += 1;
     }
-    return total;
-  }, 0);
+  });
 
-  return numCircles + numExtraCircles;
+  return matchingGeometries;
 }
 
-export default function parseCircles(geometries: any[]): CircleGroup|null {
-  const numCircles = countCircles(geometries);
-  if (numCircles === 0) {
-    return null;
-  }
-  const circles = geometries.filter(object => object.type === 'circle');
-  // const circles = geometries.filter(object => object.type === 'circle');
+export default function parse(geometries: any[]): GeneralCylinderGroup|null {
+  console.log('General cylinder parsing from generalCylinder parsing isn\'t implemented');
+  return null;
+  // const matchingGeometries = findMatchingGeometries(geometries);
+  // const group = new GeneralCylinderGroup(matchingGeometries.count);
+  // if (group.capacity === 0) {
+  //   return null;
+  // }
 
-  const count = circles.length;
-  const group = new CircleGroup(count);
+  // matchingGeometries.geometries.forEach(geometry => {
+  //   const primitiveInfo = geometry.primitiveInfo[geometry.type];
 
-  circles.forEach(circle => {
-    const primitiveInfo = parsePrimitiveInfo(circle.primitiveInfo);
+  //   const nodeId = parsePrimitiveNodeId(geometry);
+  //   const treeIndex = parsePrimitiveTreeIndex(geometry);
+  //   color.setHex(parsePrimitiveColor(geometry));
 
-    const nodeId = parsePrimitiveNodeId(circle);
-    const treeIndex = parsePrimitiveTreeIndex(circle);
-    const center = circle.primitiveInfo.circle.center;
-    const normal = circle.primitiveInfo.circle.normal;
-    const radius = circle.primitiveInfo.circle.radius;
-    vector1.set(center.x, center.y, center.z);
-    vector2.set(normal.x, normal.y, normal.z);
-    console.log('Color thing: ', parsePrimitiveColor(circle));
-    color.setHex(parsePrimitiveColor(circle));
-    group.add(nodeId, treeIndex, color, vector1, vector2, radius);
-  });
-  return group;
+  //   centerA.set(primitiveInfo.centerA.x, primitiveInfo.centerA.y, primitiveInfo.centerA.z);
+  //   centerB.set(primitiveInfo.centerB.x, primitiveInfo.centerB.y, primitiveInfo.centerB.z);
+  //   const radius = primitiveInfo.radius;
+  //   const heightA = primitiveInfo.heightA;
+  //   const heightB = primitiveInfo.heightB;
+  //   const slopeA = primitiveInfo.slopeA;
+  //   const slopeB = primitiveInfo.slopeB;
+  //   const zAngleA = primitiveInfo.zAngleA;
+  //   const zAngleB = primitiveInfo.zAngleB;
+  //   const angle = primitiveInfo.angle;
+  //   const arcAngle = primitiveInfo.arcAngle;
+
+  //   group.add(
+  //     nodeId,
+  //     treeIndex,
+  //     color,
+  //     centerA,
+  //     centerB,
+  //     radius,
+  //     heightA,
+  //     heightB,
+  //     slopeA,
+  //     slopeB,
+  //     zAngleA,
+  //     zAngleB,
+  //     angle,
+  //     arcAngle);
+  // });
+
+  // return group;
 }
