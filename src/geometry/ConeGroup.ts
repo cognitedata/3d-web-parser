@@ -7,14 +7,12 @@ export default class ConeGroup extends BaseCylinderGroup {
     static type = 'Cone';
     public radiusA: Float32Array;
     public radiusB: Float32Array;
-    public isClosed: Uint8Array;
     public angle: Float32Array;
     public arcAngle: Float32Array;
   constructor(capacity: number) {
     super(capacity);
     this.radiusA = new Float32Array(capacity);
     this.radiusB = new Float32Array(capacity);
-    this.isClosed = new Uint8Array(capacity);
     this.angle = new Float32Array(capacity);
     this.arcAngle = new Float32Array(capacity);
   }
@@ -33,14 +31,6 @@ export default class ConeGroup extends BaseCylinderGroup {
 
   getRadiusB(index: number): number {
     return this.radiusB[index];
-  }
-
-  setIsClosed(value: boolean, index: number) {
-    this.isClosed[index] = value ? 1 : 0;
-  }
-
-  getIsClosed(index: number): boolean {
-    return this.isClosed[index] === 1 ? true : false;
   }
 
   setAngle(value: number, index: number) {
@@ -67,9 +57,8 @@ export default class ConeGroup extends BaseCylinderGroup {
     centerB: THREE.Vector3,
     radiusA: number,
     radiusB: number,
-    isClosed: boolean,
-    angle: number,
-    arcAngle: number,
+    angle: number = 0,
+    arcAngle: number = 2 * Math.PI,
   ) {
     this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
@@ -78,7 +67,6 @@ export default class ConeGroup extends BaseCylinderGroup {
     this.setCenterB(centerB, this.count);
     this.setRadiusA(radiusA, this.count);
     this.setRadiusB(radiusB, this.count);
-    this.setIsClosed(isClosed, this.count);
     this.setAngle(angle, this.count);
     this.setArcAngle(arcAngle, this.count);
 
