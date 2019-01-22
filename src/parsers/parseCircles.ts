@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import CircleGroup from '../geometry/CircleGroup';
-import { parsePrimitiveColor, parsePrimitiveInfo, parsePrimitiveNodeId, parsePrimitiveTreeIndex } from './parseUtils';
-import { zAxis } from '../constants';
+import { MatchingGeometries, parsePrimitiveColor, parsePrimitiveNodeId, parsePrimitiveTreeIndex } from './parseUtils';
 
 const color = new THREE.Color();
 const center = new THREE.Vector3();
@@ -9,11 +8,6 @@ const centerA = new THREE.Vector3();
 const centerB = new THREE.Vector3();
 const normal = new THREE.Vector3();
 const vector = new THREE.Vector3();
-
-interface MatchingGeometries {
-  count: number;
-  geometries: any[];
-}
 
 function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   const matchingGeometries: MatchingGeometries = {
