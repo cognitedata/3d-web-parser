@@ -1,53 +1,62 @@
 import * as THREE from 'three';
-import CircleGroup from '../geometry/CircleGroup';
+import EccentricConeGroup from '../geometry/EccentricConeGroup';
 import { parsePrimitiveColor, parsePrimitiveInfo, parsePrimitiveNodeId, parsePrimitiveTreeIndex } from './parseUtils';
+import { zAxis } from '../constants';
 
 const color = new THREE.Color();
-const vector1 = new THREE.Vector3();
-const vector2 = new THREE.Vector3();
-const vector3 = new THREE.Vector3();
+const centerA = new THREE.Vector3();
+const centerB = new THREE.Vector3();
+const normal = new THREE.Vector3();
+const vector = new THREE.Vector3();
 
-function countCircles(geometries: any[]): number {
-  const numCircles = geometries.reduce(
-    (total, geometry) => { return geometry.type === 'circle' ? total + 1 : total; }, 0);
-
-  const numExtraCircles = geometries.reduce((total, geometry) => {
-    if (['cylinder', 'cone', 'eccentricCone'].indexOf(geometry.type) > 0) {
-      // Found one of them
-      const type = Object.keys(geometry.primitiveInfo)[0];
-      const isClosed = geometry.primitiveInfo[type].isClosed;
-      return total + 2;
-    }
-    return total;
-  }, 0);
-
-  return numCircles + numExtraCircles;
+interface MatchingGeometries {
+  count: number;
+  geometries: any[];
 }
 
-export default function parseCircles(geometries: any[]): CircleGroup|null {
-  const numCircles = countCircles(geometries);
-  if (numCircles === 0) {
+function findMatchingGeometries(geometries: any[]): MatchingGeometries {
+  const matchingGeometries: MatchingGeometries = {
+    count: 0,
+    geometries: [],
+  };
+
+  geometries.forEach(geometry => {
+    if (geometry.type === 'eccentricCone') {
+      matchingGeometries.geometries.push(geometry);
+      matchingGeometries.count += 1;
+  });
+
+  return matchingGeometries;
+}
+
+export default function parse(geometries: any[]): EccentricConeGroup|null {
+  const matchingGeometries = findMatchingGeometries(geometries);
+  const group = new EccentricConeGroup(matchingGeometries.count);
+  if (group.capacity === 0) {
     return null;
   }
-  const circles = geometries.filter(object => object.type === 'circle');
-  // const circles = geometries.filter(object => object.type === 'circle');
 
-  const count = circles.length;
-  const group = new CircleGroup(count);
+  matchingGeometries.geometries.forEach(geometry => {
+    const primitiveInfo = geometry.primitiveInfo[geometry.type];
+    const nodeId = parsePrimitiveNodeId(geometry);
+    const treeIndex = parsePrimitiveTreeIndex(geometry);
+    color.setHex(parsePrimitiveColor(geometry));
 
-  circles.forEach(circle => {
-    const primitiveInfo = parsePrimitiveInfo(circle.primitiveInfo);
+    centerA.set(primitiveInfo.centerA.x, primitiveInfo.centerA.y, primitiveInfo.centerA.z);
+    centerB.set(primitiveInfo.centerB.x, primitiveInfo.centerB.y, primitiveInfo.centerB.z);
+    const radiusA = primitiveInfo.radiusA;
+    const radiusB = primitiveInfo.radiusB;
 
-    const nodeId = parsePrimitiveNodeId(circle);
-    const treeIndex = parsePrimitiveTreeIndex(circle);
-    const center = circle.primitiveInfo.circle.center;
-    const normal = circle.primitiveInfo.circle.normal;
-    const radius = circle.primitiveInfo.circle.radius;
-    vector1.set(center.x, center.y, center.z);
-    vector2.set(normal.x, normal.y, normal.z);
-    console.log('Color thing: ', parsePrimitiveColor(circle));
-    color.setHex(parsePrimitiveColor(circle));
-    group.add(nodeId, treeIndex, color, vector1, vector2, radius);
+    // TODO(anders.hafreager) ref https://github.com/cognitedata/3d-optimizer/issues/127
+    normal.set(primitiveInfo.normal.x, primitiveInfo.normal.y, primitiveInfo.normal.z);
+    const dotProduct = normal.dot(vector.copy(centerA).sub(centerB));
+    if (dotProduct === 0) {
+      // flat eccentric cones are discarded if it is processed by the latest 3d-optimizer in the backend.
+      // However, models processed with earlier versions may still contain flat eccentric cones.
+      return;
+    }
+
+    group.add(nodeId, treeIndex, color, centerA, centerB, radiusA, radiusB, normal);
   });
   return group;
 }
