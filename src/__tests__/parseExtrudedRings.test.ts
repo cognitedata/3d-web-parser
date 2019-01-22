@@ -31,6 +31,22 @@ describe('parseExtrudedRings', () => {
             centerB: { x: centerB.x, y: centerB.y, z: centerB.z },
             innerRadius: innerRadius,
             outerRadius: outerRadius,
+          },
+        },
+      },
+      {
+        type: 'extrudedRingSegment',
+        nodes: [{ properties: [{
+          nodeId: nodeId,
+          treeIndex: treeIndex,
+          color: { rgb: color.getHex() },
+        }] }],
+        primitiveInfo: {
+          extrudedRing: {
+            centerA: { x: centerA.x, y: centerA.y, z: centerA.z },
+            centerB: { x: centerB.x, y: centerB.y, z: centerB.z },
+            innerRadius: innerRadius,
+            outerRadius: outerRadius,
             isClosed: isClosed,
             arcAngle: arcAngle,
             angle: angle,
@@ -42,17 +58,35 @@ describe('parseExtrudedRings', () => {
     let group: ExtrudedRingGroup;
     // @ts-ignore
     group = parseExtrudedRings(geometries);
-    expect(group.capacity).toBe(1);
-    expect(group.getNodeId(0)).toBe(nodeId);
-    expect(group.getTreeIndex(0)).toBe(treeIndex);
-    expectColorEqual(group.getColor(new THREE.Color(), 0), color);
+    expect(group.capacity).toBe(2);
 
-    expectVector3Equal(group.getCenterA(new THREE.Vector3(), 0), centerA);
-    expectVector3Equal(group.getCenterB(new THREE.Vector3(), 0), centerB);
-    expect(group.getInnerRadius(0)).toBeCloseTo(innerRadius);
-    expect(group.getOuterRadius(0)).toBeCloseTo(outerRadius);
-    expect(group.getIsClosed(0)).toBe(isClosed);
-    expect(group.getAngle(0)).toBe(angle);
-    expect(group.getArcAngle(0)).toBe(arcAngle);
+    {
+      // Test regular extrudedRing
+      const index = 0;
+      expect(group.getNodeId(index)).toBe(nodeId);
+      expect(group.getTreeIndex(index)).toBe(treeIndex);
+      expectColorEqual(group.getColor(new THREE.Color(), 0), color);
+
+      expectVector3Equal(group.getCenterA(new THREE.Vector3(), 0), centerA);
+      expectVector3Equal(group.getCenterB(new THREE.Vector3(), 0), centerB);
+      expect(group.getInnerRadius(index)).toBeCloseTo(innerRadius);
+      expect(group.getOuterRadius(index)).toBeCloseTo(outerRadius);
+    }
+
+    {
+      // Test extrudedRingSegment
+      const index = 1;
+      expect(group.getNodeId(index)).toBe(nodeId);
+      expect(group.getTreeIndex(index)).toBe(treeIndex);
+      expectColorEqual(group.getColor(new THREE.Color(), 0), color);
+
+      expectVector3Equal(group.getCenterA(new THREE.Vector3(), 0), centerA);
+      expectVector3Equal(group.getCenterB(new THREE.Vector3(), 0), centerB);
+      expect(group.getInnerRadius(index)).toBeCloseTo(innerRadius);
+      expect(group.getOuterRadius(index)).toBeCloseTo(outerRadius);
+      expect(group.getIsClosed(index)).toBe(isClosed);
+      expect(group.getAngle(index)).toBe(angle);
+      expect(group.getArcAngle(index)).toBe(arcAngle);
+    }
   });
 });
