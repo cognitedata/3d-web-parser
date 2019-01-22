@@ -76,12 +76,12 @@ export default class GeneralRingGroup extends PlaneGroup {
     color: THREE.Color,
     center: THREE.Vector3,
     normal: THREE.Vector3,
+    localXAxis: THREE.Vector3,
     xRadius: number,
     yRadius: number,
-    localXAxis: THREE.Vector3,
     thickness: number,
-    angle: number,
-    arcAngle: number,
+    angle: number = 0,
+    arcAngle: number = 2 * Math.PI,
   ) {
     this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
