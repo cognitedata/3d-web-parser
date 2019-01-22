@@ -1,15 +1,10 @@
 import * as THREE from 'three';
 import EllipsoidSegmentGroup from '../geometry/EllipsoidSegmentGroup';
-import { parsePrimitiveColor, parsePrimitiveInfo, parsePrimitiveNodeId, parsePrimitiveTreeIndex } from './parseUtils';
+import { MatchingGeometries, parsePrimitiveColor, parsePrimitiveNodeId, parsePrimitiveTreeIndex } from './parseUtils';
 
 const color = new THREE.Color();
 const center = new THREE.Vector3();
 const normal = new THREE.Vector3();
-
-interface MatchingGeometries {
-  count: number;
-  geometries: any[];
-}
 
 function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   const matchingGeometries: MatchingGeometries = {
@@ -18,9 +13,6 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   };
 
   geometries.forEach(geometry => {
-    const isClosed = geometry.primitiveInfo[geometry.type].isClosed;
-    const thickness = geometry.primitiveInfo[geometry.type].thickness;
-
     if (geometry.type === 'ellipsoid' || geometry.type === 'ellipsoidSegment') {
       matchingGeometries.geometries.push(geometry);
       matchingGeometries.count += 1;
