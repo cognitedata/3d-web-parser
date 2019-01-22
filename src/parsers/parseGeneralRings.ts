@@ -1,53 +1,162 @@
 import * as THREE from 'three';
-import CircleGroup from '../geometry/CircleGroup';
-import { parsePrimitiveColor, parsePrimitiveInfo, parsePrimitiveNodeId, parsePrimitiveTreeIndex } from './parseUtils';
+import GeneralRingGroup from '../geometry/GeneralRingGroup';
+import { MatchingGeometries, parsePrimitiveColor, parsePrimitiveNodeId, parsePrimitiveTreeIndex } from './parseUtils';
+import { xAxis, zAxis } from '../constants';
 
-const color = new THREE.Color();
-const vector1 = new THREE.Vector3();
-const vector2 = new THREE.Vector3();
-const vector3 = new THREE.Vector3();
+const THREEColor = new THREE.Color();
+const center = new THREE.Vector3();
+const centerA = new THREE.Vector3();
+const centerB = new THREE.Vector3();
+const capZAxis = new THREE.Vector3();
+const capXAxis = new THREE.Vector3();
+const normal = new THREE.Vector3();
+const localXAxis = new THREE.Vector3();
+const rotation = new THREE.Quaternion();
 
-function countCircles(geometries: any[]): number {
-  const numCircles = geometries.reduce(
-    (total, geometry) => { return geometry.type === 'circle' ? total + 1 : total; }, 0);
+function findMatchingGeometries(geometries: any[]): MatchingGeometries {
+  const matchingGeometries: MatchingGeometries = {
+    count: 0,
+    geometries: [],
+  };
 
-  const numExtraCircles = geometries.reduce((total, geometry) => {
-    if (['cylinder', 'cone', 'eccentricCone'].indexOf(geometry.type) > 0) {
-      // Found one of them
-      const type = Object.keys(geometry.primitiveInfo)[0];
-      const isClosed = geometry.primitiveInfo[type].isClosed;
-      return total + 2;
+  geometries.forEach(geometry => {
+    const thickness = geometry.primitiveInfo[geometry.type].thickness;
+
+    if (geometry.type === 'ring') {
+      matchingGeometries.geometries.push(geometry);
+      matchingGeometries.count += 1;
+    } else if (geometry.type === 'extrudedRing'
+            || geometry.type === 'generalCylinder'
+            || geometry.type === 'cone' && thickness > 0) {
+      matchingGeometries.geometries.push(geometry);
+      matchingGeometries.count += 2;
     }
-    return total;
-  }, 0);
+  });
 
-  return numCircles + numExtraCircles;
+  return matchingGeometries;
 }
 
-export default function parseCircles(geometries: any[]): CircleGroup|null {
-  const numCircles = countCircles(geometries);
-  if (numCircles === 0) {
+function parseRing(primitiveInfo: any,
+                   nodeId: number,
+                   treeIndex: number,
+                   color: THREE.Color,
+                   group: GeneralRingGroup) {
+  center.set(primitiveInfo.center.x, primitiveInfo.center.y, primitiveInfo.center.z);
+  normal.set(primitiveInfo.normal.x, primitiveInfo.normal.y, primitiveInfo.normal.z);
+  const innerRadius = primitiveInfo.innerRadius;
+  const outerRadius = primitiveInfo.outerRadius;
+
+  localXAxis.copy(xAxis).applyQuaternion(rotation.setFromUnitVectors(zAxis, normal)),
+  group.add(nodeId,
+            treeIndex,
+            color,
+            center,
+            normal,
+            localXAxis,
+            outerRadius,
+            outerRadius,
+            outerRadius - innerRadius,
+            );
+}
+
+function parseCone(primitiveInfo: any,
+                   nodeId: number,
+                   treeIndex: number,
+                   color: THREE.Color,
+                   group: GeneralRingGroup) {
+  centerA.set(primitiveInfo.centerA.x, primitiveInfo.centerA.y, primitiveInfo.centerA.z);
+  centerB.set(primitiveInfo.centerB.x, primitiveInfo.centerB.y, primitiveInfo.centerB.z);
+
+  capZAxis.copy(centerA).sub(centerB);
+  rotation.setFromUnitVectors(zAxis, capZAxis.normalize());
+  capXAxis.copy(xAxis).applyQuaternion(rotation);
+  const {
+    angle = 0,
+    arcAngle,
+    isClosed,
+    radiusA,
+    radiusB,
+    thickness = 0,
+  } = primitiveInfo;
+
+  group.add(nodeId, treeIndex, color, centerA, capZAxis, capXAxis, radiusA, radiusA, thickness, angle, arcAngle);
+  group.add(nodeId, treeIndex, color, centerB, capZAxis, capXAxis, radiusB, radiusB, thickness, angle, arcAngle);
+}
+
+function parseExtrudedRing(primitiveInfo: any,
+                           nodeId: number,
+                           treeIndex: number,
+                           color: THREE.Color,
+                           group: GeneralRingGroup) {
+  const {
+    angle = 0,
+    arcAngle = 2 * Math.PI,
+    innerRadius,
+    outerRadius,
+  } = primitiveInfo;
+
+  centerA.set(primitiveInfo.centerA.x, primitiveInfo.centerA.y, primitiveInfo.centerA.z);
+  centerB.set(primitiveInfo.centerB.x, primitiveInfo.centerB.y, primitiveInfo.centerB.z);
+
+  normal.copy(centerA).sub(centerB).normalize();
+
+  rotation.setFromUnitVectors(zAxis, normal);
+  capXAxis.copy(xAxis).applyQuaternion(rotation);
+
+  group.add(nodeId,
+            treeIndex,
+            color,
+            centerA,
+            normal,
+            capXAxis,
+            outerRadius,
+            outerRadius,
+            outerRadius - innerRadius,
+            angle,
+            arcAngle);
+  group.add(nodeId,
+              treeIndex,
+              color,
+              centerB,
+              normal,
+              capXAxis,
+              outerRadius,
+              outerRadius,
+              outerRadius - innerRadius,
+              angle,
+              arcAngle);
+}
+
+function parseGeneralCylinder(primitiveInfo: any,
+                              nodeId: number,
+                              treeIndex: number,
+                              color: THREE.Color,
+                              group: GeneralRingGroup) {
+  console.log('General ring parsing from generalCylinder parsing isn\'t implemented');
+}
+
+export default function parse(geometries: any[]): GeneralRingGroup|null {
+  const matchingGeometries = findMatchingGeometries(geometries);
+  const group = new GeneralRingGroup(matchingGeometries.count);
+  if (group.capacity === 0) {
     return null;
   }
-  const circles = geometries.filter(object => object.type === 'circle');
-  // const circles = geometries.filter(object => object.type === 'circle');
 
-  const count = circles.length;
-  const group = new CircleGroup(count);
+  matchingGeometries.geometries.forEach(geometry => {
+    const primitiveInfo = geometry.primitiveInfo[geometry.type];
+    const nodeId = parsePrimitiveNodeId(geometry);
+    const treeIndex = parsePrimitiveTreeIndex(geometry);
+    THREEColor.setHex(parsePrimitiveColor(geometry));
 
-  circles.forEach(circle => {
-    const primitiveInfo = parsePrimitiveInfo(circle.primitiveInfo);
-
-    const nodeId = parsePrimitiveNodeId(circle);
-    const treeIndex = parsePrimitiveTreeIndex(circle);
-    const center = circle.primitiveInfo.circle.center;
-    const normal = circle.primitiveInfo.circle.normal;
-    const radius = circle.primitiveInfo.circle.radius;
-    vector1.set(center.x, center.y, center.z);
-    vector2.set(normal.x, normal.y, normal.z);
-    console.log('Color thing: ', parsePrimitiveColor(circle));
-    color.setHex(parsePrimitiveColor(circle));
-    group.add(nodeId, treeIndex, color, vector1, vector2, radius);
+    if (geometry.type === 'ring') {
+      parseRing(primitiveInfo, nodeId, treeIndex, THREEColor, group);
+    } else if (geometry.type === 'cone') {
+      parseCone(primitiveInfo, nodeId, treeIndex, THREEColor, group);
+    } else if (geometry.type === 'extrudedRing') {
+      parseExtrudedRing(primitiveInfo, nodeId, treeIndex, THREEColor, group);
+    } else if (geometry.type === 'generalCylinder') {
+      parseGeneralCylinder(primitiveInfo, nodeId, treeIndex, THREEColor, group);
+    }
   });
   return group;
 }
