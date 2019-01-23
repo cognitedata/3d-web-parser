@@ -12,16 +12,16 @@ import {MatchingGeometries,
 const color = new THREE.Color();
 describe('parseBoxes', () => {
   test('parseBoxes', () => {
-    const boxIndices = [ [19, 0], [39, 1]]; // Pairs
+    const indexPairs = [ [19, 0], [39, 1]]; // Pairs
 
     let group: BoxGroup;
     // @ts-ignore
     group = parseBoxes(TestScene.geometries);
     expect(group.capacity).toBe(2);
 
-    boxIndices.forEach(pair => {
-      const boxIndex = pair[0];
-      const groupIndex = pair[1];
+    indexPairs.forEach(indexPair => {
+      const boxIndex = indexPair[0];
+      const groupIndex = indexPair[1];
       const box = TestScene.geometries[boxIndex];
 
       // @ts-ignore

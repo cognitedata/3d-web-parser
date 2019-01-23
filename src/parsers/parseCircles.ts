@@ -16,8 +16,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   };
 
   geometries.forEach(geometry => {
-    const isClosed = geometry.primitiveInfo[geometry.type].isClosed;
-    const thickness = geometry.primitiveInfo[geometry.type].thickness;
+    const { isClosed = false, thickness = 0 } = geometry.primitiveInfo[geometry.type];
 
     if (geometry.type === 'circle') {
       matchingGeometries.geometries.push(geometry);
