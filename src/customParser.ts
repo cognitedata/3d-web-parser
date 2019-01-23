@@ -135,7 +135,7 @@ class BufferReader {
   }
 }
 
-function parseArrayBuffer(asArrayBuffer: ArrayBuffer, flip: boolean) {
+function parseCustomFileFormat(asArrayBuffer: ArrayBuffer, flip: boolean) {
   let fileReader = new BufferReader(asArrayBuffer, true);
   
   let infoHeader = fileReader.readUint32Array(4);
@@ -217,4 +217,4 @@ function parseArrayBuffer(asArrayBuffer: ArrayBuffer, flip: boolean) {
   return {"magicBytes": magicBytes, "formatVersion": formatVersion, "optimizerVersion": optimizerVersion, "arrayCount": arrayCount, "arrays": arraysDictionary, "geometries": geometryAttributes};
 }
 
-export { parseArrayBuffer, decodeFibonacciEncoding }
+export { parseCustomFileFormat, decodeFibonacciEncoding }
