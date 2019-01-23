@@ -1,4 +1,4 @@
-import { parseArrayBuffer, decodeFibonacciEncoding } from '../../customParser'
+import { parseCustomFileFormat, decodeFibonacciEncoding } from '../../customParser'
 // @ts-ignore
 const fs = require('fs');
 
@@ -48,7 +48,7 @@ describe('customFileParser', () => {
       arrayBufferCopier[i] = incomingFile[i];
     }
 
-    let parsedFile = parseArrayBuffer(asArrayBuffer, true);
+    let parsedFile = parseCustomFileFormat(asArrayBuffer, true);
   
     expect(parsedFile.magicBytes).toBe(1178874739);
     expect(parsedFile.formatVersion).toBe(1);
@@ -100,7 +100,7 @@ describe('customFileParser', () => {
     checkFloatArrayMatch(parsedFile.arrays.matrixes.slice(0,20), expectedMatrixes);
     expect(parsedFile.arrays.x_translations.length).toBe(0);
     checkFloatArrayMatch(parsedFile.arrays.x_translations.slice(0,20), expectedXTranslations);
-    expect(parsedFile.arrays.y_translations.length).toBe(0);
+    expect(parsedFile.arrays.y_translations.length).toBe(0); 
     checkFloatArrayMatch(parsedFile.arrays.y_translations.slice(0,20), expectedYTranslations);
     expect(parsedFile.arrays.z_translations.length).toBe(0);
     checkFloatArrayMatch(parsedFile.arrays.z_translations.slice(0,20), expectedZTranslations);
