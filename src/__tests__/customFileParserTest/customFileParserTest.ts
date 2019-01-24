@@ -148,7 +148,7 @@ describe('customFileParser', () => {
       }
     }
   });
- 
+  
 
   test('generate groups', async() => {
     const incomingFile = fs.readFileSync('./src/__tests__/customFileParserTest/Pipes.c3d', null);
