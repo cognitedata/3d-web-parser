@@ -9,7 +9,6 @@ describe('EccentricConeGroup', () => {
     const group = new EccentricConeGroup(2);
     expect(group.radiusA.length).toBe(2);
     expect(group.radiusB.length).toBe(2);
-    expect(group.isClosed.length).toBe(2);
     expect(group.normal.length).toBe(6);
 
     expect(EccentricConeGroup.type).toBe('EccentricCone');
