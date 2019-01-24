@@ -1,3 +1,9 @@
+import BoxGroup from './geometry/BoxGroup'
+import CircleGroup from './geometry/CircleGroup'
+import ConeGroup from './geometry/ConeGroup'
+import * as THREE from 'three';
+import { start } from 'repl';
+
 let debug = false;
 
 let lookup = [1,2];
@@ -5,64 +11,57 @@ for (let i=2; i<=77; i++) {
   lookup.push(lookup[i-1] + lookup[i-2])
 }
 
-function decodeFibonacciEncoding(compressedBuffer: ArrayBuffer, numberOfValues: number) {
-  let compressedView = new Uint8Array(compressedBuffer);
-  let uncompressedData = new ArrayBuffer(numberOfValues*8);
-  let uncompressedView = new Float64Array(uncompressedData);
 
-  if (debug) {
-    console.log(compressedBuffer);
-    console.log(numberOfValues); 
-    console.log(compressedView.length);
-    for (let i=0; i<10; i++) {
-      console.log(compressedView[i].toString(2))
-    }
+class FibonacciDecoder {
+  private buffer: ArrayBuffer;
+  private data: Uint8Array;
+  public numberRead: number;
+
+  private readBitId: number;
+  private currentValue: number;
+  private nextFibIndex: number;
+
+  constructor(compressedBuffer: ArrayBuffer, startByte?: number, length?: number) {
+    if (!startByte) startByte = 0;
+    if (!length) length = compressedBuffer.byteLength - startByte;
+
+    this.numberRead = 0;
+    this.buffer = compressedBuffer;
+    this.data = new Uint8Array(this.buffer, startByte, length);
+
+    // read first bit
+    this.currentValue = (this.data[0]&(1<<7))>>7;
+    this.nextFibIndex = 1;
+    this.readBitId = 1;
   }
 
-  // read first bit
-  let newNumberId = 0;
-  let currentValue = (compressedView[0]&(1<<7))>>7;
-  
-    let nextFibIndex = 1;
-  let lengthRead;
-
-  // read rest of file
-  for (let bitId=1; bitId<compressedView.length*8; bitId++) {
-    let currentBit = compressedView[Math.floor(bitId/8)] & 1<<(7-(bitId%8));
-    if (currentBit != 0) {
-      // check if termination bit
-      let terminationBit = compressedView[Math.floor((bitId-1)/8)] & (1<<(7-(bitId-1)%8))
-      if ((terminationBit != 0) && (nextFibIndex != 0)) {
-        uncompressedView[newNumberId] = currentValue-1;
-        if (newNumberId == numberOfValues-1) {
-          lengthRead = Math.ceil(bitId/8);
-          if (debug) {
-            console.log("...")
-            console.log(lengthRead);
-            console.log(compressedView.length);
-          }
-
-          break;
+  nextValue() {
+    this.numberRead++;
+    // read rest of file
+    //while (true) {
+    for (let i=0; i<100; i++) {
+      let currentBit8 = this.data[Math.floor(this.readBitId/8)] & 1<<(7-(this.readBitId%8));
+      if (currentBit8 != 0) {
+        // check if termination bit
+        let previousBit8 = this.data[Math.floor((this.readBitId-1)/8)] & (1<<(7-(this.readBitId-1)%8))
+        if ((previousBit8 != 0) && (this.nextFibIndex != 0)) {
+          let returnValue = this.currentValue-1;
+          this.currentValue = 0;
+          this.nextFibIndex = 0;
+          this.readBitId++;
+          return returnValue;
         }
-        currentValue = 0;
-        newNumberId += 1;
-        nextFibIndex = 0;
-        continue;
-      }
 
-      // Otherwise update read value
-      else {
-        currentValue += lookup[nextFibIndex];
-        if (debug) {
-          console.log("FIB: " + lookup[nextFibIndex])
-          console.log(currentValue);
+        // Otherwise update read value
+        else {
+          this.currentValue += lookup[this.nextFibIndex];
         }
       }
+      this.nextFibIndex++;
+      this.readBitId++;
     }
-    nextFibIndex += 1;
+    throw Error("THIS IS REALLY BAD")
   }
-
-  return uncompressedView;
 }
 
 function toHex(yourNumber: number): string {
@@ -128,10 +127,8 @@ class BufferReader {
   return newArray;
   }
 
-  readFibonacci(numberOfBytes: number, numberOfValues: number) {
-    let decoded = decodeFibonacciEncoding(this.arrayBuffer.slice(this.location), numberOfValues)
+  skip(numberOfBytes: number) {
     this.location += numberOfBytes;
-    return decoded;
   }
 }
 
@@ -152,7 +149,7 @@ function parseCustomFileFormat(asArrayBuffer: ArrayBuffer, flip: boolean) {
     console.log(arrayCount);
   }
 
-  let arraysList = ['colors', 'x_values', 'y_values', 'z_values', 'normals', 'deltas', 'heights', 'radii', 'angles', 'matrixes', 'x_translations', 'y_translations', 'z_translations']
+  let arraysList = ['colors', 'x_values', 'y_values', 'z_values', 'normals', 'deltas', 'heights', 'radiuses', 'angles', 'matrixes', 'x_translations', 'y_translations', 'z_translations']
   let arraysDictionary: any = {};
   for (let array_id=0; array_id<arrayCount;  array_id++) {
     let clusterCount = fileReader.readUint32();
@@ -172,10 +169,8 @@ function parseCustomFileFormat(asArrayBuffer: ArrayBuffer, flip: boolean) {
       let normalValues = fileReader.readFloat32Array(clusterCount*3);
       arraysDictionary[type] = [];
       for (let j=0; j<clusterCount; j++) {
-        arraysDictionary[type].push([]);
-        for (let k=0; k<3; k++) {
-          arraysDictionary[type][j].push(normalValues[j*3+k]);
-        }
+        let normal = new THREE.Vector3(normalValues[j*3], normalValues[j*3+1], normalValues[j*3+2]);
+        arraysDictionary[type].push(normal);
       }
     } else if (bytesForOneValue === 4) {
       arraysDictionary[type] = fileReader.readFloat32Array(clusterCount);
@@ -197,7 +192,8 @@ function parseCustomFileFormat(asArrayBuffer: ArrayBuffer, flip: boolean) {
     let attributeCount = fileReader.readUint32();
     let byteCount = fileReader.readUint32();
 
-    let indexes = fileReader.readFibonacci(byteCount, geometryCount*attributeCount);
+    let indexes = new FibonacciDecoder(asArrayBuffer, fileReader.location, byteCount);
+    fileReader.skip(byteCount);
 
     if (debug) {
       console.log(geometryType);
@@ -207,7 +203,7 @@ function parseCustomFileFormat(asArrayBuffer: ArrayBuffer, flip: boolean) {
       console.log(indexes);
     }
 
-    geometryAttributes.push({"type": geometryType, "indexes": indexes})
+    geometryAttributes.push({"type": geometryType, "indexes": indexes, "count": geometryCount})
 
     if (fileReader.location == asArrayBuffer.byteLength) {
       break;
@@ -217,4 +213,150 @@ function parseCustomFileFormat(asArrayBuffer: ArrayBuffer, flip: boolean) {
   return {"magicBytes": magicBytes, "formatVersion": formatVersion, "optimizerVersion": optimizerVersion, "arrayCount": arrayCount, "arrays": arraysDictionary, "geometries": geometryAttributes};
 }
 
-export { parseCustomFileFormat, decodeFibonacciEncoding }
+
+let nodeId: number;
+let treeIndex: number;
+let color: any;
+let x: number, y: number, z: number;
+let delta_x: number, delta_y: number, delta_z: number;
+let height: number;
+let radius: number, radiusA: number, radiusB: number;
+let angle: number;
+let center = new THREE.Vector3();
+let normal = new THREE.Vector3();
+let delta = new THREE.Vector3();
+
+let centerA = new THREE.Vector3();
+let centerB = new THREE.Vector3();
+
+function loadData(trueValuesArray: any, geometryInfo: any) {
+  nodeId =    geometryInfo.indexes.nextValue();
+  treeIndex = geometryInfo.indexes.nextValue();
+  color =     geometryInfo.indexes.nextValue();
+  let x_index = geometryInfo.indexes.nextValue();
+  let y_index = geometryInfo.indexes.nextValue();
+  let z_index = geometryInfo.indexes.nextValue();
+
+  x =         trueValuesArray.x_values[x_index];
+  y =         trueValuesArray.y_values[y_index];
+  z =         trueValuesArray.z_values[z_index];
+
+  center.set(x,y,z);
+
+  // Normal: All but spheres
+  if ([1, 3, 4].indexOf(geometryInfo.type) != -1) {
+    normal = trueValuesArray.normals[geometryInfo.indexes.nextValue()];
+  }
+
+  // Delta: Box
+  if (geometryInfo.type == 1) {
+    delta_x = trueValuesArray.deltas[geometryInfo.indexes.nextValue()];
+    delta_y = trueValuesArray.deltas[geometryInfo.indexes.nextValue()];
+    delta_z = trueValuesArray.deltas[geometryInfo.indexes.nextValue()];
+    delta.set(delta_x, delta_y, delta_z);
+  }
+  
+  // Height: Cylinders and sphere/ellipsoid segments
+  if ([3, 4].indexOf(geometryInfo.type) != -1) {
+    height = trueValuesArray.heights[geometryInfo.indexes.nextValue()];
+  }
+  
+  // Radius (one): Circle, sphere/ellipsoid segment, cylinder
+  if ([2, 4].indexOf(geometryInfo.type) != -1) {
+    radius = trueValuesArray.radiuses[geometryInfo.indexes.nextValue()];
+  }
+
+
+  // Radiuses (two): Cones
+  if ([3].indexOf(geometryInfo.type) != -1) {
+    radiusA = trueValuesArray.radiuses[geometryInfo.indexes.nextValue()];
+    radiusB = trueValuesArray.radiuses[geometryInfo.indexes.nextValue()];    
+  }
+
+  // Angle: Box
+  if ([1].indexOf(geometryInfo.type) != -1) {
+    angle = trueValuesArray.angles[geometryInfo.indexes.nextValue()];
+  }
+
+  // Matrix: ??
+  // Translation: ??
+}
+
+function generateGeometryGroups(segmentInformation: any) {
+  let circleCount = 0;
+  let boxCount = 0;
+  let coneCount = 0;
+
+  for (let i=0; i<segmentInformation.geometries.length; i++) {
+    let geometryInfo = segmentInformation.geometries[i];
+    switch (geometryInfo.type) {
+      case 1: // Box
+        boxCount += geometryInfo.count;
+        break;
+      case 2: // Circle
+        circleCount += geometryInfo.count;
+        break;
+      case 3: // Closed cone
+        circleCount += 2*geometryInfo.count;
+        coneCount += geometryInfo.count;
+        break;
+      case 4: // Closed cylinder
+        circleCount += 2*geometryInfo.count;
+        coneCount += geometryInfo.count;
+        break;
+      default:
+        console.log("Geometry count: Unrecognized geometry with type " + geometryInfo.type)
+    }
+  }
+
+  let circleGroup = new CircleGroup(circleCount);
+  let boxGroup = new BoxGroup(boxCount);
+  let coneGroup = new ConeGroup(coneCount);
+
+  for (let i=0; i<segmentInformation.geometries.length; i++) {
+    let geometryInfo = segmentInformation.geometries[i];
+
+    switch (geometryInfo.type) {
+      case 1: // Box
+        for (let j=0; j<geometryInfo.count; j++) {
+          loadData(segmentInformation.arrays, geometryInfo);
+          boxGroup.add(nodeId, treeIndex, color, center, normal, angle, delta);
+        }
+        console.log("Boxes done");
+        break;
+      case 2: // Circle
+        for (let j=0; j<geometryInfo.count; j++) {
+          loadData(segmentInformation.arrays, geometryInfo);
+          circleGroup.add(nodeId, treeIndex, color, center, normal, radius);
+        }
+        console.log("Circles done");
+        break;
+      case 3: // Closed cone
+        for (let j=0; j<geometryInfo.count; j++) {
+          loadData(segmentInformation.arrays, geometryInfo);
+          centerA.copy(normal).multiplyScalar(height/2).add(center); // center + normal*height/2
+          centerB.copy(normal).multiplyScalar(-height/2).add(center); // center - normal*height/2
+          coneGroup.add(nodeId, treeIndex, color, centerA, centerB, radiusA, radiusB, angle);
+          circleGroup.add(nodeId, treeIndex, color, centerA, normal, radius);
+          circleGroup.add(nodeId, treeIndex, color, centerB, normal, radius);
+        }
+        console.log("Cones done");
+        break;
+      case 4: // Closed cylinder
+        for (let j=0; j<geometryInfo.count; j++) {
+          loadData(segmentInformation.arrays, geometryInfo);
+          centerA.copy(normal).multiplyScalar(height/2).add(center); // center + normal*height/2
+          centerB.copy(normal).multiplyScalar(-height/2).add(center); // center - normal*height/2
+          coneGroup.add(nodeId, treeIndex, color, centerA, centerB, radius, radius, angle);
+          circleGroup.add(nodeId, treeIndex, color, centerA, normal, radius);
+          circleGroup.add(nodeId, treeIndex, color, centerB, normal, radius);
+        }
+        break;
+      default:
+        console.log("Geometry parse: Unrecognized geometry with type " + geometryInfo.type)
+    }
+  }
+  return {'circleGroup': circleGroup, 'boxGroup': boxGroup, 'coneGroup': coneGroup}
+}
+
+export { parseCustomFileFormat, FibonacciDecoder, generateGeometryGroups }
