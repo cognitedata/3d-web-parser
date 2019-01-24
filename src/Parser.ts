@@ -46,7 +46,7 @@ function parseGeometries(geometries: GeometryGroup[]) {
     }
   });
 
-  return geometryGroups.filter(Boolean);
+  return geometryGroups;
 }
 
 export default async function parseProtobuf(protobufData: Uint8Array) {
