@@ -2,6 +2,7 @@
 
 import * as THREE from 'three';
 import GeometryGroup from './geometry/GeometryGroup';
+import PrimitiveGroup from './geometry/PrimitiveGroup';
 
 export default class Sector {
   public readonly min: THREE.Vector3;
@@ -29,10 +30,20 @@ export default class Sector {
     this.object3d.add(child.object3d);
   }
 
-  *traverseChildren(): IterableIterator<Sector> {
+  *traverseSectors(): IterableIterator<Sector> {
     yield this;
     for (const child of this.children) {
-      yield* child.traverseChildren();
+      yield* child.traverseSectors();
+    }
+  }
+
+  *traversePrimitiveGroups(): IterableIterator<PrimitiveGroup> {
+    for (const child of this.traverseSectors()) {
+      for (const geometryGroup of child.geometries) {
+        if (geometryGroup instanceof PrimitiveGroup) {
+          yield geometryGroup;
+        }
+      }
     }
   }
 
@@ -43,7 +54,7 @@ export default class Sector {
     });
 
     if (recursive) {
-      for (const child of this.traverseChildren()) {
+      for (const child of this.traverseSectors()) {
         usage += child.memoryUsage(false);
       }
     }
