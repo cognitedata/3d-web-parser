@@ -49,7 +49,7 @@ function parseGeometries(geometries: GeometryGroup[]) {
   return geometryGroups.filter(Boolean);
 }
 
-export default async function(protobufData: Uint8Array) {
+export default async function parseProtobuf(protobufData: Uint8Array) {
   const protobufDecoder = new ProtobufDecoder();
 
   const nodes: { [path: string]: Sector } = { };
