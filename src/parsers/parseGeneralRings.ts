@@ -4,7 +4,8 @@ import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
          parsePrimitiveTreeIndex,
-         getPrimitiveType } from './parseUtils';
+         getPrimitiveType,
+         isPrimitive } from './parseUtils';
 import { xAxis, zAxis } from '../constants';
 
 const THREEColor = new THREE.Color();
@@ -24,6 +25,9 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   };
 
   geometries.forEach(geometry => {
+    if (!isPrimitive(geometry)) {
+      return;
+    }
     const thickness = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)].thickness;
 
     if (geometry.type === 'ring') {

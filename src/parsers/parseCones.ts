@@ -1,17 +1,17 @@
 import * as THREE from 'three';
 import ConeGroup from '../geometry/ConeGroup';
-import { parsePrimitiveColor, parsePrimitiveInfo, parsePrimitiveNodeId, parsePrimitiveTreeIndex } from './parseUtils';
+import { MatchingGeometries,
+  parsePrimitiveColor,
+  parsePrimitiveNodeId,
+  parsePrimitiveTreeIndex,
+  getPrimitiveType,
+  isPrimitive } from './parseUtils';
 import { zAxis } from '../constants';
 
 const color = new THREE.Color();
 const centerA = new THREE.Vector3();
 const centerB = new THREE.Vector3();
 const vector = new THREE.Vector3();
-
-interface MatchingGeometries {
-  count: number;
-  geometries: any[];
-}
 
 function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   const matchingGeometries: MatchingGeometries = {
@@ -20,6 +20,9 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   };
 
   geometries.forEach(geometry => {
+    if (!isPrimitive(geometry)) {
+      return;
+    }
     const isClosed = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)].isClosed;
     const thickness = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)].thickness;
 

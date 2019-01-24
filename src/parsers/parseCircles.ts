@@ -4,7 +4,8 @@ import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
          parsePrimitiveTreeIndex,
-         getPrimitiveType } from './parseUtils';
+         getPrimitiveType,
+         isPrimitive } from './parseUtils';
 
 const color = new THREE.Color();
 const center = new THREE.Vector3();
@@ -20,6 +21,9 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   };
 
   geometries.forEach(geometry => {
+    if (!isPrimitive(geometry)) {
+      return;
+    }
     const { isClosed = false, thickness = 0 } = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
 
     if (geometry.type === 'circle') {
