@@ -143,7 +143,7 @@ function parseGeneralCylinder(primitiveInfo: any,
   console.log('General ring parsing from generalCylinder parsing isn\'t implemented');
 }
 
-export default function parse(geometries: any[]): GeneralRingGroup|null {
+export default function parse(geometries: any[]): GeneralRingGroup {
   const matchingGeometries = findMatchingGeometries(geometries);
   const group = new GeneralRingGroup(matchingGeometries.count);
 

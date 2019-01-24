@@ -26,7 +26,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-export default function parse(geometries: any[]): SphericalSegmentGroup|null {
+export default function parse(geometries: any[]): SphericalSegmentGroup {
   const matchingGeometries = findMatchingGeometries(geometries);
   const group = new SphericalSegmentGroup(matchingGeometries.count);
 

@@ -96,7 +96,7 @@ function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup) {
   }
 }
 
-export default function parse(geometries: any[]): CircleGroup|null {
+export default function parse(geometries: any[]): CircleGroup {
   const matchingGeometries = findMatchingGeometries(geometries);
   const group = new CircleGroup(matchingGeometries.count);
 

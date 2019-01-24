@@ -45,11 +45,11 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-export default function parse(geometries: any[]): ConeGroup|null {
-  const matchingGeometries = findMatchingGeometries(geometries);
-  const group = new ConeGroup(matchingGeometries.count);
+export default function parse(geometries: any[]): ConeGroup {
+const matchingGeometries = findMatchingGeometries(geometries);
+const group = new ConeGroup(matchingGeometries.count);
 
-  matchingGeometries.geometries.forEach(geometry => {
+matchingGeometries.geometries.forEach(geometry => {
 
     // Regular circles
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
@@ -85,5 +85,5 @@ export default function parse(geometries: any[]): ConeGroup|null {
       group.add(nodeId, treeIndex, color, centerA, centerB, outerRadius, outerRadius, angle, arcAngle);
     }
   });
-  return group;
+return group;
 }

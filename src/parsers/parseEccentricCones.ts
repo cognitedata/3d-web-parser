@@ -29,7 +29,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-export default function parse(geometries: any[]): EccentricConeGroup|null {
+export default function parse(geometries: any[]): EccentricConeGroup {
   const matchingGeometries = findMatchingGeometries(geometries);
   const group = new EccentricConeGroup(matchingGeometries.count);
 

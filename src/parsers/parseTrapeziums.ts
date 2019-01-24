@@ -96,7 +96,7 @@ function parseGeneralCylinder(primitiveInfo: any,
   console.log('Trapezium parsing from generalCylinder parsing isn\'t implemented');
 }
 
-export default function parse(geometries: any[]): TrapeziumGroup|null {
+export default function parse(geometries: any[]): TrapeziumGroup {
   const matchingGeometries = findMatchingGeometries(geometries);
   const group = new TrapeziumGroup(matchingGeometries.count);
 

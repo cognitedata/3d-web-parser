@@ -35,7 +35,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-export default function parse(geometries: any[]): QuadGroup|null {
+export default function parse(geometries: any[]): QuadGroup {
   const matchingGeometries = findMatchingGeometries(geometries);
   const group = new QuadGroup(matchingGeometries.count);
 

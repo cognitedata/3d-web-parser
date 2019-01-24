@@ -26,7 +26,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-export default function parse(geometries: any[]): GeneralCylinderGroup|null {
+export default function parse(geometries: any[]): GeneralCylinderGroup {
   console.log('General cylinder parsing from generalCylinder parsing isn\'t implemented');
   return null;
   // const matchingGeometries = findMatchingGeometries(geometries);

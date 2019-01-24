@@ -23,5 +23,5 @@ export function getPrimitiveType(primitiveInfo: any): string {
 }
 
 export function isPrimitive(geometry: any): boolean {
-  return geometry.primitiveInfo !== undefined;
+  return geometry.primitiveInfo != null;
 }

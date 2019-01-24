@@ -10,10 +10,9 @@ import CircleGroup from './geometry/CircleGroup';
 import GeometryGroup from './geometry/GeometryGroup';
 import parseCircles from './parsers/parseCircles';
 
-function parseGeometries(geometries: any[]) {
-  const geometryGroups = [];
+function parseGeometries(geometries: GeometryGroup[]) {
+  const geometryGroups: GeometryGroup[] = [];
   geometryGroups.push(parseCircles(geometries));
-  geometryGroups.push(null);
   return geometryGroups.filter(Boolean);
 }
 
@@ -27,7 +26,7 @@ export default async function(protobufData: Uint8Array) {
     const boundingBoxMax = new Vector3(boundingBox.max.x, boundingBox.max.y, boundingBox.max.z);
     const sector = new Sector(boundingBoxMin, boundingBoxMax);
     nodes[path] = sector;
-    const geometries = parseGeometries(webNode.geometries);
+    sector.geometries = parseGeometries(webNode.geometries);
     // console.log('Geometries: ', webNode.geometries);
 
     // attach to parent

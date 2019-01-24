@@ -25,7 +25,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-export default function parse(geometries: any[]): NutGroup|null {
+export default function parse(geometries: any[]): NutGroup {
   const matchingGeometries = findMatchingGeometries(geometries);
   const group = new NutGroup(matchingGeometries.count);
 
