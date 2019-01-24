@@ -9,7 +9,6 @@ describe('ConeGroup', () => {
     const group = new ConeGroup(2);
     expect(group.radiusA.length).toBe(2);
     expect(group.radiusB.length).toBe(2);
-    expect(group.isClosed.length).toBe(2);
     expect(group.angle.length).toBe(2);
     expect(group.arcAngle.length).toBe(2);
 
@@ -32,18 +31,6 @@ describe('ConeGroup', () => {
     expect(group.getRadiusB(0)).toBeCloseTo(radius);
   });
 
-  test('(set/get)IsClosed', () => {
-    const group = new ConeGroup(2);
-
-    group.setIsClosed(true, 0);
-    expect(group.isClosed[0]).toBe(1);
-    expect(group.getIsClosed(0)).toBe(true);
-
-    group.setIsClosed(false, 0);
-    expect(group.isClosed[0]).toBe(0);
-    expect(group.getIsClosed(0)).toBe(false);
-  });
-
   test('add', () => {
     const group = new ConeGroup(2);
 
@@ -54,11 +41,10 @@ describe('ConeGroup', () => {
     const centerB = new THREE.Vector3(4, 5, 6);
     const radiusA = 100.0;
     const radiusB = 150.0;
-    const isClosed = true;
     const angle = 1.33;
     const arcAngle = 2.33;
 
-    group.add(nodeId, treeIndex, color, centerA, centerB, radiusA, radiusB, isClosed, angle, arcAngle);
+    group.add(nodeId, treeIndex, color, centerA, centerB, radiusA, radiusB, angle, arcAngle);
     const targetVector = new THREE.Vector3();
     const targetColor = new THREE.Color();
 
@@ -78,7 +64,6 @@ describe('ConeGroup', () => {
 
     expect(group.getRadiusA(0)).toBeCloseTo(radiusA);
     expect(group.getRadiusB(0)).toBeCloseTo(radiusB);
-    expect(group.getIsClosed(0)).toBe(isClosed);
     expect(group.getAngle(0)).toBeCloseTo(angle);
     expect(group.getArcAngle(0)).toBeCloseTo(arcAngle);
   });

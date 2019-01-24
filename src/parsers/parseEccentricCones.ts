@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 import EccentricConeGroup from '../geometry/EccentricConeGroup';
-import { parsePrimitiveColor, parsePrimitiveInfo, parsePrimitiveNodeId, parsePrimitiveTreeIndex } from './parseUtils';
+import { MatchingGeometries,
+         parsePrimitiveColor,
+         parsePrimitiveNodeId,
+         parsePrimitiveTreeIndex,
+         getPrimitiveType } from './parseUtils';
 import { zAxis } from '../constants';
 
 const color = new THREE.Color();
@@ -8,11 +12,6 @@ const centerA = new THREE.Vector3();
 const centerB = new THREE.Vector3();
 const normal = new THREE.Vector3();
 const vector = new THREE.Vector3();
-
-interface MatchingGeometries {
-  count: number;
-  geometries: any[];
-}
 
 function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   const matchingGeometries: MatchingGeometries = {
@@ -24,6 +23,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
     if (geometry.type === 'eccentricCone') {
       matchingGeometries.geometries.push(geometry);
       matchingGeometries.count += 1;
+    }
   });
 
   return matchingGeometries;
@@ -37,7 +37,7 @@ export default function parse(geometries: any[]): EccentricConeGroup|null {
   }
 
   matchingGeometries.geometries.forEach(geometry => {
-    const primitiveInfo = geometry.primitiveInfo[geometry.type];
+    const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
     const nodeId = parsePrimitiveNodeId(geometry);
     const treeIndex = parsePrimitiveTreeIndex(geometry);
     color.setHex(parsePrimitiveColor(geometry));

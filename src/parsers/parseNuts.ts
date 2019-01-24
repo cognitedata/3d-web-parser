@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 import NutGroup from '../geometry/NutGroup';
-import { MatchingGeometries, parsePrimitiveColor, parsePrimitiveNodeId, parsePrimitiveTreeIndex } from './parseUtils';
+import { MatchingGeometries,
+         parsePrimitiveColor,
+         parsePrimitiveNodeId,
+         parsePrimitiveTreeIndex,
+         getPrimitiveType } from './parseUtils';
 const color = new THREE.Color();
 const centerA = new THREE.Vector3();
 const centerB = new THREE.Vector3();
@@ -29,7 +33,7 @@ export default function parse(geometries: any[]): NutGroup|null {
   }
 
   matchingGeometries.geometries.forEach(geometry => {
-    const primitiveInfo = geometry.primitiveInfo[geometry.type];
+    const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
 
     const nodeId = parsePrimitiveNodeId(geometry);
     const treeIndex = parsePrimitiveTreeIndex(geometry);

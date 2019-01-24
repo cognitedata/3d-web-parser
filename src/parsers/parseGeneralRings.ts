@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 import GeneralRingGroup from '../geometry/GeneralRingGroup';
-import { MatchingGeometries, parsePrimitiveColor, parsePrimitiveNodeId, parsePrimitiveTreeIndex } from './parseUtils';
+import { MatchingGeometries,
+         parsePrimitiveColor,
+         parsePrimitiveNodeId,
+         parsePrimitiveTreeIndex,
+         getPrimitiveType } from './parseUtils';
 import { xAxis, zAxis } from '../constants';
 
 const THREEColor = new THREE.Color();
@@ -20,7 +24,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   };
 
   geometries.forEach(geometry => {
-    const thickness = geometry.primitiveInfo[geometry.type].thickness;
+    const thickness = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)].thickness;
 
     if (geometry.type === 'ring') {
       matchingGeometries.geometries.push(geometry);
@@ -143,7 +147,7 @@ export default function parse(geometries: any[]): GeneralRingGroup|null {
   }
 
   matchingGeometries.geometries.forEach(geometry => {
-    const primitiveInfo = geometry.primitiveInfo[geometry.type];
+    const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
     const nodeId = parsePrimitiveNodeId(geometry);
     const treeIndex = parsePrimitiveTreeIndex(geometry);
     THREEColor.setHex(parsePrimitiveColor(geometry));

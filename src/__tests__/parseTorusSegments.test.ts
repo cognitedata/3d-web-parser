@@ -1,26 +1,26 @@
 // Copyright 2019 Cognite AS
 import * as THREE from 'three';
-import parseTorusSegments from '../parsers/parseTorusSegments';
-import { expectVector3Equal, expectColorEqual } from '../TestUtils';
+import parse from '../parsers/parseTorusSegments';
+import { expectVector3Equal, expectColorEqual, expectVector3Valid, expectColorValid } from '../TestUtils';
 import TorusSegmentGroup from '../geometry/TorusSegmentGroup';
 import * as TestScene from './fixtures/test_scene.json';
+import {MatchingGeometries,
+        parsePrimitiveColor,
+        parsePrimitiveNodeId,
+        parsePrimitiveTreeIndex } from '../parsers/parseUtils';
 
+const color = new THREE.Color();
 describe('parseTorusSegments', () => {
   test('parseTorusSegments', () => {
     let group: TorusSegmentGroup;
     // @ts-ignore
-    group = parseTorusSegments(TestScene.geometries);
-    // expect(group.capacity).toBe(1);
-    // expect(group.getNodeId(0)).toBe(nodeId);
-    // expect(group.getTreeIndex(0)).toBe(treeIndex);
-    // expectColorEqual(group.getColor(new THREE.Color(), 0), color);
-
-    // expectVector3Equal(group.getCenter(new THREE.Vector3(), 0), center);
-    // expectVector3Equal(group.getNormal(new THREE.Vector3(), 0), normal);
-    // expect(group.getRadius(0)).toBeCloseTo(radius);
-    // expect(group.getTubeRadius(0)).toBeCloseTo(tubeRadius);
-    // expect(group.getIsClosed(0)).toBe(isClosed);
-    // expect(group.getAngle(0)).toBeCloseTo(angle);
-    // expect(group.getArcAngle(0)).toBeCloseTo(arcAngle);
+    group = parse(TestScene.geometries);
+    const expectedCount = 8;
+    expect(group.capacity).toBe(expectedCount);
+    for (let i = 0; i < expectedCount; i++) {
+      expectColorValid(group.getColor(new THREE.Color(), i));
+      expectVector3Valid(group.getCenter(new THREE.Vector3(), i));
+      expectVector3Valid(group.getNormal(new THREE.Vector3(), i));
+    }
   });
 });

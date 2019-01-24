@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 import CircleGroup from '../geometry/CircleGroup';
-import { MatchingGeometries, parsePrimitiveColor, parsePrimitiveNodeId, parsePrimitiveTreeIndex } from './parseUtils';
+import { MatchingGeometries,
+         parsePrimitiveColor,
+         parsePrimitiveNodeId,
+         parsePrimitiveTreeIndex,
+         getPrimitiveType } from './parseUtils';
 
 const color = new THREE.Color();
 const center = new THREE.Vector3();
@@ -16,7 +20,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   };
 
   geometries.forEach(geometry => {
-    const { isClosed = false, thickness = 0 } = geometry.primitiveInfo[geometry.type];
+    const { isClosed = false, thickness = 0 } = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
 
     if (geometry.type === 'circle') {
       matchingGeometries.geometries.push(geometry);
@@ -43,7 +47,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 
 function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup) {
   // @ts-ignore
-  const primitiveInfo = geometry.primitiveInfo[geometry.type];
+  const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
   const nodeId = parsePrimitiveNodeId(geometry);
   const treeIndex = parsePrimitiveTreeIndex(geometry);
   color.setHex(parsePrimitiveColor(geometry));
@@ -100,7 +104,7 @@ export default function parse(geometries: any[]): CircleGroup|null {
       parseConeEccentricConeCylinder(geometry, group);
     } else {
       // Regular circles
-      const primitiveInfo = geometry.primitiveInfo[geometry.type];
+      const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
       const nodeId = parsePrimitiveNodeId(geometry);
       const treeIndex = parsePrimitiveTreeIndex(geometry);
       color.setHex(parsePrimitiveColor(geometry));

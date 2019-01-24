@@ -43,18 +43,6 @@ describe('EccentricConeGroup', () => {
     expect(target).toEqual(normal);
   });
 
-  test('(set/get)IsClosed', () => {
-    const group = new EccentricConeGroup(2);
-
-    group.setIsClosed(true, 0);
-    expect(group.isClosed[0]).toBe(1);
-    expect(group.getIsClosed(0)).toBe(true);
-
-    group.setIsClosed(false, 0);
-    expect(group.isClosed[0]).toBe(0);
-    expect(group.getIsClosed(0)).toBe(false);
-  });
-
   test('add', () => {
     const group = new EccentricConeGroup(2);
 
@@ -65,10 +53,9 @@ describe('EccentricConeGroup', () => {
     const centerB = new THREE.Vector3(4, 5, 6);
     const radiusA = 100.0;
     const radiusB = 150.0;
-    const isClosed = true;
     const normal = new THREE.Vector3(7, 8, 9);
 
-    group.add(nodeId, treeIndex, color, centerA, centerB, radiusA, radiusB, normal, isClosed);
+    group.add(nodeId, treeIndex, color, centerA, centerB, radiusA, radiusB, normal);
     const targetVector = new THREE.Vector3();
     const targetColor = new THREE.Color();
 
@@ -91,6 +78,5 @@ describe('EccentricConeGroup', () => {
 
     expect(group.getRadiusA(0)).toBeCloseTo(radiusA);
     expect(group.getRadiusB(0)).toBeCloseTo(radiusB);
-    expect(group.getIsClosed(0)).toBe(isClosed);
   });
 });

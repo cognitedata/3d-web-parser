@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 import QuadGroup from '../geometry/QuadGroup';
-import { MatchingGeometries, parsePrimitiveColor, parsePrimitiveNodeId, parsePrimitiveTreeIndex } from './parseUtils';
+import { MatchingGeometries,
+         parsePrimitiveColor,
+         parsePrimitiveNodeId,
+         parsePrimitiveTreeIndex,
+         getPrimitiveType } from './parseUtils';
 import { zAxis } from '../constants';
 
 const color = new THREE.Color();
@@ -40,7 +44,7 @@ export default function parse(geometries: any[]): QuadGroup|null {
 
   matchingGeometries.geometries.forEach(geometry => {
     // Only extruded rings will produce quads
-    const primitiveInfo = geometry.primitiveInfo[geometry.type];
+    const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
     const nodeId = parsePrimitiveNodeId(geometry);
     const treeIndex = parsePrimitiveTreeIndex(geometry);
     color.setHex(parsePrimitiveColor(geometry));

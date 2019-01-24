@@ -20,8 +20,8 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   };
 
   geometries.forEach(geometry => {
-    const isClosed = geometry.primitiveInfo[geometry.type].isClosed;
-    const thickness = geometry.primitiveInfo[geometry.type].thickness;
+    const isClosed = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)].isClosed;
+    const thickness = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)].thickness;
 
     if (geometry.type === 'cone') {
       matchingGeometries.geometries.push(geometry);
@@ -52,7 +52,7 @@ export default function parse(geometries: any[]): ConeGroup|null {
   matchingGeometries.geometries.forEach(geometry => {
 
     // Regular circles
-    const primitiveInfo = geometry.primitiveInfo[geometry.type];
+    const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
     const nodeId = parsePrimitiveNodeId(geometry);
     const treeIndex = parsePrimitiveTreeIndex(geometry);
     color.setHex(parsePrimitiveColor(geometry));

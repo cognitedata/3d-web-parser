@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 import TrapeziumGroup from '../geometry/TrapeziumGroup';
-import { MatchingGeometries, parsePrimitiveColor, parsePrimitiveNodeId, parsePrimitiveTreeIndex } from './parseUtils';
+import { MatchingGeometries,
+         parsePrimitiveColor,
+         parsePrimitiveNodeId,
+         parsePrimitiveTreeIndex,
+         getPrimitiveType } from './parseUtils';
 import { xAxis, zAxis } from '../constants';
 
 const THREEColor = new THREE.Color();
@@ -20,7 +24,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   };
 
   geometries.forEach(geometry => {
-    const { thickness, arcAngle, isClosed } = geometry.primitiveInfo[geometry.type];
+    const { thickness, arcAngle, isClosed } = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
 
     if ( (geometry.type === 'cone' || geometry.type === 'generalCylinder')
         && thickness > 0
@@ -95,7 +99,7 @@ export default function parse(geometries: any[]): TrapeziumGroup|null {
   }
 
   matchingGeometries.geometries.forEach(geometry => {
-    const primitiveInfo = geometry.primitiveInfo[geometry.type];
+    const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
     const nodeId = parsePrimitiveNodeId(geometry);
     const treeIndex = parsePrimitiveTreeIndex(geometry);
     THREEColor.setHex(parsePrimitiveColor(geometry));

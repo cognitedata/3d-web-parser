@@ -17,3 +17,7 @@ export interface MatchingGeometries {
   count: number;
   geometries: any[];
 }
+
+export function getPrimitiveType(primitiveInfo: any): string {
+  return Object.keys(primitiveInfo)[0];
+}
