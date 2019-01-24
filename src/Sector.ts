@@ -35,4 +35,19 @@ export default class Sector {
       yield* child.traverseChilds();
     }
   }
+
+  memoryUsage(recursive = true): number {
+    let usage = 0;
+    this.geometries.forEach(geometryGroup => {
+      usage += geometryGroup.memoryUsage();
+    });
+
+    if (recursive) {
+      for (const child of this.traverseChilds()) {
+        usage += child.memoryUsage(false);
+      }
+    }
+
+    return usage;
+  }
 }
