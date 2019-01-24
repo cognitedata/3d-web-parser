@@ -32,9 +32,6 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 export default function parse(geometries: any[]): EccentricConeGroup|null {
   const matchingGeometries = findMatchingGeometries(geometries);
   const group = new EccentricConeGroup(matchingGeometries.count);
-  if (group.capacity === 0) {
-    return null;
-  }
 
   matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
@@ -48,7 +45,7 @@ export default function parse(geometries: any[]): EccentricConeGroup|null {
     const radiusB = primitiveInfo.radiusB;
 
     // TODO(anders.hafreager) ref https://github.com/cognitedata/3d-optimizer/issues/127
-    normal.set(primitiveInfo.normal.x, primitiveInfo.normal.y, primitiveInfo.normal.z);
+    normal.set(primitiveInfo.normalA.x, primitiveInfo.normalA.y, primitiveInfo.normalA.z);
     const dotProduct = normal.dot(vector.copy(centerA).sub(centerB));
     if (dotProduct === 0) {
       // flat eccentric cones are discarded if it is processed by the latest 3d-optimizer in the backend.

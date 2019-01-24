@@ -15,7 +15,7 @@ describe('parseEccentricCones', () => {
     let group: EccentricConeGroup;
     // @ts-ignore
     group = parse(TestScene.geometries);
-    const expectedCount = 8;
+    const expectedCount = 2;
     expect(group.capacity).toBe(expectedCount);
     for (let i = 0; i < expectedCount; i++) {
       expectColorValid(group.getColor(new THREE.Color(), i));
