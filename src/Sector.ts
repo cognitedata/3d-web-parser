@@ -29,10 +29,10 @@ export default class Sector {
     this.object3d.add(child.object3d);
   }
 
-  *traverseChilds(): IterableIterator<Sector> {
+  *traverseChildren(): IterableIterator<Sector> {
     yield this;
     for (const child of this.children) {
-      yield* child.traverseChilds();
+      yield* child.traverseChildren();
     }
   }
 
@@ -43,7 +43,7 @@ export default class Sector {
     });
 
     if (recursive) {
-      for (const child of this.traverseChilds()) {
+      for (const child of this.traverseChildren()) {
         usage += child.memoryUsage(false);
       }
     }

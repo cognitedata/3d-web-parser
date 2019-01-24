@@ -90,7 +90,7 @@ describe('Sectors', () => {
       rootSecondFirstSector,
     ];
     let counter = 0;
-    for (const sector of rootSector.traverseChilds()) {
+    for (const sector of rootSector.traverseChildren()) {
       expect(sector).toBe(expected[counter++]);
     }
   });
