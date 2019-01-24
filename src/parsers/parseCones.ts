@@ -48,9 +48,6 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 export default function parse(geometries: any[]): ConeGroup|null {
   const matchingGeometries = findMatchingGeometries(geometries);
   const group = new ConeGroup(matchingGeometries.count);
-  if (group.capacity === 0) {
-    return null;
-  }
 
   matchingGeometries.geometries.forEach(geometry => {
 

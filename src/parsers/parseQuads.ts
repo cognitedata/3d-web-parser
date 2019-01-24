@@ -38,9 +38,6 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 export default function parse(geometries: any[]): QuadGroup|null {
   const matchingGeometries = findMatchingGeometries(geometries);
   const group = new QuadGroup(matchingGeometries.count);
-  if (group.capacity === 0) {
-    return null;
-  }
 
   matchingGeometries.geometries.forEach(geometry => {
     // Only extruded rings will produce quads

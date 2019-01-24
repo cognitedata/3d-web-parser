@@ -99,9 +99,6 @@ function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup) {
 export default function parse(geometries: any[]): CircleGroup|null {
   const matchingGeometries = findMatchingGeometries(geometries);
   const group = new CircleGroup(matchingGeometries.count);
-  if (group.capacity === 0) {
-    return null;
-  }
 
   matchingGeometries.geometries.forEach(geometry => {
     if (['cylinder', 'cone', 'eccentricCone'].indexOf(geometry.type) !== -1) {

@@ -28,9 +28,6 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 export default function parse(geometries: any[]): NutGroup|null {
   const matchingGeometries = findMatchingGeometries(geometries);
   const group = new NutGroup(matchingGeometries.count);
-  if (group.capacity === 0) {
-    return null;
-  }
 
   matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
