@@ -2,15 +2,11 @@ import BoxGroup from './geometry/BoxGroup'
 import CircleGroup from './geometry/CircleGroup'
 import ConeGroup from './geometry/ConeGroup'
 import * as THREE from 'three';
-import { start } from 'repl';
-
-let debug = false;
 
 let lookup = [1,2];
 for (let i=2; i<=77; i++) {
   lookup.push(lookup[i-1] + lookup[i-2])
 }
-
 
 class FibonacciDecoder {
   private buffer: ArrayBuffer;
@@ -62,14 +58,6 @@ class FibonacciDecoder {
     }
     throw Error("THIS IS REALLY BAD")
   }
-}
-
-function toHex(yourNumber: number): string {
-  let hexString = yourNumber.toString(16);
-  if (hexString.length % 2) {
-    hexString = '0' + hexString;
-  }
-  return hexString;
 }
 
 class BufferReader {
@@ -141,14 +129,6 @@ function parseCustomFileFormat(asArrayBuffer: ArrayBuffer, flip: boolean) {
   let optimizerVersion = infoHeader[2];
   let arrayCount = infoHeader[3]; 
 
-  if (debug) {
-    console.log(magicBytes);
-    console.log(toHex(magicBytes));
-    console.log(formatVersion);
-    console.log(optimizerVersion);
-    console.log(arrayCount);
-  }
-
   let arraysList = ['colors', 'x_values', 'y_values', 'z_values', 'normals', 'deltas', 'heights', 'radiuses', 'angles', 'matrixes', 'x_translations', 'y_translations', 'z_translations']
   let arraysDictionary: any = {};
   for (let array_id=0; array_id<arrayCount;  array_id++) {
@@ -175,13 +155,7 @@ function parseCustomFileFormat(asArrayBuffer: ArrayBuffer, flip: boolean) {
     } else if (bytesForOneValue === 4) {
       arraysDictionary[type] = fileReader.readFloat32Array(clusterCount);
     } else {
-      console.log("Well this is unexpected. bytesForOneValue is " + bytesForOneValue);
-    }
-    if (debug) {
-      console.log(type)
-      console.log(clusterCount);
-      console.log(bytesForOneValue);
-      console.log(arraysDictionary[type].slice(0,20));
+      throw Error("Well this is unexpected. bytesForOneValue is " + bytesForOneValue);
     }
   }
 
@@ -195,15 +169,7 @@ function parseCustomFileFormat(asArrayBuffer: ArrayBuffer, flip: boolean) {
     let indexes = new FibonacciDecoder(asArrayBuffer, fileReader.location, byteCount);
     fileReader.skip(byteCount);
 
-    if (debug) {
-      console.log(geometryType);
-      console.log(geometryCount);
-      console.log(attributeCount);
-      console.log(byteCount);
-      console.log(indexes);
-    }
-
-    geometryAttributes.push({"type": geometryType, "indexes": indexes, "count": geometryCount})
+    geometryAttributes.push({"type": geometryType, "indexes": indexes, "count": geometryCount, "attributeCount": attributeCount})
 
     if (fileReader.location == asArrayBuffer.byteLength) {
       break;
