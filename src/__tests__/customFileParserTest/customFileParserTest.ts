@@ -1,4 +1,5 @@
-import { parseCustomFileFormat, decodeFibonacciEncoding } from '../../customParser'
+import { parseCustomFileFormat, FibonacciDecoder, generateGeometryGroups } from '../../customParser'
+import * as THREE from 'three'
 // @ts-ignore
 const fs = require('fs');
 
@@ -19,27 +20,31 @@ function checkIntArrayMatch(arrayA: any, arrayB: any) {
 
 describe('customFileParser', () => {
   test('parse fibonacci encoding', async() => {
-    let uncompressedData = new ArrayBuffer(10);
+    let uncompressedData = new ArrayBuffer(13);
     let uncompressedView = new Uint8Array(uncompressedData);
-    uncompressedView[0] = parseInt('10001000', 2);
+    uncompressedView[0] = parseInt('11110011', 2);
     uncompressedView[1] = parseInt('10001000', 2);
-    uncompressedView[2] = parseInt('10', 2);
-    uncompressedView[3] = parseInt('101001', 2);
-    uncompressedView[4] = parseInt('1', 2);
-    uncompressedView[5] = parseInt('1000000', 2);
-    uncompressedView[6] = parseInt('10010001', 2);
-    uncompressedView[7] = parseInt('10101', 2);
-    uncompressedView[8] = parseInt('10', 2);
-    uncompressedView[9] = parseInt('1011100', 2);
-    console.log(uncompressedView);
-    let decoding = decodeFibonacciEncoding(uncompressedData, 1);
-    console.log(decoding);
-    console.log("HI");
-    expect(decoding[0]).toBe(8164540613673614);
+    uncompressedView[2] = parseInt('10001000', 2);
+    uncompressedView[3] = parseInt('00000010', 2);
+    uncompressedView[4] = parseInt('00101001', 2);
+    uncompressedView[5] = parseInt('00000001', 2);
+    uncompressedView[6] = parseInt('01000000', 2);
+    uncompressedView[7] = parseInt('10010001', 2);
+    uncompressedView[8] = parseInt('00010101', 2);
+    uncompressedView[9] = parseInt('00000010', 2);
+    uncompressedView[10] = parseInt('01011110', 2);
+    uncompressedView[11] = parseInt('10110000', 2);
+    let decoder = new FibonacciDecoder(uncompressedData)
+    expect(decoder.nextValue()).toBe(0);
+    expect(decoder.nextValue()).toBe(0);
+    expect(decoder.nextValue()).toBe(2);
+    expect(decoder.nextValue()).toBe(8164540613673614);
+    expect(decoder.nextValue()).toBe(0);
+    expect(decoder.nextValue()).toBe(6);
   });
 
   
-  test('parse file', async() => {
+  test('parse file 42', async() => {
     const incomingFile = fs.readFileSync('./src/__tests__/customFileParserTest/Pipes.c3d', null);
     
     let asArrayBuffer = new ArrayBuffer(incomingFile.length);
@@ -60,15 +65,30 @@ describe('customFileParser', () => {
     let expectedXValues = [290.4921, 282.7001, 288.9621, 281.4592, 286.4021, 289.89, 290.05, 287.707, 295.9749, 284.3424, 286.2073, 290.9632, 293.3277, 287.9075, 284.691, 287.8749, 288.3569, 284.6376, 290.561, 289.53];
     let expectedYValues = [93.71999, 90.49236, 86.76433, 110.37, 87.23443, 89.99999, 108.66, 94.14565, 103.466, 109.8561, 101.1051, 106.3237, 106.9305, 95.52113, 96.43997, 100.0974, 101.8245, 101.6237, 94.92494, 97.18592];
     let expectedZValues = [529, 528.85, 528.4, 528.7, 528.6, 527.8, 528.8, 528.75, 528.5, 528.45, 528.9973, 528.78, 528.3, 528.35, 528.8402, 529.1, 528.55, 528.99, 529.05, 525.9815];
-    let expectedNormals = [[ 0, 0, 1 ], [ 0, 1, 0 ], [ 0, -1, 0 ], [ 1, 0, 0 ], [ -1, 0, 0 ], [ 0.707072377204895, 0, 0.7071411609649658 ],
-    [ 0, -0.8660270571708679, 0.49999716877937317 ], [ 0, 0.8628952503204346, 0.5053828358650208 ], [ 0, -0.7072240114212036, 0.7069895267486572 ],
-      [ 0.8660598397254944, 0, 0.4999403953552246 ], [ -0.5000000596046448, -0.8660253882408142, 0 ], [ -0.4999999403953552, 0.866025447845459, 0 ],
-      [ 0, 0.563718855381012, 0.8259667158126831 ], [ -0.7071261405944824, 0, 0.7070874571800232 ], [ 0, 0.49998918175697327, 0.8660316467285156 ],
-      [ 0, 0.7069307565689087, 0.7072827219963074 ], [ -0.7963610291481018, -0.6048215627670288, 0 ], [ -0.561081051826477, -0.8277608752250671, 0 ],
-      [ 0, -0.8260104060173035, 0.5636548399925232 ], [ 0, -0.5024152398109436, 0.8646264672279358 ]];
+    let expectedNormals = [
+      new THREE.Vector3(0, 0, 1 ),
+      new THREE.Vector3(0, 1, 0 ),
+      new THREE.Vector3(0, -1, 0 ),
+      new THREE.Vector3(1, 0, 0 ),
+      new THREE.Vector3(-1, 0, 0 ),
+      new THREE.Vector3(0.707072377204895, 0, 0.7071411609649658 ),
+      new THREE.Vector3(0, -0.8660270571708679, 0.49999716877937317 ),
+      new THREE.Vector3(0, 0.8628952503204346, 0.5053828358650208 ),
+      new THREE.Vector3(0, -0.7072240114212036, 0.7069895267486572 ),
+      new THREE.Vector3(0.8660598397254944, 0, 0.4999403953552246 ),
+      new THREE.Vector3(-0.5000000596046448, -0.8660253882408142, 0 ),
+      new THREE.Vector3(-0.4999999403953552, 0.866025447845459, 0 ),
+      new THREE.Vector3(0, 0.563718855381012, 0.8259667158126831 ),
+      new THREE.Vector3(-0.7071261405944824, 0, 0.7070874571800232 ),
+      new THREE.Vector3(0, 0.49998918175697327, 0.8660316467285156 ),
+      new THREE.Vector3(0, 0.7069307565689087, 0.7072827219963074 ),
+      new THREE.Vector3(-0.7963610291481018, -0.6048215627670288, 0 ),
+      new THREE.Vector3(-0.561081051826477, -0.8277608752250671, 0 ),
+      new THREE.Vector3(0, -0.8260104060173035, 0.5636548399925232 ),
+      new THREE.Vector3(0, -0.5024152398109436, 0.8646264672279358 )];
     let expectedDeltas = [0.6, 0.4, 0.06, 0.04, 0.004, 0.46, 0.015, 0.007, 0.2, 1.4, 0.05, 0.5, 1.46, 0.01, 0.623, 0.543, 1.2, 0.451, 0.411, 0.097];
     let expectedHeights = [0.002, 0.003, 0.02100002, 0.4, 0.05, 0.004000001, 0.056292, 0.3, 0.04000005, 0.006100481, 0.02500007, 0.02050001, 0.034641, 0.03990259, 0.043301, 0.073612, 0.0149983, 0.36, 0.01, 0.48];
-    let expectedRadii = [0.1249847, 0.1999946, 0.09999415, 0.06249976, 0.07999946, 0.1574976, 0.1299997, 0.2299984, 0.1550003, 0.0595, 0.02499999, 0.1219649, 0.1099979, 0.1124228, 0.2499941, 0.1769338, 0.07700001, 0.05939444, 0.0635, 0.1874982];
+    let expectedRadiuses = [0.1249847, 0.1999946, 0.09999415, 0.06249976, 0.07999946, 0.1574976, 0.1299997, 0.2299984, 0.1550003, 0.0595, 0.02499999, 0.1219649, 0.1099979, 0.1124228, 0.2499941, 0.1769338, 0.07700001, 0.05939444, 0.0635, 0.1874982];
     let expectedAngles = [0, 1.570796, 3.141593, 0.7853982, 4.712389, 0.5235988, 1.590028, 1.047198, 2.617994, 6.283185, 5.759586, 2.356194, 4.693129, 5.497787, 3.926991, 0.1308997, 5.235988, 2.96706, 1.550322, 2.094395];
     let expectedMatrixes: any = [];
     let expectedXTranslations: any = [];
@@ -85,15 +105,15 @@ describe('customFileParser', () => {
     checkFloatArrayMatch(parsedFile.arrays.z_values.slice(0,20), expectedZValues);
     expect(parsedFile.arrays.normals.length).toBe(38);
     for (let i=0; i<20; i++) {
-      checkFloatArrayMatch(parsedFile.arrays.normals[i], expectedNormals[i]);
+      expect(parsedFile.arrays.normals[i].distanceToSquared(expectedNormals[i])).toBeCloseTo(0);
     }
-    
+
     expect(parsedFile.arrays.deltas.length).toBe(125);
     checkFloatArrayMatch(parsedFile.arrays.deltas.slice(0,20), expectedDeltas);
     expect(parsedFile.arrays.heights.length).toBe(408);
     checkFloatArrayMatch(parsedFile.arrays.heights.slice(0,20), expectedHeights);
-    expect(parsedFile.arrays.radii.length).toBe(76);
-    checkFloatArrayMatch(parsedFile.arrays.radii.slice(0,20), expectedRadii);
+    expect(parsedFile.arrays.radiuses.length).toBe(76);
+    checkFloatArrayMatch(parsedFile.arrays.radiuses.slice(0,20), expectedRadiuses);
     expect(parsedFile.arrays.angles.length).toBe(29);
     checkFloatArrayMatch(parsedFile.arrays.angles.slice(0,20), expectedAngles);
     expect(parsedFile.arrays.matrixes.length).toBe(0);
@@ -122,7 +142,42 @@ describe('customFileParser', () => {
     for (let k=0; k<parsedFile.geometries.length; k++) {
       let type = parsedFile.geometries[k].type;
       let indexes = parsedFile.geometries[k].indexes;
-      checkIntArrayMatch(indexes.slice(0,20), expectedGeometryIndexes[type]);
+      for (let m=0; m<Math.min(20, expectedGeometryIndexes[type].length); m++) {
+        console.log(m + " " + type);
+        expect(indexes.nextValue() == expectedGeometryIndexes[type][m])
+      }
     }
+  });
+ 
+
+  test('generate groups', async() => {
+    const incomingFile = fs.readFileSync('./src/__tests__/customFileParserTest/Pipes.c3d', null);
+    
+    let asArrayBuffer = new ArrayBuffer(incomingFile.length);
+    let arrayBufferCopier = new Uint8Array(asArrayBuffer);
+    for (let i=0; i<incomingFile.length; i++) {
+      arrayBufferCopier[i] = incomingFile[i];
+    }
+
+    let parsedFile = parseCustomFileFormat(asArrayBuffer, true);
+    let geometryGroups = generateGeometryGroups(parsedFile);
+
+    expect(geometryGroups).toBeDefined();
+
+    expect(geometryGroups.boxGroup.capacity).toBe(327);
+    expect(geometryGroups.circleGroup.capacity).toBe(251+2*435+2*913);
+    expect(geometryGroups.coneGroup.capacity).toBe(435+913);
+
+    let boxes = geometryGroups.boxGroup;
+    expect(boxes.getNodeId(0)).toBe(7060329795587960);
+    expect(boxes.getTreeIndex(0)).toBe(1043);
+    // checkIntArrayMatch(boxes.getColor(), [1, 36, 34, 47]);
+    let test = new THREE.Vector3();
+    boxes.getCenter(test, 0)
+    expect(test.x).toBeCloseTo(282.05499267578125);
+    expect(test.y).toBeCloseTo(105.20599365234375);
+    expect(test.z).toBeCloseTo(527.9949951171875);
+
+    expect(boxes.getAngle(0)).toBeUndefined;
   });
 });
