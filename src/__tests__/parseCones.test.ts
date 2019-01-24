@@ -1,6 +1,6 @@
 // Copyright 2019 Cognite AS
 import * as THREE from 'three';
-import parse from '../parsers/parseCircles';
+import parse from '../parsers/parseCones';
 import { expectVector3Equal, expectColorEqual, expectVector3Valid, expectColorValid } from '../TestUtils';
 import ConeGroup from '../geometry/ConeGroup';
 import * as TestScene from './fixtures/test_scene.json';
