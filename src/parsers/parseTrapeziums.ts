@@ -4,7 +4,8 @@ import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
          parsePrimitiveTreeIndex,
-         getPrimitiveType } from './parseUtils';
+         getPrimitiveType,
+         isPrimitive } from './parseUtils';
 import { xAxis, zAxis } from '../constants';
 
 const THREEColor = new THREE.Color();
@@ -103,9 +104,6 @@ export default function parse(geometries: any[]): TrapeziumGroup|null {
   }
 
   matchingGeometries.geometries.forEach(geometry => {
-    if (geometry.primitiveInfo === undefined) {
-      return;
-    }
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
     const nodeId = parsePrimitiveNodeId(geometry);
     const treeIndex = parsePrimitiveTreeIndex(geometry);
