@@ -1,13 +1,13 @@
 // Copyright 2019 Cognite AS
 
 import * as THREE from 'three';
-import CylinderGroup from './CylinderGroup';
+import BaseCylinderGroup from './BaseCylinderGroup';
 
-export default class GeneralCylinderGroup extends CylinderGroup {
+export default class GeneralCylinderGroup extends BaseCylinderGroup {
     static type = 'GeneralCylinder';
     public angle: Float32Array;
     public arcAngle: Float32Array;
-    public caps: Uint8Array; // Indices to GeneralRing's
+    public radius: Float32Array;
     public heightA: Float32Array;
     public heightB: Float32Array;
     public slopeA: Float32Array;
@@ -18,7 +18,7 @@ export default class GeneralCylinderGroup extends CylinderGroup {
     super(capacity);
     this.angle = new Float32Array(capacity);
     this.arcAngle = new Float32Array(capacity);
-    this.caps = new Uint8Array(2 * capacity);
+    this.radius = new Float32Array(capacity);
     this.heightA = new Float32Array(capacity);
     this.heightB = new Float32Array(capacity);
     this.slopeA = new Float32Array(capacity);
@@ -41,6 +41,14 @@ export default class GeneralCylinderGroup extends CylinderGroup {
 
   getArcAngle(index: number): number {
     return this.arcAngle[index];
+  }
+
+  setRadius(value: number, index: number) {
+    this.radius[index] = value;
+  }
+
+  getRadius(index: number): number {
+    return this.radius[index];
   }
 
   setHeightA(value: number, index: number) {

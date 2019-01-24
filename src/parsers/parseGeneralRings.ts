@@ -28,7 +28,8 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
     if (!isPrimitive(geometry)) {
       return;
     }
-    const thickness = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)].thickness;
+    const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
+    const { thickness = 0 } = primitiveInfo;
 
     if (geometry.type === 'ring') {
       matchingGeometries.geometries.push(geometry);
@@ -49,10 +50,13 @@ function parseRing(primitiveInfo: any,
                    treeIndex: number,
                    color: THREE.Color,
                    group: GeneralRingGroup) {
-  center.set(primitiveInfo.center.x, primitiveInfo.center.y, primitiveInfo.center.z);
-  normal.set(primitiveInfo.normal.x, primitiveInfo.normal.y, primitiveInfo.normal.z);
-  const innerRadius = primitiveInfo.innerRadius;
-  const outerRadius = primitiveInfo.outerRadius;
+
+  let { x = 0, y = 0, z = 0 } = primitiveInfo.center;
+  center.set(x, y, z);
+
+  ({ x = 0, y = 0, z = 0 } = primitiveInfo.normal);
+  normal.set(x, y, z);
+  const { innerRadius, outerRadius } = primitiveInfo;
 
   localXAxis.copy(xAxis).applyQuaternion(rotation.setFromUnitVectors(zAxis, normal)),
   group.add(nodeId,
@@ -72,8 +76,11 @@ function parseCone(primitiveInfo: any,
                    treeIndex: number,
                    color: THREE.Color,
                    group: GeneralRingGroup) {
-  centerA.set(primitiveInfo.centerA.x, primitiveInfo.centerA.y, primitiveInfo.centerA.z);
-  centerB.set(primitiveInfo.centerB.x, primitiveInfo.centerB.y, primitiveInfo.centerB.z);
+  let { x = 0, y = 0, z = 0 } = primitiveInfo.centerA;
+  centerA.set(x, y, z);
+
+  ({ x = 0, y = 0, z = 0 } = primitiveInfo.centerB);
+  centerB.set(x, y, z);
 
   capZAxis.copy(centerA).sub(centerB);
   rotation.setFromUnitVectors(zAxis, capZAxis.normalize());
@@ -103,8 +110,11 @@ function parseExtrudedRing(primitiveInfo: any,
     outerRadius,
   } = primitiveInfo;
 
-  centerA.set(primitiveInfo.centerA.x, primitiveInfo.centerA.y, primitiveInfo.centerA.z);
-  centerB.set(primitiveInfo.centerB.x, primitiveInfo.centerB.y, primitiveInfo.centerB.z);
+  let { x = 0, y = 0, z = 0 } = primitiveInfo.centerA;
+  centerA.set(x, y, z);
+
+  ({ x = 0, y = 0, z = 0 } = primitiveInfo.centerB);
+  centerB.set(x, y, z);
 
   normal.copy(centerA).sub(centerB).normalize();
 

@@ -37,8 +37,11 @@ export default function parse(geometries: any[]): TorusSegmentGroup {
     const treeIndex = parsePrimitiveTreeIndex(geometry);
     color.setHex(parsePrimitiveColor(geometry));
 
-    center.set(primitiveInfo.center.x, primitiveInfo.center.y, primitiveInfo.center.z);
-    normal.set(primitiveInfo.normal.x, primitiveInfo.normal.y, primitiveInfo.normal.z);
+    let { x = 0, y = 0, z = 0 } = primitiveInfo.center;
+    center.set(x, y, z);
+
+    ({ x = 0, y = 0, z = 0 } = primitiveInfo.normal);
+    normal.set(x, y, z);
 
     const {
       radius,

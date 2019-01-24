@@ -57,16 +57,18 @@ matchingGeometries.geometries.forEach(geometry => {
     const treeIndex = parsePrimitiveTreeIndex(geometry);
     color.setHex(parsePrimitiveColor(geometry));
 
-    centerA.set(primitiveInfo.centerA.x, primitiveInfo.centerA.y, primitiveInfo.centerA.z);
-    centerB.set(primitiveInfo.centerB.x, primitiveInfo.centerB.y, primitiveInfo.centerB.z);
+    let { x = 0, y = 0, z = 0 } = primitiveInfo.centerA;
+    centerA.set(x, y, z);
+
+    ({ x = 0, y = 0, z = 0 } = primitiveInfo.centerB);
+    centerB.set(x, y, z);
+
     if (geometry.type === 'cylinder') {
-      const radius = primitiveInfo.radius;
+      const { radius } = primitiveInfo;
       group.add(nodeId, treeIndex, color, centerA, centerB, radius, radius);
     } else if (geometry.type === 'cone') {
-      let radiusA = primitiveInfo.radiusA;
-      let radiusB = primitiveInfo.radiusB;
-      const angle  = primitiveInfo.angle;
-      const arcAngle  = primitiveInfo.arcAngle;
+      let { radiusA = 0, radiusB = 0 } = primitiveInfo;
+      const { angle = 0, arcAngle = 0 } = primitiveInfo;
 
       group.add(nodeId, treeIndex, color, centerA, centerB, radiusA, radiusB, angle, arcAngle);
 
@@ -76,11 +78,9 @@ matchingGeometries.geometries.forEach(geometry => {
         radiusB -= primitiveInfo.thickness;
         group.add(nodeId, treeIndex, color, centerA, centerB, radiusA, radiusB, angle, arcAngle);
       }
+
     } else if (geometry.type === 'extrudedRing') {
-      const innerRadius = primitiveInfo.innerRadius;
-      const outerRadius = primitiveInfo.outerRadius;
-      const angle  = primitiveInfo.angle;
-      const arcAngle  = primitiveInfo.arcAngle;
+      const { innerRadius, outerRadius, angle, arcAngle } = primitiveInfo;
       group.add(nodeId, treeIndex, color, centerA, centerB, innerRadius, innerRadius, angle, arcAngle);
       group.add(nodeId, treeIndex, color, centerA, centerB, outerRadius, outerRadius, angle, arcAngle);
     }

@@ -48,8 +48,11 @@ function parseCone(primitiveInfo: any,
                    treeIndex: number,
                    color: THREE.Color,
                    group: TrapeziumGroup) {
-  centerA.set(primitiveInfo.centerA.x, primitiveInfo.centerA.y, primitiveInfo.centerA.z);
-  centerB.set(primitiveInfo.centerB.x, primitiveInfo.centerB.y, primitiveInfo.centerB.z);
+  let { x = 0, y = 0, z = 0 } = primitiveInfo.centerA;
+  centerA.set(x, y, z);
+
+  ({ x = 0, y = 0, z = 0 } = primitiveInfo.centerB);
+  centerB.set(x, y, z);
 
   capZAxis.copy(centerA).sub(centerB);
   rotation.setFromUnitVectors(zAxis, capZAxis.normalize());

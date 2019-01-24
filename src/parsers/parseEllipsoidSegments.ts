@@ -36,10 +36,13 @@ export default function parse(geometries: any[]): EllipsoidSegmentGroup {
     const treeIndex = parsePrimitiveTreeIndex(geometry);
     color.setHex(parsePrimitiveColor(geometry));
 
-    center.set(primitiveInfo.center.x, primitiveInfo.center.y, primitiveInfo.center.z);
-    normal.set(primitiveInfo.normal.x, primitiveInfo.normal.y, primitiveInfo.normal.z);
-    const horizontalRadius = primitiveInfo.horizontalRadius;
-    const verticalRadius = primitiveInfo.verticalRadius;
+    let { x = 0, y = 0, z = 0 } = primitiveInfo.center;
+    center.set(x, y, z);
+
+    ({ x = 0, y = 0, z = 0 } = primitiveInfo.normal);
+    normal.set(x, y, z);
+
+    const { horizontalRadius, verticalRadius } = primitiveInfo;
     let height = 2 * verticalRadius; // Default value for ellipsoids
 
     if (geometry.type === 'ellipsoidSegment') {

@@ -36,12 +36,15 @@ export default function parse(geometries: any[]): SphericalSegmentGroup {
     const treeIndex = parsePrimitiveTreeIndex(geometry);
     color.setHex(parsePrimitiveColor(geometry));
 
-    center.set(primitiveInfo.center.x, primitiveInfo.center.y, primitiveInfo.center.z);
+    let { x = 0, y = 0, z = 0 } = primitiveInfo.center;
+    center.set(x, y, z);
+
     const radius = primitiveInfo.radius;
     let height = 2 * radius; // Default value for sphere
 
     if (geometry.type === 'sphericalSegment') {
-      normal.set(primitiveInfo.normal.x, primitiveInfo.normal.y, primitiveInfo.normal.z);
+      ({ x = 0, y = 0, z = 0 } = primitiveInfo.normal);
+      normal.set(x, y, z);
       height = primitiveInfo.height;
     } else {
       normal.set(0, -1, 0);

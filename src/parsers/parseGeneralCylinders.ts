@@ -27,8 +27,8 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 }
 
 export default function parse(geometries: any[]): GeneralCylinderGroup {
-  console.log('General cylinder parsing from generalCylinder parsing isn\'t implemented');
-  return null;
+  // console.log('General cylinder parsing from generalCylinder parsing isn\'t implemented');
+  return new GeneralCylinderGroup(0);
   // const matchingGeometries = findMatchingGeometries(geometries);
   // const group = new GeneralCylinderGroup(matchingGeometries.count);
   // if (group.capacity === 0) {

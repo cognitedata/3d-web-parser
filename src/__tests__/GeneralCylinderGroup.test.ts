@@ -9,7 +9,7 @@ describe('GeneralCylinderGroup', () => {
     const group = new GeneralCylinderGroup(2);
     expect(group.angle.length).toBe(2);
     expect(group.arcAngle.length).toBe(2);
-    expect(group.caps.length).toBe(4);
+    expect(group.radius.length).toBe(2);
     expect(group.heightA.length).toBe(2);
     expect(group.heightB.length).toBe(2);
     expect(group.slopeA.length).toBe(2);

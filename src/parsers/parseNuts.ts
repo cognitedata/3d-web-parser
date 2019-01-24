@@ -36,10 +36,12 @@ export default function parse(geometries: any[]): NutGroup {
     const treeIndex = parsePrimitiveTreeIndex(geometry);
     color.setHex(parsePrimitiveColor(geometry));
 
-    centerA.set(primitiveInfo.centerA.x, primitiveInfo.centerA.y, primitiveInfo.centerA.z);
-    centerB.set(primitiveInfo.centerB.x, primitiveInfo.centerB.y, primitiveInfo.centerB.z);
-    const radius = primitiveInfo.radius;
-    const rotationAngle = primitiveInfo.rotationAngle;
+    let { x = 0, y = 0, z = 0 } = primitiveInfo.centerA;
+    centerA.set(x, y, z);
+
+    ({ x = 0, y = 0, z = 0 } = primitiveInfo.centerB);
+    centerB.set(x, y, z);
+    const { radius = 0, rotationAngle = 0 } = primitiveInfo;
 
     group.add(nodeId, treeIndex, color, centerA, centerB, radius, rotationAngle);
   });

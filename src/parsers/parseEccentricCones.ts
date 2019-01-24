@@ -39,19 +39,16 @@ export default function parse(geometries: any[]): EccentricConeGroup {
     const treeIndex = parsePrimitiveTreeIndex(geometry);
     color.setHex(parsePrimitiveColor(geometry));
 
-    centerA.set(primitiveInfo.centerA.x, primitiveInfo.centerA.y, primitiveInfo.centerA.z);
-    centerB.set(primitiveInfo.centerB.x, primitiveInfo.centerB.y, primitiveInfo.centerB.z);
-    const radiusA = primitiveInfo.radiusA;
-    const radiusB = primitiveInfo.radiusB;
+    let { x = 0, y = 0, z = 0 } = primitiveInfo.centerA;
+    centerA.set(x, y, z);
 
-    // TODO(anders.hafreager) ref https://github.com/cognitedata/3d-optimizer/issues/127
-    normal.set(primitiveInfo.normalA.x, primitiveInfo.normalA.y, primitiveInfo.normalA.z);
-    const dotProduct = normal.dot(vector.copy(centerA).sub(centerB));
-    if (dotProduct === 0) {
-      // flat eccentric cones are discarded if it is processed by the latest 3d-optimizer in the backend.
-      // However, models processed with earlier versions may still contain flat eccentric cones.
-      return;
-    }
+    ({ x = 0, y = 0, z = 0 } = primitiveInfo.centerB);
+    centerB.set(x, y, z);
+
+    const { radiusA, radiusB } = primitiveInfo;
+
+    ({ x = 0, y = 0, z = 0 } = primitiveInfo.normalA);
+    normal.set(x, y, z);
 
     group.add(nodeId, treeIndex, color, centerA, centerB, radiusA, radiusB, normal);
   });

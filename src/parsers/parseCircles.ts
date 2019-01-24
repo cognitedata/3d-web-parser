@@ -56,11 +56,14 @@ function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup) {
   const treeIndex = parsePrimitiveTreeIndex(geometry);
   color.setHex(parsePrimitiveColor(geometry));
 
-  centerA.set(primitiveInfo.centerA.x, primitiveInfo.centerA.y, primitiveInfo.centerA.z);
-  centerB.set(primitiveInfo.centerB.x, primitiveInfo.centerB.y, primitiveInfo.centerB.z);
+  let { x = 0, y = 0, z = 0 } = primitiveInfo.centerA;
+  centerA.set(x, y, z);
+
+  ({ x = 0, y = 0, z = 0 } = primitiveInfo.centerB);
+  centerB.set(x, y, z);
   // @ts-ignore
   if (geometry.type === 'cylinder') {
-    const radius = primitiveInfo.radius;
+    const { radius = 0 } = primitiveInfo;
     normal.copy(centerA)
     .sub(centerB)
     .normalize();
@@ -68,25 +71,21 @@ function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup) {
     group.add(nodeId, treeIndex, color, centerB, normal, radius);
   // @ts-ignore
   } else if (geometry.type === 'cone') {
-    const radiusA = primitiveInfo.radiusA;
-    const radiusB = primitiveInfo.radiusB;
+    const { radiusA = 0, radiusB = 0 } = primitiveInfo;
+
     normal.copy(centerA)
     .sub(centerB)
     .normalize();
+
     group.add(nodeId, treeIndex, color, centerA, normal, radiusA);
     group.add(nodeId, treeIndex, color, centerB, normal, radiusA);
   // @ts-ignore
   } else if (geometry.type === 'eccentricCone') {
-    const radiusA = primitiveInfo.radiusA;
-    const radiusB = primitiveInfo.radiusB;
-    // TODO(anders.hafreager) ref https://github.com/cognitedata/3d-optimizer/issues/127
-    normal.set(primitiveInfo.normalA.x, primitiveInfo.normalA.y, primitiveInfo.normalA.z);
+    const { radiusA, radiusB } = primitiveInfo;
+
+    ({ x = 0, y = 0, z = 0 } = primitiveInfo.normalA);
+    normal.set(x, y, z);
     const dotProduct = normal.dot(vector.copy(centerA).sub(centerB));
-    if (Math.abs(dotProduct) < 1e-6) {
-      // flat eccentric cones are discarded if it is processed by the latest 3d-optimizer in the backend.
-      // However, models processed with earlier versions may still contain flat eccentric cones.
-      return;
-    }
 
     if (dotProduct > 0) {
       normal.negate();
@@ -110,8 +109,12 @@ export default function parse(geometries: any[]): CircleGroup {
       const treeIndex = parsePrimitiveTreeIndex(geometry);
       color.setHex(parsePrimitiveColor(geometry));
 
-      center.set(primitiveInfo.center.x, primitiveInfo.center.y, primitiveInfo.center.z);
-      normal.set(primitiveInfo.normal.x, primitiveInfo.normal.y, primitiveInfo.normal.z);
+      let { x = 0, y = 0, z = 0 } = primitiveInfo.center;
+      center.set(x, y, z);
+
+      ({ x = 0, y = 0, z = 0 } = primitiveInfo.normal);
+      normal.set(x, y, z);
+
       const radius = primitiveInfo.radius;
       group.add(nodeId, treeIndex, color, center, normal, radius);
     }
