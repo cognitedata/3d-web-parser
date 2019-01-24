@@ -4,15 +4,48 @@ import ProtobufDecoder from './ProtobufDecoder';
 import * as WebSceneProto from './proto/web_scene.json';
 import * as THREE from 'three';
 import Sector from './Sector';
-import { Vector3 } from 'three';
+import { Vector3, Group } from 'three';
 import { getParentPath } from './PathExtractor';
-import CircleGroup from './geometry/CircleGroup';
+import PrimitiveGroup from './geometry/PrimitiveGroup';
 import GeometryGroup from './geometry/GeometryGroup';
+
 import parseCircles from './parsers/parseCircles';
+import parseBoxes from './parsers/parseBoxes';
+import parseCones from './parsers/parseCones';
+import parseEccentricCones from './parsers/parseEccentricCones';
+import parseEllipsoidSegments from './parsers/parseEllipsoidSegments';
+import parseGeneralCylinders from './parsers/parseGeneralCylinders';
+import parseGeneralRings from './parsers/parseGeneralRings';
+import parseNuts from './parsers/parseNuts';
+import parseQuads from './parsers/parseQuads';
+import parseSphericalSegments from './parsers/parseSphericalSegments';
+import parseTorusSegments from './parsers/parseTorusSegments';
+import parseTrapeziums from './parsers/parseTrapeziums';
+
+const primitiveParsers = [
+  parseCircles,
+  parseBoxes,
+  parseCones,
+  parseEccentricCones,
+  parseEllipsoidSegments,
+  parseGeneralCylinders,
+  parseGeneralRings,
+  parseNuts,
+  parseQuads,
+  parseSphericalSegments,
+  parseTorusSegments,
+  parseTrapeziums,
+];
 
 function parseGeometries(geometries: GeometryGroup[]) {
   const geometryGroups: GeometryGroup[] = [];
-  geometryGroups.push(parseCircles(geometries));
+  primitiveParsers.forEach(parser => {
+    const group: PrimitiveGroup = parser(geometries);
+    if (group.capacity > 0) {
+      geometryGroups.push(group);
+    }
+  });
+
   return geometryGroups.filter(Boolean);
 }
 
@@ -27,7 +60,6 @@ export default async function(protobufData: Uint8Array) {
     const sector = new Sector(boundingBoxMin, boundingBoxMax);
     nodes[path] = sector;
     sector.geometries = parseGeometries(webNode.geometries);
-    // console.log('Geometries: ', webNode.geometries);
 
     // attach to parent
     const parentPath = getParentPath(path);
