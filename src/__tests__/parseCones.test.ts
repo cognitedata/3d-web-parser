@@ -15,7 +15,7 @@ describe('parseCones', () => {
     let group: ConeGroup;
     // @ts-ignore
     group = parse(TestScene.geometries);
-    const expectedCount = 8;
+    const expectedCount = 10;
     expect(group.capacity).toBe(expectedCount);
     for (let i = 0; i < expectedCount; i++) {
       expectColorValid(group.getColor(new THREE.Color(), i));
