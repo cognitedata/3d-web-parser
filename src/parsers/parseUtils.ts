@@ -21,3 +21,7 @@ export interface MatchingGeometries {
 export function getPrimitiveType(primitiveInfo: any): string {
   return Object.keys(primitiveInfo)[0];
 }
+
+export function isPrimitive(geometry: any): boolean {
+  return geometry.primitiveInfo !== undefined;
+}

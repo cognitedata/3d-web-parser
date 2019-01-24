@@ -24,6 +24,10 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   };
 
   geometries.forEach(geometry => {
+    if (!isPrimitive(geometry)) {
+      return;
+    }
+
     const { thickness, arcAngle, isClosed } = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
 
     if ( (geometry.type === 'cone' || geometry.type === 'generalCylinder')
@@ -99,6 +103,9 @@ export default function parse(geometries: any[]): TrapeziumGroup|null {
   }
 
   matchingGeometries.geometries.forEach(geometry => {
+    if (geometry.primitiveInfo === undefined) {
+      return;
+    }
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
     const nodeId = parsePrimitiveNodeId(geometry);
     const treeIndex = parsePrimitiveTreeIndex(geometry);
