@@ -1,10 +1,12 @@
 // Copyright 2019 Cognite AS
 
 import * as THREE from 'three';
-import TorusGroup from './TorusGroup';
+import PlaneGroup from './PlaneGroup';
 
-export default class TorusSegmentGroup extends TorusGroup {
+export default class TorusSegmentGroup extends PlaneGroup {
   static type = 'TorusSegment';
+  public radius: Float32Array;
+  public tubeRadius: Float32Array;
   public angle: Float32Array;
   public arcAngle: Float32Array;
   constructor(capacity: number) {
@@ -13,6 +15,22 @@ export default class TorusSegmentGroup extends TorusGroup {
     this.tubeRadius = new Float32Array(capacity);
     this.angle = new Float32Array(capacity);
     this.arcAngle = new Float32Array(capacity);
+  }
+
+  setRadius(value: number, index: number) {
+    this.radius[index] = value;
+  }
+
+  getRadius(index: number): number {
+    return this.radius[index];
+  }
+
+  setTubeRadius(value: number, index: number) {
+    this.tubeRadius[index] = value;
+  }
+
+  getTubeRadius(index: number): number {
+    return this.tubeRadius[index];
   }
 
   setAngle(value: number, index: number) {
