@@ -6,6 +6,11 @@ import GeometryGroup from './GeometryGroup';
 type TypedArray = Float32Array | Float64Array;
 type THREEVector = THREE.Vector2 | THREE.Vector3;
 
+interface Attribute {
+  name: string;
+  array: TypedArray;
+}
+
 export default abstract class PrimitiveGroup extends GeometryGroup {
   static type: string;
 
@@ -15,6 +20,7 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
   public treeIndex: Float32Array;
   public color: Float32Array;
   public hasCustomTransformAttributes: boolean;
+  public attributes: Attribute[];
   // _parents: BasePrimitive[];
   // _children: BasePrimitive[];
   // abstract: boolean;
@@ -29,6 +35,9 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     // this._parent = null;
     // this._children = [];
     // this.abstract = false;
+    this.attributes = [
+      { name: 'treeIndex', array: this.treeIndex },
+    ];
     this.hasCustomTransformAttributes = false;
   }
 
