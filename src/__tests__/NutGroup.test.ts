@@ -10,7 +10,7 @@ describe('NutGroup', () => {
     expect(group.radius.length).toBe(2);
     expect(group.rotationAngle.length).toBe(2);
 
-    expect(NutGroup.type).toBe('Nut');
+    expect(group.type).toBe('Nut');
   });
 
   test('(set/get)Radius', () => {

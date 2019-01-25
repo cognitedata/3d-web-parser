@@ -4,11 +4,12 @@ import * as THREE from 'three';
 import BaseCylinderGroup from './BaseCylinderGroup';
 
 export default class NutGroup extends BaseCylinderGroup {
-    static type = 'Nut';
     public radius: Float32Array;
     public rotationAngle: Float32Array;
-  constructor(capacity: number) {
+
+    constructor(capacity: number) {
     super(capacity);
+    this.type = 'Nut';
     this.radius = new Float32Array(capacity);
     this.rotationAngle = new Float32Array(capacity);
   }

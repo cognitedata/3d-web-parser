@@ -4,12 +4,13 @@ import * as THREE from 'three';
 import PlaneGroup from './PlaneGroup';
 
 export default class EllipsoidSegmentGroup extends PlaneGroup {
-  static type = 'EllipsoidSegment';
   public horizontalRadius: Float32Array;
   public verticalRadius: Float32Array;
   public height: Float32Array;
+
   constructor(capacity: number) {
     super(capacity);
+    this.type = 'EllipsoidSegment';
     this.height = new Float32Array(capacity);
     this.horizontalRadius = new Float32Array(capacity);
     this.verticalRadius = new Float32Array(capacity);

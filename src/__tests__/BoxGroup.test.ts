@@ -22,7 +22,7 @@ describe('BoxGroup', () => {
     const group = new BoxGroup(2);
     expect(group.angle.length).toBe(2);
     expect(group.delta.length).toBe(6);
-    expect(BoxGroup.type).toBe('Box');
+    expect(group.type).toBe('Box');
   });
 
   test('(set/get)Angle', () => {

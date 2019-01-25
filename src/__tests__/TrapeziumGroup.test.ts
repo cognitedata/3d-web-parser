@@ -11,7 +11,7 @@ describe('TrapeziumGroup', () => {
     expect(group.vertex2.length).toBe(6);
     expect(group.vertex3.length).toBe(6);
     expect(group.vertex4.length).toBe(6);
-    expect(TrapeziumGroup.type).toBe('Trapezium');
+    expect(group.type).toBe('Trapezium');
   });
 
   test('(set/get)Vertex1', () => {

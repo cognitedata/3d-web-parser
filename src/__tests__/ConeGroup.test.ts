@@ -12,7 +12,7 @@ describe('ConeGroup', () => {
     expect(group.angle.length).toBe(2);
     expect(group.arcAngle.length).toBe(2);
 
-    expect(ConeGroup.type).toBe('Cone');
+    expect(group.type).toBe('Cone');
   });
 
   test('(set/get)RadiusA', () => {

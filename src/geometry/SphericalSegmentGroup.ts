@@ -3,7 +3,6 @@
 import PrimitiveGroup from './PrimitiveGroup';
 
 export default class SphericalSegmentGroup extends PrimitiveGroup {
-  static type = 'SphericalSegment';
   public center: Float32Array;
   public radius: Float32Array;
   public normal: Float32Array;
@@ -11,6 +10,7 @@ export default class SphericalSegmentGroup extends PrimitiveGroup {
 
   constructor(capacity: number) {
     super(capacity);
+    this.type = 'SphericalSegment';
     this.center = new Float32Array(3 * capacity);
     this.radius = new Float32Array(capacity);
     this.normal = new Float32Array(3 * capacity);

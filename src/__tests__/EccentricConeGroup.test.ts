@@ -11,7 +11,7 @@ describe('EccentricConeGroup', () => {
     expect(group.radiusB.length).toBe(2);
     expect(group.normal.length).toBe(6);
 
-    expect(EccentricConeGroup.type).toBe('EccentricCone');
+    expect(group.type).toBe('EccentricCone');
   });
 
   test('(set/get)RadiusA', () => {

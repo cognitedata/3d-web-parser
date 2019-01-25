@@ -16,7 +16,7 @@ describe('GeneralCylinderGroup', () => {
     expect(group.slopeB.length).toBe(2);
     expect(group.zAngleA.length).toBe(2);
     expect(group.zAngleB.length).toBe(2);
-    expect(GeneralCylinderGroup.type).toBe('GeneralCylinder');
+    expect(group.type).toBe('GeneralCylinder');
   });
 
   test('(set/get)Angle', () => {

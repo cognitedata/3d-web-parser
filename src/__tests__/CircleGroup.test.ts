@@ -22,7 +22,7 @@ describe('CircleGroup', () => {
   test('constructor', () => {
     const group = new CircleGroup(2);
     expect(group.radius.length).toBe(2);
-    expect(CircleGroup.type).toBe('Circle');
+    expect(group.type).toBe('Circle');
   });
 
   test('(set/get)Radius', () => {

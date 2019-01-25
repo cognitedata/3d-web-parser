@@ -4,13 +4,13 @@ import * as THREE from 'three';
 import PlaneGroup from './PlaneGroup';
 
 export default class TorusSegmentGroup extends PlaneGroup {
-  static type = 'TorusSegment';
   public radius: Float32Array;
   public tubeRadius: Float32Array;
   public angle: Float32Array;
   public arcAngle: Float32Array;
   constructor(capacity: number) {
     super(capacity);
+    this.type = 'TorusSegment';
     this.radius = new Float32Array(capacity);
     this.tubeRadius = new Float32Array(capacity);
     this.angle = new Float32Array(capacity);

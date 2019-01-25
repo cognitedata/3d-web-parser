@@ -34,10 +34,10 @@ const transformedCenter = new THREE.Vector3();
 const transformedNormal = new THREE.Vector3();
 
 export default class CircleGroup extends PlaneGroup {
-  static type = 'Circle';
   public radius: Float32Array;
   constructor(capacity: number) {
     super(capacity);
+    this.type = 'Circle';
     this.radius = new Float32Array(capacity);
   }
 

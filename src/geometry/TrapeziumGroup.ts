@@ -3,13 +3,13 @@
 import PrimitiveGroup from './PrimitiveGroup';
 
 export default class TrapeziumGroup extends PrimitiveGroup {
-  static type = 'Trapezium';
   public vertex1: Float32Array;
   public vertex2: Float32Array;
   public vertex3: Float32Array;
   public vertex4: Float32Array;
   constructor(capacity: number) {
     super(capacity);
+    this.type = 'Trapezium';
     this.vertex1 = new Float32Array(3 * capacity);
     this.vertex2 = new Float32Array(3 * capacity);
     this.vertex3 = new Float32Array(3 * capacity);

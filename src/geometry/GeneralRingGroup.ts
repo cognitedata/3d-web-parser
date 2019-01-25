@@ -4,7 +4,6 @@ import * as THREE from 'three';
 import PlaneGroup from './PlaneGroup';
 
 export default class GeneralRingGroup extends PlaneGroup {
-  static type = 'GeneralRing';
   public xRadius: Float32Array;
   public yRadius: Float32Array;
   public localXAxis: Float32Array;
@@ -14,6 +13,7 @@ export default class GeneralRingGroup extends PlaneGroup {
 
   constructor(capacity: number) {
     super(capacity);
+    this.type = 'GeneralRing';
     this.xRadius = new Float32Array(capacity);
     this.yRadius = new Float32Array(capacity);
     this.localXAxis = new Float32Array(3 * capacity);

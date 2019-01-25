@@ -15,7 +15,7 @@ describe('TorusSegmentGroup', () => {
     expect(group.angle.length).toBe(2);
     expect(group.arcAngle.length).toBe(2);
 
-    expect(TorusSegmentGroup.type).toBe('TorusSegment');
+    expect(group.type).toBe('TorusSegment');
   });
 
   test('(set/get)Radius', () => {

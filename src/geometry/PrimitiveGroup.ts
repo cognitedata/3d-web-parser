@@ -6,14 +6,13 @@ import GeometryGroup from './GeometryGroup';
 type TypedArray = Float32Array | Float64Array;
 type THREEVector = THREE.Vector2 | THREE.Vector3;
 
-interface Attribute {
+export interface Attribute {
   name: string;
   array: TypedArray;
+  itemSize: number;
 }
 
 export default abstract class PrimitiveGroup extends GeometryGroup {
-  static type: string;
-
   public count: number;
   public capacity: number;
   public nodeId: Float64Array;
@@ -36,7 +35,7 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     // this._children = [];
     // this.abstract = false;
     this.attributes = [
-      { name: 'treeIndex', array: this.treeIndex },
+      { name: 'treeIndex', array: this.treeIndex, itemSize: 1 },
     ];
     this.hasCustomTransformAttributes = false;
   }

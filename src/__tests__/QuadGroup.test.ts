@@ -10,7 +10,7 @@ describe('QuadGroup', () => {
     expect(group.vertex1.length).toBe(6);
     expect(group.vertex2.length).toBe(6);
     expect(group.vertex3.length).toBe(6);
-    expect(QuadGroup.type).toBe('Quad');
+    expect(group.type).toBe('Quad');
   });
 
   test('(set/get)Vertex1', () => {

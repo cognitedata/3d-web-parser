@@ -4,7 +4,6 @@ import * as THREE from 'three';
 import BaseCylinderGroup from './BaseCylinderGroup';
 
 export default class GeneralCylinderGroup extends BaseCylinderGroup {
-    static type = 'GeneralCylinder';
     public angle: Float32Array;
     public arcAngle: Float32Array;
     public radius: Float32Array;
@@ -14,8 +13,10 @@ export default class GeneralCylinderGroup extends BaseCylinderGroup {
     public slopeB: Float32Array;
     public zAngleA: Float32Array;
     public zAngleB: Float32Array;
+
   constructor(capacity: number) {
     super(capacity);
+    this.type = 'GeneralCylinder';
     this.angle = new Float32Array(capacity);
     this.arcAngle = new Float32Array(capacity);
     this.radius = new Float32Array(capacity);

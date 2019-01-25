@@ -4,14 +4,15 @@ import * as THREE from 'three';
 import BaseCylinderGroup from './BaseCylinderGroup';
 
 export default class ExtrudedRingGroup extends BaseCylinderGroup {
-    static type = 'ExtrudedRing';
     public innerRadius: Float32Array;
     public outerRadius: Float32Array;
     public angle: Float32Array;
     public arcAngle: Float32Array;
     public isClosed: Uint8Array;
-  constructor(capacity: number) {
+
+    constructor(capacity: number) {
     super(capacity);
+    this.type = 'ExtrudedRing';
     this.innerRadius = new Float32Array(capacity);
     this.outerRadius = new Float32Array(capacity);
     this.isClosed = new Uint8Array(capacity);

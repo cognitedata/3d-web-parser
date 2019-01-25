@@ -12,11 +12,11 @@ const secondRotation = new THREE.Quaternion();
 const fullMatrix = new THREE.Matrix4();
 
 export default class BoxGroup extends PlaneGroup {
-  static type = 'Box';
   public angle: Float32Array;
   public delta: Float32Array;
   constructor(capacity: number) {
     super(capacity);
+    this.type = 'Box';
     this.angle = new Float32Array(capacity);
     this.delta = new Float32Array(3 * capacity);
   }
