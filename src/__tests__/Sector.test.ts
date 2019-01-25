@@ -66,7 +66,7 @@ describe('Sectors', () => {
     );
   });
 
-  test('traverse childs', async () => {
+  test('traverse children', async () => {
     const rootSector = new Sector(new THREE.Vector3(), new THREE.Vector3());
     const rootFirstSector = new Sector(
       new THREE.Vector3(),
