@@ -1,5 +1,6 @@
 // Copyright 2019 Cognite AS
 
+import * as THREE from 'three';
 import PrimitiveGroup from './PrimitiveGroup';
 
 export default class QuadGroup extends PrimitiveGroup {

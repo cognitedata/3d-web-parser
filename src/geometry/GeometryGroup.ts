@@ -1,4 +1,5 @@
 // Copyright 2019 Cognite AS
+import * as THREE from 'three';
 
 export default abstract class GeometryGroup {
   public type: string;
