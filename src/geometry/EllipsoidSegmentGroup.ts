@@ -3,6 +3,60 @@
 import * as THREE from 'three';
 import PlaneGroup from './PlaneGroup';
 import { computeCircleBoundingBox } from './CircleGroup';
+import { zAxis } from './../constants';
+
+// reusable variables
+const rotation = new THREE.Quaternion();
+const scale = new THREE.Vector3();
+const SI = new THREE.Matrix4();
+SI.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1);
+const M = new THREE.Matrix4();
+const MT = new THREE.Matrix4();
+const boundingBoxCenter = new THREE.Vector3();
+const size = new THREE.Vector3();
+const arr = new Array(16);
+
+// (haowei.guo) I found this ellipsoid bounding box algorithm from stackoverflow
+// https://stackoverflow.com/questions/4368961/calculating-an-aabb-for-a-transformed-sphere/4369956#4369956
+export function computeEllipsoidBoundingBox(
+  center: THREE.Vector3,
+  normal: THREE.Vector3,
+  xRadius: number,
+  yRadius: number,
+  zRadius: number,
+  matrix: THREE.Matrix4,
+  box: THREE.Box3,
+): THREE.Box3 {
+  rotation.setFromUnitVectors(zAxis, normal);
+  scale.set(2 * xRadius, 2 * yRadius, 2 * zRadius);
+  M.compose(
+    center,
+    rotation,
+    scale,
+  ).premultiply(matrix);
+
+  MT.copy(M).transpose();
+  M.multiply(SI);
+  M.multiply(MT);
+  // @ts-ignore
+  M.toArray(arr);
+  const r11 = arr[0];
+  const r14 = arr[3];
+  const r22 = arr[5];
+  const r24 = arr[7];
+  const r33 = arr[10];
+  const r34 = arr[11];
+  const r44 = arr[15];
+  boundingBoxCenter.set(r14 / r44, r24 / r44, r34 / r44);
+  size.set(
+    Math.abs(Math.sqrt(r14 * r14 - r44 * r11) / r44),
+    Math.abs(Math.sqrt(r24 * r24 - r44 * r22) / r44),
+    Math.abs(Math.sqrt(r34 * r34 - r44 * r33) / r44),
+  );
+  box.setFromCenterAndSize(boundingBoxCenter, size);
+
+  return box;
+}
 
 // reusable variables
 const normalMatrix = new THREE.Matrix3();
@@ -72,7 +126,7 @@ export default class EllipsoidSegmentGroup extends PlaneGroup {
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
-    return outputMatrix;
+    return outputMatrix.identity();
   }
 
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
