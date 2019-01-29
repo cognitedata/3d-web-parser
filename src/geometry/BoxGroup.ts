@@ -17,6 +17,7 @@ export default class BoxGroup extends PlaneGroup {
   constructor(capacity: number) {
     super(capacity);
     this.type = 'Box';
+    this.hasCustomTransformAttributes = false;
     this.angle = new Float32Array(capacity);
     this.delta = new Float32Array(3 * capacity);
   }

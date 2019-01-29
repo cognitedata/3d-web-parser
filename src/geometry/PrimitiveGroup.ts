@@ -3,6 +3,8 @@
 import * as THREE from 'three';
 import GeometryGroup from './GeometryGroup';
 
+const matrix = new THREE.Matrix4();
+
 type TypedArray = Float32Array | Float64Array;
 type THREEVector = THREE.Vector2 | THREE.Vector3;
 
@@ -18,6 +20,12 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
   public nodeId: Float64Array;
   public treeIndex: Float32Array;
   public color: Float32Array;
+
+  // The transformX arrays contain contain transformation matrix
+  public transform0: Float32Array;
+  public transform1: Float32Array;
+  public transform2: Float32Array;
+  public transform3: Float32Array;
   public hasCustomTransformAttributes: boolean;
   public attributes: Attribute[];
   // _parents: BasePrimitive[];
@@ -31,6 +39,10 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     this.nodeId = new Float64Array(this.capacity);
     this.treeIndex = new Float32Array(this.capacity);
     this.color = new Float32Array(3 * this.capacity);
+    this.transform0 = new Float32Array(0);
+    this.transform1 = new Float32Array(0);
+    this.transform2 = new Float32Array(0);
+    this.transform3 = new Float32Array(0);
     // this._parent = null;
     // this._children = [];
     // this.abstract = false;
@@ -113,5 +125,60 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
 
   getTreeIndex(index: number): number {
     return this.treeIndex[index];
+  }
+
+  computeTransformAttributes() {
+    if (this.hasCustomTransformAttributes) {
+      return;
+    }
+
+    // the 3x4 matrix to the shader.
+    // This array has length 4 (four columns in the matrix)
+    // and will contain block of 3 numbers (one block per object)
+    this.transform0 = new Float32Array(3 * this.count);
+    this.transform1 = new Float32Array(3 * this.count);
+    this.transform2 = new Float32Array(3 * this.count);
+    this.transform3 = new Float32Array(3 * this.count);
+
+    let rowIndex = 0;
+
+    for (let i = 0; i < this.count; i++) {
+      this.computeModelMatrix(matrix, i);
+      for (let row = 0; row < 3; row++) {
+        let idx = row;
+        this.transform0[rowIndex] = matrix.elements[idx];
+        idx += 4;
+        this.transform1[rowIndex] = matrix.elements[idx];
+        idx += 4;
+        this.transform2[rowIndex] = matrix.elements[idx];
+        idx += 4;
+        this.transform3[rowIndex] = matrix.elements[idx];
+        rowIndex++;
+      }
+    }
+
+    this.attributes.push({
+      name: 'matCol0',
+      array: this.transform0,
+      itemSize: 3,
+    });
+
+    this.attributes.push({
+      name: 'matCol1',
+      array: this.transform1,
+      itemSize: 3,
+    });
+
+    this.attributes.push({
+      name: 'matCol2',
+      array: this.transform2,
+      itemSize: 3,
+    });
+
+    this.attributes.push({
+      name: 'matCol3',
+      array: this.transform3,
+      itemSize: 3,
+    });
   }
 }
