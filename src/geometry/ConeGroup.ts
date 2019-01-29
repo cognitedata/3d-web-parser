@@ -2,6 +2,15 @@
 
 import * as THREE from 'three';
 import BaseCylinderGroup from './BaseCylinderGroup';
+import { computeCircleBoundingBox } from './CircleGroup';
+
+// reusable variables
+const center = new THREE.Vector3();
+const normal = new THREE.Vector3();
+const normalMatrix = new THREE.Matrix3();
+const reusableBox = new THREE.Box3();
+const centerA = new THREE.Vector3();
+const centerB = new THREE.Vector3();
 
 export default class ConeGroup extends BaseCylinderGroup {
     public radiusA: Float32Array;
@@ -75,10 +84,30 @@ export default class ConeGroup extends BaseCylinderGroup {
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
-    return outputMatrix;
+    return outputMatrix.identity();
   }
 
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
+    normalMatrix.setFromMatrix4(matrix);
+    const scaling = matrix.getMaxScaleOnAxis();
+
+    normal
+      .subVectors(this.getCenterA(centerA, index), this.getCenterB(centerB, index))
+      .applyMatrix3(normalMatrix)
+      .normalize();
+
+    box.makeEmpty();
+
+    // A
+    center.copy(this.getCenterA(centerA, index)).applyMatrix4(matrix);
+    let radius = scaling * this.getRadiusA(index);
+    box.union(computeCircleBoundingBox(center, normal, radius, reusableBox));
+
+    // B
+    center.copy(this.getCenterB(centerB, index)).applyMatrix4(matrix);
+    radius = scaling * this.getRadiusB(index);
+    box.union(computeCircleBoundingBox(center, normal, radius, reusableBox));
+
     return box;
   }
 }

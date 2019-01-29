@@ -5,11 +5,13 @@ import PlaneGroup from './PlaneGroup';
 import { zAxis } from '../constants';
 
 // reusable variables
-const vector1 = new THREE.Vector3();
-const vector2 = new THREE.Vector3();
 const firstRotation = new THREE.Quaternion();
 const secondRotation = new THREE.Quaternion();
 const fullMatrix = new THREE.Matrix4();
+const normal = new THREE.Vector3();
+const delta = new THREE.Vector3();
+const center = new THREE.Vector3();
+const point = new THREE.Vector3();
 
 export default class BoxGroup extends PlaneGroup {
   public angle: Float32Array;
@@ -59,10 +61,10 @@ export default class BoxGroup extends PlaneGroup {
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
     firstRotation.setFromAxisAngle(zAxis, this.getAngle(index));
-    secondRotation.setFromUnitVectors(zAxis, this.getNormal(vector1, index));
-    const scale = this.getDelta(vector1, index);
+    secondRotation.setFromUnitVectors(zAxis, this.getNormal(normal, index));
+    const scale = this.getDelta(delta, index);
     return outputMatrix.compose(
-      this.getCenter(vector2, index),
+      this.getCenter(center, index),
       secondRotation.multiply(firstRotation), // A.multiply(B) === A*B
       scale,
     );
@@ -75,7 +77,7 @@ export default class BoxGroup extends PlaneGroup {
     coords.forEach(x =>
       coords.forEach(y =>
         coords.forEach(z =>
-          box.expandByPoint(vector1.set(x, y, z).applyMatrix4(fullMatrix)),
+          box.expandByPoint(point.set(x, y, z).applyMatrix4(fullMatrix)),
         ),
       ),
     );

@@ -2,6 +2,17 @@
 
 import * as THREE from 'three';
 import PlaneGroup from './PlaneGroup';
+import { computeEllipsoidBoundingBox } from './EllipsoidSegmentGroup';
+
+// reusable variables
+const rotation = new THREE.Quaternion();
+const scale = new THREE.Vector3();
+const rotationMatrix = new THREE.Matrix4();
+const localYAxis = new THREE.Vector3();
+
+const normal = new THREE.Vector3();
+const localXAxis = new THREE.Vector3();
+const center = new THREE.Vector3();
 
 export default class GeneralRingGroup extends PlaneGroup {
   public xRadius: Float32Array;
@@ -98,10 +109,34 @@ export default class GeneralRingGroup extends PlaneGroup {
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
-    return outputMatrix;
+    this.getNormal(normal, index);
+    this.getLocalXAxis(localXAxis, index);
+    localYAxis.crossVectors(this.getNormal(normal, index), this.getLocalXAxis(localXAxis, index));
+    rotationMatrix.set(
+      localXAxis.x, localYAxis.x, normal.x, 0,
+      localXAxis.y, localYAxis.y, normal.y, 0,
+      localXAxis.z, localYAxis.z, normal.z, 0,
+                 0,            0,        0, 1,
+    );
+
+    rotation.setFromRotationMatrix(rotationMatrix);
+    scale.set(2 * this.getXRadius(index), 2 * this.getYRadius(index), 1);
+    return outputMatrix.compose(
+      this.getCenter(center, index),
+      rotation,
+      scale,
+    );
   }
 
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
-    return box;
+    return computeEllipsoidBoundingBox(
+      this.getCenter(center, index),
+      this.getNormal(normal, index),
+      this.getXRadius(index),
+      this.getYRadius(index),
+      0,
+      matrix,
+      box,
+    );
   }
 }

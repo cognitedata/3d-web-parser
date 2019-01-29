@@ -2,6 +2,20 @@
 
 import * as THREE from 'three';
 import PlaneGroup from './PlaneGroup';
+import { computeCircleBoundingBox } from './CircleGroup';
+import { zAxis, twoPI } from './../constants';
+
+// reusable variables
+const firstRotation = new THREE.Quaternion();
+const secondRotation = new THREE.Quaternion();
+const scale = new THREE.Vector3();
+const tubeCenter = new THREE.Vector3();
+const tubeNormal = new THREE.Vector3();
+const reusableBox = new THREE.Box3();
+const normalMatrix = new THREE.Matrix3();
+
+const vector1 = new THREE.Vector3();
+const vector2 = new THREE.Vector3();
 
 export default class TorusSegmentGroup extends PlaneGroup {
   public radius: Float32Array;
@@ -74,10 +88,52 @@ export default class TorusSegmentGroup extends PlaneGroup {
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
-    return outputMatrix;
+    firstRotation.setFromAxisAngle(zAxis, this.getAngle(index));
+    secondRotation.setFromUnitVectors(zAxis, this.getNormal(vector1, index));
+    scale.set(1, 1, 1);
+
+    return outputMatrix.compose(
+      this.getCenter(vector2, index),
+      secondRotation.multiply(firstRotation), // A.multiply(B) === A*B
+      scale,
+    );
   }
 
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
+    box.makeEmpty();
+
+    normalMatrix.setFromMatrix4(matrix);
+    secondRotation.setFromUnitVectors(zAxis, this.getNormal(vector1, index));
+
+    const radialSegmentAngle = twoPI / 24;
+    const angle = this.getAngle(index);
+    const arcAngle = this.getArcAngle(index);
+    const radius = this.getRadius(index);
+
+    const iterations = Math.ceil(arcAngle / radialSegmentAngle) + 1;
+    for (let i = 0; i < iterations; ++i) {
+      const zAngle = Math.min(angle + i * radialSegmentAngle, angle + arcAngle);
+      const x = Math.cos(zAngle);
+      const y = Math.sin(zAngle);
+      tubeCenter
+        .set(x * radius, y * radius, 0)
+        .applyQuaternion(secondRotation)
+        .add(this.getCenter(vector2, index))
+        .applyMatrix4(matrix);
+      tubeNormal
+        .set(y, -x, 0)
+        .applyQuaternion(secondRotation)
+        .applyMatrix3(normalMatrix);
+      box.union(
+        computeCircleBoundingBox(
+          tubeCenter,
+          tubeNormal,
+          this.getTubeRadius(index),
+          reusableBox,
+        ),
+      );
+    }
+
     return box;
   }
 }

@@ -2,6 +2,28 @@
 
 import * as THREE from 'three';
 import PrimitiveGroup from './PrimitiveGroup';
+import { computeCircleBoundingBox } from './CircleGroup';
+
+// constants
+type triplet = [number, number, number];
+const points: triplet[] = [
+  [1, 0, 0],
+  [-1, 0, 0],
+  [0, 1, 0],
+  [0, -1, 0],
+  [0, 0, 1],
+  [0, 0, -1],
+];
+
+// reusable variables
+const transformedCenter = new THREE.Vector3();
+const transformedNormal = new THREE.Vector3();
+const normalMatrix = new THREE.Matrix3();
+const point = new THREE.Vector3();
+const direction = new THREE.Vector3();
+const sphereCenter = new THREE.Vector3();
+const center = new THREE.Vector3();
+const normal = new THREE.Vector3();
 
 export default class SphericalSegmentGroup extends PrimitiveGroup {
   public center: Float32Array;
@@ -71,10 +93,49 @@ export default class SphericalSegmentGroup extends PrimitiveGroup {
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
-    return outputMatrix;
+    return outputMatrix.identity();
   }
 
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
+    box.makeEmpty();
+    normalMatrix.setFromMatrix4(matrix);
+    transformedNormal
+      .copy(this.getNormal(normal, index))
+      .applyMatrix3(normalMatrix)
+      .normalize();
+    const scaling = matrix.getMaxScaleOnAxis();
+    const radius = scaling * this.getRadius(index);
+    const height = scaling * this.getHeight(index);
+
+    sphereCenter.copy(this.getCenter(center, index)).applyMatrix4(matrix);
+    transformedCenter
+      .copy(sphereCenter)
+      .add(direction.copy(transformedNormal).multiplyScalar(radius - height));
+    box = computeCircleBoundingBox(
+      transformedCenter,
+      transformedNormal,
+      Math.sqrt(radius * radius - (radius - height) * (radius - height)),
+      box,
+    );
+
+    points.forEach(p => {
+      const dot = point
+        .set(p[0], p[1], p[2])
+        .multiplyScalar(radius)
+        .add(sphereCenter)
+        .sub(transformedCenter)
+        .dot(transformedNormal);
+      const EPS = 1e-6;
+      if (dot >= -EPS) {
+        box.expandByPoint(
+          point
+            .set(p[0], p[1], p[2])
+            .multiplyScalar(radius)
+            .add(sphereCenter),
+        );
+      }
+    });
+
     return box;
   }
 }
