@@ -31,6 +31,25 @@ export default class GeneralRingGroup extends PlaneGroup {
     this.thickness = new Float32Array(capacity);
     this.angle = new Float32Array(capacity);
     this.arcAngle = new Float32Array(capacity);
+    this.hasCustomTransformAttributes = false;
+
+    this.attributes.push({
+      name: 'a_thickness',
+      array: this.thickness,
+      itemSize: 1,
+    });
+
+    this.attributes.push({
+      name: 'a_angle',
+      array: this.angle,
+      itemSize: 1,
+    });
+
+    this.attributes.push({
+      name: 'a_arcAngle',
+      array: this.arcAngle,
+      itemSize: 1,
+    });
   }
 
   setXRadius(value: number, index: number) {
@@ -102,7 +121,7 @@ export default class GeneralRingGroup extends PlaneGroup {
     this.setXRadius(xRadius, this.count);
     this.setYRadius(yRadius, this.count);
     this.setLocalXAxis(localXAxis, this.count);
-    this.setThickness(thickness, this.count);
+    this.setThickness(thickness / yRadius, this.count);
     this.setAngle(angle, this.count);
     this.setArcAngle(arcAngle, this.count);
     this.count += 1;

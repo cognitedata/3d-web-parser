@@ -28,6 +28,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
     if (!isPrimitive(geometry)) {
       return;
     }
+    const treeIndex = parsePrimitiveTreeIndex(geometry);
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
     const { thickness = 0 } = primitiveInfo;
 
@@ -35,6 +36,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
       matchingGeometries.geometries.push(geometry);
       matchingGeometries.count += 1;
     } else if (geometry.type === 'extrudedRing'
+            || geometry.type === 'extrudedRingSegment'
             || geometry.type === 'generalCylinder'
             || geometry.type === 'cone' && thickness > 0) {
       matchingGeometries.geometries.push(geometry);
@@ -167,7 +169,7 @@ export default function parse(geometries: any[]): GeneralRingGroup {
       parseRing(primitiveInfo, nodeId, treeIndex, THREEColor, group);
     } else if (geometry.type === 'cone') {
       parseCone(primitiveInfo, nodeId, treeIndex, THREEColor, group);
-    } else if (geometry.type === 'extrudedRing') {
+    } else if (geometry.type === 'extrudedRing' || geometry.type === 'extrudedRingSegment') {
       parseExtrudedRing(primitiveInfo, nodeId, treeIndex, THREEColor, group);
     } else if (geometry.type === 'generalCylinder') {
       parseGeneralCylinder(primitiveInfo, nodeId, treeIndex, THREEColor, group);
