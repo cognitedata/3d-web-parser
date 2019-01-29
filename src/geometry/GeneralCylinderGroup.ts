@@ -26,6 +26,7 @@ export default class GeneralCylinderGroup extends BaseCylinderGroup {
     this.slopeB = new Float32Array(capacity);
     this.zAngleA = new Float32Array(capacity);
     this.zAngleB = new Float32Array(capacity);
+    this.hasCustomTransformAttributes = true;
   }
 
   setAngle(value: number, index: number) {

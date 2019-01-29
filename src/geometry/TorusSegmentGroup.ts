@@ -29,6 +29,24 @@ export default class TorusSegmentGroup extends PlaneGroup {
     this.tubeRadius = new Float32Array(capacity);
     this.angle = new Float32Array(capacity);
     this.arcAngle = new Float32Array(capacity);
+
+    this.attributes.push({
+      name: 'arc',
+      array: this.arcAngle,
+      itemSize: 1,
+    });
+
+    this.attributes.push({
+      name: 'radius',
+      array: this.radius,
+      itemSize: 1,
+    });
+
+    this.attributes.push({
+      name: 'tubeRadius',
+      array: this.tubeRadius,
+      itemSize: 1,
+    });
   }
 
   setRadius(value: number, index: number) {

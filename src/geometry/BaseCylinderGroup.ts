@@ -6,10 +6,12 @@ import PrimitiveGroup from './PrimitiveGroup';
 export default abstract class BaseCylinderGroup extends PrimitiveGroup {
   centerA: Float32Array;
   centerB: Float32Array;
+  localXAxis: Float32Array;
   constructor(capacity: number) {
     super(capacity);
     this.centerA = new Float32Array(3 * capacity);
     this.centerB = new Float32Array(3 * capacity);
+    this.localXAxis = new Float32Array(3 * capacity);
   }
 
   setCenterA(value: THREE.Vector3, index: number) {
@@ -26,5 +28,13 @@ export default abstract class BaseCylinderGroup extends PrimitiveGroup {
 
   getCenterB(target: THREE.Vector3, index: number): THREE.Vector3 {
     return this.getVector(this.centerB, target, index);
+  }
+
+  setLocalXAxis(value: THREE.Vector3, index: number) {
+    this.setVector(value, this.localXAxis, index);
+  }
+
+  getLocalXAxis(target: THREE.Vector3, index: number): THREE.Vector3 {
+    return this.getVector(this.localXAxis, target, index);
   }
 }

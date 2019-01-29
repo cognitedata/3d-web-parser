@@ -38,6 +38,37 @@ export default class SphericalSegmentGroup extends PrimitiveGroup {
     this.radius = new Float32Array(capacity);
     this.normal = new Float32Array(3 * capacity);
     this.height = new Float32Array(capacity);
+    this.hasCustomTransformAttributes = true;
+
+    this.attributes.push({
+      name: 'a_center',
+      array: this.center,
+      itemSize: 3,
+    });
+
+    this.attributes.push({
+      name: 'a_normal',
+      array: this.normal,
+      itemSize: 3,
+    });
+
+    this.attributes.push({
+      name: 'a_hRadius',
+      array: this.radius,
+      itemSize: 1,
+    });
+
+    this.attributes.push({
+      name: 'a_vRadius',
+      array: this.radius,
+      itemSize: 1,
+    });
+
+    this.attributes.push({
+      name: 'a_height',
+      array: this.height,
+      itemSize: 1,
+    });
   }
 
   setCenter(source: THREE.Vector3, index: number) {

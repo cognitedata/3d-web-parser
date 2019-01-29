@@ -19,6 +19,31 @@ export default class TrapeziumGroup extends PrimitiveGroup {
     this.vertex2 = new Float32Array(3 * capacity);
     this.vertex3 = new Float32Array(3 * capacity);
     this.vertex4 = new Float32Array(3 * capacity);
+    this.hasCustomTransformAttributes = true;
+
+    this.attributes.push({
+      name: 'aVertex1',
+      array: this.vertex1,
+      itemSize: 3,
+    });
+
+    this.attributes.push({
+      name: 'aVertex2',
+      array: this.vertex2,
+      itemSize: 3,
+    });
+
+    this.attributes.push({
+      name: 'aVertex3',
+      array: this.vertex3,
+      itemSize: 3,
+    });
+
+    this.attributes.push({
+      name: 'aVertex4',
+      array: this.vertex4,
+      itemSize: 3,
+    });
   }
 
   setVertex1(value: THREE.Vector3, index: number) {

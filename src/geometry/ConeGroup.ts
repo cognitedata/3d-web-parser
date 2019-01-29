@@ -3,14 +3,17 @@
 import * as THREE from 'three';
 import BaseCylinderGroup from './BaseCylinderGroup';
 import { computeCircleBoundingBox } from './CircleGroup';
+import { xAxis, zAxis } from '../constants';
 
 // reusable variables
+const vector1 = new THREE.Vector3();
 const center = new THREE.Vector3();
 const normal = new THREE.Vector3();
 const normalMatrix = new THREE.Matrix3();
 const reusableBox = new THREE.Box3();
 const centerA = new THREE.Vector3();
 const centerB = new THREE.Vector3();
+const rotation = new THREE.Quaternion();
 
 export default class ConeGroup extends BaseCylinderGroup {
     public radiusA: Float32Array;
@@ -25,6 +28,49 @@ export default class ConeGroup extends BaseCylinderGroup {
     this.radiusB = new Float32Array(capacity);
     this.angle = new Float32Array(capacity);
     this.arcAngle = new Float32Array(capacity);
+    this.hasCustomTransformAttributes = true;
+
+    this.attributes.push({
+      name: 'a_radiusA',
+      array: this.radiusA,
+      itemSize: 1,
+    });
+
+    this.attributes.push({
+      name: 'a_radiusB',
+      array: this.radiusA,
+      itemSize: 1,
+    });
+
+    this.attributes.push({
+      name: 'a_centerA',
+      array: this.centerA,
+      itemSize: 3,
+    });
+
+    this.attributes.push({
+      name: 'a_centerB',
+      array: this.centerB,
+      itemSize: 3,
+    });
+
+    this.attributes.push({
+      name: 'a_localXAxis',
+      array: this.localXAxis,
+      itemSize: 3,
+    });
+
+    this.attributes.push({
+      name: 'a_angle',
+      array: this.angle,
+      itemSize: 1,
+    });
+
+    this.attributes.push({
+      name: 'a_arcAngle',
+      array: this.arcAngle,
+      itemSize: 1,
+    });
   }
 
   setRadiusA(value: number, index: number) {
@@ -79,6 +125,10 @@ export default class ConeGroup extends BaseCylinderGroup {
     this.setRadiusB(radiusB, this.count);
     this.setAngle(angle, this.count);
     this.setArcAngle(arcAngle, this.count);
+
+    normal.subVectors(centerA, centerB).normalize();
+    rotation.setFromUnitVectors(zAxis, normal);
+    this.setLocalXAxis(vector1.copy(xAxis).applyQuaternion(rotation), this.count);
 
     this.count += 1;
   }

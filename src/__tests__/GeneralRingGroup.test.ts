@@ -102,7 +102,7 @@ describe('GeneralRingGroup', () => {
     group.getLocalXAxis(targetVector, 0);
     expectVector3Equal(targetVector, localXAxis);
 
-    expect(group.getThickness(0)).toBeCloseTo(thickness);
+    expect(group.getThickness(0)).toBeCloseTo(thickness / yRadius);
     expect(group.getAngle(0)).toBeCloseTo(angle);
     expect(group.getArcAngle(0)).toBeCloseTo(arcAngle);
   });

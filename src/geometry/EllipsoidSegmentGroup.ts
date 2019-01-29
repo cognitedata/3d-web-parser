@@ -78,6 +78,37 @@ export default class EllipsoidSegmentGroup extends PlaneGroup {
     this.height = new Float32Array(capacity);
     this.horizontalRadius = new Float32Array(capacity);
     this.verticalRadius = new Float32Array(capacity);
+    this.hasCustomTransformAttributes = true;
+
+    this.attributes.push({
+      name: 'a_center',
+      array: this.center,
+      itemSize: 3,
+    });
+
+    this.attributes.push({
+      name: 'a_normal',
+      array: this.normal,
+      itemSize: 3,
+    });
+
+    this.attributes.push({
+      name: 'a_hRadius',
+      array: this.horizontalRadius,
+      itemSize: 1,
+    });
+
+    this.attributes.push({
+      name: 'a_vRadius',
+      array: this.verticalRadius,
+      itemSize: 1,
+    });
+
+    this.attributes.push({
+      name: 'a_height',
+      array: this.height,
+      itemSize: 1,
+    });
   }
 
   setHeight(value: number, index: number) {
@@ -163,7 +194,7 @@ export default class EllipsoidSegmentGroup extends PlaneGroup {
 
     // union the point which maximizes z
     box.expandByPoint(
-      circleCenter.copy(transformedNormal).multiplyScalar(vRadius).add(transformedCenter)
+      circleCenter.copy(transformedNormal).multiplyScalar(vRadius).add(transformedCenter),
     );
 
     return box;
