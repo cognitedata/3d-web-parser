@@ -65,6 +65,7 @@ export default async function parseProtobuf(protobufData: Uint8Array) {
     const parentPath = getParentPath(path);
     if (parentPath !== undefined) {
       nodes[parentPath].addChild(sector);
+      nodes[parentPath].object3d.add(sector.object3d);
     }
   }
 
