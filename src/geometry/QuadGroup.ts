@@ -1,6 +1,22 @@
 // Copyright 2019 Cognite AS
 
 import PrimitiveGroup from './PrimitiveGroup';
+import * as THREE from 'three';
+
+// reusable variables
+const basis = new THREE.Matrix4();
+const rotation = new THREE.Quaternion();
+const scale = new THREE.Vector3();
+
+const center = new THREE.Vector3();
+const normal = new THREE.Vector3();
+const side1 = new THREE.Vector3();
+const side2 = new THREE.Vector3();
+const vertex1 = new THREE.Vector3();
+const vertex2 = new THREE.Vector3();
+const vertex3 = new THREE.Vector3();
+const vertex4 = new THREE.Vector3();
+const point = new THREE.Vector3();
 
 export default class QuadGroup extends PrimitiveGroup {
   static type = 'Quad';
@@ -57,10 +73,57 @@ export default class QuadGroup extends PrimitiveGroup {
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
+    this.getVertex1(vertex1, index);
+    this.getVertex2(vertex2, index);
+    this.getVertex3(vertex3, index);
+
+    side1.subVectors(vertex3, vertex1);
+    side2.subVectors(vertex3, vertex2);
+    scale.set(side2.length(), side1.length(), 1);
+    normal.crossVectors(side1, side2).normalize();
+    side1.normalize();
+    side2.normalize();
+
+    basis.set(
+      side2.x, side1.x, normal.x, 0,
+      side2.y, side1.y, normal.y, 0,
+      side2.z, side1.z, normal.z, 0,
+            0,       0,        0, 1,
+    );
+
+    outputMatrix = outputMatrix.identity().compose(
+      center.set(0, 0, 0),
+      rotation,
+      scale,
+    );
+
+    outputMatrix.premultiply(basis);
+
+    center.addVectors(vertex1, vertex2).multiplyScalar(0.5);
+    basis.set(
+      1, 0, 0, center.x,
+      0, 1, 0, center.y,
+      0, 0, 1, center.z,
+      0, 0, 0, 1,
+    );
+
+    outputMatrix.premultiply(basis);
+
     return outputMatrix;
   }
 
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
+    this.getVertex1(vertex1, index);
+    this.getVertex2(vertex2, index);
+    this.getVertex3(vertex3, index);
+
+    box.makeEmpty();
+    vertex4.subVectors(vertex1, vertex3).add(vertex2);
+    const vertices = [vertex1, vertex2, vertex3, vertex4];
+    vertices.forEach(vertex => {
+      box.expandByPoint(point.copy(vertex).applyMatrix4(matrix));
+    });
+
     return box;
   }
 }

@@ -1,6 +1,12 @@
 // Copyright 2019 Cognite AS
 
+import * as THREE from 'three';
 import PrimitiveGroup from './PrimitiveGroup';
+import { identityMatrix4 } from './../constants';
+
+// reusable variables
+const center = new THREE.Vector3();
+const point = new THREE.Vector3(); 
 
 export default class SphereGroup extends PrimitiveGroup {
   static type = 'Sphere';
@@ -48,6 +54,22 @@ export default class SphereGroup extends PrimitiveGroup {
   }
 
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
+    this.getCenter(center, index);
+    
+    box.makeEmpty();
+    const isIdentity = matrix.equals(identityMatrix4);
+    point.copy(center).addScalar(this.getRadius(index));
+    if (!isIdentity) {
+      point.applyMatrix4(matrix);
+    }
+    box.expandByPoint(point);
+
+    point.copy(center).addScalar(-this.radius);
+    if (!isIdentity) {
+      point.applyMatrix4(matrix);
+    }
+    box.expandByPoint(point);
+
     return box;
   }
 }

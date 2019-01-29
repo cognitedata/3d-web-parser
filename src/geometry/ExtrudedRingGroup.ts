@@ -2,6 +2,22 @@
 
 import * as THREE from 'three';
 import BaseCylinderGroup from './BaseCylinderGroup';
+import { zAxis, twoPI, identityMatrix4 } from './../constants';
+import { computeCircleBoundingBox } from './CircleGroup';
+
+// reusable variables
+const firstRotation = new THREE.Quaternion();
+const secondRotation = new THREE.Quaternion();
+const scale = new THREE.Vector3();
+
+const normalMatrix = new THREE.Matrix3();
+const reusableBox = new THREE.Box3();
+
+const center = new THREE.Vector3();
+const normal = new THREE.Vector3();
+const point = new THREE.Vector3();
+const centerA = new THREE.Vector3();
+const centerB = new THREE.Vector3();
 
 export default class ExtrudedRingGroup extends BaseCylinderGroup {
     static type = 'ExtrudedRing';
@@ -86,10 +102,80 @@ export default class ExtrudedRingGroup extends BaseCylinderGroup {
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
-    return outputMatrix;
+    this.getCenterA(centerA, index);
+    this.getCenterB(centerB, index);
+    center.addVectors(centerA, centerB).multiplyScalar(0.5);
+    normal.subVectors(centerA, centerB);
+    const height = normal.length() / 2;
+    normal.normalize();
+
+    firstRotation.setFromAxisAngle(zAxis, this.getAngle(index));
+    secondRotation.setFromUnitVectors(zAxis, normal);
+
+    scale.set(1, 1, height);
+
+    return outputMatrix.compose(
+      center,
+      secondRotation.multiply(firstRotation), // A.multiply(B) === A*B
+      scale,
+    );
+  }
+
+  computeExtrudedRingBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
+    this.getCenterA(centerA, index);
+    this.getCenterB(centerB, index);
+
+    normalMatrix.setFromMatrix4(matrix);
+    const scaling = matrix.getMaxScaleOnAxis();
+
+    normal
+      .subVectors(centerA, centerB)
+      .applyMatrix3(normalMatrix)
+      .normalize();
+    const maxRadius = scaling * this.getOuterRadius(index);
+
+    [centerA, centerB].forEach(capCenter => {
+      center.copy(capCenter).applyMatrix4(matrix);
+      box.union(
+        computeCircleBoundingBox(center, normal, maxRadius, reusableBox),
+      );
+    });
+
+    return box;
+  }
+
+  computeExtrudedRingSegmentBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
+    const radialSegmentAngle = twoPI / 24;
+    this.getCenterA(centerA, index);
+    this.getCenterB(centerB, index);
+    let arcAngle = this.getArcAngle(index);
+    let angle = this.getAngle(index);
+    const iterations = Math.ceil(arcAngle / radialSegmentAngle) + 1;
+    secondRotation.setFromUnitVectors(zAxis, normal.subVectors(centerA, centerB).normalize());
+    for (let i = 0; i < iterations; ++i) {
+      [this.getOuterRadius(index), this.getInnerRadius(index)].forEach(circleRadius => {
+        [centerA, centerB].forEach(circleCenter => {
+          const zAngle = Math.min(angle + i * radialSegmentAngle, angle + arcAngle);
+          const x = Math.cos(zAngle) * circleRadius;
+          const y = Math.sin(zAngle) * circleRadius;
+          point
+            .set(x, y, 0)
+            .applyQuaternion(secondRotation)
+            .add(circleCenter)
+            .applyMatrix4(matrix);
+          box.expandByPoint(point);
+        });
+      });
+    }
+
+    return box;
   }
 
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
-    return box;
+    box.makeEmpty();
+
+    return this.getArcAngle(index) < twoPI ?
+      this.computeExtrudedRingSegmentBoundingBox(matrix, box, index) :
+      this.computeExtrudedRingBoundingBox(matrix, box, index);
   }
 }

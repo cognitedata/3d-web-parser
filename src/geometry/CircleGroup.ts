@@ -4,9 +4,6 @@ import * as THREE from 'three';
 import PlaneGroup from './PlaneGroup';
 import { zAxis } from '../constants';
 
-// reusable variables
-const dot = new THREE.Vector3();
-
 export function computeCircleBoundingBox(
   center: THREE.Vector3,
   normal: THREE.Vector3,
@@ -26,12 +23,14 @@ export function computeCircleBoundingBox(
 }
 
 // reusable variables
-const vector1 = new THREE.Vector3();
-const vector2 = new THREE.Vector3();
+const dot = new THREE.Vector3();
 const quaternion = new THREE.Quaternion();
 const normalMatrix = new THREE.Matrix3();
 const transformedCenter = new THREE.Vector3();
 const transformedNormal = new THREE.Vector3();
+const normal = new THREE.Vector3();
+const center = new THREE.Vector3();
+const scale = new THREE.Vector3();
 
 export default class CircleGroup extends PlaneGroup {
   static type = 'Circle';
@@ -67,19 +66,20 @@ export default class CircleGroup extends PlaneGroup {
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
-    quaternion.setFromUnitVectors(zAxis, this.getNormal(vector1, index));
+    quaternion.setFromUnitVectors(zAxis, this.getNormal(normal, index));
     const twoRadius = 2 * this.getRadius(index);
-    vector2.set(twoRadius, twoRadius, 1);
+    scale.set(twoRadius, twoRadius, 1);
     return outputMatrix.compose(
-      this.getCenter(vector1, index),
+      this.getCenter(center, index),
       quaternion, // Rotation
-      vector2, // Scale
+      scale, // Scale
     );
   }
+
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
     normalMatrix.setFromMatrix4(matrix);
-    transformedCenter.copy(this.getCenter(vector1, index)).applyMatrix4(matrix);
-    transformedNormal.copy(this.getNormal(vector1, index)).applyMatrix3(normalMatrix);
+    transformedCenter.copy(this.getCenter(center, index)).applyMatrix4(matrix);
+    transformedNormal.copy(this.getNormal(normal, index)).applyMatrix3(normalMatrix);
     const scaling = matrix.getMaxScaleOnAxis();
     const radius = scaling * this.getRadius(index);
 

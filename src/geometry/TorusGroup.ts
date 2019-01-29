@@ -2,6 +2,20 @@
 
 import * as THREE from 'three';
 import PlaneGroup from './PlaneGroup';
+import {computeCircleBoundingBox} from './CircleGroup';
+import { zAxis } from './../constants'
+
+// reusable variables
+const rotation = new THREE.Quaternion();
+const scale = new THREE.Vector3();
+const normalMatrix = new THREE.Matrix3();
+const transformedCenter = new THREE.Vector3();
+const transformedNormal = new THREE.Vector3();
+const reusableBox = new THREE.Box3();
+
+const point = new THREE.Vector3();
+const center = new THREE.Vector3();
+const normal = new THREE.Vector3();
 
 export default class TorusGroup extends PlaneGroup {
   static type = 'Torus';
@@ -49,10 +63,49 @@ export default class TorusGroup extends PlaneGroup {
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
-    return outputMatrix;
+    rotation.setFromUnitVectors(zAxis, this.getNormal(normal, index));
+    scale.set(1, 1, 1);
+
+    return outputMatrix.compose(
+      this.getCenter(center, index),
+      rotation,
+      scale,
+    );
   }
 
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
+    box.makeEmpty();
+    normalMatrix.setFromMatrix4(matrix);
+    const scaling = matrix.getMaxScaleOnAxis();
+
+    transformedCenter.copy(this.getCenter(center, index)).applyMatrix4(matrix);
+    transformedNormal
+      .copy(this.getNormal(normal, index))
+      .applyMatrix3(normalMatrix)
+      .normalize();
+    const radius = scaling * this.getRadius(index);
+    const tubeRadius = scaling * this.getTubeRadius(index);
+
+    const tubularSegments = 16;
+    for (let i = 0; i <= tubularSegments; ++i) {
+      const x = i * 2 / tubularSegments - 1;
+      const y = Math.sqrt(1 - x * x);
+      const sliceCenter = point
+        .copy(transformedNormal)
+        .multiplyScalar(x * tubeRadius)
+        .add(transformedCenter);
+      const sliceOuterRadius = radius + y * tubeRadius;
+
+      box.union(
+        computeCircleBoundingBox(
+          sliceCenter,
+          transformedNormal,
+          sliceOuterRadius,
+          reusableBox,
+        ),
+      );
+    }
+
     return box;
   }
 }

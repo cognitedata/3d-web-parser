@@ -2,6 +2,16 @@
 
 import * as THREE from 'three';
 import PlaneGroup from './PlaneGroup';
+import { computeCircleBoundingBox } from './CircleGroup';
+
+// reusable variables
+const normalMatrix = new THREE.Matrix3();
+const transformedCenter = new THREE.Vector3();
+const transformedNormal = new THREE.Vector3();
+const circleCenter = new THREE.Vector3();
+const reusableBox = new THREE.Box3();
+const center = new THREE.Vector3();
+const normal = new THREE.Vector3();
 
 export default class EllipsoidSegmentGroup extends PlaneGroup {
   static type = 'EllipsoidSegment';
@@ -66,6 +76,41 @@ export default class EllipsoidSegmentGroup extends PlaneGroup {
   }
 
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
+    box.makeEmpty();
+
+    normalMatrix.setFromMatrix4(matrix);
+
+    transformedCenter.copy(this.getCenter(center, index)).applyMatrix4(matrix);
+    transformedNormal
+      .copy(this.getNormal(normal, index))
+      .applyMatrix3(normalMatrix)
+      .normalize();
+
+    const height = this.getHeight(index);
+    const hRadius = this.getHorizontalRadius(index);
+    const vRadius = this.getVerticalRadius(index);
+
+    const segments = 16;
+    const step = hRadius / segments;
+    for (let z = vRadius - height; z < vRadius; z += step) {
+      const circleRadius = Math.sqrt(vRadius * vRadius - z * z) * hRadius / vRadius;
+      circleCenter.copy(transformedNormal).multiplyScalar(z).add(transformedCenter);
+
+      box.union(
+        computeCircleBoundingBox(
+          circleCenter,
+          transformedNormal,
+          circleRadius,
+          reusableBox,
+        ),
+      );
+    }
+
+    // union the point which maximizes z
+    box.expandByPoint(
+      circleCenter.copy(transformedNormal).multiplyScalar(vRadius).add(transformedCenter)
+    );
+
     return box;
   }
 }

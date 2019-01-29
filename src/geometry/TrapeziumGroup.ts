@@ -1,6 +1,11 @@
 // Copyright 2019 Cognite AS
 
+import * as THREE from 'three';
 import PrimitiveGroup from './PrimitiveGroup';
+
+// reusable variables
+const point = new THREE.Vector3();
+const vertex = new THREE.Vector3();
 
 export default class TrapeziumGroup extends PrimitiveGroup {
   static type = 'Trapezium';
@@ -73,6 +78,11 @@ export default class TrapeziumGroup extends PrimitiveGroup {
   }
 
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
+    box.makeEmpty();
+    box.expandByPoint(this.getVertex1(vertex, index));
+    box.expandByPoint(this.getVertex2(vertex, index));
+    box.expandByPoint(this.getVertex3(vertex, index));
+    box.expandByPoint(this.getVertex4(vertex, index));
     return box;
   }
 }
