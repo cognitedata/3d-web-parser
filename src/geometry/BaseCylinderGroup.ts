@@ -12,6 +12,18 @@ export default abstract class BaseCylinderGroup extends PrimitiveGroup {
     this.centerA = new Float32Array(3 * capacity);
     this.centerB = new Float32Array(3 * capacity);
     this.localXAxis = new Float32Array(3 * capacity);
+
+    this.attributes.push({
+      name: 'a_centerA',
+      array: this.centerA,
+      itemSize: 3,
+    });
+
+    this.attributes.push({
+      name: 'a_centerB',
+      array: this.centerB,
+      itemSize: 3,
+    });
   }
 
   setCenterA(value: THREE.Vector3, index: number) {

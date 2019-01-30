@@ -42,18 +42,6 @@ export default class ConeGroup extends BaseCylinderGroup {
       });
 
       this.attributes.push({
-        name: 'a_centerA',
-        array: this.centerA,
-        itemSize: 3,
-      });
-
-      this.attributes.push({
-        name: 'a_centerB',
-        array: this.centerB,
-        itemSize: 3,
-      });
-
-      this.attributes.push({
         name: 'a_localXAxis',
         array: this.localXAxis,
         itemSize: 3,

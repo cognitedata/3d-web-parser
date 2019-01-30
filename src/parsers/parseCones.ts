@@ -68,8 +68,8 @@ matchingGeometries.geometries.forEach(geometry => {
       const { radius } = primitiveInfo;
       group.add(nodeId, treeIndex, color, centerA, centerB, radius, radius);
     } else if (geometry.type === 'cone') {
-      let { radiusA = 0, radiusB = 0 } = primitiveInfo;
-      const { angle = 0, arcAngle = 0 } = primitiveInfo;
+      let { radiusA, radiusB } = primitiveInfo;
+      const { angle = 0, arcAngle  = 2.0 * Math.PI } = primitiveInfo;
 
       group.add(nodeId, treeIndex, color, centerA, centerB, radiusA, radiusB, angle, arcAngle);
 
@@ -79,9 +79,9 @@ matchingGeometries.geometries.forEach(geometry => {
         radiusB -= primitiveInfo.thickness;
         group.add(nodeId, treeIndex, color, centerA, centerB, radiusA, radiusB, angle, arcAngle);
       }
-
     } else if (geometry.type === 'extrudedRing') {
-      const { innerRadius, outerRadius, angle, arcAngle } = primitiveInfo;
+      const { innerRadius, outerRadius, angle = 0, arcAngle = 2.0 * Math.PI } = primitiveInfo;
+
       group.add(nodeId, treeIndex, color, centerA, centerB, innerRadius, innerRadius, angle, arcAngle);
       group.add(nodeId, treeIndex, color, centerA, centerB, outerRadius, outerRadius, angle, arcAngle);
     }

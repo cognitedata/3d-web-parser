@@ -8,7 +8,6 @@ export { default as CircleGroup } from './geometry/CircleGroup';
 export { default as ConeGroup } from './geometry/ConeGroup';
 export { default as EccentricConeGroup } from './geometry/EccentricConeGroup';
 export { default as EllipsoidSegmentGroup } from './geometry/EllipsoidSegmentGroup';
-export { default as ExtrudedRingGroup } from './geometry/ExtrudedRingGroup';
 export { default as GeneralCylinderGroup } from './geometry/GeneralCylinderGroup';
 export { default as GeneralRingGroup } from './geometry/GeneralRingGroup';
 export { default as GeometryGroup } from './geometry/GeometryGroup';

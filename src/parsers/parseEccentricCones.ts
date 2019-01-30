@@ -50,6 +50,11 @@ export default function parse(geometries: any[]): EccentricConeGroup {
     ({ x = 0, y = 0, z = 0 } = primitiveInfo.normalA);
     normal.set(x, y, z);
 
+    const dotProduct = normal.dot(vector.copy(centerA).sub(centerB));
+    if (dotProduct < 0) {
+      normal.negate();
+    }
+
     group.add(nodeId, treeIndex, color, centerA, centerB, radiusA, radiusB, normal);
   });
   return group;
