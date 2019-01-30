@@ -3,9 +3,9 @@ import CircleGroup from './geometry/CircleGroup';
 import ConeGroup from './geometry/ConeGroup';
 import * as THREE from 'three';
 
-const lookup = [1, 2];
+const fibonacciLookup = [1, 2];
 for (let i = 2; i <= 77; i++) {
-  lookup.push(lookup[i - 1] + lookup[i - 2]);
+  fibonacciLookup.push(fibonacciLookup[i - 1] + fibonacciLookup[i - 2]);
 }
 
 class FibonacciDecoder {
@@ -32,6 +32,7 @@ class FibonacciDecoder {
     this.readBitId = 1;
   }
 
+  // Read next encoded value
   nextValue() {
     this.numberRead++;
     // read rest of file
@@ -47,7 +48,7 @@ class FibonacciDecoder {
           this.readBitId++;
           return returnValue;
         } else { // Otherwise update read value
-          this.currentValue += lookup[this.nextFibIndex];
+          this.currentValue += fibonacciLookup[this.nextFibIndex];
         }
       }
       this.nextFibIndex++;
@@ -201,6 +202,27 @@ const delta = new THREE.Vector3();
 const centerA = new THREE.Vector3();
 const centerB = new THREE.Vector3();
 
+const allGeometryNames: {[type: number]: string} = {
+  1: 'Box',
+  2: 'Circle',
+  3: 'ClosedCone',
+  4: 'ClosedCylinder',
+  13: 'Nut',
+  14: 'OpenCone',
+  15: 'OpenCylinder',
+  19: 'OpenGeneralCylinder',
+  21: 'OpenTorusSegment',
+  22: 'Ring',
+  100: 'TriangleMesh',
+};
+
+const allGeometryProperties: {[name: string]: string[]} = {
+  'Box': ['normal', 'deltas', 'angle'],
+  'Circle': ['radius (1)'],
+  'ClosedCone': ['normal', 'height', 'radiuses (2)'],
+  'ClosedCylinder': ['normal', 'height', 'radius (1)'],
+};
+
 function loadData(trueValuesArray: any, geometryInfo: any) {
   nodeId =    geometryInfo.indexes.nextValue();
   treeIndex = geometryInfo.indexes.nextValue();
@@ -214,43 +236,32 @@ function loadData(trueValuesArray: any, geometryInfo: any) {
   z =         trueValuesArray.z_values[zIndex];
 
   center.set(x, y, z);
+  const geometryName: string = allGeometryNames[geometryInfo.type];
+  const geometryProperties: string[] = allGeometryProperties[geometryName];
 
-  // Normal: All but spheres
-  if ([1, 3, 4].indexOf(geometryInfo.type) !== -1) {
+  if (geometryProperties.indexOf('normal') !== -1) {
     normal = trueValuesArray.normals[geometryInfo.indexes.nextValue()];
   }
-
-  // Delta: Box
-  if (geometryInfo.type === 1) {
+  if (geometryProperties.indexOf('deltas') !== -1) {
     deltaX = trueValuesArray.deltas[geometryInfo.indexes.nextValue()];
     deltaY = trueValuesArray.deltas[geometryInfo.indexes.nextValue()];
     deltaZ = trueValuesArray.deltas[geometryInfo.indexes.nextValue()];
     delta.set(deltaX, deltaY, deltaZ);
   }
-
-  // Height: Cylinders and sphere/ellipsoid segments
-  if ([3, 4].indexOf(geometryInfo.type) !== -1) {
+  if (geometryProperties.indexOf('height') !== -1) {
     height = trueValuesArray.heights[geometryInfo.indexes.nextValue()];
   }
-
-  // Radius (one): Circle, sphere/ellipsoid segment, cylinder
-  if ([2, 4].indexOf(geometryInfo.type) !== -1) {
+  if (geometryProperties.indexOf('radius (1)') !== -1) {
     radius = trueValuesArray.radiuses[geometryInfo.indexes.nextValue()];
   }
-
-  // Radiuses (two): Cones
-  if ([3].indexOf(geometryInfo.type) !== -1) {
+  if (geometryProperties.indexOf('radiuses (2)') !== -1) {
     radiusA = trueValuesArray.radiuses[geometryInfo.indexes.nextValue()];
     radiusB = trueValuesArray.radiuses[geometryInfo.indexes.nextValue()];
   }
-
-  // Angle: Box
-  if ([1].indexOf(geometryInfo.type) !== -1) {
+  if (geometryProperties.indexOf('angle') !== -1) {
     angle = trueValuesArray.angles[geometryInfo.indexes.nextValue()];
   }
-
-  // Matrix: ??
-  // Translation: ??
+  // TODO(verkhovskaya): Add Matrix and Translation once relevant
 }
 
 function generateGeometryGroups(segmentInformation: any) {
