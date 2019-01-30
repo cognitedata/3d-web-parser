@@ -42,7 +42,7 @@ describe('customFileParser', () => {
     expect(decoder.nextValue()).toBe(6);
   });
 
-  test('parse file 42', async() => {
+  test('parse file', async() => {
     const incomingFile = fs.readFileSync('./src/__tests__/customFileParserTest/Pipes.c3d', null);
 
     const asArrayBuffer = new ArrayBuffer(incomingFile.length);
@@ -181,7 +181,6 @@ describe('customFileParser', () => {
     const boxes = geometryGroups.boxGroup;
     expect(boxes.getNodeId(0)).toBe(7060329795587960);
     expect(boxes.getTreeIndex(0)).toBe(1043);
-    // checkIntArrayMatch(boxes.getColor(), [1, 36, 34, 47]);
     const test = new THREE.Vector3();
     boxes.getCenter(test, 0);
     expect(test.x).toBeCloseTo(282.05499267578125);
