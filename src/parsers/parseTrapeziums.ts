@@ -96,7 +96,7 @@ function parseGeneralCylinder(primitiveInfo: any,
                               treeIndex: number,
                               color: THREE.Color,
                               group: TrapeziumGroup) {
-  console.log('Trapezium parsing from generalCylinder parsing isn\'t implemented');
+  // console.log('Trapezium parsing from generalCylinder parsing isn\'t implemented');
 }
 
 export default function parse(geometries: any[]): TrapeziumGroup {

@@ -152,7 +152,7 @@ function parseGeneralCylinder(primitiveInfo: any,
                               treeIndex: number,
                               color: THREE.Color,
                               group: GeneralRingGroup) {
-  console.log('General ring parsing from generalCylinder parsing isn\'t implemented');
+  // console.log('General ring parsing from generalCylinder parsing isn\'t implemented');
 }
 
 export default function parse(geometries: any[]): GeneralRingGroup {
