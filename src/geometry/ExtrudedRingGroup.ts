@@ -13,11 +13,11 @@ const scale = new THREE.Vector3();
 const normalMatrix = new THREE.Matrix3();
 const reusableBox = new THREE.Box3();
 
-const center = new THREE.Vector3();
-const normal = new THREE.Vector3();
-const point = new THREE.Vector3();
-const centerA = new THREE.Vector3();
-const centerB = new THREE.Vector3();
+const globalCenter = new THREE.Vector3();
+const globalNormal = new THREE.Vector3();
+const globalPoint = new THREE.Vector3();
+const globalCenterA = new THREE.Vector3();
+const globalCenterB = new THREE.Vector3();
 
 export default class ExtrudedRingGroup extends BaseCylinderGroup {
     public innerRadius: Float32Array;
@@ -103,42 +103,42 @@ export default class ExtrudedRingGroup extends BaseCylinderGroup {
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
-    this.getCenterA(centerA, index);
-    this.getCenterB(centerB, index);
-    center.addVectors(centerA, centerB).multiplyScalar(0.5);
-    normal.subVectors(centerA, centerB);
-    const height = normal.length() / 2;
-    normal.normalize();
+    this.getCenterA(globalCenterA, index);
+    this.getCenterB(globalCenterB, index);
+    globalCenter.addVectors(globalCenterA, globalCenterB).multiplyScalar(0.5);
+    globalNormal.subVectors(globalCenterA, globalCenterB);
+    const height = globalNormal.length() / 2;
+    globalNormal.normalize();
 
     firstRotation.setFromAxisAngle(zAxis, this.getAngle(index));
-    secondRotation.setFromUnitVectors(zAxis, normal);
+    secondRotation.setFromUnitVectors(zAxis, globalNormal);
 
     scale.set(1, 1, height);
 
     return outputMatrix.compose(
-      center,
+      globalCenter,
       secondRotation.multiply(firstRotation), // A.multiply(B) === A*B
       scale,
     );
   }
 
   computeExtrudedRingBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
-    this.getCenterA(centerA, index);
-    this.getCenterB(centerB, index);
+    this.getCenterA(globalCenterA, index);
+    this.getCenterB(globalCenterB, index);
 
     normalMatrix.setFromMatrix4(matrix);
     const scaling = matrix.getMaxScaleOnAxis();
 
-    normal
-      .subVectors(centerA, centerB)
+    globalNormal
+      .subVectors(globalCenterA, globalCenterB)
       .applyMatrix3(normalMatrix)
       .normalize();
     const maxRadius = scaling * this.getOuterRadius(index);
 
-    [centerA, centerB].forEach(capCenter => {
-      center.copy(capCenter).applyMatrix4(matrix);
+    [globalCenterA, globalCenterB].forEach(capCenter => {
+      globalCenter.copy(capCenter).applyMatrix4(matrix);
       box.union(
-        computeCircleBoundingBox(center, normal, maxRadius, reusableBox),
+        computeCircleBoundingBox(globalCenter, globalNormal, maxRadius, reusableBox),
       );
     });
 
@@ -147,24 +147,24 @@ export default class ExtrudedRingGroup extends BaseCylinderGroup {
 
   computeExtrudedRingSegmentBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
     const radialSegmentAngle = twoPI / 24;
-    this.getCenterA(centerA, index);
-    this.getCenterB(centerB, index);
-    let arcAngle = this.getArcAngle(index);
-    let angle = this.getAngle(index);
+    this.getCenterA(globalCenterA, index);
+    this.getCenterB(globalCenterB, index);
+    const arcAngle = this.getArcAngle(index);
+    const angle = this.getAngle(index);
     const iterations = Math.ceil(arcAngle / radialSegmentAngle) + 1;
-    secondRotation.setFromUnitVectors(zAxis, normal.subVectors(centerA, centerB).normalize());
+    secondRotation.setFromUnitVectors(zAxis, globalNormal.subVectors(globalCenterA, globalCenterB).normalize());
     for (let i = 0; i < iterations; ++i) {
       [this.getOuterRadius(index), this.getInnerRadius(index)].forEach(circleRadius => {
-        [centerA, centerB].forEach(circleCenter => {
+        [globalCenterA, globalCenterB].forEach(circleCenter => {
           const zAngle = Math.min(angle + i * radialSegmentAngle, angle + arcAngle);
           const x = Math.cos(zAngle) * circleRadius;
           const y = Math.sin(zAngle) * circleRadius;
-          point
+          globalPoint
             .set(x, y, 0)
             .applyQuaternion(secondRotation)
             .add(circleCenter)
             .applyMatrix4(matrix);
-          box.expandByPoint(point);
+          box.expandByPoint(globalPoint);
         });
       });
     }

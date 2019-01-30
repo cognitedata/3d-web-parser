@@ -12,10 +12,10 @@ const center = new THREE.Vector3();
 const normal = new THREE.Vector3();
 const side1 = new THREE.Vector3();
 const side2 = new THREE.Vector3();
-const vertex1 = new THREE.Vector3();
-const vertex2 = new THREE.Vector3();
-const vertex3 = new THREE.Vector3();
-const vertex4 = new THREE.Vector3();
+const globalVertex1 = new THREE.Vector3();
+const globalVertex2 = new THREE.Vector3();
+const globalVertex3 = new THREE.Vector3();
+const globalVertex4 = new THREE.Vector3();
 const point = new THREE.Vector3();
 
 export default class QuadGroup extends PrimitiveGroup {
@@ -74,12 +74,12 @@ export default class QuadGroup extends PrimitiveGroup {
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
-    this.getVertex1(vertex1, index);
-    this.getVertex2(vertex2, index);
-    this.getVertex3(vertex3, index);
+    this.getVertex1(globalVertex1, index);
+    this.getVertex2(globalVertex2, index);
+    this.getVertex3(globalVertex3, index);
 
-    side1.subVectors(vertex3, vertex1);
-    side2.subVectors(vertex3, vertex2);
+    side1.subVectors(globalVertex3, globalVertex1);
+    side2.subVectors(globalVertex3, globalVertex2);
     scale.set(side2.length(), side1.length(), 1);
     normal.crossVectors(side1, side2).normalize();
     side1.normalize();
@@ -100,7 +100,7 @@ export default class QuadGroup extends PrimitiveGroup {
 
     outputMatrix.premultiply(basis);
 
-    center.addVectors(vertex1, vertex2).multiplyScalar(0.5);
+    center.addVectors(globalVertex1, globalVertex2).multiplyScalar(0.5);
     basis.set(
       1, 0, 0, center.x,
       0, 1, 0, center.y,
@@ -114,13 +114,13 @@ export default class QuadGroup extends PrimitiveGroup {
   }
 
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
-    this.getVertex1(vertex1, index);
-    this.getVertex2(vertex2, index);
-    this.getVertex3(vertex3, index);
+    this.getVertex1(globalVertex1, index);
+    this.getVertex2(globalVertex2, index);
+    this.getVertex3(globalVertex3, index);
 
     box.makeEmpty();
-    vertex4.subVectors(vertex1, vertex3).add(vertex2);
-    const vertices = [vertex1, vertex2, vertex3, vertex4];
+    globalVertex4.subVectors(globalVertex1, globalVertex3).add(globalVertex2);
+    const vertices = [globalVertex1, globalVertex2, globalVertex3, globalVertex4];
     vertices.forEach(vertex => {
       box.expandByPoint(point.copy(vertex).applyMatrix4(matrix));
     });

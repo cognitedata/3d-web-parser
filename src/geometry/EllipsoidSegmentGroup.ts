@@ -16,6 +16,15 @@ const boundingBoxCenter = new THREE.Vector3();
 const size = new THREE.Vector3();
 const arr = new Array(16);
 
+// reusable variables
+const globalNormalMatrix = new THREE.Matrix3();
+const globalTransformedCenter = new THREE.Vector3();
+const globalTransformedNormal = new THREE.Vector3();
+const globalCircleCenter = new THREE.Vector3();
+const globalReusableBox = new THREE.Box3();
+const globalCenter = new THREE.Vector3();
+const globalNormal = new THREE.Vector3();
+
 // (haowei.guo) I found this ellipsoid bounding box algorithm from stackoverflow
 // https://stackoverflow.com/questions/4368961/calculating-an-aabb-for-a-transformed-sphere/4369956#4369956
 export function computeEllipsoidBoundingBox(
@@ -57,15 +66,6 @@ export function computeEllipsoidBoundingBox(
 
   return box;
 }
-
-// reusable variables
-const normalMatrix = new THREE.Matrix3();
-const transformedCenter = new THREE.Vector3();
-const transformedNormal = new THREE.Vector3();
-const circleCenter = new THREE.Vector3();
-const reusableBox = new THREE.Box3();
-const center = new THREE.Vector3();
-const normal = new THREE.Vector3();
 
 export default class EllipsoidSegmentGroup extends PlaneGroup {
   public horizontalRadius: Float32Array;
@@ -164,12 +164,12 @@ export default class EllipsoidSegmentGroup extends PlaneGroup {
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
     box.makeEmpty();
 
-    normalMatrix.setFromMatrix4(matrix);
+    globalNormalMatrix.setFromMatrix4(matrix);
 
-    transformedCenter.copy(this.getCenter(center, index)).applyMatrix4(matrix);
-    transformedNormal
-      .copy(this.getNormal(normal, index))
-      .applyMatrix3(normalMatrix)
+    globalTransformedCenter.copy(this.getCenter(globalCenter, index)).applyMatrix4(matrix);
+    globalTransformedNormal
+      .copy(this.getNormal(globalNormal, index))
+      .applyMatrix3(globalNormalMatrix)
       .normalize();
 
     const height = this.getHeight(index);
@@ -180,21 +180,21 @@ export default class EllipsoidSegmentGroup extends PlaneGroup {
     const step = hRadius / segments;
     for (let z = vRadius - height; z < vRadius; z += step) {
       const circleRadius = Math.sqrt(vRadius * vRadius - z * z) * hRadius / vRadius;
-      circleCenter.copy(transformedNormal).multiplyScalar(z).add(transformedCenter);
+      globalCircleCenter.copy(globalTransformedNormal).multiplyScalar(z).add(globalTransformedCenter);
 
       box.union(
         computeCircleBoundingBox(
-          circleCenter,
-          transformedNormal,
+          globalCircleCenter,
+          globalTransformedNormal,
           circleRadius,
-          reusableBox,
+          globalReusableBox,
         ),
       );
     }
 
     // union the point which maximizes z
     box.expandByPoint(
-      circleCenter.copy(transformedNormal).multiplyScalar(vRadius).add(transformedCenter),
+      globalCircleCenter.copy(globalTransformedNormal).multiplyScalar(vRadius).add(globalTransformedCenter),
     );
 
     return box;

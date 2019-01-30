@@ -10,9 +10,9 @@ const scale = new THREE.Vector3();
 const rotationMatrix = new THREE.Matrix4();
 const localYAxis = new THREE.Vector3();
 
-const normal = new THREE.Vector3();
-const localXAxis = new THREE.Vector3();
-const center = new THREE.Vector3();
+const globalNormal = new THREE.Vector3();
+const globalLocalXAxis = new THREE.Vector3();
+const globalCenter = new THREE.Vector3();
 
 export default class GeneralRingGroup extends PlaneGroup {
   public xRadius: Float32Array;
@@ -128,20 +128,20 @@ export default class GeneralRingGroup extends PlaneGroup {
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
-    this.getNormal(normal, index);
-    this.getLocalXAxis(localXAxis, index);
-    localYAxis.crossVectors(this.getNormal(normal, index), this.getLocalXAxis(localXAxis, index));
+    this.getNormal(globalNormal, index);
+    this.getLocalXAxis(globalLocalXAxis, index);
+    localYAxis.crossVectors(this.getNormal(globalNormal, index), this.getLocalXAxis(globalLocalXAxis, index));
     rotationMatrix.set(
-      localXAxis.x, localYAxis.x, normal.x, 0,
-      localXAxis.y, localYAxis.y, normal.y, 0,
-      localXAxis.z, localYAxis.z, normal.z, 0,
+      globalLocalXAxis.x, localYAxis.x, globalNormal.x, 0,
+      globalLocalXAxis.y, localYAxis.y, globalNormal.y, 0,
+      globalLocalXAxis.z, localYAxis.z, globalNormal.z, 0,
                  0,            0,        0, 1,
     );
 
     rotation.setFromRotationMatrix(rotationMatrix);
     scale.set(2 * this.getXRadius(index), 2 * this.getYRadius(index), 1);
     return outputMatrix.compose(
-      this.getCenter(center, index),
+      this.getCenter(globalCenter, index),
       rotation,
       scale,
     );
@@ -149,8 +149,8 @@ export default class GeneralRingGroup extends PlaneGroup {
 
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
     return computeEllipsoidBoundingBox(
-      this.getCenter(center, index),
-      this.getNormal(normal, index),
+      this.getCenter(globalCenter, index),
+      this.getNormal(globalNormal, index),
       this.getXRadius(index),
       this.getYRadius(index),
       0,

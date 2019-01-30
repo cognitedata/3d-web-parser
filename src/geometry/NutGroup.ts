@@ -9,12 +9,12 @@ const firstRotation = new THREE.Quaternion();
 const secondRotation = new THREE.Quaternion();
 const fullMatrix = new THREE.Matrix4();
 
-const normal = new THREE.Vector3();
-const scale = new THREE.Vector3();
-const center = new THREE.Vector3();
-const centerA = new THREE.Vector3();
-const centerB = new THREE.Vector3();
-const point = new THREE.Vector3();
+const globalNormal = new THREE.Vector3();
+const globalScale = new THREE.Vector3();
+const globalCenter = new THREE.Vector3();
+const globalCenterA = new THREE.Vector3();
+const globalCenterB = new THREE.Vector3();
+const globalPoint = new THREE.Vector3();
 
 export default class NutGroup extends BaseCylinderGroup {
     public radius: Float32Array;
@@ -64,20 +64,20 @@ export default class NutGroup extends BaseCylinderGroup {
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
-    this.getCenterA(centerA, index);
-    this.getCenterB(centerB, index);
-    center.addVectors(centerA, centerB).multiplyScalar(0.5);
-    normal.subVectors(centerA, centerB);
-    const height = normal.length();
+    this.getCenterA(globalCenterA, index);
+    this.getCenterB(globalCenterB, index);
+    globalCenter.addVectors(globalCenterA, globalCenterB).multiplyScalar(0.5);
+    globalNormal.subVectors(globalCenterA, globalCenterB);
+    const height = globalNormal.length();
     firstRotation.setFromAxisAngle(zAxis, this.getRotationAngle(index));
-    secondRotation.setFromUnitVectors(zAxis, normal.normalize());
+    secondRotation.setFromUnitVectors(zAxis, globalNormal.normalize());
 
     const diameter = 2 * this.getRadius(index);
-    scale.set(diameter, diameter, height);
+    globalScale.set(diameter, diameter, height);
     return outputMatrix.compose(
-      center,
+      globalCenter,
       secondRotation.multiply(firstRotation),
-      scale,
+      globalScale,
     );
   }
 
@@ -89,10 +89,10 @@ export default class NutGroup extends BaseCylinderGroup {
     for (let i = 0; i < 6; i++, angle += Math.PI / 3) {
       const sin = 0.5 * Math.sin(angle);
       const cos = 0.5 * Math.cos(angle);
-      point.set(sin, cos, 0.5).applyMatrix4(fullMatrix);
-      box.expandByPoint(point);
-      point.set(sin, cos, -0.5).applyMatrix4(fullMatrix);
-      box.expandByPoint(point);
+      globalPoint.set(sin, cos, 0.5).applyMatrix4(fullMatrix);
+      box.expandByPoint(globalPoint);
+      globalPoint.set(sin, cos, -0.5).applyMatrix4(fullMatrix);
+      box.expandByPoint(globalPoint);
     }
 
     return box;

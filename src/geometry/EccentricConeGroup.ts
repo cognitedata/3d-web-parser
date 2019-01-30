@@ -5,12 +5,12 @@ import BaseCylinderGroup from './BaseCylinderGroup';
 import { computeCircleBoundingBox } from './CircleGroup';
 
 // reusable variables
-const normalMatrix = new THREE.Matrix3();
-const reusableBox = new THREE.Box3();
-const center = new THREE.Vector3();
-const normal = new THREE.Vector3();
-const centerA = new THREE.Vector3();
-const centerB = new THREE.Vector3();
+const globalNormalMatrix = new THREE.Matrix3();
+const globalReusableBox = new THREE.Box3();
+const globalCenter = new THREE.Vector3();
+const globalNormal = new THREE.Vector3();
+const globalCenterA = new THREE.Vector3();
+const globalCenterB = new THREE.Vector3();
 
 export default class EccentricConeGroup extends BaseCylinderGroup {
     public radiusA: Float32Array;
@@ -77,21 +77,21 @@ export default class EccentricConeGroup extends BaseCylinderGroup {
   }
 
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
-    normalMatrix.setFromMatrix4(matrix);
+    globalNormalMatrix.setFromMatrix4(matrix);
     const scaling = matrix.getMaxScaleOnAxis();
 
     box.makeEmpty();
-    normal.copy(this.getNormal(normal, index)).applyMatrix3(normalMatrix).normalize();
+    globalNormal.copy(this.getNormal(globalNormal, index)).applyMatrix3(globalNormalMatrix).normalize();
 
     // A
-    center.copy(this.getCenterA(centerA, index)).applyMatrix4(matrix);
+    globalCenter.copy(this.getCenterA(globalCenterA, index)).applyMatrix4(matrix);
     let radius = scaling * this.getRadiusA(index);
-    box.union(computeCircleBoundingBox(center, normal, radius, reusableBox));
+    box.union(computeCircleBoundingBox(globalCenter, globalNormal, radius, globalReusableBox));
 
     // B
-    center.copy(this.getCenterB(centerB, index)).applyMatrix4(matrix);
+    globalCenter.copy(this.getCenterB(globalCenterB, index)).applyMatrix4(matrix);
     radius = scaling * this.getRadiusB(index);
-    box.union(computeCircleBoundingBox(center, normal, radius, reusableBox));
+    box.union(computeCircleBoundingBox(globalCenter, globalNormal, radius, globalReusableBox));
 
     return box;
   }

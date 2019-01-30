@@ -12,7 +12,7 @@ import {MatchingGeometries,
 const color = new THREE.Color();
 describe('parseGeneralCylinders', () => {
   test('parseGeneralCylinders', () => {
-    let group: GeneralCylinderGroup;
+    // let group: GeneralCylinderGroup;
     // @ts-ignore
     // group = parse(TestScene.geometries);
     // const expectedCount = 0;

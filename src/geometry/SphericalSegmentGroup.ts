@@ -22,8 +22,8 @@ const normalMatrix = new THREE.Matrix3();
 const point = new THREE.Vector3();
 const direction = new THREE.Vector3();
 const sphereCenter = new THREE.Vector3();
-const center = new THREE.Vector3();
-const normal = new THREE.Vector3();
+const globalCenter = new THREE.Vector3();
+const globalNormal = new THREE.Vector3();
 
 export default class SphericalSegmentGroup extends PrimitiveGroup {
   public center: Float32Array;
@@ -131,14 +131,14 @@ export default class SphericalSegmentGroup extends PrimitiveGroup {
     box.makeEmpty();
     normalMatrix.setFromMatrix4(matrix);
     transformedNormal
-      .copy(this.getNormal(normal, index))
+      .copy(this.getNormal(globalNormal, index))
       .applyMatrix3(normalMatrix)
       .normalize();
     const scaling = matrix.getMaxScaleOnAxis();
     const radius = scaling * this.getRadius(index);
     const height = scaling * this.getHeight(index);
 
-    sphereCenter.copy(this.getCenter(center, index)).applyMatrix4(matrix);
+    sphereCenter.copy(this.getCenter(globalCenter, index)).applyMatrix4(matrix);
     transformedCenter
       .copy(sphereCenter)
       .add(direction.copy(transformedNormal).multiplyScalar(radius - height));
