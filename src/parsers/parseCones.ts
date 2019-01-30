@@ -23,14 +23,18 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
     if (!isPrimitive(geometry)) {
       return;
     }
+    const treeIndex = parsePrimitiveTreeIndex(geometry);
+    console.log(treeIndex, ': ', geometry.type);
     const isClosed = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)].isClosed;
     const thickness = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)].thickness;
 
     if (geometry.type === 'cone') {
       matchingGeometries.geometries.push(geometry);
       if (geometry.thickness > 0.0) {
+        console.log('+2');
         matchingGeometries.count += 2;
       } else {
+        console.log('+1');
         matchingGeometries.count += 1;
       }
     } else if (geometry.type === 'cylinder') {

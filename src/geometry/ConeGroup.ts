@@ -7,12 +7,11 @@ import { xAxis, zAxis } from '../constants';
 
 // reusable variables
 const vector1 = new THREE.Vector3();
+const vector2 = new THREE.Vector3();
 const center = new THREE.Vector3();
 const normal = new THREE.Vector3();
 const normalMatrix = new THREE.Matrix3();
 const reusableBox = new THREE.Box3();
-const centerA = new THREE.Vector3();
-const centerB = new THREE.Vector3();
 const rotation = new THREE.Quaternion();
 
 export default class ConeGroup extends BaseCylinderGroup {
@@ -22,56 +21,56 @@ export default class ConeGroup extends BaseCylinderGroup {
     public arcAngle: Float32Array;
 
     constructor(capacity: number) {
-    super(capacity);
-    this.type = 'Cone';
-    this.radiusA = new Float32Array(capacity);
-    this.radiusB = new Float32Array(capacity);
-    this.angle = new Float32Array(capacity);
-    this.arcAngle = new Float32Array(capacity);
-    this.hasCustomTransformAttributes = true;
+      super(capacity);
+      this.type = 'Cone';
+      this.radiusA = new Float32Array(capacity);
+      this.radiusB = new Float32Array(capacity);
+      this.angle = new Float32Array(capacity);
+      this.arcAngle = new Float32Array(capacity);
+      this.hasCustomTransformAttributes = true;
 
-    this.attributes.push({
-      name: 'a_radiusA',
-      array: this.radiusA,
-      itemSize: 1,
-    });
+      this.attributes.push({
+        name: 'a_radiusA',
+        array: this.radiusA,
+        itemSize: 1,
+      });
 
-    this.attributes.push({
-      name: 'a_radiusB',
-      array: this.radiusA,
-      itemSize: 1,
-    });
+      this.attributes.push({
+        name: 'a_radiusB',
+        array: this.radiusB,
+        itemSize: 1,
+      });
 
-    this.attributes.push({
-      name: 'a_centerA',
-      array: this.centerA,
-      itemSize: 3,
-    });
+      this.attributes.push({
+        name: 'a_centerA',
+        array: this.centerA,
+        itemSize: 3,
+      });
 
-    this.attributes.push({
-      name: 'a_centerB',
-      array: this.centerB,
-      itemSize: 3,
-    });
+      this.attributes.push({
+        name: 'a_centerB',
+        array: this.centerB,
+        itemSize: 3,
+      });
 
-    this.attributes.push({
-      name: 'a_localXAxis',
-      array: this.localXAxis,
-      itemSize: 3,
-    });
+      this.attributes.push({
+        name: 'a_localXAxis',
+        array: this.localXAxis,
+        itemSize: 3,
+      });
 
-    this.attributes.push({
-      name: 'a_angle',
-      array: this.angle,
-      itemSize: 1,
-    });
+      this.attributes.push({
+        name: 'a_angle',
+        array: this.angle,
+        itemSize: 1,
+      });
 
-    this.attributes.push({
-      name: 'a_arcAngle',
-      array: this.arcAngle,
-      itemSize: 1,
-    });
-  }
+      this.attributes.push({
+        name: 'a_arcAngle',
+        array: this.arcAngle,
+        itemSize: 1,
+      });
+    }
 
   setRadiusA(value: number, index: number) {
     this.radiusA[index] = value;
@@ -142,19 +141,19 @@ export default class ConeGroup extends BaseCylinderGroup {
     const scaling = matrix.getMaxScaleOnAxis();
 
     normal
-      .subVectors(this.getCenterA(centerA, index), this.getCenterB(centerB, index))
+      .subVectors(this.getCenterA(vector1, index), this.getCenterB(vector2, index))
       .applyMatrix3(normalMatrix)
       .normalize();
 
     box.makeEmpty();
 
     // A
-    center.copy(this.getCenterA(centerA, index)).applyMatrix4(matrix);
+    center.copy(this.getCenterA(vector1, index)).applyMatrix4(matrix);
     let radius = scaling * this.getRadiusA(index);
     box.union(computeCircleBoundingBox(center, normal, radius, reusableBox));
 
     // B
-    center.copy(this.getCenterB(centerB, index)).applyMatrix4(matrix);
+    center.copy(this.getCenterB(vector2, index)).applyMatrix4(matrix);
     radius = scaling * this.getRadiusB(index);
     box.union(computeCircleBoundingBox(center, normal, radius, reusableBox));
 
