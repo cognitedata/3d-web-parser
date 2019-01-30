@@ -37,7 +37,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
     } else if (geometry.type === 'cylinder') {
       matchingGeometries.geometries.push(geometry);
       matchingGeometries.count += 2;
-    } else if (geometry.type === 'extrudedRing') {
+    } else if (geometry.type === 'extrudedRing' || geometry.type === 'extrudedRingSegment') {
       matchingGeometries.geometries.push(geometry);
       matchingGeometries.count += 2;
     }
@@ -79,9 +79,8 @@ matchingGeometries.geometries.forEach(geometry => {
         radiusB -= primitiveInfo.thickness;
         group.add(nodeId, treeIndex, color, centerA, centerB, radiusA, radiusB, angle, arcAngle);
       }
-    } else if (geometry.type === 'extrudedRing') {
+    } else if (geometry.type === 'extrudedRing' || geometry.type === 'extrudedRingSegment') {
       const { innerRadius, outerRadius, angle = 0, arcAngle = 2.0 * Math.PI } = primitiveInfo;
-
       group.add(nodeId, treeIndex, color, centerA, centerB, innerRadius, innerRadius, angle, arcAngle);
       group.add(nodeId, treeIndex, color, centerA, centerB, outerRadius, outerRadius, angle, arcAngle);
     }
