@@ -63,8 +63,6 @@ function loadData(trueValuesArray: any, geometryInfo: any) {
     angle = trueValuesArray.angle[geometryInfo.indexes.nextValue()];
   }
   // TODO(verkhovskaya): Add Matrix and Translation once relevant
-
-  console.log(nodeId, treeIndex, colorIndex, x, y, z);
 }
 
 export default function generateGeometryGroups(segmentInformation: any) {
