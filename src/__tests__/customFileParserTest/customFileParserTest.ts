@@ -143,7 +143,6 @@ describe('customFileParser', () => {
       let type = parsedFile.geometries[k].type;
       let indexes = parsedFile.geometries[k].indexes;
       for (let m=0; m<Math.min(20, expectedGeometryIndexes[type].length); m++) {
-        console.log(m + " " + type);
         expect(indexes.nextValue() == expectedGeometryIndexes[type][m])
       }
     }
