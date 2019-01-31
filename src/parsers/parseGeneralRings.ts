@@ -203,8 +203,7 @@ function parseGeneralCylinder(primitiveInfo: any,
       .multiplyScalar(-distFromBToExtB)
       .add(globalCenterB);
 
-  ['A', 'B'].forEach(key => {
-    const isA = key === 'A';
+  [true, false].forEach(isA => {
     const center = isA ? globalCenterA : globalCenterB;
     const slope = isA ? slopeA : slopeB;
     const zAngle = isA ? zAngleA : zAngleB;
