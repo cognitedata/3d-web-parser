@@ -13,6 +13,7 @@ import * as THREE from 'three';
 export class NodeMappings {
   public count: number;
   public capacity: number;
+  public triangleOffsets: Uint32Array;
   public triangleCounts: Uint32Array;
   public color: Float32Array;
   public nodeId: Float64Array;
@@ -26,6 +27,7 @@ export class NodeMappings {
   constructor(capacity: number) {
     this.count = 0;
     this.capacity = capacity;
+    this.triangleOffsets = new Uint32Array(this.capacity);
     this.triangleCounts = new Uint32Array(this.capacity);
     this.color = new Float32Array(3 * this.capacity);
     this.nodeId = new Float64Array(this.capacity);
@@ -38,12 +40,14 @@ export class NodeMappings {
   }
 
   public add(
+    triangleOffset: number,
     triangleCount: number,
     nodeId: number,
     treeIndex: number,
     color: THREE.Color,
     transformMatrix?: THREE.Matrix4,
   ) {
+    this.setTriangleOffset(triangleOffset, this.count);
     this.setTriangleCount(triangleCount, this.count);
     this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
@@ -99,6 +103,10 @@ export class NodeMappings {
     return this.triangleCounts[index];
   }
 
+  public getTriangleOffset(index: number) {
+    return this.triangleOffsets[index];
+  }
+
   private setColor(source: THREE.Color, index: number) {
     let nextIndex = 3 * index;
     this.color[nextIndex++] = source.r;
@@ -108,6 +116,10 @@ export class NodeMappings {
 
   private setTriangleCount(value: number, index: number) {
     this.triangleCounts[index] = value;
+  }
+
+  private setTriangleOffset(value: number, index: number) {
+    this.triangleOffsets[index] = value;
   }
 
   private setNodeId(value: number, index: number) {

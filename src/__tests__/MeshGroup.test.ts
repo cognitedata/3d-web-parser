@@ -7,6 +7,8 @@ describe('MeshGroup', () => {
     const capacity = 5;
     const nodeMappings = new NodeMappings(capacity);
 
+    expect(nodeMappings.triangleOffsets.length).toBe(capacity);
+    expect(nodeMappings.triangleCounts.length).toBe(capacity);
     expect(nodeMappings.count).toBe(0);
     expect(nodeMappings.capacity).toBe(capacity);
     expect(nodeMappings.color.length).toBe(3 * capacity);
@@ -20,11 +22,12 @@ describe('MeshGroup', () => {
     let index = 0;
     // add first node mapping
     {
+      const triangleOffset = 995;
       const triangleCount = 1234;
       const nodeId = 123;
       const treeIndex = 456;
       const color = new THREE.Color(0xff0000);
-      nodeMappings.add(triangleCount, nodeId, treeIndex, color);
+      nodeMappings.add(triangleOffset, triangleCount, nodeId, treeIndex, color);
       expect(nodeMappings.count).toBe(index + 1);
       expect(nodeMappings.capacity).toBe(capacity);
 
@@ -32,6 +35,7 @@ describe('MeshGroup', () => {
       expect(nodeMappings.getColor(targetColor, index)).toBe(targetColor);
       expectColorEqual(targetColor, color);
 
+      expect(nodeMappings.getTriangleOffset(index)).toBe(triangleOffset);
       expect(nodeMappings.getTriangleCount(index)).toBe(triangleCount);
       expect(nodeMappings.getNodeId(index)).toBe(nodeId);
       expect(nodeMappings.getTreeIndex(index)).toBe(treeIndex);
@@ -42,6 +46,7 @@ describe('MeshGroup', () => {
 
     // add second node mapping
     {
+      const triangleOffset = 995;
       const triangleCount = 4322;
       const nodeId = 11;
       const treeIndex = 10;
@@ -53,7 +58,7 @@ describe('MeshGroup', () => {
         31, 32, 33, 34,
         0,  0,  0,  1,
       );
-      nodeMappings.add(triangleCount, nodeId, treeIndex, color, transformMatrix);
+      nodeMappings.add(triangleOffset, triangleCount, nodeId, treeIndex, color, transformMatrix);
       expect(nodeMappings.count).toBe(index + 1);
       expect(nodeMappings.capacity).toBe(capacity);
 
