@@ -7,7 +7,8 @@ import { MatchingGeometries,
          parsePrimitiveTreeIndex,
          getPrimitiveType,
          isPrimitive,
-         angleBetweenVector3s } from './parseUtils';
+         angleBetweenVector3s,
+         normalizeRadians } from './parseUtils';
 import { xAxis, yAxis, zAxis } from '../constants';
 
 const globalColor = new THREE.Color();
@@ -195,6 +196,13 @@ function parseGeneralCylinder(primitiveInfo: any,
   const heightA = distFromBToExtB + distFromBToA;
   const heightB = distFromBToExtB;
 
+  globalExtA.copy(globalAxis)
+      .multiplyScalar(distFromAToExtA)
+      .add(globalCenterA);
+  globalExtB.copy(globalAxis)
+      .multiplyScalar(-distFromBToExtB)
+      .add(globalCenterB);
+
   ['A', 'B'].forEach(key => {
     const isA = key === 'A';
     const center = isA ? globalCenterA : globalCenterB;
@@ -202,13 +210,6 @@ function parseGeneralCylinder(primitiveInfo: any,
     const zAngle = isA ? zAngleA : zAngleB;
     const height = isA ? heightA : heightB;
     const radius = isA ? radiusA : radiusB;
-
-    globalExtA.copy(globalAxis)
-      .multiplyScalar(distFromAToExtA)
-      .add(globalCenterA);
-    globalExtB.copy(globalAxis)
-      .multiplyScalar(-distFromBToExtB)
-      .add(globalCenterB);
 
     const invertNormal = !isA;
     GeneralCylinderGroup.slicingPlane(globalSlicingPlane, slope, zAngle, height, invertNormal);
@@ -255,7 +256,7 @@ function parseGeneralCylinder(primitiveInfo: any,
     if (thickness > 0) {
       group.add(nodeId, treeIndex, color, center, normal,
                 capXAxis, radius / Math.abs(Math.cos(slope)),
-                radius, thickness, capAngle, arcAngle);
+                radius, thickness, normalizeRadians(capAngle), arcAngle);
     }
   });
 }
