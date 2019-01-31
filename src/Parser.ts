@@ -9,27 +9,29 @@ import { getParentPath } from './PathExtractor';
 import PrimitiveGroup from './geometry/PrimitiveGroup';
 import GeometryGroup from './geometry/GeometryGroup';
 
-import parseCircles from './parsers/parseCircles';
 import parseBoxes from './parsers/parseBoxes';
+import parseCircles from './parsers/parseCircles';
 import parseCones from './parsers/parseCones';
 import parseEccentricCones from './parsers/parseEccentricCones';
 import parseEllipsoidSegments from './parsers/parseEllipsoidSegments';
 import parseGeneralCylinders from './parsers/parseGeneralCylinders';
 import parseGeneralRings from './parsers/parseGeneralRings';
+import parseMeshes from './parsers/parseMeshes';
 import parseNuts from './parsers/parseNuts';
 import parseQuads from './parsers/parseQuads';
 import parseSphericalSegments from './parsers/parseSphericalSegments';
 import parseTorusSegments from './parsers/parseTorusSegments';
 import parseTrapeziums from './parsers/parseTrapeziums';
 
-const primitiveParsers = [
-  parseCircles,
+const parsers = [
   parseBoxes,
+  parseCircles,
   parseCones,
   parseEccentricCones,
   parseEllipsoidSegments,
   parseGeneralCylinders,
   parseGeneralRings,
+  // parseMeshes,
   parseNuts,
   parseQuads,
   parseSphericalSegments,
@@ -39,7 +41,7 @@ const primitiveParsers = [
 
 function parseGeometries(geometries: GeometryGroup[]) {
   const geometryGroups: GeometryGroup[] = [];
-  primitiveParsers.forEach(parser => {
+  parsers.forEach(parser => {
     const group: PrimitiveGroup = parser(geometries);
     if (group.capacity > 0) {
       geometryGroups.push(group);

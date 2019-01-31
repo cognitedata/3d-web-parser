@@ -24,6 +24,24 @@ export default class EccentricConeGroup extends BaseCylinderGroup {
     this.radiusB = new Float32Array(capacity);
     this.normal = new Float32Array(3 * capacity);
     this.hasCustomTransformAttributes = true;
+
+    this.attributes.push({
+      name: 'a_radiusA',
+      array: this.radiusA,
+      itemSize: 1,
+    });
+
+    this.attributes.push({
+      name: 'a_radiusB',
+      array: this.radiusB,
+      itemSize: 1,
+    });
+
+    this.attributes.push({
+      name: 'a_normal',
+      array: this.normal,
+      itemSize: 3,
+    });
   }
 
   setRadiusA(value: number, index: number) {
