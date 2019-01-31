@@ -7,16 +7,26 @@ import { MatchingGeometries,
          getPrimitiveType,
          isPrimitive } from './parseUtils';
 import { xAxis, zAxis } from '../constants';
+import { GeneralCylinderGroup } from '..';
 
-const THREEColor = new THREE.Color();
-const centerA = new THREE.Vector3();
-const centerB = new THREE.Vector3();
-const capZAxis = new THREE.Vector3();
-const capXAxis = new THREE.Vector3();
-const vertex = new THREE.Vector3();
-const normal = new THREE.Vector3();
-const localXAxis = new THREE.Vector3();
-const rotation = new THREE.Quaternion();
+const globalColor = new THREE.Color();
+const globalCenterA = new THREE.Vector3();
+const globalCenterB = new THREE.Vector3();
+const globalCapZAxis = new THREE.Vector3();
+const globalCapXAxis = new THREE.Vector3();
+const globalVertex = new THREE.Vector3();
+const globalSlicingPlane = new THREE.Vector4();
+const globalAxis = new THREE.Vector3();
+const globalNormal = new THREE.Vector3();
+const globalLocalXAxis = new THREE.Vector3();
+const globalRotation = new THREE.Quaternion();
+const globalLine = new THREE.Line3();
+const globalLineStart = new THREE.Vector3();
+const globalLineEnd = new THREE.Vector3();
+const globalExtA = new THREE.Vector3();
+const globalExtB = new THREE.Vector3();
+const globalPlanes = [new THREE.Plane(), new THREE.Plane()];
+const globalVertices = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
 
 function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   const matchingGeometries: MatchingGeometries = {
@@ -29,14 +39,18 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
       return;
     }
 
-    const { thickness, arcAngle, isClosed } = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
-
+    const {
+      thickness = 0,
+      arcAngle = 2 * Math.PI,
+      isClosed = false,
+    } = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
+    const treeIndex = parsePrimitiveTreeIndex(geometry);
     if ( (geometry.type === 'cone' || geometry.type === 'generalCylinder')
         && thickness > 0
         && arcAngle < 2 * Math.PI
         && isClosed) {
-      matchingGeometries.geometries.push(geometry);
-      matchingGeometries.count += 2;
+          matchingGeometries.geometries.push(geometry);
+          matchingGeometries.count += 2;
     }
   });
 
@@ -49,18 +63,17 @@ function parseCone(primitiveInfo: any,
                    color: THREE.Color,
                    group: TrapeziumGroup) {
   let { x = 0, y = 0, z = 0 } = primitiveInfo.centerA;
-  centerA.set(x, y, z);
+  globalCenterA.set(x, y, z);
 
   ({ x = 0, y = 0, z = 0 } = primitiveInfo.centerB);
-  centerB.set(x, y, z);
+  globalCenterB.set(x, y, z);
 
-  capZAxis.copy(centerA).sub(centerB);
-  rotation.setFromUnitVectors(zAxis, capZAxis.normalize());
-  capXAxis.copy(xAxis).applyQuaternion(rotation);
+  globalCapZAxis.copy(globalCenterA).sub(globalCenterB);
+  globalRotation.setFromUnitVectors(zAxis, globalCapZAxis.normalize());
+  globalCapXAxis.copy(xAxis).applyQuaternion(globalRotation);
   const {
     angle = 0,
     arcAngle,
-    isClosed,
     radiusA,
     radiusB,
     thickness = 0,
@@ -68,19 +81,19 @@ function parseCone(primitiveInfo: any,
 
   [false, true].forEach(isSecondQuad => {
     const finalAngle = angle + Number(isSecondQuad) * arcAngle;
-    vertex
+    globalVertex
       .set(Math.cos(finalAngle), Math.sin(finalAngle), 0)
-      .applyQuaternion(rotation)
+      .applyQuaternion(globalRotation)
       .normalize();
     const vertices: THREE.Vector3[] = [];
     const offsets = [0, -thickness];
     [true, false].forEach(isA => {
       if (isSecondQuad) { isA = !isA; }
       const radius = isA ? radiusA : radiusB;
-      const center = isA ? centerA : centerB;
+      const center = isA ? globalCenterA : globalCenterB;
       offsets.forEach(offset => {
         vertices.push(
-          vertex
+          globalVertex
             .clone()
             .multiplyScalar(radius + offset)
             .add(center),
@@ -96,7 +109,91 @@ function parseGeneralCylinder(primitiveInfo: any,
                               treeIndex: number,
                               color: THREE.Color,
                               group: TrapeziumGroup) {
-  // console.log('Trapezium parsing from generalCylinder parsing isn\'t implemented');
+  //
+  const {
+    radiusA,
+    radiusB,
+    angle = 0,
+    thickness = 0,
+    slopeA = 0,
+    slopeB = 0,
+    zAngleA = 0,
+    zAngleB = 0,
+    arcAngle = 2 * Math.PI,
+    isClosed = false,
+  } = primitiveInfo;
+
+  let { x = 0, y = 0, z = 0 } = primitiveInfo.centerA;
+  globalCenterA.set(x, y, z);
+
+  ({ x = 0, y = 0, z = 0 } = primitiveInfo.centerB);
+  globalCenterB.set(x, y, z);
+
+  globalAxis.subVectors(globalCenterA, globalCenterB);
+  const distFromBToA = globalAxis.length();
+  globalRotation.setFromUnitVectors(zAxis, globalAxis.normalize());
+
+  const distFromAToExtA = radiusA * Math.tan(slopeA);
+  const distFromBToExtB = radiusA * Math.tan(slopeB);
+  const heightA = distFromBToExtB + distFromBToA;
+  const heightB = distFromBToExtB;
+
+  globalExtA.copy(globalAxis)
+      .multiplyScalar(distFromAToExtA)
+      .add(globalCenterA);
+  globalExtB.copy(globalAxis)
+      .multiplyScalar(-distFromBToExtB)
+      .add(globalCenterB);
+
+  [true, false].forEach(isA => {
+    const center = isA ? globalCenterA : globalCenterB;
+    const slope = isA ? slopeA : slopeB;
+    const zAngle = isA ? zAngleA : zAngleB;
+    const height = isA ? heightA : heightB;
+
+    const invertNormal = !isA;
+    GeneralCylinderGroup.slicingPlane(globalSlicingPlane, slope, zAngle, height, invertNormal);
+    if (invertNormal) { globalSlicingPlane.negate(); }
+    globalNormal.set(
+      globalSlicingPlane.x,
+      globalSlicingPlane.y,
+      globalSlicingPlane.z,
+    ).applyQuaternion(globalRotation);
+
+    const plane = globalPlanes[Number(Boolean(isA))];
+    plane.setFromNormalAndCoplanarPoint(globalNormal, center);
+  });
+
+  [false, true].forEach(isSecondQuad => {
+    let vertexIndex = 0;
+    const finalAngle = angle + Number(isSecondQuad) * arcAngle;
+    const radii = !isSecondQuad
+      ? [radiusA, radiusA - thickness]
+      : [radiusA - thickness, radiusA];
+    globalVertex
+      .set(Math.cos(finalAngle), Math.sin(finalAngle), 0)
+      .applyQuaternion(globalRotation)
+      .normalize();
+    radii.forEach(radius => {
+      globalLineStart
+        .copy(globalVertex)
+        .multiplyScalar(radius)
+        .add(globalExtB)
+        .sub(globalAxis);
+      globalLineEnd
+        .copy(globalVertex)
+        .multiplyScalar(radius)
+        .add(globalExtA)
+        .add(globalAxis);
+      globalLine.set(globalLineStart, globalLineEnd);
+      globalPlanes.forEach(plane => {
+        plane.intersectLine(globalLine, globalVertices[vertexIndex]);
+        vertexIndex++;
+      });
+    });
+
+    group.add(nodeId, treeIndex, color, globalVertices[0], globalVertices[1], globalVertices[2], globalVertices[3]);
+  });
 }
 
 export default function parse(geometries: any[]): TrapeziumGroup {
@@ -107,12 +204,17 @@ export default function parse(geometries: any[]): TrapeziumGroup {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
     const nodeId = parsePrimitiveNodeId(geometry);
     const treeIndex = parsePrimitiveTreeIndex(geometry);
-    THREEColor.setHex(parsePrimitiveColor(geometry));
+    globalColor.setHex(parsePrimitiveColor(geometry));
 
     if (geometry.type === 'cone') {
-      parseCone(primitiveInfo, nodeId, treeIndex, THREEColor, group);
+      parseCone(primitiveInfo, nodeId, treeIndex, globalColor, group);
     } else if (geometry.type === 'generalCylinder') {
-      parseGeneralCylinder(primitiveInfo, nodeId, treeIndex, THREEColor, group);
+      const { radiusA, radiusB } = primitiveInfo;
+      if (radiusA !== radiusB) {
+        parseCone(primitiveInfo, nodeId, treeIndex, globalColor, group);
+      } else {
+        parseGeneralCylinder(primitiveInfo, nodeId, treeIndex, globalColor, group);
+      }
     }
   });
   return group;
