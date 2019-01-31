@@ -31,7 +31,7 @@ export default class GeneralRingGroup extends PlaneGroup {
     this.thickness = new Float32Array(capacity);
     this.angle = new Float32Array(capacity);
     this.arcAngle = new Float32Array(capacity);
-    this.hasCustomTransformAttributes = false;
+    this.hasCustomTransformAttributes = true;
 
     this.attributes.push({
       name: 'a_thickness',
