@@ -27,7 +27,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-export default function parseBoxes(geometries: any[]): BoxGroup {
+export default function parse(geometries: any[]): BoxGroup {
   const matchingGeometries = findMatchingGeometries(geometries);
   const group = new BoxGroup(matchingGeometries.count);
 
