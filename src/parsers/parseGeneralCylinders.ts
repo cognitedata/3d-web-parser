@@ -1,14 +1,28 @@
 import * as THREE from 'three';
 import GeneralCylinderGroup from '../geometry/GeneralCylinderGroup';
 import { MatchingGeometries,
-         parsePrimitiveColor,
-         parsePrimitiveNodeId,
-         parsePrimitiveTreeIndex,
-         getPrimitiveType } from './parseUtils';
+  parsePrimitiveColor,
+  parsePrimitiveNodeId,
+  parsePrimitiveTreeIndex,
+  getPrimitiveType,
+  isPrimitive,
+  normalizeRadians } from './parseUtils';
+import { zAxis } from '../constants';
 
+// reusable variables
 const color = new THREE.Color();
 const centerA = new THREE.Vector3();
 const centerB = new THREE.Vector3();
+const extA = new THREE.Vector3();
+const extB = new THREE.Vector3();
+const rotation = new THREE.Quaternion();
+const slicingPlane = new THREE.Vector4();
+const axis = new THREE.Vector3();
+const vertex = new THREE.Vector3();
+const planes = [new THREE.Plane(), new THREE.Plane()];
+const line = new THREE.Line3();
+const lineStart = new THREE.Vector3();
+const lineEnd = new THREE.Vector3();
 
 function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   const matchingGeometries: MatchingGeometries = {
@@ -17,9 +31,19 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   };
 
   geometries.forEach(geometry => {
-    if (geometry.type === 'generalCylinder') {
+    if (!isPrimitive(geometry)) {
+      return;
+    }
+    const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
+    const { thickness = 0, radiusA, radiusB } = primitiveInfo;
+
+    if (geometry.type === 'generalCylinder' && radiusA === radiusB) {
+      // A cone is produced if radii are different
       matchingGeometries.geometries.push(geometry);
       matchingGeometries.count += 1;
+      if (thickness > 0) {
+        matchingGeometries.count += 1;
+      }
     }
   });
 
@@ -27,49 +51,63 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 }
 
 export default function parse(geometries: any[]): GeneralCylinderGroup {
-  // console.log('General cylinder parsing from generalCylinder parsing isn\'t implemented');
-  return new GeneralCylinderGroup(0);
-  // const matchingGeometries = findMatchingGeometries(geometries);
-  // const group = new GeneralCylinderGroup(matchingGeometries.count);
-  // if (group.capacity === 0) {
-  //   return null;
-  // }
+  const matchingGeometries = findMatchingGeometries(geometries);
+  const group = new GeneralCylinderGroup(matchingGeometries.count);
 
-  // matchingGeometries.geometries.forEach(geometry => {
-  //   const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
+  matchingGeometries.geometries.forEach(geometry => {
+    const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
 
-  //   const nodeId = parsePrimitiveNodeId(geometry);
-  //   const treeIndex = parsePrimitiveTreeIndex(geometry);
-  //   color.setHex(parsePrimitiveColor(geometry));
+    const nodeId = parsePrimitiveNodeId(geometry);
+    const treeIndex = parsePrimitiveTreeIndex(geometry);
+    color.setHex(parsePrimitiveColor(geometry));
 
-  //   centerA.set(primitiveInfo.centerA.x, primitiveInfo.centerA.y, primitiveInfo.centerA.z);
-  //   centerB.set(primitiveInfo.centerB.x, primitiveInfo.centerB.y, primitiveInfo.centerB.z);
-  //   const radius = primitiveInfo.radius;
-  //   const heightA = primitiveInfo.heightA;
-  //   const heightB = primitiveInfo.heightB;
-  //   const slopeA = primitiveInfo.slopeA;
-  //   const slopeB = primitiveInfo.slopeB;
-  //   const zAngleA = primitiveInfo.zAngleA;
-  //   const zAngleB = primitiveInfo.zAngleB;
-  //   const angle = primitiveInfo.angle;
-  //   const arcAngle = primitiveInfo.arcAngle;
+    let { x = 0, y = 0, z = 0 } = primitiveInfo.centerA;
+    centerA.set(x, y, z);
 
-  //   group.add(
-  //     nodeId,
-  //     treeIndex,
-  //     color,
-  //     centerA,
-  //     centerB,
-  //     radius,
-  //     heightA,
-  //     heightB,
-  //     slopeA,
-  //     slopeB,
-  //     zAngleA,
-  //     zAngleB,
-  //     angle,
-  //     arcAngle);
-  // });
+    ({ x = 0, y = 0, z = 0 } = primitiveInfo.centerB);
+    centerB.set(x, y, z);
 
-  // return group;
+    const {
+      radiusA,
+      radiusB,
+      arcAngle = 2.0 * Math.PI,
+      slopeA = 0,
+      slopeB = 0,
+      zAngleA = 0,
+      zAngleB = 0,
+      isClosed = false,
+    } = primitiveInfo;
+
+    let { angle = 0 } = primitiveInfo;
+    angle = normalizeRadians(angle);
+
+    const thickness = primitiveInfo.thickness || (isClosed ? radiusA : 0);
+
+    const distFromBToA = axis.subVectors(centerA, centerB).length();
+    rotation.setFromUnitVectors(zAxis, axis.normalize());
+
+    const distFromAToExtA = radiusA * Math.tan(slopeA);
+    const distFromBToExtB = radiusA * Math.tan(slopeB);
+
+    extA.copy(axis)
+      .multiplyScalar(distFromAToExtA)
+      .add(centerA);
+    extB.copy(axis)
+      .multiplyScalar(-distFromBToExtB)
+      .add(centerB);
+
+    group.add(nodeId, treeIndex, color, extA, extB,
+              radiusA, distFromBToExtB + distFromBToA,
+              distFromBToExtB, slopeA, slopeB, zAngleA, zAngleB,
+              angle, arcAngle);
+    if (thickness > 0) {
+      if (thickness !== radiusA) {
+        group.add(nodeId, treeIndex, color, extA, extB,
+                  radiusA - thickness, distFromBToExtB + distFromBToA,
+                  distFromBToExtB, slopeA, slopeB, zAngleA, zAngleB,
+                  angle, arcAngle);
+      }
+    }
+  });
+  return group;
 }
