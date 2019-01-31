@@ -43,7 +43,6 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
     const treeIndex = parsePrimitiveTreeIndex(geometry);
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
     const { thickness = 0 } = primitiveInfo;
-    console.log(treeIndex, ' is ', geometry.type);
 
     if (geometry.type === 'ring') {
       matchingGeometries.geometries.push(geometry);
