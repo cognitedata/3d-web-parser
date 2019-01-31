@@ -11,6 +11,28 @@ const globalRotation = new THREE.Quaternion();
 const globalSlicingPlaneNormal = new THREE.Vector3();
 
 export default class GeneralCylinderGroup extends BaseCylinderGroup {
+
+  static slicingPlane(target: THREE.Vector4,
+                      slope: number,
+                      zAngle: number,
+                      height: number,
+                      invertNormal: boolean): THREE.Vector4 {
+    globalSlicingPlaneNormal
+      .copy(zAxis)
+      .applyAxisAngle(yAxis, slope)
+      .applyAxisAngle(zAxis, zAngle);
+
+    if (invertNormal) {
+      globalSlicingPlaneNormal.negate();
+    }
+
+    return target.set(
+      globalSlicingPlaneNormal.x,
+      globalSlicingPlaneNormal.y,
+      globalSlicingPlaneNormal.z,
+      height,
+    );
+  }
     public angle: Float32Array;
     public arcAngle: Float32Array;
     public radius: Float32Array;
@@ -219,45 +241,28 @@ export default class GeneralCylinderGroup extends BaseCylinderGroup {
     this.setZAngleB(zAngleB, this.count);
     this.setAngle(angle, this.count);
     this.setArcAngle(arcAngle, this.count);
-    this.setPlaneA(this.slicingPlane(globalPlane, true, this.count), this.count);
-    this.setPlaneB(this.slicingPlane(globalPlane, false, this.count), this.count);
+    this.setPlaneA(
+      GeneralCylinderGroup.slicingPlane(
+        globalPlane,
+        this.getSlopeA(this.count),
+        this.getZAngleA(this.count),
+        this.getHeightA(this.count),
+        false),
+      this.count);
+    this.setPlaneB(
+      GeneralCylinderGroup.slicingPlane(
+        globalPlane,
+        this.getSlopeB(this.count),
+        this.getZAngleB(this.count),
+        this.getHeightB(this.count),
+        true),
+      this.count);
 
     globalNormal.subVectors(centerA, centerB).normalize();
     globalRotation.setFromUnitVectors(zAxis, globalNormal);
     this.setLocalXAxis(globalVector.copy(xAxis).applyQuaternion(globalRotation), this.count);
 
     this.count += 1;
-  }
-
-  slicingPlane(target: THREE.Vector4, isA: boolean, index: number): THREE.Vector4 {
-    let slope = 0;
-    let zAngle = 0;
-    let height = 0;
-    if (isA) {
-      slope = this.getSlopeA(index);
-      zAngle = this.getZAngleA(index);
-      height = this.getHeightA(index);
-    } else {
-      slope = this.getSlopeB(index);
-      zAngle = this.getZAngleB(index);
-      height = this.getHeightB(index);
-    }
-
-    globalSlicingPlaneNormal
-      .copy(zAxis)
-      .applyAxisAngle(yAxis, slope)
-      .applyAxisAngle(zAxis, zAngle);
-
-    if (!isA) {
-      globalSlicingPlaneNormal.negate();
-    }
-
-    return target.set(
-      globalSlicingPlaneNormal.x,
-      globalSlicingPlaneNormal.y,
-      globalSlicingPlaneNormal.z,
-      height,
-    );
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
