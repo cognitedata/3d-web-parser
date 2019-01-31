@@ -16,6 +16,11 @@ describe('GeneralCylinderGroup', () => {
     expect(group.slopeB.length).toBe(2);
     expect(group.zAngleA.length).toBe(2);
     expect(group.zAngleB.length).toBe(2);
+    expect(group.localXAxis.length).toBe(6);
+    expect(group.planeA.length).toBe(8);
+    expect(group.planeB.length).toBe(8);
+    expect(group.hasCustomTransformAttributes).toBeTruthy();
+
     expect(group.type).toBe('GeneralCylinder');
   });
 

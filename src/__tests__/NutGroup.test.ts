@@ -9,7 +9,7 @@ describe('NutGroup', () => {
     const group = new NutGroup(2);
     expect(group.radius.length).toBe(2);
     expect(group.rotationAngle.length).toBe(2);
-
+    expect(group.hasCustomTransformAttributes).toBeFalsy();
     expect(group.type).toBe('Nut');
   });
 

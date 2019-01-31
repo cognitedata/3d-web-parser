@@ -11,7 +11,7 @@ describe('ConeGroup', () => {
     expect(group.radiusB.length).toBe(2);
     expect(group.angle.length).toBe(2);
     expect(group.arcAngle.length).toBe(2);
-
+    expect(group.hasCustomTransformAttributes).toBeTruthy();
     expect(group.type).toBe('Cone');
   });
 
