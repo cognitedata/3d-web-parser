@@ -13,7 +13,7 @@ describe('GeneralRingGroup', () => {
     expect(group.thickness.length).toBe(2);
     expect(group.angle.length).toBe(2);
     expect(group.arcAngle.length).toBe(2);
-    expect(group.hasCustomTransformAttributes).toBeTruthy();
+    expect(group.hasCustomTransformAttributes).toBeFalsy();
     expect(group.type).toBe('GeneralRing');
   });
 
