@@ -47,15 +47,21 @@ export default class Sector {
     }
   }
 
-  memoryUsage(recursive = true): number {
-    let usage = 0;
+  memoryUsage(recursive = true, usage: any): number {
+    if (usage == null) {
+      usage = {
+        total: 0,
+        byGeometry: {},
+        byProperty: {},
+      };
+    }
     this.geometries.forEach(geometryGroup => {
-      usage += geometryGroup.memoryUsage();
+      geometryGroup.memoryUsage(usage);
     });
 
     if (recursive) {
       for (const child of this.traverseSectors()) {
-        usage += child.memoryUsage(false);
+        child.memoryUsage(false, usage);
       }
     }
 
