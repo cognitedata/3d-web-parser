@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import GeometryGroup from './GeometryGroup';
 
 // NodeMapping = {
 //   properties: [
@@ -145,10 +146,37 @@ export class NodeMappings {
   }
 }
 
-export default class MeshGroup {
-  public type: string;
-  constructor(capacity: number) {
-    this.type = 'Mesh';
+export class MergedMesh {
+  mappings: NodeMappings;
+  fileId: number;
+  geometry: null|THREE.Mesh;
+  treeIndexMap: { [s: number]: number; };
+  constructor(capacity: number, fileId: number) {
+    this.mappings = new NodeMappings(capacity);
+    this.geometry = null;
+    this.fileId = fileId;
+    this.treeIndexMap = {};
+  }
+}
+
+export class MergedMeshGroup extends GeometryGroup {
+  meshes: MergedMesh[];
+  constructor() {
+    super();
+    this.meshes = [];
+    this.type = 'MergedMesh';
+  }
+
+  add(mergedMesh: MergedMesh) {
+    this.meshes.push(mergedMesh);
+  }
+
+  computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
+    return outputMatrix;
+  }
+
+  computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
+    return box;
   }
 }
 
