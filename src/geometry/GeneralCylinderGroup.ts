@@ -270,7 +270,7 @@ export default class GeneralCylinderGroup extends BaseCylinderGroup {
   }
 
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
-    console.log('TODO: implement computeBoundingBox for general cylinder');
+    // console.log('TODO: implement computeBoundingBox for general cylinder');
     return box;
   }
 }

@@ -38,7 +38,6 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
           matchingGeometries.geometries.push(geometry);
           matchingGeometries.count += 2;
           const treeIndex = parsePrimitiveTreeIndex(geometry);
-          console.log('Found a quad for extruded ring: ', treeIndex);
       }
   });
 
@@ -91,10 +90,8 @@ export default function parse(geometries: any[]): QuadGroup {
 
       if (isSecondQuad) {
         // swap the order of vertex1 and vertex2 to flip the normal
-        console.log('Adding quad for ', treeIndex, ' at ', vertex2, vertex1, vertex3);
         group.add(nodeId, treeIndex, color, vertex2, vertex1, vertex3);
       } else {
-        console.log('Adding quad for ', treeIndex, ' at ', vertex1, vertex2, vertex3);
         group.add(nodeId, treeIndex, color, vertex1, vertex2, vertex3);
       }
     });
