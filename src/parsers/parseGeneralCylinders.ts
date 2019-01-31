@@ -88,6 +88,8 @@ export default function parse(geometries: any[]): GeneralCylinderGroup {
 
     const distFromAToExtA = radiusA * Math.tan(slopeA);
     const distFromBToExtB = radiusA * Math.tan(slopeB);
+    const heightA = distFromBToExtB + distFromBToA;
+    const heightB = distFromBToExtB;
 
     extA.copy(axis)
       .multiplyScalar(distFromAToExtA)
@@ -97,14 +99,14 @@ export default function parse(geometries: any[]): GeneralCylinderGroup {
       .add(centerB);
 
     group.add(nodeId, treeIndex, color, extA, extB,
-              radiusA, distFromBToExtB + distFromBToA,
-              distFromBToExtB, slopeA, slopeB, zAngleA, zAngleB,
+              radiusA, heightA,
+              heightB, slopeA, slopeB, zAngleA, zAngleB,
               angle, arcAngle);
     if (thickness > 0) {
       if (thickness !== radiusA) {
         group.add(nodeId, treeIndex, color, extA, extB,
-                  radiusA - thickness, distFromBToExtB + distFromBToA,
-                  distFromBToExtB, slopeA, slopeB, zAngleA, zAngleB,
+                  radiusA - thickness, heightA,
+                  heightB, slopeA, slopeB, zAngleA, zAngleB,
                   angle, arcAngle);
       }
     }
