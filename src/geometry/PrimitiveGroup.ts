@@ -6,7 +6,7 @@ import GeometryGroup from './GeometryGroup';
 const matrix = new THREE.Matrix4();
 
 type TypedArray = Float32Array | Float64Array;
-type THREEVector = THREE.Vector2 | THREE.Vector3;
+type THREEVector = THREE.Vector2 | THREE.Vector3 | THREE.Vector4;
 
 export interface Attribute {
   name: string;
@@ -67,6 +67,14 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
       target[3 * index + 1] = source.y;
       // @ts-ignore
       target[3 * index + 2] = source.z;
+      // @ts-ignore
+    } else if (source.isVector4) {
+      target[4 * index + 0] = source.x;
+      target[4 * index + 1] = source.y;
+      // @ts-ignore
+      target[4 * index + 2] = source.z;
+      // @ts-ignore
+      target[4 * index + 3] = source.w;
     }
   }
 
@@ -90,6 +98,15 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
         array[3 * index + 0],
         array[3 * index + 1],
         array[3 * index + 2],
+      );
+      // @ts-ignore
+    } else if (target.isVector4) {
+      // @ts-ignore
+      target.set(
+        array[4 * index + 0],
+        array[4 * index + 1],
+        array[4 * index + 2],
+        array[4 * index + 3],
       );
     }
 
