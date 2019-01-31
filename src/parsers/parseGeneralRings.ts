@@ -42,6 +42,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
     const treeIndex = parsePrimitiveTreeIndex(geometry);
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
     const { thickness = 0 } = primitiveInfo;
+    console.log(treeIndex, ' is ', geometry.type);
 
     if (geometry.type === 'ring') {
       matchingGeometries.geometries.push(geometry);
@@ -200,6 +201,7 @@ function parseGeneralCylinder(primitiveInfo: any,
     const slope = isA ? slopeA : slopeB;
     const zAngle = isA ? zAngleA : zAngleB;
     const height = isA ? heightA : heightB;
+    const radius = isA ? radiusA : radiusB;
 
     globalExtA.copy(globalAxis)
       .multiplyScalar(distFromAToExtA)
@@ -252,8 +254,8 @@ function parseGeneralCylinder(primitiveInfo: any,
 
     if (thickness > 0) {
       group.add(nodeId, treeIndex, color, center, normal,
-                capXAxis, radiusA / Math.abs(Math.cos(slope)),
-                radiusA, thickness, capAngle, arcAngle);
+                capXAxis, radius / Math.abs(Math.cos(slope)),
+                radius, thickness, capAngle, arcAngle);
     }
   });
 }
