@@ -11,7 +11,7 @@ export { default as EllipsoidSegmentGroup } from './geometry/EllipsoidSegmentGro
 export { default as GeneralCylinderGroup } from './geometry/GeneralCylinderGroup';
 export { default as GeneralRingGroup } from './geometry/GeneralRingGroup';
 export { default as GeometryGroup } from './geometry/GeometryGroup';
-export { default as MergedMeshGroup } from './geometry/MergedMeshGroup';
+export { NodeMappings, MergedMesh, MergedMeshGroup } from './geometry/MeshGroup';
 export { default as NutGroup } from './geometry/NutGroup';
 export { default as PlaneGroup } from './geometry/PlaneGroup';
 export { default as PrimitiveGroup } from './geometry/PrimitiveGroup';

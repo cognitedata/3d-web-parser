@@ -1,11 +1,7 @@
 import * as THREE from 'three';
-import NutGroup from '../geometry/NutGroup';
-import { MatchingGeometries,
-         parsePrimitiveColor,
-         parsePrimitiveNodeId,
-         parsePrimitiveTreeIndex,
-         getPrimitiveType } from './parseUtils';
-const color = new THREE.Color();
+import { MergedMeshGroup, MergedMesh, NodeMappings } from '../geometry/MeshGroup';
+import { MatchingGeometries } from './parseUtils';
+const globalColor = new THREE.Color();
 
 function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   const matchingGeometries: MatchingGeometries = {
@@ -25,23 +21,23 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 
 export default function parse(geometries: any[]): MergedMeshGroup {
   const matchingGeometries = findMatchingGeometries(geometries);
-  const group = new NutGroup(matchingGeometries.count);
+  const group = new MergedMeshGroup();
 
   matchingGeometries.geometries.forEach(geometry => {
-    const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
+    const fileId = geometry.file[0].fileId;
 
-    const nodeId = parsePrimitiveNodeId(geometry);
-    const treeIndex = parsePrimitiveTreeIndex(geometry);
-    color.setHex(parsePrimitiveColor(geometry));
-
-    let { x = 0, y = 0, z = 0 } = primitiveInfo.centerA;
-    centerA.set(x, y, z);
-
-    ({ x = 0, y = 0, z = 0 } = primitiveInfo.centerB);
-    centerB.set(x, y, z);
-    const { radius = 0, rotationAngle = 0 } = primitiveInfo;
-
-    group.add(nodeId, treeIndex, color, centerA, centerB, radius, rotationAngle);
+    const nodes: any[] = geometry.nodes;
+    const mergedMesh = new MergedMesh(nodes.length, fileId);
+    let triangleOffset = 0;
+    nodes.forEach(node => {
+      const nodeId = Number(node.properties[0].nodeId);
+      const { color, treeIndex } = node.properties[0];
+      const { triangleCount } = node;
+      globalColor.setHex(color.rgb);
+      mergedMesh.mappings.add(triangleOffset, triangleCount, nodeId, treeIndex, globalColor);
+      triangleOffset += triangleCount;
+    });
+    group.add(mergedMesh);
   });
 
   return group;

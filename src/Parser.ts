@@ -8,6 +8,7 @@ import { Vector3, Group } from 'three';
 import { getParentPath } from './PathExtractor';
 import PrimitiveGroup from './geometry/PrimitiveGroup';
 import GeometryGroup from './geometry/GeometryGroup';
+import { MergedMeshGroup } from './geometry/MeshGroup';
 
 import parseBoxes from './parsers/parseBoxes';
 import parseCircles from './parsers/parseCircles';
@@ -16,14 +17,14 @@ import parseEccentricCones from './parsers/parseEccentricCones';
 import parseEllipsoidSegments from './parsers/parseEllipsoidSegments';
 import parseGeneralCylinders from './parsers/parseGeneralCylinders';
 import parseGeneralRings from './parsers/parseGeneralRings';
-import parseMeshes from './parsers/parseMeshes';
+import parseMergedMeshes from './parsers/parseMergedMeshes';
 import parseNuts from './parsers/parseNuts';
 import parseQuads from './parsers/parseQuads';
 import parseSphericalSegments from './parsers/parseSphericalSegments';
 import parseTorusSegments from './parsers/parseTorusSegments';
 import parseTrapeziums from './parsers/parseTrapeziums';
 
-const parsers = [
+const primitiveParsers = [
   parseBoxes,
   parseCircles,
   parseCones,
@@ -31,7 +32,6 @@ const parsers = [
   parseEllipsoidSegments,
   parseGeneralCylinders,
   parseGeneralRings,
-  // parseMeshes,
   parseNuts,
   parseQuads,
   parseSphericalSegments,
@@ -39,11 +39,22 @@ const parsers = [
   parseTrapeziums,
 ];
 
+const meshParsers = [
+  parseMergedMeshes,
+];
+
 function parseGeometries(geometries: GeometryGroup[]) {
   const geometryGroups: GeometryGroup[] = [];
-  parsers.forEach(parser => {
+  primitiveParsers.forEach(parser => {
     const group: PrimitiveGroup = parser(geometries);
     if (group.capacity > 0) {
+      geometryGroups.push(group);
+    }
+  });
+
+  meshParsers.forEach(parser => {
+    const group: MergedMeshGroup = parser(geometries);
+    if (group.meshes.length > 0) {
       geometryGroups.push(group);
     }
   });
