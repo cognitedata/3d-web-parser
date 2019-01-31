@@ -19,6 +19,7 @@ export default class ConeGroup extends BaseCylinderGroup {
     public radiusB: Float32Array;
     public angle: Float32Array;
     public arcAngle: Float32Array;
+    public localXAxis: Float32Array;
 
     constructor(capacity: number) {
       super(capacity);
@@ -27,6 +28,7 @@ export default class ConeGroup extends BaseCylinderGroup {
       this.radiusB = new Float32Array(capacity);
       this.angle = new Float32Array(capacity);
       this.arcAngle = new Float32Array(capacity);
+      this.localXAxis = new Float32Array(3 * capacity);
       this.hasCustomTransformAttributes = true;
 
       this.attributes.push({
@@ -90,6 +92,14 @@ export default class ConeGroup extends BaseCylinderGroup {
 
   getArcAngle(index: number): number {
     return this.arcAngle[index];
+  }
+
+  setLocalXAxis(value: THREE.Vector3, index: number) {
+    this.setVector(value, this.localXAxis, index);
+  }
+
+  getLocalXAxis(target: THREE.Vector3, index: number): THREE.Vector3 {
+    return this.getVector(this.localXAxis, target, index);
   }
 
   add(
