@@ -91,7 +91,7 @@ function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup) {
       normal.negate();
     }
     group.add(nodeId, treeIndex, color, centerA, normal, radiusA);
-    group.add(nodeId, treeIndex, color, centerB, normal, radiusA);
+    group.add(nodeId, treeIndex, color, centerB, normal, radiusB);
   }
 }
 
