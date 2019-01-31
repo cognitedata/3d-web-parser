@@ -4,7 +4,8 @@ import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
          parsePrimitiveTreeIndex,
-         getPrimitiveType } from './parseUtils';
+         getPrimitiveType,
+         isPrimitive } from './parseUtils';
 import { zAxis } from '../constants';
 
 const color = new THREE.Color();
@@ -24,11 +25,20 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   };
 
   geometries.forEach(geometry => {
-    if (geometry.type === 'extrudedRing'
-        && geometry.primitiveInfo.extrudedRing.arcAngle < 2 * Math.PI
-        && geometry.primitiveInfo.extrudedRing.isClosed) {
+    if (!isPrimitive(geometry)) {
+      return;
+    }
+
+    const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
+    const { arcAngle = 0, isClosed = false } = primitiveInfo;
+
+    if ( (geometry.type === 'extrudedRing' || geometry.type === 'extrudedRingSegment')
+        && arcAngle < 2 * Math.PI
+        && isClosed) {
           matchingGeometries.geometries.push(geometry);
           matchingGeometries.count += 2;
+          const treeIndex = parsePrimitiveTreeIndex(geometry);
+          console.log('Found a quad for extruded ring: ', treeIndex);
       }
   });
 
@@ -45,12 +55,11 @@ export default function parse(geometries: any[]): QuadGroup {
     const nodeId = parsePrimitiveNodeId(geometry);
     const treeIndex = parsePrimitiveTreeIndex(geometry);
     color.setHex(parsePrimitiveColor(geometry));
-
     const {
-      angle,
+      angle = 0,
       innerRadius,
       outerRadius,
-      arcAngle,
+      arcAngle = 2 * Math.PI,
     } = primitiveInfo;
 
     let { x = 0, y = 0, z = 0 } = primitiveInfo.centerA;
@@ -71,21 +80,23 @@ export default function parse(geometries: any[]): QuadGroup {
       vertex1.copy(vertex)
         .multiplyScalar(innerRadius)
         .add(centerA);
+
       vertex2.copy(vertex)
         .multiplyScalar(outerRadius)
         .add(centerB);
+
       vertex3.copy(vertex)
-        .clone()
         .multiplyScalar(innerRadius)
         .add(centerB);
 
       if (isSecondQuad) {
         // swap the order of vertex1 and vertex2 to flip the normal
+        console.log('Adding quad for ', treeIndex, ' at ', vertex2, vertex1, vertex3);
         group.add(nodeId, treeIndex, color, vertex2, vertex1, vertex3);
       } else {
+        console.log('Adding quad for ', treeIndex, ' at ', vertex1, vertex2, vertex3);
         group.add(nodeId, treeIndex, color, vertex1, vertex2, vertex3);
       }
-
     });
   });
   return group;
