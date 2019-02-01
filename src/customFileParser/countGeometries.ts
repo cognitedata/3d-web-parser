@@ -36,9 +36,10 @@ export default function countGeometries(segmentInformation: any) {
         counts.circle += 2 * geometryInfo.geometryCount;
         counts.eccentricCone += geometryInfo.geometryCount;
       case 'ClosedElipsoidSegment':
-        counts.circle += geometryInfo.geometryCount;
+        // IDK
         break;
       case 'ClosedExtrudedRingSegment':
+        counts.cone += 2 * geometryInfo.geometryCount;
         counts.generalRing += geometryInfo.geometryCount;
         break;
       case 'ClosedGeneralCylinder':
