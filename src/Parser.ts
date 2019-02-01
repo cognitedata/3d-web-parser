@@ -17,12 +17,13 @@ import parseEccentricCones from './parsers/parseEccentricCones';
 import parseEllipsoidSegments from './parsers/parseEllipsoidSegments';
 import parseGeneralCylinders from './parsers/parseGeneralCylinders';
 import parseGeneralRings from './parsers/parseGeneralRings';
-import parseMergedMeshes from './parsers/parseMergedMeshes';
 import parseNuts from './parsers/parseNuts';
 import parseQuads from './parsers/parseQuads';
 import parseSphericalSegments from './parsers/parseSphericalSegments';
 import parseTorusSegments from './parsers/parseTorusSegments';
 import parseTrapeziums from './parsers/parseTrapeziums';
+import parseMergedMeshes from './parsers/parseMergedMeshes';
+// import parseInstancedMeshes from './parsers/parseInstancedMeshes';
 
 const primitiveParsers = [
   parseBoxes,
@@ -39,27 +40,19 @@ const primitiveParsers = [
   parseTrapeziums,
 ];
 
-const meshParsers = [
-  parseMergedMeshes,
-];
-
 function parseGeometries(geometries: GeometryGroup[]) {
-  const geometryGroups: GeometryGroup[] = [];
+  const primitives: PrimitiveGroup[] = [];
   primitiveParsers.forEach(parser => {
     const group: PrimitiveGroup = parser(geometries);
     if (group.capacity > 0) {
-      geometryGroups.push(group);
+      primitives.push(group);
     }
   });
 
-  meshParsers.forEach(parser => {
-    const group: MergedMeshGroup = parser(geometries);
-    if (group.meshes.length > 0) {
-      geometryGroups.push(group);
-    }
-  });
+  const mergedMeshes = parseMergedMeshes(geometries);
+  // const instancedMeshes = parseInstancedMeshes(geometries);
 
-  return geometryGroups;
+  return { primitives, mergedMeshes };
 }
 
 export default async function parseProtobuf(protobufData: Uint8Array) {
@@ -72,7 +65,10 @@ export default async function parseProtobuf(protobufData: Uint8Array) {
     const boundingBoxMax = new Vector3(boundingBox.max.x, boundingBox.max.y, boundingBox.max.z);
     const sector = new Sector(boundingBoxMin, boundingBoxMax);
     nodes[path] = sector;
-    sector.geometries = parseGeometries(webNode.geometries);
+    const { primitives, mergedMeshes } = parseGeometries(webNode.geometries);
+    sector.primitives = primitives;
+    sector.mergedMeshes = mergedMeshes;
+    // sector.instancedMeshes = instancedMeshes;
 
     // attach to parent
     const parentPath = getParentPath(path);

@@ -48,3 +48,44 @@ export function angleBetweenVector3s(v1: THREE.Vector3, v2: THREE.Vector3, up: T
   const moreThanPi = right.dot(v2) < 0;
   return moreThanPi ? 2 * Math.PI - angle : angle;
 }
+
+export function parseInstancedMeshTransformMatrix(target: THREE.Matrix4, transformMatrix: number[]): THREE.Matrix4 {
+  if (transformMatrix.length === 0) {
+    target.identity();
+    return target;
+  }
+
+  const [
+    n11,
+    n21,
+    n31,
+    n12,
+    n22,
+    n32,
+    n13,
+    n23,
+    n33,
+    n14,
+    n24,
+    n34,
+  ] = transformMatrix;
+  target.set(
+    n11,
+    n12,
+    n13,
+    n14,
+    n21,
+    n22,
+    n23,
+    n24,
+    n31,
+    n32,
+    n33,
+    n34,
+    0,
+    0,
+    0,
+    1,
+  );
+  return target;
+}

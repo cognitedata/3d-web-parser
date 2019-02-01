@@ -146,7 +146,7 @@ export class NodeMappings {
   }
 }
 
-export class MergedMesh {
+export class Mesh {
   mappings: NodeMappings;
   fileId: number;
   geometry: null|THREE.Mesh;
@@ -160,15 +160,36 @@ export class MergedMesh {
 }
 
 export class MergedMeshGroup extends GeometryGroup {
-  meshes: MergedMesh[];
+  meshes: Mesh[];
   constructor() {
     super();
     this.meshes = [];
     this.type = 'MergedMesh';
   }
 
-  add(mergedMesh: MergedMesh) {
-    this.meshes.push(mergedMesh);
+  add(mesh: Mesh) {
+    this.meshes.push(mesh);
+  }
+
+  computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
+    return outputMatrix;
+  }
+
+  computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
+    return box;
+  }
+}
+
+export class InstancedMeshGroup extends GeometryGroup {
+  meshes: Mesh[];
+  constructor() {
+    super();
+    this.meshes = [];
+    this.type = 'InstancedMesh';
+  }
+
+  add(mesh: Mesh) {
+    this.meshes.push(mesh);
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {

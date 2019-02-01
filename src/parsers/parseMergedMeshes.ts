@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { MergedMeshGroup, MergedMesh, NodeMappings } from '../geometry/MeshGroup';
+import { MergedMeshGroup, Mesh, NodeMappings } from '../geometry/MeshGroup';
 import { MatchingGeometries } from './parseUtils';
 const globalColor = new THREE.Color();
 
@@ -27,7 +27,7 @@ export default function parse(geometries: any[]): MergedMeshGroup {
     const fileId = geometry.file[0].fileId;
 
     const nodes: any[] = geometry.nodes;
-    const mergedMesh = new MergedMesh(nodes.length, fileId);
+    const mergedMesh = new Mesh(nodes.length, fileId);
     let triangleOffset = 0;
     nodes.forEach(node => {
       const nodeId = Number(node.properties[0].nodeId);
