@@ -1,137 +1,21 @@
 import * as THREE from 'three';
 import FibonacciDecoder from './FibonacciDecoder';
 import BufferReader from './BufferReader';
-import { MorphBlendMeshAnimation, BufferGeometryLoader } from 'three';
-
-const propertyNames = ['color', 'centerX', 'centerY', 'centerZ', 'normal', 'delta', 'height', 'radius',
-'angle', 'translationX', 'translationY', 'translationZ', 'scaleX', 'scaleY', 'scaleZ'];
-
-const allGeometryNames: {[type: number]: string} = {
-  1: 'Box',
-  2: 'Circle',
-  3: 'ClosedCone',
-  4: 'ClosedCylinder',
-  5: 'ClosedEccentricCone',
-  6: 'ClosedEllipsoidSegment',
-  7: 'ClosedExtrudedRingSegment',
-  8: 'ClosedGeneralCylinder',
-  9: 'ClosedSphericalSegment',
-  10: 'ClosedTorusSegment',
-  11: 'Ellipsoid',
-  12: 'ExtrudedRing',
-  13: 'Nut',
-  14: 'OpenCone',
-  15: 'OpenCylinder',
-  16: 'OpenEccentricCone',
-  17: 'OpenEllipsoidSegment',
-  18: 'OpenExtrudedRingSegment',
-  19: 'OpenGeneralCylinder',
-  20: 'OpenSphericalSegment',
-  21: 'OpenTorusSegment',
-  22: 'Ring',
-  23: 'Sphere',
-  24: 'Torus',
-  100: 'TriangleMesh',
-  101: 'InstancedMesh',
-};
+import { propertyNames, allGeometryNames, SectorInformation, GeometryIndexInformation,
+  extraGeometryProperties, NodeIdReader } from './sharedFileParserTypes';
 
 const specialByteSizes: {[index: string]: number} = {
   'color': 4,
   'normal': 12,
 };
 
-const extraGeometryProperties: {[name: string]: string[]} = {
-  Box: ['normal', 'deltaX', 'deltaY', 'deltaZ', 'angle'],
-  Circle: ['normal', 'radiusA'],
-  ClosedCone: ['normal', 'height', 'radiusA', 'radiusB'],
-  ClosedCylinder: ['normal', 'height', 'radiusA'],
-  ClosedEccentricCone: [],
-  ClosedEllipsoidSegment: [],
-  ClosedExtrudedRingSegment: [],
-  ClosedGeneralCylinder: [],
-  ClosedSphericalSegment: [],
-  ClosedTorusSegment: [],
-  Ellipsoid: [],
-  ExtrudedRing: [],
-  Nut: [],
-  OpenCone: [],
-  OpenCylinder: [],
-  OpenEccentricCone: [],
-  OpenEllipsoidSegment: [],
-  OpenExtrudedRingSegment: [],
-  OpenGeneralCylinder: [],
-  OpenSphericalSegment: [],
-  OpenTorusSegment: [],
-  Ring: [],
-  Sphere: [],
-  Torus: [],
-  TriangleMesh: [],
-  InstancedMesh: [],
-};
-
-interface GeometryIndexInformation {
-  name: string;
-  properties?: string[];
-  nodeIds?: NodeIdReader;
-  indexes?: FibonacciDecoder;
-  geometryCount?: number;
-  byteCount?: number;
-  attributeCount?: number;
-}
-
-interface TrueValues {
-  color: THREE.Color[];
-  centerX: number[];
-  centerY: number[];
-  centerZ: number[];
-  normal: THREE.Vector3[];
-  delta: number[];
-  height: number[];
-  radius: number[];
-  angle: number[];
-  translationX: number[];
-  translationY: number[];
-  translationZ: number[];
-  scaleX: number[];
-  scaleY: number[];
-  scaleZ: number[];
-}
-
-interface SectorInformation {
-  magicBytes?: number;
-  formatVersion?: number;
-  optimizerVersion?: number;
-  sectorId?: number;
-  parentSectorId?: number;
-  arrayCount?: number;
-  propertyTrueValues: TrueValues;
-  geometryIndexes: GeometryIndexInformation[];
-}
-
-class NodeIdReader {
-  private dataView: DataView;
-  private location = 0;
-
-  constructor(arrayBuffer: ArrayBuffer, startLocation: number, lengthBytes: number) {
-    this.dataView = new DataView(arrayBuffer, startLocation, lengthBytes);
-    this.location = 0;
-  }
-  // Node ID is saved as a 7 byte integer
-  nextNodeId(): number {
-    let readValue = 0;
-    for (let i = 0; i < 7; i++) {
-      readValue += this.dataView.getUint8(this.location + i) << (8 * (6 - i));
-    }
-    this.location += 7;
-    return readValue;
-  }
-}
+const defaultColor = new THREE.Color(42, 42, 42);
 
 export default function readSegmentFile(asArrayBuffer: ArrayBuffer, flip: boolean): SectorInformation {
   const fileReader = new BufferReader(asArrayBuffer, true);
   const sectorInformation: SectorInformation = {
     propertyTrueValues: {
-      color: [new THREE.Color()],
+      color: [defaultColor],
       centerX: [],
       centerY: [],
       centerZ: [],
@@ -197,30 +81,47 @@ export default function readSegmentFile(asArrayBuffer: ArrayBuffer, flip: boolea
   sectorInformation.geometryIndexes = [];
   while (fileReader.location < asArrayBuffer.byteLength) {
     const name = allGeometryNames[fileReader.readUint32()];
-    const newGeometry: GeometryIndexInformation = { name: name };
+    const geometryCount = fileReader.readUint32();
+    const attributeCount = fileReader.readUint32();
+    const byteCount = fileReader.readUint32();
+    const properties = extraGeometryProperties[name];
 
-    // Remaining types are not implemented yet, break early.
-    if (newGeometry.name === 'ClosedCylinder') {
-      return sectorInformation;
+    let expectedAttributeCount = 0;
+    for (let i = 0; i < properties.length; i++) {
+      switch (properties[i]) {
+        case 'center':
+        case 'delta':
+        case 'translation':
+        case 'rotation3':
+        case 'scale':
+          expectedAttributeCount += 3;
+          break;
+        default:
+          expectedAttributeCount += 1;
+          break;
+      }
+    }
+    if (attributeCount !== expectedAttributeCount) {
+      throw Error('Incorrect atttibute count for type ' + name + '. Expected ' +
+      expectedAttributeCount + ', got ' +
+      attributeCount);
     }
 
-    newGeometry.geometryCount = fileReader.readUint32();
-    newGeometry.attributeCount = fileReader.readUint32();
-    newGeometry.byteCount = fileReader.readUint32();
+    const nodeIds = new NodeIdReader(asArrayBuffer, fileReader.location, geometryCount * 7);
+    fileReader.skip(geometryCount * 7);
+    const indexes = new FibonacciDecoder(asArrayBuffer, fileReader.location, byteCount);
+    fileReader.skip(byteCount);
 
-    if (newGeometry.attributeCount !== extraGeometryProperties[newGeometry.name].length + 5) {
-      throw Error('Incorrect atttibute count for type ' + newGeometry.name + '. Expected ' +
-      (extraGeometryProperties[newGeometry.name].length + 5) + ', got ' +
-      newGeometry.attributeCount);
-    }
+    const newGeometry: GeometryIndexInformation = {
+      name: name,
+      properties: properties,
+      nodeIds: nodeIds,
+      indexes: indexes,
+      geometryCount: geometryCount,
+      byteCount: byteCount,
+      attributeCount: attributeCount,
+    };
 
-    newGeometry.nodeIds = new NodeIdReader(asArrayBuffer, fileReader.location, newGeometry.geometryCount * 7);
-    fileReader.skip(newGeometry.geometryCount * 7);
-
-    newGeometry.indexes = new FibonacciDecoder(asArrayBuffer, fileReader.location, newGeometry.byteCount);
-    fileReader.skip(newGeometry.byteCount);
-
-    newGeometry.properties = extraGeometryProperties[newGeometry.name];
     sectorInformation.geometryIndexes.push(newGeometry);
   }
 

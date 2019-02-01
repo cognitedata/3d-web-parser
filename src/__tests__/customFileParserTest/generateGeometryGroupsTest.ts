@@ -3,7 +3,7 @@ import generateGeometryGroups from '../../customFileParser/generateGeometryGroup
 import * as THREE from 'three';
 const fs = require('fs');
 
-describe('customFileParser', () => {
+describe('generateGeometryGroups', () => {
   test('generate groups', async() => {
     const incomingFile = fs.readFileSync('./src/__tests__/customFileParserTest/Pipes.c3d', null);
 
@@ -16,10 +16,12 @@ describe('customFileParser', () => {
     const parsedFile = readSegmentFile(asArrayBuffer, true);
     const geometryGroups = generateGeometryGroups(parsedFile);
 
+    console.log(geometryGroups);
+
     expect(geometryGroups).toBeDefined();
 
-    expect(geometryGroups.boxGroup.capacity).toBe(327);
-    expect(geometryGroups.circleGroup.capacity).toBe(251 + 2 * 435);
-    expect(geometryGroups.coneGroup.capacity).toBe(435);
+    expect(geometryGroups.box.capacity).toBe(327);
+    expect(geometryGroups.circle.capacity).toBe(251 + 2 * 435);
+    expect(geometryGroups.cone.capacity).toBe(435);
   });
 });

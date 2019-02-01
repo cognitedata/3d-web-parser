@@ -16,7 +16,6 @@ import parseEccentricCones from './parsers/parseEccentricCones';
 import parseEllipsoidSegments from './parsers/parseEllipsoidSegments';
 import parseGeneralCylinders from './parsers/parseGeneralCylinders';
 import parseGeneralRings from './parsers/parseGeneralRings';
-import parseMeshes from './parsers/parseMeshes';
 import parseNuts from './parsers/parseNuts';
 import parseQuads from './parsers/parseQuads';
 import parseSphericalSegments from './parsers/parseSphericalSegments';
