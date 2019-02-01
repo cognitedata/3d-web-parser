@@ -11,6 +11,7 @@ describe('SphericalSegmentGroup', () => {
     expect(group.normal.length).toBe(6);
     expect(group.radius.length).toBe(2);
     expect(group.height.length).toBe(2);
+    expect(group.hasCustomTransformAttributes).toBeTruthy();
     expect(group.type).toBe('SphericalSegment');
   });
 

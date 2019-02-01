@@ -3,6 +3,8 @@
 import * as THREE from 'three';
 import GeometryGroup from './geometry/GeometryGroup';
 import PrimitiveGroup from './geometry/PrimitiveGroup';
+import { MergedMeshGroup } from './geometry/MergedMeshGroup';
+import { InstancedMeshGroup } from './geometry/InstancedMeshGroup';
 
 export default class Sector {
   public readonly min: THREE.Vector3;
@@ -10,13 +12,17 @@ export default class Sector {
   public depth: number;
   public children: Sector[];
   public parent: undefined | Sector;
-  public geometries: GeometryGroup[];
+  public primitives: PrimitiveGroup[];
+  public mergedMeshes: null|MergedMeshGroup;
+  public instancedMeshes: null|InstancedMeshGroup;
   public readonly object3d: THREE.Object3D;
 
   constructor(min: THREE.Vector3, max: THREE.Vector3) {
     this.min = min;
     this.max = max;
-    this.geometries = [];
+    this.primitives = [];
+    this.mergedMeshes = null;
+    this.instancedMeshes = null;
     this.depth = 0;
     this.object3d = new THREE.Object3D();
     this.object3d.frustumCulled = false;
@@ -39,23 +45,31 @@ export default class Sector {
 
   *traversePrimitiveGroups(): IterableIterator<PrimitiveGroup> {
     for (const child of this.traverseSectors()) {
-      for (const geometryGroup of child.geometries) {
-        if (geometryGroup instanceof PrimitiveGroup) {
-          yield geometryGroup;
-        }
+      for (const geometryGroup of child.primitives) {
+        yield geometryGroup;
       }
     }
   }
 
-  memoryUsage(recursive = true): number {
-    let usage = 0;
-    this.geometries.forEach(geometryGroup => {
-      usage += geometryGroup.memoryUsage();
+  memoryUsage(recursive = true, usage: any): number {
+    if (usage == null) {
+      usage = {
+        total: 0,
+        byGeometry: {},
+        byProperty: {},
+      };
+    }
+    this.primitives.forEach(geometryGroup => {
+      geometryGroup.memoryUsage(usage);
     });
+
+    if (this.mergedMeshes != null) {
+      this.mergedMeshes.memoryUsage(usage);
+    }
 
     if (recursive) {
       for (const child of this.traverseSectors()) {
-        usage += child.memoryUsage(false);
+        child.memoryUsage(false, usage);
       }
     }
 

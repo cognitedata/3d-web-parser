@@ -21,8 +21,10 @@ import parseQuads from './parsers/parseQuads';
 import parseSphericalSegments from './parsers/parseSphericalSegments';
 import parseTorusSegments from './parsers/parseTorusSegments';
 import parseTrapeziums from './parsers/parseTrapeziums';
+import parseMergedMeshes from './parsers/parseMergedMeshes';
+import parseInstancedMeshes from './parsers/parseInstancedMeshes';
 
-const parsers = [
+const primitiveParsers = [
   parseBoxes,
   parseCircles,
   parseCones,
@@ -30,7 +32,6 @@ const parsers = [
   parseEllipsoidSegments,
   parseGeneralCylinders,
   parseGeneralRings,
-  // parseMeshes,
   parseNuts,
   parseQuads,
   parseSphericalSegments,
@@ -39,15 +40,18 @@ const parsers = [
 ];
 
 function parseGeometries(geometries: GeometryGroup[]) {
-  const geometryGroups: GeometryGroup[] = [];
-  parsers.forEach(parser => {
+  const primitives: PrimitiveGroup[] = [];
+  primitiveParsers.forEach(parser => {
     const group: PrimitiveGroup = parser(geometries);
     if (group.capacity > 0) {
-      geometryGroups.push(group);
+      primitives.push(group);
     }
   });
 
-  return geometryGroups;
+  const mergedMeshes = parseMergedMeshes(geometries);
+  const instancedMeshes = parseInstancedMeshes(geometries);
+
+  return { primitives, mergedMeshes, instancedMeshes };
 }
 
 export default async function parseProtobuf(protobufData: Uint8Array) {
@@ -60,7 +64,10 @@ export default async function parseProtobuf(protobufData: Uint8Array) {
     const boundingBoxMax = new Vector3(boundingBox.max.x, boundingBox.max.y, boundingBox.max.z);
     const sector = new Sector(boundingBoxMin, boundingBoxMax);
     nodes[path] = sector;
-    sector.geometries = parseGeometries(webNode.geometries);
+    const { primitives, mergedMeshes, instancedMeshes } = parseGeometries(webNode.geometries);
+    sector.primitives = primitives;
+    sector.mergedMeshes = mergedMeshes;
+    sector.instancedMeshes = instancedMeshes;
 
     // attach to parent
     const parentPath = getParentPath(path);

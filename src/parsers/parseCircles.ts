@@ -30,6 +30,8 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
       matchingGeometries.geometries.push(geometry);
       matchingGeometries.count += 1;
     } else if (isClosed) {
+      // Closed geometries may produce circles
+
       if (['cylinder', 'eccentricCone'].indexOf(geometry.type) !== -1) {
         // End caps on the cylinder types
         matchingGeometries.geometries.push(geometry);
@@ -38,10 +40,26 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
         // End caps on the cone
         matchingGeometries.geometries.push(geometry);
         matchingGeometries.count += 2;
-      } else if (['ellipsoidSegment', 'sphericalSegment'].indexOf(geometry.type) !== -1) {
-        // End cap on the sphere types
-        matchingGeometries.geometries.push(geometry);
-        matchingGeometries.count += 1;
+      } else if (geometry.type === 'sphericalSegment') {
+        // End cap on spherical segments
+        const EPS = 1e-6;
+        const { radius, height } = geometry.primitiveInfo.sphericalSegment;
+        const circleRadius = Math.sqrt(height * (2 * radius - height));
+        if (circleRadius / radius > EPS) {
+          matchingGeometries.geometries.push(geometry);
+          matchingGeometries.count += 1;
+        }
+      } else if (geometry.type === 'ellipsoidSegment') {
+        // End cap on ellipsoid segments
+        const EPS = 1e-6;
+        const { verticalRadius, horizontalRadius, height } = geometry.primitiveInfo.ellipsoidSegment;
+        // Ellipse equation: x^2 / hR ^2 + y^2 / vR^2 = 1
+        const y = verticalRadius - height;
+        const circleRadius = (Math.sqrt(verticalRadius * verticalRadius - y * y) * horizontalRadius) / verticalRadius;
+        if (circleRadius / horizontalRadius > EPS) {
+          matchingGeometries.geometries.push(geometry);
+          matchingGeometries.count += 1;
+        }
       }
     }
   });
@@ -91,7 +109,7 @@ function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup) {
       normal.negate();
     }
     group.add(nodeId, treeIndex, color, centerA, normal, radiusA);
-    group.add(nodeId, treeIndex, color, centerB, normal, radiusA);
+    group.add(nodeId, treeIndex, color, centerB, normal, radiusB);
   }
 }
 
@@ -103,20 +121,37 @@ export default function parse(geometries: any[]): CircleGroup {
     if (['cylinder', 'cone', 'eccentricCone'].indexOf(geometry.type) !== -1) {
       parseConeEccentricConeCylinder(geometry, group);
     } else {
-      // Regular circles
       const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
       const nodeId = parsePrimitiveNodeId(geometry);
       const treeIndex = parsePrimitiveTreeIndex(geometry);
       color.setHex(parsePrimitiveColor(geometry));
 
-      let { x = 0, y = 0, z = 0 } = primitiveInfo.center;
-      center.set(x, y, z);
+      const { radius } = primitiveInfo;
 
-      ({ x = 0, y = 0, z = 0 } = primitiveInfo.normal);
+      let { x = 0, y = 0, z = 0 } = primitiveInfo.normal;
       normal.set(x, y, z);
 
-      const radius = primitiveInfo.radius;
-      group.add(nodeId, treeIndex, color, center, normal, radius);
+      ({ x = 0, y = 0, z = 0 } = primitiveInfo.center);
+      center.set(x, y, z);
+
+      if (geometry.type === 'sphericalSegment') {
+        const { height } = primitiveInfo;
+        const circleRadius = Math.sqrt(height * (2 * radius - height));
+        center.add(vector.copy(normal).multiplyScalar(radius - height));
+        group.add(nodeId, treeIndex, color, center, normal, circleRadius);
+      } else if (geometry.type === 'ellipsoidSegment') {
+        const { verticalRadius, horizontalRadius, height } = primitiveInfo;
+        const length = verticalRadius - height;
+        const circleRadius =
+              (Math.sqrt(verticalRadius * verticalRadius - length * length) * horizontalRadius)
+              / verticalRadius;
+        center.add(vector.copy(normal).normalize().multiplyScalar(length));
+        group.add(nodeId, treeIndex, color, center, normal, circleRadius);
+      } else {
+        // Regular circles
+        group.add(nodeId, treeIndex, color, center, normal, radius);
+      }
+
     }
   });
   return group;

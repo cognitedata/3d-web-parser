@@ -1,22 +1,34 @@
 import * as THREE from 'three';
 import GeneralRingGroup from '../geometry/GeneralRingGroup';
+import GeneralCylinderGroup from '../geometry/GeneralCylinderGroup';
 import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
          parsePrimitiveTreeIndex,
          getPrimitiveType,
-         isPrimitive } from './parseUtils';
-import { xAxis, zAxis } from '../constants';
+         isPrimitive,
+         angleBetweenVector3s,
+         normalizeRadians } from './parseUtils';
+import { xAxis, yAxis, zAxis } from '../constants';
 
-const THREEColor = new THREE.Color();
-const center = new THREE.Vector3();
-const centerA = new THREE.Vector3();
-const centerB = new THREE.Vector3();
-const capZAxis = new THREE.Vector3();
-const capXAxis = new THREE.Vector3();
-const normal = new THREE.Vector3();
-const localXAxis = new THREE.Vector3();
-const rotation = new THREE.Quaternion();
+const globalColor = new THREE.Color();
+const globalCenter = new THREE.Vector3();
+const globalCenterA = new THREE.Vector3();
+const globalCenterB = new THREE.Vector3();
+const globalCapZAxis = new THREE.Vector3();
+const globalCapXAxis = new THREE.Vector3();
+const globalNormal = new THREE.Vector3();
+const globalLocalXAxis = new THREE.Vector3();
+const globalSlicingPlane = new THREE.Vector4();
+const globalAxis = new THREE.Vector3();
+const globalVertex = new THREE.Vector3();
+const globalRotation = new THREE.Quaternion();
+const globalPlanes = [new THREE.Plane(), new THREE.Plane()];
+const globalExtA = new THREE.Vector3();
+const globalExtB = new THREE.Vector3();
+const globalLine = new THREE.Line3();
+const globalLineStart = new THREE.Vector3();
+const globalLineEnd = new THREE.Vector3();
 
 function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   const matchingGeometries: MatchingGeometries = {
@@ -54,19 +66,19 @@ function parseRing(primitiveInfo: any,
                    group: GeneralRingGroup) {
 
   let { x = 0, y = 0, z = 0 } = primitiveInfo.center;
-  center.set(x, y, z);
+  globalCenter.set(x, y, z);
 
   ({ x = 0, y = 0, z = 0 } = primitiveInfo.normal);
-  normal.set(x, y, z);
+  globalNormal.set(x, y, z);
   const { innerRadius, outerRadius } = primitiveInfo;
 
-  localXAxis.copy(xAxis).applyQuaternion(rotation.setFromUnitVectors(zAxis, normal)),
+  globalLocalXAxis.copy(xAxis).applyQuaternion(globalRotation.setFromUnitVectors(zAxis, globalNormal)),
   group.add(nodeId,
             treeIndex,
             color,
-            center,
-            normal,
-            localXAxis,
+            globalCenter,
+            globalNormal,
+            globalLocalXAxis,
             outerRadius,
             outerRadius,
             outerRadius - innerRadius,
@@ -79,25 +91,28 @@ function parseCone(primitiveInfo: any,
                    color: THREE.Color,
                    group: GeneralRingGroup) {
   let { x = 0, y = 0, z = 0 } = primitiveInfo.centerA;
-  centerA.set(x, y, z);
+  globalCenterA.set(x, y, z);
 
   ({ x = 0, y = 0, z = 0 } = primitiveInfo.centerB);
-  centerB.set(x, y, z);
+  globalCenterB.set(x, y, z);
 
-  capZAxis.copy(centerA).sub(centerB);
-  rotation.setFromUnitVectors(zAxis, capZAxis.normalize());
-  capXAxis.copy(xAxis).applyQuaternion(rotation);
+  globalCapZAxis.copy(globalCenterA).sub(globalCenterB);
+  globalRotation.setFromUnitVectors(zAxis, globalCapZAxis.normalize());
+  globalCapXAxis.copy(xAxis).applyQuaternion(globalRotation);
   const {
     angle = 0,
-    arcAngle,
-    isClosed,
+    arcAngle = 2 * Math.PI,
     radiusA,
     radiusB,
     thickness = 0,
   } = primitiveInfo;
 
-  group.add(nodeId, treeIndex, color, centerA, capZAxis, capXAxis, radiusA, radiusA, thickness, angle, arcAngle);
-  group.add(nodeId, treeIndex, color, centerB, capZAxis, capXAxis, radiusB, radiusB, thickness, angle, arcAngle);
+  group.add(nodeId, treeIndex, color, globalCenterA,
+            globalCapZAxis, globalCapXAxis, radiusA,
+            radiusA, thickness, angle, arcAngle);
+  group.add(nodeId, treeIndex, color, globalCenterB,
+            globalCapZAxis, globalCapXAxis, radiusB,
+            radiusB, thickness, angle, arcAngle);
 }
 
 function parseExtrudedRing(primitiveInfo: any,
@@ -113,22 +128,21 @@ function parseExtrudedRing(primitiveInfo: any,
   } = primitiveInfo;
 
   let { x = 0, y = 0, z = 0 } = primitiveInfo.centerA;
-  centerA.set(x, y, z);
+  globalCenterA.set(x, y, z);
 
   ({ x = 0, y = 0, z = 0 } = primitiveInfo.centerB);
-  centerB.set(x, y, z);
+  globalCenterB.set(x, y, z);
 
-  normal.copy(centerA).sub(centerB).normalize();
-
-  rotation.setFromUnitVectors(zAxis, normal);
-  capXAxis.copy(xAxis).applyQuaternion(rotation);
+  globalNormal.copy(globalCenterA).sub(globalCenterB).normalize();
+  globalRotation.setFromUnitVectors(zAxis, globalNormal);
+  globalCapXAxis.copy(xAxis).applyQuaternion(globalRotation);
 
   group.add(nodeId,
             treeIndex,
             color,
-            centerA,
-            normal,
-            capXAxis,
+            globalCenterA,
+            globalNormal,
+            globalCapXAxis,
             outerRadius,
             outerRadius,
             outerRadius - innerRadius,
@@ -137,9 +151,9 @@ function parseExtrudedRing(primitiveInfo: any,
   group.add(nodeId,
               treeIndex,
               color,
-              centerB,
-              normal,
-              capXAxis,
+              globalCenterB,
+              globalNormal,
+              globalCapXAxis,
               outerRadius,
               outerRadius,
               outerRadius - innerRadius,
@@ -152,7 +166,97 @@ function parseGeneralCylinder(primitiveInfo: any,
                               treeIndex: number,
                               color: THREE.Color,
                               group: GeneralRingGroup) {
-  // console.log('General ring parsing from generalCylinder parsing isn\'t implemented');
+  //
+  const {
+    radiusA,
+    radiusB,
+    angle = 0,
+    arcAngle = 2.0 * Math.PI,
+    slopeA = 0,
+    slopeB = 0,
+    zAngleA = 0,
+    zAngleB = 0,
+    isClosed = false,
+  } = primitiveInfo;
+  const thickness = primitiveInfo.thickness || (isClosed ? radiusA : 0);
+
+  let { x = 0, y = 0, z = 0 } = primitiveInfo.centerA;
+  globalCenterA.set(x, y, z);
+
+  ({ x = 0, y = 0, z = 0 } = primitiveInfo.centerB);
+  globalCenterB.set(x, y, z);
+
+  globalAxis.subVectors(globalCenterA, globalCenterB);
+  const distFromBToA = globalAxis.length();
+  globalRotation.setFromUnitVectors(zAxis, globalAxis.normalize());
+
+  const distFromAToExtA = radiusA * Math.tan(slopeA);
+  const distFromBToExtB = radiusA * Math.tan(slopeB);
+  const heightA = distFromBToExtB + distFromBToA;
+  const heightB = distFromBToExtB;
+
+  globalExtA.copy(globalAxis)
+      .multiplyScalar(distFromAToExtA)
+      .add(globalCenterA);
+  globalExtB.copy(globalAxis)
+      .multiplyScalar(-distFromBToExtB)
+      .add(globalCenterB);
+
+  [true, false].forEach(isA => {
+    const center = isA ? globalCenterA : globalCenterB;
+    const slope = isA ? slopeA : slopeB;
+    const zAngle = isA ? zAngleA : zAngleB;
+    const height = isA ? heightA : heightB;
+    const radius = isA ? radiusA : radiusB;
+
+    const invertNormal = !isA;
+    GeneralCylinderGroup.slicingPlane(globalSlicingPlane, slope, zAngle, height, invertNormal);
+    if (invertNormal) { globalSlicingPlane.negate(); }
+
+    const normal = new THREE.Vector3(
+      globalSlicingPlane.x,
+      globalSlicingPlane.y,
+      globalSlicingPlane.z,
+    ).applyQuaternion(globalRotation);
+
+    const plane = globalPlanes[Number(Boolean(isA))];
+    plane.setFromNormalAndCoplanarPoint(normal, center);
+
+    const capXAxis = xAxis
+      .clone()
+      .applyAxisAngle(yAxis, slope)
+      .applyAxisAngle(zAxis, zAngle)
+      .applyQuaternion(globalRotation)
+      .normalize();
+
+    globalVertex
+      .set(Math.cos(angle), Math.sin(angle), 0)
+      .applyQuaternion(globalRotation)
+      .normalize();
+
+    globalLineStart
+      .copy(globalVertex)
+      .multiplyScalar(radiusA)
+      .add(globalExtB)
+      .sub(globalAxis);
+    globalLineEnd
+      .copy(globalVertex)
+      .multiplyScalar(radiusA)
+      .add(globalExtA)
+      .add(globalAxis);
+
+    globalLine.set(globalLineStart, globalLineEnd);
+    plane.intersectLine(globalLine, globalVertex);
+
+    const capAngleAxis = globalVertex.sub(center).normalize();
+    const capAngle = angleBetweenVector3s(capAngleAxis, capXAxis, normal);
+
+    if (thickness > 0) {
+      group.add(nodeId, treeIndex, color, center, normal,
+                capXAxis, radius / Math.abs(Math.cos(slope)),
+                radius, thickness, normalizeRadians(capAngle), arcAngle);
+    }
+  });
 }
 
 export default function parse(geometries: any[]): GeneralRingGroup {
@@ -163,16 +267,16 @@ export default function parse(geometries: any[]): GeneralRingGroup {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
     const nodeId = parsePrimitiveNodeId(geometry);
     const treeIndex = parsePrimitiveTreeIndex(geometry);
-    THREEColor.setHex(parsePrimitiveColor(geometry));
+    globalColor.setHex(parsePrimitiveColor(geometry));
 
     if (geometry.type === 'ring') {
-      parseRing(primitiveInfo, nodeId, treeIndex, THREEColor, group);
+      parseRing(primitiveInfo, nodeId, treeIndex, globalColor, group);
     } else if (geometry.type === 'cone') {
-      parseCone(primitiveInfo, nodeId, treeIndex, THREEColor, group);
+      parseCone(primitiveInfo, nodeId, treeIndex, globalColor, group);
     } else if (geometry.type === 'extrudedRing' || geometry.type === 'extrudedRingSegment') {
-      parseExtrudedRing(primitiveInfo, nodeId, treeIndex, THREEColor, group);
+      parseExtrudedRing(primitiveInfo, nodeId, treeIndex, globalColor, group);
     } else if (geometry.type === 'generalCylinder') {
-      parseGeneralCylinder(primitiveInfo, nodeId, treeIndex, THREEColor, group);
+      parseGeneralCylinder(primitiveInfo, nodeId, treeIndex, globalColor, group);
     }
   });
   return group;

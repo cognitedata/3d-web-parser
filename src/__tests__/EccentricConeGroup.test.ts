@@ -10,7 +10,7 @@ describe('EccentricConeGroup', () => {
     expect(group.radiusA.length).toBe(2);
     expect(group.radiusB.length).toBe(2);
     expect(group.normal.length).toBe(6);
-
+    expect(group.hasCustomTransformAttributes).toBeTruthy();
     expect(group.type).toBe('EccentricCone');
   });
 
