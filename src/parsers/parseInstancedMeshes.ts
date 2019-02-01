@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { InstancedMeshGroup, InstancedMesh, InstancedMeshMappings, InstancedMeshCollection } from '../geometry/InstancedMeshGroup';
+import { InstancedMeshGroup, InstancedMesh, InstancedMeshCollection } from '../geometry/InstancedMeshGroup';
 import { MatchingGeometries, parseInstancedMeshTransformMatrix } from './parseUtils';
 const globalColor = new THREE.Color();
 const globalMatrix = new THREE.Matrix4();
