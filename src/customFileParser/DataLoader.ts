@@ -38,7 +38,6 @@ export default class DataLoader {
   }
 
   loadData(geometryInfo: GeometryIndexInformation) {
-    console.log('loading data for ' + geometryInfo.name);
     this.nodeId =    geometryInfo.nodeIds.nextNodeId();
 
     for (let i = 0; i < geometryInfo.properties.length; i++) {
@@ -97,9 +96,11 @@ export default class DataLoader {
         case 'fileId':
         case 'triangleOffset':
         case 'triangleCount':
-        case 'thickness':
           // @ts-ignore
           this[property] = geometryInfo.indexes.nextValue();
+          break;
+        case 'thickness':
+          this.thickness = this.trueValuesArray.radius[geometryInfo.indexes.nextValue()];
           break;
         default:
           if (Object.getOwnPropertyNames(this).indexOf(property) !== -1) {

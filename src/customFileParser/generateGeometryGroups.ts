@@ -37,7 +37,6 @@ export default function generateGeometryGroups(segmentInformation: any) {
   const centerA = new THREE.Vector3();
   const centerB = new THREE.Vector3();
 
-  console.log("Starting to generate geometries");
   for (let i = 0; i < segmentInformation.geometryIndexes.length; i++) {
     const geometryInfo = segmentInformation.geometryIndexes[i];
 
@@ -70,9 +69,12 @@ export default function generateGeometryGroups(segmentInformation: any) {
           groups.circle.add(data.nodeId, data.treeIndex, data.color, centerB, data.normal, data.radiusA);
           break;
         case 'ClosedEccentricCone':
-          groups.eccentricCone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB, data.radiusA,
-            data.radiusB, data.normal);
+          centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
+          centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
+          groups.eccentricCone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB,
+            data.radiusA, data.radiusA, data.rotationalAngle);
           groups.circle.add(data.nodeId, data.treeIndex, data.color, centerA, data.normal, data.radiusA);
+          groups.circle.add(data.nodeId, data.treeIndex, data.color, centerB, data.normal, data.radiusA);
           break;
         case 'ClosedElipsoidSegment':
           // Group.add(nodeId, treeIndex, data.color);
