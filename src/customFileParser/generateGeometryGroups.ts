@@ -1,142 +1,149 @@
 import * as THREE from 'three';
 
+import { propertyNames, GeometryGroups } from './sharedFileParserTypes';
+import countGeometries from './countGeometries';
 import BoxGroup from '../geometry/BoxGroup';
 import CircleGroup from '../geometry/CircleGroup';
 import ConeGroup from '../geometry/ConeGroup';
+import EccentricConeGroup from '../geometry/EccentricConeGroup';
+import GeneralCylinderGroup from '../geometry/GeneralCylinderGroup';
+import GeneralRingGroup from '../geometry/GeneralRingGroup';
+import NutGroup from '../geometry/NutGroup';
+import QuadGroup from '../geometry/QuadGroup';
+import SphericalSegmentGroup from '../geometry/SphericalSegmentGroup';
+import TorusSegmentGroup from '../geometry/TorusSegmentGroup';
+import TrapeziumGroup from '../geometry/TrapeziumGroup';
 
-let nodeId: number;
-let treeIndex: number;
-let color: THREE.Color;
-let x: number;
-let y: number;
-let z: number;
-let normal: THREE.Vector3;
-let deltaX: number;
-let deltaY: number;
-let deltaZ: number;
-let height: number;
-let radiusA: number;
-let radiusB: number;
-let angle: number;
-const center = new THREE.Vector3();
-const delta = new THREE.Vector3();
-
-const centerA = new THREE.Vector3();
-const centerB = new THREE.Vector3();
-
-const propertyNames = ['color', 'centerX', 'centerY', 'centerZ', 'normal', 'delta', 'height', 'radius',
-'angle', 'translationX', 'translationY', 'translationZ', 'scaleX', 'scaleY', 'scaleZ'];
-
-function loadData(trueValuesArray: any, geometryInfo: any) {
-  nodeId =    geometryInfo.nodeIds.nextNodeId();
-  treeIndex = geometryInfo.indexes.nextValue();
-  const colorIndex = geometryInfo.indexes.nextValue();
-  color =     trueValuesArray.color[colorIndex];
-  const xIndex = geometryInfo.indexes.nextValue();
-  const yIndex = geometryInfo.indexes.nextValue();
-  const zIndex = geometryInfo.indexes.nextValue();
-  x =         trueValuesArray.centerX[xIndex];
-  y =         trueValuesArray.centerY[yIndex];
-  z =         trueValuesArray.centerZ[zIndex];
-  center.set(x, y, z);
-
-  const geometryProperties: string[] = geometryInfo.properties;
-  if (geometryProperties.indexOf('normal') !== -1) {
-    normal = trueValuesArray.normal[geometryInfo.indexes.nextValue()];
-  }
-  if (geometryProperties.indexOf('deltaX') !== -1) {
-    deltaX = trueValuesArray.delta[geometryInfo.indexes.nextValue()];
-    deltaY = trueValuesArray.delta[geometryInfo.indexes.nextValue()];
-    deltaZ = trueValuesArray.delta[geometryInfo.indexes.nextValue()];
-    delta.set(deltaX, deltaY, deltaZ);
-  }
-  if (geometryProperties.indexOf('height') !== -1) {
-    height = trueValuesArray.height[geometryInfo.indexes.nextValue()];
-  }
-  if (geometryProperties.indexOf('radiusA') !== -1) {
-    radiusA = trueValuesArray.radius[geometryInfo.indexes.nextValue()];
-  }
-  if (geometryProperties.indexOf('radiusB') !== -1) {
-    radiusB = trueValuesArray.radius[geometryInfo.indexes.nextValue()];
-  }
-  if (geometryProperties.indexOf('angle') !== -1) {
-    angle = trueValuesArray.angle[geometryInfo.indexes.nextValue()];
-  }
-  // TODO(verkhovskaya): Add Matrix and Translation once relevant
-}
+import DataLoader from './DataLoader';
 
 export default function generateGeometryGroups(segmentInformation: any) {
-  let circleCount = 0;
-  let boxCount = 0;
-  let coneCount = 0;
+  const counts = countGeometries(segmentInformation);
 
-  for (let i = 0; i < segmentInformation.geometryIndexes.length; i++) {
-    const geometryInfo = segmentInformation.geometryIndexes[i];
-    switch (segmentInformation.geometryIndexes[i].name) {
-      case 'Box':
-        boxCount += geometryInfo.geometryCount;
-        break;
-      case 'Circle':
-        circleCount += geometryInfo.geometryCount;
-        break;
-      case 'ClosedCone':
-        circleCount += 2 * geometryInfo.geometryCount;
-        coneCount += geometryInfo.geometryCount;
-        break;
-      case 'ClosedCylinder':
-        circleCount += 2 * geometryInfo.geometryCount;
-        coneCount += geometryInfo.geometryCount;
-        break;
-      default:
-        break;
-    }
-  }
+  const groups: GeometryGroups = {
+    box: new BoxGroup(counts.box),
+    circle: new CircleGroup(counts.circle),
+    cone: new ConeGroup(counts.cone),
+    eccentricCone: new EccentricConeGroup(counts.eccentricCone),
+    generalCylinder: new GeneralCylinderGroup(counts.generalCylinder),
+    generalRing: new GeneralRingGroup(counts.generalRing),
+    nut: new NutGroup(counts.nut),
+    quad: new QuadGroup(counts.quad),
+    sphericalSegment: new SphericalSegmentGroup(counts.generalCylinder),
+    torusSegment: new TorusSegmentGroup(counts.torusSegment),
+    trapezium: new TrapeziumGroup(counts.trapezium),
+  };
 
-  const circleGroup = new CircleGroup(circleCount);
-  const boxGroup = new BoxGroup(boxCount);
-  const coneGroup = new ConeGroup(coneCount);
+  const data = new DataLoader(segmentInformation.propertyTrueValues);
+  const centerA = new THREE.Vector3();
+  const centerB = new THREE.Vector3();
 
+  console.log("Starting to generate geometries");
   for (let i = 0; i < segmentInformation.geometryIndexes.length; i++) {
     const geometryInfo = segmentInformation.geometryIndexes[i];
 
-    switch (geometryInfo.name) {
-      case 'Box':
-        for (let j = 0; j < geometryInfo.geometryCount; j++) {
-          loadData(segmentInformation.propertyTrueValues, geometryInfo);
-          boxGroup.add(nodeId, treeIndex, color, center, normal, angle, delta);
-        }
-        break;
-      case 'Circle':
-        for (let j = 0; j < geometryInfo.geometryCount; j++) {
-          loadData(segmentInformation.propertyTrueValues, geometryInfo);
-          circleGroup.add(nodeId, treeIndex, color, center, normal, radiusA);
-        }
-        break;
-      case 'ClosedCone':
-        for (let j = 0; j < geometryInfo.geometryCount; j++) {
-          loadData(segmentInformation.propertyTrueValues, geometryInfo);
-          centerA.copy(normal).multiplyScalar(height / 2).add(center); // center + normal*height/2
-          centerB.copy(normal).multiplyScalar(-height / 2).add(center); // center - normal*height/2
-          coneGroup.add(nodeId, treeIndex, color, centerA, centerB, radiusA, radiusB, angle);
-          circleGroup.add(nodeId, treeIndex, color, centerA, normal, radiusA);
-          circleGroup.add(nodeId, treeIndex, color, centerB, normal, radiusA);
-        }
-        break;
-      case 'ClosedCylinder':
-        for (let j = 0; j < geometryInfo.geometryCount; j++) {
-          loadData(segmentInformation.propertyTrueValues, geometryInfo);
-          centerA.copy(normal).multiplyScalar(height / 2).add(center); // center + normal*height/2
-          centerB.copy(normal).multiplyScalar(-height / 2).add(center); // center - normal*height/2
-          coneGroup.add(nodeId, treeIndex, color, centerA, centerB, radiusA, radiusA, angle);
-          circleGroup.add(nodeId, treeIndex, color, centerA, normal, radiusA);
-          circleGroup.add(nodeId, treeIndex, color, centerB, normal, radiusA);
-        }
-        break;
-      default:
-        break;
+    for (let j = 0; j < geometryInfo.geometryCount; j++) {
+      data.loadData(geometryInfo);
+      switch (geometryInfo.name) {
+        case 'Box':
+          groups.box.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal,
+            data.rotationalAngle, data.delta);
+          break;
+        case 'Circle':
+          groups.circle.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal,
+            data.radiusA);
+          break;
+        case 'ClosedCone':
+        // center +/- normal*height/2
+          centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
+          centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
+          groups.cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB,
+            data.radiusA, data.radiusB, data.rotationalAngle);
+          groups.circle.add(data.nodeId, data.treeIndex, data.color, centerA, data.normal, data.radiusA);
+          groups.circle.add(data.nodeId, data.treeIndex, data.color, centerB, data.normal, data.radiusB);
+          break;
+        case 'ClosedCylinder':
+          centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
+          centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
+          groups.cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB,
+            data.radiusA, data.radiusA, data.rotationalAngle);
+          groups.circle.add(data.nodeId, data.treeIndex, data.color, centerA, data.normal, data.radiusA);
+          groups.circle.add(data.nodeId, data.treeIndex, data.color, centerB, data.normal, data.radiusA);
+          break;
+        case 'ClosedEccentricCone':
+          groups.eccentricCone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB, data.radiusA,
+            data.radiusB, data.normal);
+          groups.circle.add(data.nodeId, data.treeIndex, data.color, centerA, data.normal, data.radiusA);
+          break;
+        case 'ClosedElipsoidSegment':
+          // Group.add(nodeId, treeIndex, data.color);
+          break;
+        case 'ClosedExtrudedRingSegment':
+          // groups.generalRing.add(nodeId, treeIndex, data.color, center, data.normal,
+          // localXAxis, xRadius, yRadius, thickness, angle? arcAngle?);
+          break;
+        case 'ClosedGeneralCylinder':
+          // groups.generalCylinder.add(nodeId, treeIndex, data.color);
+          break;
+        case 'ClosedSphericalSegment':
+          // groups.sphericalSegment.add(nodeId, treeIndex, data.color);
+          break;
+        case 'ClosedTorusSegment':
+          // groups.torusSegment.add(nodeId, treeIndex, data.color);
+          break;
+        case 'Ellipsoid':
+          // Group.add(nodeId, treeIndex, data.color);
+          break;
+        case 'ExtrudedRing':
+          // groups.generalRing.add(nodeId, treeIndex, data.color);
+          break;
+        case 'Nut':
+          // groups.nut.add(nodeId, treeIndex, data.color);
+          break;
+        case 'OpenCone':
+          // groups.cone.add(nodeId, treeIndex, data.color);
+          break;
+        case 'OpenCylinder':
+          // groups.generalCylinder.add(nodeId, treeIndex, data.color);
+          break;
+        case 'OpenEccentricCone':
+          // groups.cone.add(nodeId, treeIndex, data.color);
+          break;
+        case 'OpenEllipsoidSegment':
+          // Group.add(nodeId, treeIndex, data.color);
+          break;
+        case 'OpenExtrudedRingSegment':
+          // groups.generalRing.add(nodeId, treeIndex, color);
+          break;
+        case 'OpenGeneralCylinder':
+          // groups.generalCylinder.add(nodeId, treeIndex, color);
+          break;
+        case 'OpenSphericalSegment':
+          // groups.sphericalSegment.add(nodeId, treeIndex, color);
+          break;
+        case 'OpenTorusSegment':
+          // blah
+          break;
+        case 'Ring':
+          // groups.generalRing.add(nodeId, treeIndex, color);
+          break;
+        case 'Sphere':
+          // groups.sphericalSegment.add(nodeId, treeIndex, color);
+          break;
+        case 'Torus':
+          // groups.torusSegment.add(nodeId, treeIndex, color);
+          break;
+        case 'TriangleMesh':
+          // asdf
+          break;
+        case 'InstancedMesh':
+          //
+          break;
+        default:
+          throw Error('Unrecognized geometry name ' + geometryInfo.name);
+      }
     }
   }
-  return { 'circleGroup': circleGroup, 'boxGroup': boxGroup, 'coneGroup': coneGroup };
+  return groups;
 }
 
 export { generateGeometryGroups };
