@@ -8,7 +8,6 @@ import { Vector3, Group } from 'three';
 import { getParentPath } from './PathExtractor';
 import PrimitiveGroup from './geometry/PrimitiveGroup';
 import GeometryGroup from './geometry/GeometryGroup';
-import { MergedMeshGroup } from './geometry/MeshGroup';
 
 import parseBoxes from './parsers/parseBoxes';
 import parseCircles from './parsers/parseCircles';
@@ -23,7 +22,7 @@ import parseSphericalSegments from './parsers/parseSphericalSegments';
 import parseTorusSegments from './parsers/parseTorusSegments';
 import parseTrapeziums from './parsers/parseTrapeziums';
 import parseMergedMeshes from './parsers/parseMergedMeshes';
-// import parseInstancedMeshes from './parsers/parseInstancedMeshes';
+import parseInstancedMeshes from './parsers/parseInstancedMeshes';
 
 const primitiveParsers = [
   parseBoxes,
@@ -50,9 +49,9 @@ function parseGeometries(geometries: GeometryGroup[]) {
   });
 
   const mergedMeshes = parseMergedMeshes(geometries);
-  // const instancedMeshes = parseInstancedMeshes(geometries);
+  const instancedMeshes = parseInstancedMeshes(geometries);
 
-  return { primitives, mergedMeshes };
+  return { primitives, mergedMeshes, instancedMeshes };
 }
 
 export default async function parseProtobuf(protobufData: Uint8Array) {
@@ -65,10 +64,10 @@ export default async function parseProtobuf(protobufData: Uint8Array) {
     const boundingBoxMax = new Vector3(boundingBox.max.x, boundingBox.max.y, boundingBox.max.z);
     const sector = new Sector(boundingBoxMin, boundingBoxMax);
     nodes[path] = sector;
-    const { primitives, mergedMeshes } = parseGeometries(webNode.geometries);
+    const { primitives, mergedMeshes, instancedMeshes } = parseGeometries(webNode.geometries);
     sector.primitives = primitives;
     sector.mergedMeshes = mergedMeshes;
-    // sector.instancedMeshes = instancedMeshes;
+    sector.instancedMeshes = instancedMeshes;
 
     // attach to parent
     const parentPath = getParentPath(path);

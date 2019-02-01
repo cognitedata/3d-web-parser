@@ -3,7 +3,8 @@
 import * as THREE from 'three';
 import GeometryGroup from './geometry/GeometryGroup';
 import PrimitiveGroup from './geometry/PrimitiveGroup';
-import { MergedMeshGroup, InstancedMeshGroup } from './geometry/MeshGroup';
+import { MergedMeshGroup } from './geometry/MergedMeshGroup';
+import { InstancedMeshGroup } from './geometry/InstancedMeshGroup';
 
 export default class Sector {
   public readonly min: THREE.Vector3;
