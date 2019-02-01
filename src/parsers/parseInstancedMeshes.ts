@@ -29,9 +29,8 @@ export default function parse(geometries: any[]): InstancedMeshGroup {
 
     const nodes: any[] = geometry.nodes;
     const instancedMesh = new InstancedMesh(nodes.length, fileId);
-    let triangleOffset = 0;
     nodes.forEach(node => {
-      const { triangleCount } = node;
+      const { triangleCount, triangleOffset } = node;
       const collection = new InstancedMeshCollection(
         triangleOffset,
         triangleCount,
@@ -45,7 +44,6 @@ export default function parse(geometries: any[]): InstancedMeshGroup {
         parseInstancedMeshTransformMatrix(globalMatrix, transformMatrix);
         collection.addMapping(nodeId, treeIndex, globalColor, globalMatrix);
       });
-      triangleOffset += triangleCount;
       instancedMesh.addCollection(collection);
     });
     group.addMesh(instancedMesh);
