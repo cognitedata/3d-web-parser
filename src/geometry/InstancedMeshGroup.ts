@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import GeometryGroup from './GeometryGroup';
+import { TypedArray } from 'three';
 
 export class InstancedMeshMappings {
   public count: number;
@@ -7,15 +8,16 @@ export class InstancedMeshMappings {
   public color: Float32Array;
   public nodeId: Float64Array;
   public treeIndex: Float32Array;
-
   // The transformX arrays contain contain transformation matrix
   public transform0: Float32Array;
   public transform1: Float32Array;
   public transform2: Float32Array;
   public transform3: Float32Array;
+
   constructor(capacity: number) {
     this.count = 0;
     this.capacity = capacity;
+
     this.color = new Float32Array(3 * this.capacity);
     this.nodeId = new Float64Array(this.capacity);
     this.treeIndex = new Float32Array(this.capacity);
@@ -78,6 +80,60 @@ export class InstancedMeshMappings {
     return target;
   }
 
+  public resize(capacity: number) {
+    // TODO(anders.hafreager) Create proper helper functions to simplify/automate constructor and resize
+
+    if (capacity < this.count) {
+      throw 'Error, tried to resize InstancedMeshMappings to smaller value than current count.';
+    }
+
+    let tmp: TypedArray;
+    tmp = this.color;
+    this.color = new Float32Array(3 * capacity);
+    this.color.set(tmp.subarray(0, 3 * this.count), 0);
+
+    tmp = this.nodeId;
+    this.nodeId = new Float64Array(capacity);
+    this.nodeId.set(tmp.subarray(0, this.count), 0);
+
+    tmp = this.treeIndex;
+    this.treeIndex = new Float32Array(capacity);
+    this.treeIndex.set(tmp.subarray(0, this.count), 0);
+
+    tmp = this.transform0;
+    this.transform0 = new Float32Array(3 * capacity);
+    this.transform0.set(tmp.subarray(0, 3 * this.count), 0);
+
+    tmp = this.transform1;
+    this.transform1 = new Float32Array(3 * capacity);
+    this.transform1.set(tmp.subarray(0, 3 * this.count), 0);
+
+    tmp = this.transform2;
+    this.transform2 = new Float32Array(3 * capacity);
+    this.transform2.set(tmp.subarray(0, 3 * this.count), 0);
+
+    tmp = this.transform3;
+    this.transform3 = new Float32Array(3 * capacity);
+    this.transform3.set(tmp.subarray(0, 3 * this.count), 0);
+
+    this.capacity = capacity;
+  }
+
+  public mergeWithMappings(otherMappings: InstancedMeshMappings) {
+    // TODO(anders.hafreager) Create proper helper functions automate this
+    const newCapacity = this.count + otherMappings.count;
+    this.resize(newCapacity);
+
+    this.nodeId.set(otherMappings.nodeId.subarray(0, otherMappings.count), this.count);
+    this.treeIndex.set(otherMappings.treeIndex.subarray(0, otherMappings.count), this.count);
+    this.color.set(otherMappings.color.subarray(0, 3 * otherMappings.count), 3 * this.count);
+    this.transform0.set(otherMappings.transform0.subarray(0, 3 * otherMappings.count), 3 * this.count);
+    this.transform1.set(otherMappings.transform1.subarray(0, 3 * otherMappings.count), 3 * this.count);
+    this.transform2.set(otherMappings.transform2.subarray(0, 3 * otherMappings.count), 3 * this.count);
+    this.transform3.set(otherMappings.transform3.subarray(0, 3 * otherMappings.count), 3 * this.count);
+    this.count = newCapacity;
+  }
+
   private setColor(source: THREE.Color, index: number) {
     let nextIndex = 3 * index;
     this.color[nextIndex++] = source.r;
@@ -120,8 +176,8 @@ export class InstancedMeshCollection {
              treeIndex: number,
              color: THREE.Color,
              transformMatrix?: THREE.Matrix4) {
-      this.mappings.add(nodeId, treeIndex, color, transformMatrix);
-    }
+    this.mappings.add(nodeId, treeIndex, color, transformMatrix);
+  }
 }
 
 export class InstancedMesh {
@@ -129,14 +185,20 @@ export class InstancedMesh {
   fileId: number;
   geometry: null|THREE.Mesh;
   treeIndexMap: { [s: number]: number; };
+  collectionByTriangleOffset: { [s: number]: InstancedMeshCollection; };
   constructor(capacity: number, fileId: number) {
     this.collections = [];
     this.geometry = null;
     this.fileId = fileId;
     this.treeIndexMap = {};
+    this.collectionByTriangleOffset = {};
   }
 
   addCollection(collection: InstancedMeshCollection) {
+    const existingCollection = this.collectionByTriangleOffset[collection.triangleOffset];
+    if (existingCollection != null) {
+
+    }
     this.collections.push(collection);
   }
 }
