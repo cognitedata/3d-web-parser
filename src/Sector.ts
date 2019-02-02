@@ -5,11 +5,13 @@ import GeometryGroup from './geometry/GeometryGroup';
 import PrimitiveGroup from './geometry/PrimitiveGroup';
 import { MergedMeshGroup } from './geometry/MergedMeshGroup';
 import { InstancedMeshGroup } from './geometry/InstancedMeshGroup';
+import { strict } from 'assert';
 
 export default class Sector {
   public readonly min: THREE.Vector3;
   public readonly max: THREE.Vector3;
   public depth: number;
+  public path: string;
   public children: Sector[];
   public parent: undefined | Sector;
   public primitives: PrimitiveGroup[];
@@ -20,6 +22,7 @@ export default class Sector {
   constructor(min: THREE.Vector3, max: THREE.Vector3) {
     this.min = min;
     this.max = max;
+    this.path = '0/';
     this.primitives = [];
     this.mergedMeshes = null;
     this.instancedMeshes = null;
@@ -31,6 +34,8 @@ export default class Sector {
 
   addChild(child: Sector) {
     child.parent = this;
+    const childPath = this.path + this.children.length.toString() + '/';
+    child.path = childPath;
     this.children.push(child);
     child.depth = this.depth + 1;
     this.object3d.add(child.object3d);

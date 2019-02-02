@@ -7,10 +7,10 @@ describe('Sectors', () => {
   test('constructor', () => {
     const min = new THREE.Vector3();
     const max = new THREE.Vector3(1, 1, 1);
-
     const sector = new Sector(min, max);
     expect(sector.min).toBe(min);
     expect(sector.max).toBe(max);
+    expect(sector.path).toBe('0/');
     expect(sector.parent).toBe(undefined);
     expect(sector.children.length).toBe(0);
 
@@ -35,6 +35,7 @@ describe('Sectors', () => {
     expect(child1.depth).toBe(parent.depth + 1);
     expect(parent.children.length).toBe(1);
     expect(parent.object3d.children[0]).toBe(child1.object3d);
+    expect(child1.path).toBe('0/0/');
 
     const child2 = new Sector(min, max);
     parent.addChild(child2);
@@ -43,6 +44,7 @@ describe('Sectors', () => {
     expect(parent.children.length).toBe(2);
     expect(parent.object3d.children[0]).toBe(child1.object3d);
     expect(parent.object3d.children[1]).toBe(child2.object3d);
+    expect(child2.path).toBe('0/1/');
   });
 
   test('parent bounding box', () => {
