@@ -1,5 +1,4 @@
 import readSegmentFile from './readSegmentFile';
-<<<<<<< HEAD
 import loadGeometryGroup from './generateGeometryGroups';
 import Sector from './../Sector';
 import * as THREE from 'three';
@@ -51,20 +50,6 @@ export default function parseCustomFile(incomingFile: Uint8Array) {
   const keys = Object.keys(groups);
   for (let i = 0; i < keys.length; i++) {
     sector.primitiveGroups.push(groups[keys[i]]);
-=======
-import generateGeometryGroups from './generateGeometryGroups';
-import Sector from './../Sector';
-import * as THREE from 'three';
-
-function parseCustomFile(incomingFile: Uint8Array) {
-  const parsedFile = readSegmentFile(incomingFile, true);
-  const geometryGroups = generateGeometryGroups(parsedFile);
-  const sector = new Sector(new THREE.Vector3(0, 0, 0), new THREE.Vector3(1000, 1000, 1000));
-
-  const keys = Object.keys(geometryGroups);
-  for (let i = 0; i < keys.length; i++) {
-    sector.geometries.push(geometryGroups[keys[i]]);
->>>>>>> 30f6a6c200fb85fcbe9e7ae9df94c8bec61b658c
   }
 
   return sector;
