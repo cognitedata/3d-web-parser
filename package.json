@@ -10,9 +10,7 @@
   "author": "Anders Hafreager (anders.hafreager@cognite.com)",
   "license": "Apache-2.0",
   "files": [
-    "dist/index.js",
-    "dist/index.es.js",
-    "dist/index.d.ts"
+    "dist"
   ],
   "main": "dist/index.js",
   "module": "dist/index.es.js",
@@ -65,7 +63,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "peerDependencies": {
-    "three": ">=0.82.0"
+    "three": ">=0.96.0"
   },
   "repository": {
     "type": "git",
