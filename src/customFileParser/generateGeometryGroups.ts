@@ -1,48 +1,16 @@
 import * as THREE from 'three';
 
-import { propertyNames, GeometryGroups } from './sharedFileParserTypes';
-import countGeometries from './countGeometries';
-import BoxGroup from '../geometry/BoxGroup';
-import CircleGroup from '../geometry/CircleGroup';
-import ConeGroup from '../geometry/ConeGroup';
-import EccentricConeGroup from '../geometry/EccentricConeGroup';
-import GeneralCylinderGroup from '../geometry/GeneralCylinderGroup';
-import GeneralRingGroup from '../geometry/GeneralRingGroup';
-import NutGroup from '../geometry/NutGroup';
-import QuadGroup from '../geometry/QuadGroup';
-import SphericalSegmentGroup from '../geometry/SphericalSegmentGroup';
-import TorusSegmentGroup from '../geometry/TorusSegmentGroup';
-import TrapeziumGroup from '../geometry/TrapeziumGroup';
-import { MergedMeshMappings } from '../geometry/MergedMeshGroup';
-import { InstancedMeshMappings } from '../geometry/InstancedMeshGroup';
+import { SectorInformation, GeometryGroups } from './sharedFileParserTypes';
 
 import DataLoader from './DataLoader';
 
-export default function generateGeometryGroups(segmentInformation: any) {
-  const counts = countGeometries(segmentInformation);
-
-  const groups: GeometryGroups = {
-    box: new BoxGroup(counts.box),
-    circle: new CircleGroup(counts.circle),
-    cone: new ConeGroup(counts.cone),
-    eccentricCone: new EccentricConeGroup(counts.eccentricCone),
-    generalCylinder: new GeneralCylinderGroup(counts.generalCylinder),
-    generalRing: new GeneralRingGroup(counts.generalRing),
-    nut: new NutGroup(counts.nut),
-    quad: new QuadGroup(counts.quad),
-    sphericalSegment: new SphericalSegmentGroup(counts.generalCylinder),
-    torusSegment: new TorusSegmentGroup(counts.torusSegment),
-    trapezium: new TrapeziumGroup(counts.trapezium),
-    triangleMesh: new MergedMeshMappings(counts.triangleMesh),
-    instancedMesh: new InstancedMeshMappings(counts.instancedMesh),
-  };
+export default function loadGeometryGroup(groups: GeometryGroups, segmentInformation: SectorInformation, groupName: string) {
 
   const data = new DataLoader(segmentInformation.propertyTrueValues);
   const centerA = new THREE.Vector3();
   const centerB = new THREE.Vector3();
 
-  for (let i = 0; i < segmentInformation.geometryIndexes.length; i++) {
-    const geometryInfo = segmentInformation.geometryIndexes[i];
+    const geometryInfo = segmentInformation.geometryIndexes[groupName];
 
     for (let j = 0; j < geometryInfo.geometryCount; j++) {
       data.loadData(geometryInfo);
@@ -81,16 +49,18 @@ export default function generateGeometryGroups(segmentInformation: any) {
           groups.circle.add(data.nodeId, data.treeIndex, data.color, centerB, data.normal, data.radiusA);
           break;
         case 'ClosedElipsoidSegment':
-          // Group.add(nodeId, treeIndex, data.color);
+          groups.ellipsoidSegment.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal, data.radiusA,
+            data.radiusB, data.height);
+          // And something else
           break;
         case 'ClosedExtrudedRingSegment':
           centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
           centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
           groups.generalRing.add(data.nodeId, data.treeIndex, data.color, centerA, data.normal,
-            new THREE.Vector3(0,0,1), data.radiusA, data.radiusA, data.radiusA - data.radiusB,
+            new THREE.Vector3(0, 0, 1), data.radiusA, data.radiusA, data.radiusA - data.radiusB,
             data.rotationalAngle, data.arcAngle);
           groups.generalRing.add(data.nodeId, data.treeIndex, data.color, centerB, data.normal,
-            new THREE.Vector3(0,0,1), data.radiusA, data.radiusA, data.radiusA - data.radiusB,
+            new THREE.Vector3(0, 0, 1), data.radiusA, data.radiusA, data.radiusA - data.radiusB,
             data.rotationalAngle, data.arcAngle);
           groups.cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB, data.radiusA,
             data.radiusA, data.rotationalAngle, data.arcAngle);
@@ -101,8 +71,8 @@ export default function generateGeometryGroups(segmentInformation: any) {
           break;
         case 'ClosedGeneralCylinder':
           groups.generalCylinder.add(data.nodeId, data.treeIndex, data.color, centerA, centerB, data.radiusA,
-            data.height/2, data.height/2, data.slopeA, data.slopeB, data.zAngleA, data.zAngleB, data.rotationalAngle,
-            data.arcAngle);
+            data.height / 2, data.height / 2, data.slopeA, data.slopeB, data.zAngleA, data.zAngleB,
+            data.rotationalAngle, data.arcAngle);
           // groups.generalRing.add
           // groups.generalRing.add
           break;
@@ -118,15 +88,17 @@ export default function generateGeometryGroups(segmentInformation: any) {
             data.radiusB, data.rotationalAngle, data.arcAngle);
           break;
         case 'Ellipsoid':
-          // IDK
+          groups.ellipsoidSegment.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal, data.radiusA,
+            data.radiusB, data.radiusB * 2);
+          // And something else
           break;
         case 'ExtrudedRing':
         centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
         centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
         groups.generalRing.add(data.nodeId, data.treeIndex, data.color, centerA, data.normal,
-          new THREE.Vector3(0,0,1), data.radiusA, data.radiusA, data.radiusA - data.radiusB);
+          new THREE.Vector3(0, 0, 1), data.radiusA, data.radiusA, data.radiusA - data.radiusB);
         groups.generalRing.add(data.nodeId, data.treeIndex, data.color, centerB, data.normal,
-          new THREE.Vector3(0,0,1), data.radiusA, data.radiusA, data.radiusA - data.radiusB);
+          new THREE.Vector3(0, 0, 1), data.radiusA, data.radiusA, data.radiusA - data.radiusB);
         groups.cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB, data.radiusA,
           data.radiusA);
         groups.cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB, data.radiusA,
@@ -157,16 +129,17 @@ export default function generateGeometryGroups(segmentInformation: any) {
             data.radiusA, data.radiusA, data.normal);
           break;
         case 'OpenEllipsoidSegment':
-          // IDK
+          groups.ellipsoidSegment.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal, data.radiusA,
+            data.radiusB, data.radiusB * 2);
           break;
         case 'OpenExtrudedRingSegment':
           centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
           centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
           groups.generalRing.add(data.nodeId, data.treeIndex, data.color, centerA, data.normal,
-            new THREE.Vector3(0,0,1), data.radiusA, data.radiusA, data.radiusA - data.radiusB,
+            new THREE.Vector3(0, 0, 1), data.radiusA, data.radiusA, data.radiusA - data.radiusB,
             data.rotationalAngle, data.arcAngle);
           groups.generalRing.add(data.nodeId, data.treeIndex, data.color, centerB, data.normal,
-            new THREE.Vector3(0,0,1), data.radiusA, data.radiusA, data.radiusA - data.radiusB,
+            new THREE.Vector3(0, 0, 1), data.radiusA, data.radiusA, data.radiusA - data.radiusB,
             data.rotationalAngle, data.arcAngle);
           groups.cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB, data.radiusA,
             data.radiusA, data.rotationalAngle, data.arcAngle);
@@ -206,7 +179,6 @@ export default function generateGeometryGroups(segmentInformation: any) {
         default:
           throw Error('Unrecognized geometry name ' + geometryInfo.name);
       }
-    }
   }
   return groups;
 }

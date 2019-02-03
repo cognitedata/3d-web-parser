@@ -31,7 +31,7 @@ export default function readSegmentFile(asArrayBuffer: ArrayBuffer, flip: boolea
       scaleY: [],
       scaleZ: [],
     },
-    geometryIndexes: [],
+    geometryIndexes: {},
   };
 
   sectorInformation.magicBytes = fileReader.readUint32();
@@ -78,7 +78,6 @@ export default function readSegmentFile(asArrayBuffer: ArrayBuffer, flip: boolea
     }
   }
 
-  sectorInformation.geometryIndexes = [];
   while (fileReader.location < asArrayBuffer.byteLength) {
     const name = allGeometryNames[fileReader.readUint32()];
     const geometryCount = fileReader.readUint32();
@@ -122,7 +121,7 @@ export default function readSegmentFile(asArrayBuffer: ArrayBuffer, flip: boolea
       attributeCount: attributeCount,
     };
 
-    sectorInformation.geometryIndexes.push(newGeometry);
+    sectorInformation.geometryIndexes[newGeometry.name] = newGeometry;
   }
 
   return sectorInformation;

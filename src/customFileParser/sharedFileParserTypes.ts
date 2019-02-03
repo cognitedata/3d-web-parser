@@ -13,6 +13,7 @@ import TorusSegmentGroup from '../geometry/TorusSegmentGroup';
 import TrapeziumGroup from '../geometry/TrapeziumGroup';
 import { MergedMeshMappings } from '../geometry/MergedMeshGroup';
 import { InstancedMeshMappings } from '../geometry/InstancedMeshGroup';
+import EllipsoidSegmentGroup from '../geometry/InstancedMeshGroup';
 
 const BYTES_PER_NODE_ID = 7;
 class NodeIdReader {
@@ -144,6 +145,7 @@ interface Counts {
   circle: number;
   cone: number;
   eccentricCone: number;
+  ellipsoidSegment: number;
   generalCylinder: number;
   generalRing: number;
   nut: number;
@@ -160,6 +162,7 @@ interface GeometryGroups {
   box: BoxGroup;
   cone: ConeGroup;
   eccentricCone: EccentricConeGroup;
+  ellipsoidSegment: EllipsoidSegmentGroup;
   generalCylinder: GeneralCylinderGroup;
   generalRing: GeneralRingGroup;
   nut: NutGroup;
