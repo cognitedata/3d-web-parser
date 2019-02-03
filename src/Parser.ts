@@ -136,7 +136,7 @@ export default async function parseProtobuf(protobufData: Uint8Array, printParsi
   t0 = performance.now();
   const rootSector = sectors['0/'];
   for (const sector of rootSector.traverseSectors()) {
-    mergeInstancedMeshes(sector, 10000);
+    mergeInstancedMeshes(sector, 2500);
   }
   if (printParsingTime) {
     // tslint:disable-next-line
