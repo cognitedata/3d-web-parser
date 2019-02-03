@@ -28,9 +28,6 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
   public transform3: Float32Array;
   public hasCustomTransformAttributes: boolean;
   public attributes: Attribute[];
-  // _parents: BasePrimitive[];
-  // _children: BasePrimitive[];
-  // abstract: boolean;
   constructor(capacity: number) {
     super();
     this.count = 0;
@@ -43,9 +40,6 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     this.transform1 = new Float32Array(0);
     this.transform2 = new Float32Array(0);
     this.transform3 = new Float32Array(0);
-    // this._parent = null;
-    // this._children = [];
-    // this.abstract = false;
     this.attributes = [
       { name: 'treeIndex', array: this.treeIndex, itemSize: 1 },
     ];
