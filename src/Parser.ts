@@ -83,7 +83,7 @@ function parseGeometries(geometries: GeometryGroup[],
 export default async function parseProtobuf(protobufData: Uint8Array, printParsingTime: boolean = false) {
   const protobufDecoder = new ProtobufDecoder();
 
-  const nodes: { [path: string]: Sector } = { };
+  const sectors: { [path: string]: Sector } = { };
   const instancedMeshMap: { [key: number]: InstancedMesh } = {};
 
   // Create map since we will reuse primitive groups until the count is above some threshold.
@@ -110,7 +110,7 @@ export default async function parseProtobuf(protobufData: Uint8Array, printParsi
     const boundingBoxMin = new Vector3(boundingBox.min.x, boundingBox.min.y, boundingBox.min.z);
     const boundingBoxMax = new Vector3(boundingBox.max.x, boundingBox.max.y, boundingBox.max.z);
     const sector = new Sector(boundingBoxMin, boundingBoxMax);
-    nodes[path] = sector;
+    sectors[path] = sector;
     const {
       primitiveGroups,
       mergedMeshGroup,
@@ -124,8 +124,8 @@ export default async function parseProtobuf(protobufData: Uint8Array, printParsi
     // attach to parent
     const parentPath = getParentPath(path);
     if (parentPath !== undefined) {
-      nodes[parentPath].addChild(sector);
-      nodes[parentPath].object3d.add(sector.object3d);
+      sectors[parentPath].addChild(sector);
+      sectors[parentPath].object3d.add(sector.object3d);
     }
   }
   if (printParsingTime) {
@@ -134,7 +134,7 @@ export default async function parseProtobuf(protobufData: Uint8Array, printParsi
   }
 
   t0 = performance.now();
-  const rootSector = nodes['0/'];
+  const rootSector = sectors['0/'];
   for (const sector of rootSector.traverseSectors()) {
     mergeInstancedMeshes(sector, 10000);
   }
@@ -143,5 +143,5 @@ export default async function parseProtobuf(protobufData: Uint8Array, printParsi
     console.log('Optimizing instanced meshes took ', performance.now() - t0, ' ms.');
   }
 
-  return rootSector;
+  return { rootSector, sectors };
 }
