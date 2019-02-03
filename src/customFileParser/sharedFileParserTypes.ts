@@ -11,6 +11,8 @@ import QuadGroup from '../geometry/QuadGroup';
 import SphericalSegmentGroup from '../geometry/SphericalSegmentGroup';
 import TorusSegmentGroup from '../geometry/TorusSegmentGroup';
 import TrapeziumGroup from '../geometry/TrapeziumGroup';
+import { MergedMeshMappings } from '../geometry/MergedMeshGroup';
+import { InstancedMeshMappings } from '../geometry/InstancedMeshGroup';
 
 const BYTES_PER_NODE_ID = 7;
 class NodeIdReader {
@@ -98,20 +100,6 @@ const extraGeometryProperties: {[name: string]: string[]} = {
   // 'scale'],
 };
 
-interface Counts {
-  box: number;
-  circle: number;
-  cone: number;
-  eccentricCone: number;
-  generalCylinder: number;
-  generalRing: number;
-  nut: number;
-  quad: number;
-  sphericalSegment: number;
-  torusSegment: number;
-  trapezium: number;
-}
-
 interface GeometryIndexInformation {
   name: string;
   properties: string[];
@@ -151,6 +139,22 @@ interface SectorInformation {
   geometryIndexes: GeometryIndexInformation[];
 }
 
+interface Counts {
+  box: number;
+  circle: number;
+  cone: number;
+  eccentricCone: number;
+  generalCylinder: number;
+  generalRing: number;
+  nut: number;
+  quad: number;
+  sphericalSegment: number;
+  torusSegment: number;
+  trapezium: number;
+  triangleMesh: number;
+  instancedMesh: number;
+}
+
 interface GeometryGroups {
   circle: CircleGroup;
   box: BoxGroup;
@@ -163,6 +167,8 @@ interface GeometryGroups {
   sphericalSegment: SphericalSegmentGroup;
   torusSegment: TorusSegmentGroup;
   trapezium: TrapeziumGroup;
+  triangleMesh: MergedMeshMappings;
+  instancedMesh: InstancedMeshMappings;
 }
 
 export { propertyNames, allGeometryNames, extraGeometryProperties, GeometryIndexInformation,

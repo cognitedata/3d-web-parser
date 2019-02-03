@@ -13,6 +13,8 @@ export default function countGeometries(segmentInformation: any) {
     sphericalSegment: 0,
     torusSegment: 0,
     trapezium: 0,
+    triangleMesh: 0,
+    instancedMesh: 0,
   };
 
   for (let i = 0; i < segmentInformation.geometryIndexes.length; i++) {
@@ -40,24 +42,27 @@ export default function countGeometries(segmentInformation: any) {
         break;
       case 'ClosedExtrudedRingSegment':
         counts.cone += 2 * geometryInfo.geometryCount;
-        counts.generalRing += geometryInfo.geometryCount;
+        counts.generalRing += 2 * geometryInfo.geometryCount;
+        // counts.quad += 2
         break;
       case 'ClosedGeneralCylinder':
-        counts.cone += geometryInfo.geometryCount; // overestimate
-        counts.generalCylinder += geometryInfo.geometryCount; // overestimate
+        counts.generalCylinder += geometryInfo.geometryCount;
+        // counts.generalRing += 2 * geometryInfo.geometryCount;
         break;
       case 'ClosedSphericalSegment':
         counts.circle += geometryInfo.geometryCount;
-        counts.generalCylinder += geometryInfo.geometryCount;
+        counts.sphericalSegment += geometryInfo.geometryCount;
         break;
       case 'ClosedTorusSegment':
         counts.torusSegment += geometryInfo.geometryCount;
+        // counts.circle += 2 * geometryInfo.geometryCount;
         break;
       case 'Ellipsoid':
-        counts.generalRing += geometryInfo.geometryCount;
+        // IDK
         break;
       case 'ExtrudedRing':
-        counts.generalRing += geometryInfo.geometryCount;
+        counts.generalCylinder += 2 * geometryInfo.geometryCount;
+        counts.cone += 2 * geometryInfo.geometryCount;
         break;
       case 'Nut':
         counts.nut += geometryInfo.geometryCount;
@@ -66,7 +71,7 @@ export default function countGeometries(segmentInformation: any) {
         counts.cone += geometryInfo.geometryCount;
         break;
       case 'OpenCylinder':
-        counts.generalCylinder += geometryInfo.geometryCount;
+        counts.cone += geometryInfo.geometryCount;
         break;
       case 'OpenEccentricCone':
         counts.eccentricCone += geometryInfo.geometryCount;
@@ -75,13 +80,14 @@ export default function countGeometries(segmentInformation: any) {
         counts.generalRing += geometryInfo.geometryCount;
         break;
       case 'OpenExtrudedRingSegment':
-        counts.generalRing += geometryInfo.geometryCount;
+        counts.cone += 2 * geometryInfo.geometryCount;
+        counts.generalRing += 2 * geometryInfo.geometryCount;
         break;
       case 'OpenGeneralCylinder':
         counts.generalCylinder += geometryInfo.geometryCount;
         break;
       case 'OpenSphericalSegment':
-        counts.generalCylinder += geometryInfo.geometryCount;
+        counts.sphericalSegment += geometryInfo.geometryCount;
         break;
       case 'OpenTorusSegment':
         counts.torusSegment += geometryInfo.geometryCount;
