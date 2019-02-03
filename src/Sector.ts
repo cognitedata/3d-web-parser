@@ -5,7 +5,12 @@ import GeometryGroup from './geometry/GeometryGroup';
 import PrimitiveGroup from './geometry/PrimitiveGroup';
 import { MergedMeshGroup } from './geometry/MergedMeshGroup';
 import { InstancedMeshGroup } from './geometry/InstancedMeshGroup';
-import { strict } from 'assert';
+
+interface GeometryNode {
+  treeIndex: number;
+  nodeId: number;
+  color: THREE.Color;
+}
 
 export default class Sector {
   public readonly min: THREE.Vector3;
@@ -52,6 +57,44 @@ export default class Sector {
     for (const child of this.traverseSectors()) {
       for (const geometryGroup of child.primitiveGroups) {
         yield geometryGroup;
+      }
+    }
+  }
+
+  *traverseGeometryNodes(color: THREE.Color): IterableIterator<GeometryNode> {
+    // Will traverse all geometries and yield
+    // nodeId and treeIndex
+    for (const child of this.traverseSectors()) {
+      for (const geometryGroup of child.primitiveGroups) {
+        for (let i = 0; i < geometryGroup.count; i++) {
+          const treeIndex = geometryGroup.getTreeIndex(i);
+          const nodeId = geometryGroup.getNodeId(i);
+          geometryGroup.getColor(color, i);
+          yield { treeIndex, nodeId, color };
+        }
+      }
+
+      for (let meshIndex = 0; meshIndex < child.mergedMeshGroup.meshes.length; meshIndex++) {
+        const mappings = child.mergedMeshGroup.meshes[meshIndex].mappings;
+        for (let i = 0; i < mappings.count; i++) {
+          const treeIndex = mappings.getTreeIndex(i);
+          const nodeId = mappings.getNodeId(i);
+          mappings.getColor(color, i);
+          yield { treeIndex, nodeId, color };
+        }
+      }
+
+      for (let meshIndex = 0; meshIndex < child.instancedMeshGroup.meshes.length; meshIndex++) {
+        const instancedMesh = child.instancedMeshGroup.meshes[meshIndex];
+        for (let collectionIndex = 0; collectionIndex < instancedMesh.collections.length; collectionIndex++) {
+          const mappings = instancedMesh.collections[collectionIndex].mappings;
+          for (let i = 0; i < mappings.count; i++) {
+            const treeIndex = mappings.getTreeIndex(i);
+            const nodeId = mappings.getNodeId(i);
+            mappings.getColor(color, i);
+            yield { treeIndex, nodeId, color };
+          }
+        }
       }
     }
   }
