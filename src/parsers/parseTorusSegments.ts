@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import TorusSegmentGroup from '../geometry/TorusSegmentGroup';
+import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
 import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
@@ -26,9 +27,21 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-export default function parse(geometries: any[]): TorusSegmentGroup {
+function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
+  if (
+    primitiveGroupMap.TorusSegment.group.count + minimumRequiredCapacity
+    > primitiveGroupMap.TorusSegment.group.capacity) {
+      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.TorusSegment.capacity);
+      primitiveGroupMap.TorusSegment.group = new TorusSegmentGroup(capacity);
+      return true;
+  }
+  return false;
+}
+
+export default function parse(geometries: any[], primitiveGroupMap: PrimitiveGroupMap): boolean {
   const matchingGeometries = findMatchingGeometries(geometries);
-  const group = new TorusSegmentGroup(matchingGeometries.count);
+  const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
+  const group = primitiveGroupMap.TorusSegment.group;
 
   matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
@@ -52,5 +65,5 @@ export default function parse(geometries: any[]): TorusSegmentGroup {
 
     group.add(nodeId, treeIndex, color, center, normal, radius, tubeRadius, angle, arcAngle);
   });
-  return group;
+  return didCreateNewGroup;
 }

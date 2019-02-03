@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import EccentricConeGroup from '../geometry/EccentricConeGroup';
+import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
 import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
@@ -29,9 +30,21 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-export default function parse(geometries: any[]): EccentricConeGroup {
+function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
+  if (
+    primitiveGroupMap.EccentricCone.group.count + minimumRequiredCapacity
+    > primitiveGroupMap.EccentricCone.group.capacity) {
+      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.EccentricCone.capacity);
+      primitiveGroupMap.EccentricCone.group = new EccentricConeGroup(capacity);
+      return true;
+  }
+  return false;
+}
+
+export default function parse(geometries: any[], primitiveGroupMap: PrimitiveGroupMap): boolean {
   const matchingGeometries = findMatchingGeometries(geometries);
-  const group = new EccentricConeGroup(matchingGeometries.count);
+  const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
+  const group = primitiveGroupMap.EccentricCone.group;
 
   matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
@@ -57,5 +70,5 @@ export default function parse(geometries: any[]): EccentricConeGroup {
 
     group.add(nodeId, treeIndex, color, centerA, centerB, radiusA, radiusB, normal);
   });
-  return group;
+  return didCreateNewGroup;
 }

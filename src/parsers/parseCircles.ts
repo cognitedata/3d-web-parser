@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import CircleGroup from '../geometry/CircleGroup';
+import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
 import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
@@ -113,9 +114,20 @@ function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup) {
   }
 }
 
-export default function parse(geometries: any[]): CircleGroup {
+function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
+  if (primitiveGroupMap.Circle.group.count + minimumRequiredCapacity > primitiveGroupMap.Circle.group.capacity) {
+      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Circle.capacity);
+      primitiveGroupMap.Circle.group = new CircleGroup(capacity);
+      return true;
+  }
+  return false;
+}
+
+export default function parse(geometries: any[], primitiveGroupMap: PrimitiveGroupMap): boolean {
   const matchingGeometries = findMatchingGeometries(geometries);
-  const group = new CircleGroup(matchingGeometries.count);
+
+  const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
+  const group = primitiveGroupMap.Circle.group;
 
   matchingGeometries.geometries.forEach(geometry => {
     if (['cylinder', 'cone', 'eccentricCone'].indexOf(geometry.type) !== -1) {
@@ -138,7 +150,7 @@ export default function parse(geometries: any[]): CircleGroup {
         const { height } = primitiveInfo;
         const circleRadius = Math.sqrt(height * (2 * radius - height));
         center.add(vector.copy(normal).multiplyScalar(radius - height));
-        group.add(nodeId, treeIndex, color, center, normal, circleRadius);
+        group!.add(nodeId, treeIndex, color, center, normal, circleRadius);
       } else if (geometry.type === 'ellipsoidSegment') {
         const { verticalRadius, horizontalRadius, height } = primitiveInfo;
         const length = verticalRadius - height;
@@ -154,5 +166,5 @@ export default function parse(geometries: any[]): CircleGroup {
 
     }
   });
-  return group;
+  return didCreateNewGroup;
 }

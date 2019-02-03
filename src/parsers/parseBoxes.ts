@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import BoxGroup from '../geometry/BoxGroup';
+import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
+
 import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
@@ -27,9 +29,19 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-export default function parse(geometries: any[]): BoxGroup {
+function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
+  if (primitiveGroupMap.Box.group.count + minimumRequiredCapacity > primitiveGroupMap.Box.group.capacity) {
+      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Box.capacity);
+      primitiveGroupMap.Box.group = new BoxGroup(capacity);
+      return true;
+  }
+  return false;
+}
+
+export default function parse(geometries: any[], primitiveGroupMap: PrimitiveGroupMap): boolean {
   const matchingGeometries = findMatchingGeometries(geometries);
-  const group = new BoxGroup(matchingGeometries.count);
+  const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
+  const group = primitiveGroupMap.Box.group;
 
   matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
@@ -50,5 +62,5 @@ export default function parse(geometries: any[]): BoxGroup {
     const { angle = 0 } = geometry.primitiveInfo.box;
     group.add(nodeId, treeIndex, color, center, normal, angle, delta);
   });
-  return group;
+  return didCreateNewGroup;
 }

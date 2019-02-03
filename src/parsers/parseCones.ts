@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import ConeGroup from '../geometry/ConeGroup';
+import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
 import { MatchingGeometries,
   parsePrimitiveColor,
   parsePrimitiveNodeId,
@@ -47,11 +48,22 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-export default function parse(geometries: any[]): ConeGroup {
-const matchingGeometries = findMatchingGeometries(geometries);
-const group = new ConeGroup(matchingGeometries.count);
+function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
+  if (primitiveGroupMap.Cone.group.count + minimumRequiredCapacity > primitiveGroupMap.Cone.group.capacity) {
+      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Cone.capacity);
+      primitiveGroupMap.Cone.group = new ConeGroup(capacity);
+      return true;
+  }
+  return false;
+}
 
-matchingGeometries.geometries.forEach(geometry => {
+export default function parse(geometries: any[], primitiveGroupMap: PrimitiveGroupMap): boolean {
+  const matchingGeometries = findMatchingGeometries(geometries);
+
+  const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
+  const group = primitiveGroupMap.Cone.group;
+
+  matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
     const nodeId = parsePrimitiveNodeId(geometry);
     const treeIndex = parsePrimitiveTreeIndex(geometry);
@@ -100,5 +112,5 @@ matchingGeometries.geometries.forEach(geometry => {
         arcAngle);
     }
   });
-return group;
+  return didCreateNewGroup;
 }

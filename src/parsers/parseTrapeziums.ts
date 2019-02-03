@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import TrapeziumGroup from '../geometry/TrapeziumGroup';
+import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
+import GeneralCylinderGroup from '../geometry/GeneralCylinderGroup';
 import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
@@ -7,7 +9,6 @@ import { MatchingGeometries,
          getPrimitiveType,
          isPrimitive } from './parseUtils';
 import { xAxis, zAxis } from '../constants';
-import { GeneralCylinderGroup } from '..';
 
 const globalColor = new THREE.Color();
 const globalCenterA = new THREE.Vector3();
@@ -196,9 +197,20 @@ function parseGeneralCylinder(primitiveInfo: any,
   });
 }
 
-export default function parse(geometries: any[]): TrapeziumGroup {
+function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
+  if (primitiveGroupMap.Trapezium.group.count + minimumRequiredCapacity > primitiveGroupMap.Trapezium.group.capacity) {
+      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Trapezium.capacity);
+      primitiveGroupMap.Trapezium.group = new TrapeziumGroup(capacity);
+      return true;
+  }
+  return false;
+}
+
+export default function parse(geometries: any[], primitiveGroupMap: PrimitiveGroupMap): boolean {
   const matchingGeometries = findMatchingGeometries(geometries);
-  const group = new TrapeziumGroup(matchingGeometries.count);
+
+  const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
+  const group = primitiveGroupMap.Trapezium.group;
 
   matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
@@ -217,5 +229,5 @@ export default function parse(geometries: any[]): TrapeziumGroup {
       }
     }
   });
-  return group;
+  return didCreateNewGroup;
 }

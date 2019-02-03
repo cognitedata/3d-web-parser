@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import NutGroup from '../geometry/NutGroup';
+import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
 import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
@@ -25,9 +26,19 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-export default function parse(geometries: any[]): NutGroup {
+function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
+  if (primitiveGroupMap.Nut.group.count + minimumRequiredCapacity > primitiveGroupMap.Nut.group.capacity) {
+      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Nut.capacity);
+      primitiveGroupMap.Nut.group = new NutGroup(capacity);
+      return true;
+  }
+  return false;
+}
+
+export default function parse(geometries: any[], primitiveGroupMap: PrimitiveGroupMap): boolean {
   const matchingGeometries = findMatchingGeometries(geometries);
-  const group = new NutGroup(matchingGeometries.count);
+  const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
+  const group = primitiveGroupMap.Nut.group;
 
   matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
@@ -46,5 +57,5 @@ export default function parse(geometries: any[]): NutGroup {
     group.add(nodeId, treeIndex, color, centerA, centerB, radius, rotationAngle);
   });
 
-  return group;
+  return didCreateNewGroup;
 }

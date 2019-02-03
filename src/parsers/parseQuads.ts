@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import QuadGroup from '../geometry/QuadGroup';
+import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
 import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
@@ -44,9 +45,19 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-export default function parse(geometries: any[]): QuadGroup {
+function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
+  if (primitiveGroupMap.Quad.group.count + minimumRequiredCapacity > primitiveGroupMap.Quad.group.capacity) {
+      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Quad.capacity);
+      primitiveGroupMap.Quad.group = new QuadGroup(capacity);
+      return true;
+  }
+  return false;
+}
+
+export default function parse(geometries: any[], primitiveGroupMap: PrimitiveGroupMap): boolean {
   const matchingGeometries = findMatchingGeometries(geometries);
-  const group = new QuadGroup(matchingGeometries.count);
+  const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
+  const group = primitiveGroupMap.Quad.group;
 
   matchingGeometries.geometries.forEach(geometry => {
     // Only extruded rings will produce quads
@@ -96,5 +107,5 @@ export default function parse(geometries: any[]): QuadGroup {
       }
     });
   });
-  return group;
+  return didCreateNewGroup;
 }

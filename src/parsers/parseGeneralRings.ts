@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import GeneralRingGroup from '../geometry/GeneralRingGroup';
 import GeneralCylinderGroup from '../geometry/GeneralCylinderGroup';
+import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
 import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
@@ -259,9 +260,21 @@ function parseGeneralCylinder(primitiveInfo: any,
   });
 }
 
-export default function parse(geometries: any[]): GeneralRingGroup {
+function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
+  if (
+    primitiveGroupMap.GeneralRing.group.count + minimumRequiredCapacity
+    > primitiveGroupMap.GeneralRing.group.capacity) {
+      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.GeneralRing.capacity);
+      primitiveGroupMap.GeneralRing.group = new GeneralRingGroup(capacity);
+      return true;
+  }
+  return false;
+}
+
+export default function parse(geometries: any[], primitiveGroupMap: PrimitiveGroupMap): boolean {
   const matchingGeometries = findMatchingGeometries(geometries);
-  const group = new GeneralRingGroup(matchingGeometries.count);
+  const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
+  const group = primitiveGroupMap.GeneralRing.group;
 
   matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
@@ -279,5 +292,5 @@ export default function parse(geometries: any[]): GeneralRingGroup {
       parseGeneralCylinder(primitiveInfo, nodeId, treeIndex, globalColor, group);
     }
   });
-  return group;
+  return didCreateNewGroup;
 }

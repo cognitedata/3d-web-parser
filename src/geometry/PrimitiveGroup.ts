@@ -3,10 +3,37 @@
 import * as THREE from 'three';
 import GeometryGroup from './GeometryGroup';
 
+import BoxGroup from './BoxGroup';
+import CircleGroup from './CircleGroup';
+import ConeGroup from './ConeGroup';
+import EccentricConeGroup from './EccentricConeGroup';
+import EllipsoidSegmentGroup from './EllipsoidSegmentGroup';
+import GeneralCylinderGroup from './GeneralCylinderGroup';
+import GeneralRingGroup from './GeneralRingGroup';
+import NutGroup from './NutGroup';
+import QuadGroup from './QuadGroup';
+import SphericalSegmentGroup from './SphericalSegmentGroup';
+import TorusSegmentGroup from './TorusSegmentGroup';
+import TrapeziumGroup from './TrapeziumGroup';
 const matrix = new THREE.Matrix4();
 
 type TypedArray = Float32Array | Float64Array;
 type THREEVector = THREE.Vector2 | THREE.Vector3 | THREE.Vector4;
+
+export interface PrimitiveGroupMap {
+  Box: {capacity: number, group: BoxGroup};
+  Circle: {capacity: number, group: CircleGroup};
+  Cone: {capacity: number, group: ConeGroup};
+  EccentricCone: {capacity: number, group: EccentricConeGroup};
+  EllipsoidSegment: {capacity: number, group: EllipsoidSegmentGroup};
+  GeneralCylinder: {capacity: number, group: GeneralCylinderGroup};
+  GeneralRing: {capacity: number, group: GeneralRingGroup};
+  Nut: {capacity: number, group: NutGroup};
+  Quad: {capacity: number, group: QuadGroup};
+  SphericalSegment: {capacity: number, group: SphericalSegmentGroup};
+  TorusSegment: {capacity: number, group: TorusSegmentGroup};
+  Trapezium: {capacity: number, group: TrapeziumGroup};
+}
 
 export interface Attribute {
   name: string;
