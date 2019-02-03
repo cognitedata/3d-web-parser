@@ -118,8 +118,8 @@ export default async function parseProtobuf(protobufData: Uint8Array, printParsi
     } = parseGeometries(webNode.geometries, instancedMeshMap, primitiveGroupMap);
 
     sector.primitiveGroups = primitiveGroups;
-    // sector.mergedMeshGroup = mergedMeshGroup;
-    // sector.instancedMeshGroup = instancedMeshGroup;
+    sector.mergedMeshGroup = mergedMeshGroup;
+    sector.instancedMeshGroup = instancedMeshGroup;
 
     // attach to parent
     const parentPath = getParentPath(path);
