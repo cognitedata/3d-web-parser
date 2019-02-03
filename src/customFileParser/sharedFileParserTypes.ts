@@ -13,7 +13,7 @@ import TorusSegmentGroup from '../geometry/TorusSegmentGroup';
 import TrapeziumGroup from '../geometry/TrapeziumGroup';
 import { MergedMeshMappings } from '../geometry/MergedMeshGroup';
 import { InstancedMeshMappings } from '../geometry/InstancedMeshGroup';
-import EllipsoidSegmentGroup from '../geometry/InstancedMeshGroup';
+import EllipsoidSegmentGroup from '../geometry/EllipsoidSegmentGroup';
 
 const BYTES_PER_NODE_ID = 7;
 class NodeIdReader {
@@ -106,9 +106,9 @@ interface GeometryIndexInformation {
   properties: string[];
   nodeIds: NodeIdReader;
   indexes: FibonacciDecoder;
-  geometryCount?: number;
-  byteCount?: number;
-  attributeCount?: number;
+  geometryCount: number;
+  byteCount: number;
+  attributeCount: number;
 }
 
 interface TrueValues {
@@ -137,7 +137,7 @@ interface SectorInformation {
   parentSectorId?: number;
   arrayCount?: number;
   propertyTrueValues: TrueValues;
-  geometryIndexes: GeometryIndexInformation[];
+  geometryIndexes: {[name: string]: GeometryIndexInformation };
 }
 
 interface Counts {
@@ -158,6 +158,7 @@ interface Counts {
 }
 
 interface GeometryGroups {
+  [name: string]: any;
   circle: CircleGroup;
   box: BoxGroup;
   cone: ConeGroup;

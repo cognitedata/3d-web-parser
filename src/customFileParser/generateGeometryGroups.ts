@@ -182,5 +182,3 @@ export default function loadGeometryGroup(groups: GeometryGroups, segmentInforma
   }
   return groups;
 }
-
-export { generateGeometryGroups };
