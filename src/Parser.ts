@@ -89,18 +89,18 @@ export default async function parseProtobuf(protobufData: Uint8Array, printParsi
   // Create map since we will reuse primitive groups until the count is above some threshold.
   // This reduces the number of draw calls.
   const primitiveGroupMap: PrimitiveGroupMap = {
-    Box: { capacity: 10000, group: new BoxGroup(0) },
-    Circle: { capacity: 10000, group: new CircleGroup(0) },
-    Cone: { capacity: 10000, group: new ConeGroup(0) },
-    EccentricCone: { capacity: 10000, group: new EccentricConeGroup(0) },
-    EllipsoidSegment: { capacity: 10000, group: new EllipsoidSegmentGroup(0) },
-    GeneralCylinder: { capacity: 10000, group: new GeneralCylinderGroup(0) },
-    GeneralRing: { capacity: 10000, group: new GeneralRingGroup(0) },
-    Nut: { capacity: 10000, group: new NutGroup(0) },
-    Quad: { capacity: 10000, group: new QuadGroup(0) },
-    SphericalSegment: { capacity: 10000, group: new SphericalSegmentGroup(0) },
-    TorusSegment: { capacity: 10000, group: new TorusSegmentGroup(0) },
-    Trapezium: { capacity: 10000, group: new TrapeziumGroup(0) },
+    Box: { capacity: 5000, group: new BoxGroup(0) },
+    Circle: { capacity: 5000, group: new CircleGroup(0) },
+    Cone: { capacity: 5000, group: new ConeGroup(0) },
+    EccentricCone: { capacity: 5000, group: new EccentricConeGroup(0) },
+    EllipsoidSegment: { capacity: 5000, group: new EllipsoidSegmentGroup(0) },
+    GeneralCylinder: { capacity: 5000, group: new GeneralCylinderGroup(0) },
+    GeneralRing: { capacity: 5000, group: new GeneralRingGroup(0) },
+    Nut: { capacity: 5000, group: new NutGroup(0) },
+    Quad: { capacity: 5000, group: new QuadGroup(0) },
+    SphericalSegment: { capacity: 5000, group: new SphericalSegmentGroup(0) },
+    TorusSegment: { capacity: 5000, group: new TorusSegmentGroup(0) },
+    Trapezium: { capacity: 5000, group: new TrapeziumGroup(0) },
   };
 
   const mergedMeshMap: InstancedMeshMap = {};
@@ -118,8 +118,8 @@ export default async function parseProtobuf(protobufData: Uint8Array, printParsi
     } = parseGeometries(webNode.geometries, instancedMeshMap, primitiveGroupMap);
 
     sector.primitiveGroups = primitiveGroups;
-    // sector.mergedMeshGroup = mergedMeshGroup;
-    // sector.instancedMeshGroup = instancedMeshGroup;
+    sector.mergedMeshGroup = mergedMeshGroup;
+    sector.instancedMeshGroup = instancedMeshGroup;
 
     // attach to parent
     const parentPath = getParentPath(path);
@@ -136,7 +136,7 @@ export default async function parseProtobuf(protobufData: Uint8Array, printParsi
   t0 = performance.now();
   const rootSector = nodes['0/'];
   for (const sector of rootSector.traverseSectors()) {
-    mergeInstancedMeshes(sector, 5000);
+    mergeInstancedMeshes(sector, 10000);
   }
   if (printParsingTime) {
     // tslint:disable-next-line
