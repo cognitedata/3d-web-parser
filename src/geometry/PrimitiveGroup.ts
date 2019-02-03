@@ -47,6 +47,7 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
   public nodeId: Float64Array;
   public treeIndex: Float32Array;
   public color: Float32Array;
+  public maxTreeIndex: number;
 
   // The transformX arrays contain contain transformation matrix
   public transform0: Float32Array;
@@ -60,6 +61,7 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     this.count = 0;
     this.capacity = capacity;
 
+    this.maxTreeIndex = -1;
     this.nodeId = new Float64Array(this.capacity);
     this.treeIndex = new Float32Array(this.capacity);
     this.color = new Float32Array(3 * this.capacity);
@@ -72,6 +74,9 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     ];
     this.hasCustomTransformAttributes = false;
   }
+
+  abstract computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4;
+  abstract computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3;
 
   setVector<T extends TypedArray, U extends THREEVector>(
     source: U,
@@ -154,6 +159,7 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
   }
 
   setTreeIndex(value: number, index: number) {
+    this.maxTreeIndex = Math.max(this.maxTreeIndex, value);
     this.treeIndex[index] = value;
   }
 

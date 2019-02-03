@@ -89,18 +89,18 @@ export default async function parseProtobuf(protobufData: Uint8Array, printParsi
   // Create map since we will reuse primitive groups until the count is above some threshold.
   // This reduces the number of draw calls.
   const primitiveGroupMap: PrimitiveGroupMap = {
-    Box: { capacity: 50000, group: new BoxGroup(0) },
-    Circle: { capacity: 50000, group: new CircleGroup(0) },
-    Cone: { capacity: 50000, group: new ConeGroup(0) },
-    EccentricCone: { capacity: 50000, group: new EccentricConeGroup(0) },
-    EllipsoidSegment: { capacity: 50000, group: new EllipsoidSegmentGroup(0) },
-    GeneralCylinder: { capacity: 50000, group: new GeneralCylinderGroup(0) },
-    GeneralRing: { capacity: 50000, group: new GeneralRingGroup(0) },
-    Nut: { capacity: 50000, group: new NutGroup(0) },
-    Quad: { capacity: 50000, group: new QuadGroup(0) },
-    SphericalSegment: { capacity: 50000, group: new SphericalSegmentGroup(0) },
-    TorusSegment: { capacity: 50000, group: new TorusSegmentGroup(0) },
-    Trapezium: { capacity: 50000, group: new TrapeziumGroup(0) },
+    Box: { capacity: 10000, group: new BoxGroup(0) },
+    Circle: { capacity: 10000, group: new CircleGroup(0) },
+    Cone: { capacity: 10000, group: new ConeGroup(0) },
+    EccentricCone: { capacity: 10000, group: new EccentricConeGroup(0) },
+    EllipsoidSegment: { capacity: 10000, group: new EllipsoidSegmentGroup(0) },
+    GeneralCylinder: { capacity: 10000, group: new GeneralCylinderGroup(0) },
+    GeneralRing: { capacity: 10000, group: new GeneralRingGroup(0) },
+    Nut: { capacity: 10000, group: new NutGroup(0) },
+    Quad: { capacity: 10000, group: new QuadGroup(0) },
+    SphericalSegment: { capacity: 10000, group: new SphericalSegmentGroup(0) },
+    TorusSegment: { capacity: 10000, group: new TorusSegmentGroup(0) },
+    Trapezium: { capacity: 10000, group: new TrapeziumGroup(0) },
   };
 
   const mergedMeshMap: InstancedMeshMap = {};
@@ -118,8 +118,8 @@ export default async function parseProtobuf(protobufData: Uint8Array, printParsi
     } = parseGeometries(webNode.geometries, instancedMeshMap, primitiveGroupMap);
 
     sector.primitiveGroups = primitiveGroups;
-    sector.mergedMeshGroup = mergedMeshGroup;
-    sector.instancedMeshGroup = instancedMeshGroup;
+    // sector.mergedMeshGroup = mergedMeshGroup;
+    // sector.instancedMeshGroup = instancedMeshGroup;
 
     // attach to parent
     const parentPath = getParentPath(path);

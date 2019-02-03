@@ -8,6 +8,7 @@ export class InstancedMeshMappings {
   public color: Float32Array;
   public nodeId: Float64Array;
   public treeIndex: Float32Array;
+  public maxTreeIndex: number;
   // The transformX arrays contain contain transformation matrix
   public transform0: Float32Array;
   public transform1: Float32Array;
@@ -21,6 +22,7 @@ export class InstancedMeshMappings {
     this.color = new Float32Array(3 * this.capacity);
     this.nodeId = new Float64Array(this.capacity);
     this.treeIndex = new Float32Array(this.capacity);
+    this.maxTreeIndex = -1;
 
     this.transform0 = new Float32Array(3 * this.capacity);
     this.transform1 = new Float32Array(3 * this.capacity);
@@ -146,6 +148,7 @@ export class InstancedMeshMappings {
   }
 
   private setTreeIndex(value: number, index: number) {
+    this.maxTreeIndex = Math.max(this.maxTreeIndex, value);
     this.treeIndex[index] = value;
   }
 
