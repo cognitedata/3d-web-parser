@@ -94,7 +94,6 @@ export default async function parseProtobuf(protobufData: Uint8Array) {
 
   const rootSector = nodes['0/'];
   for (const sector of rootSector.traverseSectors()) {
-    sector.mergedMeshGroup = new MergedMeshGroup();
     mergeInstancedMeshes(sector, 5000);
   }
 
