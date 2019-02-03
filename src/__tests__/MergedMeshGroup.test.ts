@@ -14,6 +14,10 @@ describe('MeshGroup', () => {
     expect(nodeMappings.color.length).toBe(3 * capacity);
     expect(nodeMappings.nodeId.length).toBe(capacity);
     expect(nodeMappings.treeIndex.length).toBe(capacity);
+    expect(nodeMappings.transform0.length).toBe(capacity);
+    expect(nodeMappings.transform1.length).toBe(capacity);
+    expect(nodeMappings.transform2.length).toBe(capacity);
+    expect(nodeMappings.transform3.length).toBe(capacity);
 
     let index = 0;
     // add first node mapping
@@ -35,6 +39,7 @@ describe('MeshGroup', () => {
       expect(nodeMappings.getTriangleCount(index)).toBe(triangleCount);
       expect(nodeMappings.getNodeId(index)).toBe(nodeId);
       expect(nodeMappings.getTreeIndex(index)).toBe(treeIndex);
+      expect(nodeMappings.hasTransform(index)).toBe(false);
 
       ++index;
     }
@@ -46,8 +51,15 @@ describe('MeshGroup', () => {
       const nodeId = 11;
       const treeIndex = 10;
       const color = new THREE.Color(0x00ff00);
+      const transformMatrix = new THREE.Matrix4();
+      transformMatrix.set(
+        11, 12, 13, 14,
+        21, 22, 23, 24,
+        31, 32, 33, 34,
+        0,  0,  0,  1,
+      );
 
-      nodeMappings.add(triangleOffset, triangleCount, nodeId, treeIndex, color);
+      nodeMappings.add(triangleOffset, triangleCount, nodeId, treeIndex, color, transformMatrix);
       expect(nodeMappings.count).toBe(index + 1);
       expect(nodeMappings.capacity).toBe(capacity);
 
@@ -58,6 +70,11 @@ describe('MeshGroup', () => {
       expect(nodeMappings.getTriangleCount(index)).toBe(triangleCount);
       expect(nodeMappings.getNodeId(index)).toBe(nodeId);
       expect(nodeMappings.getTreeIndex(index)).toBe(treeIndex);
+
+      const targetMatrix = new THREE.Matrix4();
+      expect(nodeMappings.hasTransform(index)).toBe(true);
+      expect(nodeMappings.getTransformMatrix(targetMatrix, index)).toBe(targetMatrix);
+      expect(targetMatrix.elements).toEqual(transformMatrix.elements);
     }
   });
 });

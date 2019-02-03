@@ -17,8 +17,7 @@ describe('Sectors', () => {
     expect(sector.depth).toBe(0);
     expect(sector.object3d.frustumCulled).toBe(false);
 
-    expect(sector.primitives.length).toBe(0);
-    expect(sector.mergedMeshes).toBeNull();
+    expect(sector.primitiveGroups.length).toBe(0);
   });
 
   test('add child', () => {

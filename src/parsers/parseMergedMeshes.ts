@@ -28,6 +28,7 @@ export default function parse(geometries: any[]): MergedMeshGroup {
 
     const nodes: any[] = geometry.nodes;
     const mergedMesh = new MergedMesh(nodes.length, fileId);
+
     let triangleOffset = 0;
     nodes.forEach(node => {
       const nodeId = Number(node.properties[0].nodeId);
@@ -37,7 +38,7 @@ export default function parse(geometries: any[]): MergedMeshGroup {
       mergedMesh.mappings.add(triangleOffset, triangleCount, nodeId, treeIndex, globalColor);
       triangleOffset += triangleCount;
     });
-    group.add(mergedMesh);
+    group.addMesh(mergedMesh);
   });
 
   return group;

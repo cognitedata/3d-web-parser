@@ -6,6 +6,8 @@ import * as THREE from 'three';
 import Sector from './Sector';
 import { Vector3, Group } from 'three';
 import { getParentPath } from './PathExtractor';
+import { InstancedMesh, InstancedMeshGroup } from './geometry/InstancedMeshGroup';
+import { MergedMesh } from './geometry/MergedMeshGroup';
 import PrimitiveGroup from './geometry/PrimitiveGroup';
 import GeometryGroup from './geometry/GeometryGroup';
 
@@ -24,6 +26,9 @@ import parseTrapeziums from './parsers/parseTrapeziums';
 import parseMergedMeshes from './parsers/parseMergedMeshes';
 import parseInstancedMeshes from './parsers/parseInstancedMeshes';
 
+import mergeInstancedMeshes from './optimizations/mergeInstancedMeshes';
+import { MergedMeshGroup } from './geometry/MergedMeshGroup';
+
 const primitiveParsers = [
   parseBoxes,
   parseCircles,
@@ -39,35 +44,45 @@ const primitiveParsers = [
   parseTrapeziums,
 ];
 
-function parseGeometries(geometries: GeometryGroup[]) {
-  const primitives: PrimitiveGroup[] = [];
+interface InstancedMeshMap { [key: number]: InstancedMesh; }
+
+function parseGeometries(geometries: GeometryGroup[],
+                         instancedMeshMap: InstancedMeshMap) {
+  const primitiveGroups: PrimitiveGroup[] = [];
   primitiveParsers.forEach(parser => {
     const group: PrimitiveGroup = parser(geometries);
     if (group.capacity > 0) {
-      primitives.push(group);
+      primitiveGroups.push(group);
     }
   });
 
-  const mergedMeshes = parseMergedMeshes(geometries);
-  const instancedMeshes = parseInstancedMeshes(geometries);
+  const mergedMeshGroup = parseMergedMeshes(geometries);
+  const instancedMeshGroup = parseInstancedMeshes(geometries, instancedMeshMap);
 
-  return { primitives, mergedMeshes, instancedMeshes };
+  return { primitiveGroups, mergedMeshGroup, instancedMeshGroup };
 }
 
 export default async function parseProtobuf(protobufData: Uint8Array) {
   const protobufDecoder = new ProtobufDecoder();
 
   const nodes: { [path: string]: Sector } = { };
+  const instancedMeshMap: { [key: number]: InstancedMesh } = {};
+  const mergedMeshMap: { [key: number]: MergedMesh } = {};
   for (const webNode of protobufDecoder.decodeWebScene(protobufData)) {
     const { boundingBox, path } = webNode;
     const boundingBoxMin = new Vector3(boundingBox.min.x, boundingBox.min.y, boundingBox.min.z);
     const boundingBoxMax = new Vector3(boundingBox.max.x, boundingBox.max.y, boundingBox.max.z);
     const sector = new Sector(boundingBoxMin, boundingBoxMax);
     nodes[path] = sector;
-    const { primitives, mergedMeshes, instancedMeshes } = parseGeometries(webNode.geometries);
-    sector.primitives = primitives;
-    sector.mergedMeshes = mergedMeshes;
-    sector.instancedMeshes = instancedMeshes;
+    const {
+      primitiveGroups,
+      mergedMeshGroup,
+      instancedMeshGroup,
+    } = parseGeometries(webNode.geometries, instancedMeshMap);
+
+    sector.primitiveGroups = primitiveGroups;
+    sector.mergedMeshGroup = mergedMeshGroup;
+    sector.instancedMeshGroup = instancedMeshGroup;
 
     // attach to parent
     const parentPath = getParentPath(path);
@@ -77,6 +92,12 @@ export default async function parseProtobuf(protobufData: Uint8Array) {
     }
   }
 
-  // return root node
-  return nodes['0/'];
+  const rootSector = nodes['0/'];
+  for (const sector of rootSector.traverseSectors()) {
+    sector.mergedMeshGroup = new MergedMeshGroup();
+    mergeInstancedMeshes(sector, 5000);
+  }
+
+  // return root sector
+  return rootSector;
 }

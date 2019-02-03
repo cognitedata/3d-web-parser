@@ -14,18 +14,18 @@ export default class Sector {
   public path: string;
   public children: Sector[];
   public parent: undefined | Sector;
-  public primitives: PrimitiveGroup[];
-  public mergedMeshes: null|MergedMeshGroup;
-  public instancedMeshes: null|InstancedMeshGroup;
+  public primitiveGroups: PrimitiveGroup[];
+  public mergedMeshGroup: MergedMeshGroup;
+  public instancedMeshGroup: InstancedMeshGroup;
   public readonly object3d: THREE.Object3D;
 
   constructor(min: THREE.Vector3, max: THREE.Vector3) {
     this.min = min;
     this.max = max;
     this.path = '0/';
-    this.primitives = [];
-    this.mergedMeshes = null;
-    this.instancedMeshes = null;
+    this.primitiveGroups = [];
+    this.mergedMeshGroup = new MergedMeshGroup();
+    this.instancedMeshGroup = new InstancedMeshGroup();
     this.depth = 0;
     this.object3d = new THREE.Object3D();
     this.object3d.frustumCulled = false;
@@ -50,7 +50,7 @@ export default class Sector {
 
   *traversePrimitiveGroups(): IterableIterator<PrimitiveGroup> {
     for (const child of this.traverseSectors()) {
-      for (const geometryGroup of child.primitives) {
+      for (const geometryGroup of child.primitiveGroups) {
         yield geometryGroup;
       }
     }
@@ -64,12 +64,16 @@ export default class Sector {
         byProperty: {},
       };
     }
-    this.primitives.forEach(geometryGroup => {
+    this.primitiveGroups.forEach(geometryGroup => {
       geometryGroup.memoryUsage(usage);
     });
 
-    if (this.mergedMeshes != null) {
-      this.mergedMeshes.memoryUsage(usage);
+    if (this.mergedMeshGroup != null) {
+      this.mergedMeshGroup.memoryUsage(usage);
+    }
+
+    if (this.instancedMeshGroup != null) {
+      this.instancedMeshGroup.memoryUsage(usage);
     }
 
     if (recursive) {

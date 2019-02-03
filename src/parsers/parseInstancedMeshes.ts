@@ -20,7 +20,26 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-export default function parse(geometries: any[]): InstancedMeshGroup {
+function createCollection(node: any) {
+  const { triangleCount, triangleOffset } = node;
+  const collection = new InstancedMeshCollection(
+    triangleOffset,
+    triangleCount,
+    node.properties.length,
+  );
+  // @ts-ignore
+  node.properties.forEach(property => {
+    const nodeId = Number(property.nodeId);
+    const { color, treeIndex, transformMatrix } = property;
+    globalColor.setHex(color.rgb);
+    parseInstancedMeshTransformMatrix(globalMatrix, transformMatrix);
+    collection.addMapping(nodeId, treeIndex, globalColor, globalMatrix);
+  });
+  return collection;
+}
+
+export default function parse(geometries: any[],
+                              instancedMeshMap: { [key: number]: InstancedMesh }): InstancedMeshGroup {
   const matchingGeometries = findMatchingGeometries(geometries);
   const group = new InstancedMeshGroup();
 
@@ -28,25 +47,23 @@ export default function parse(geometries: any[]): InstancedMeshGroup {
     const fileId = geometry.file[0].fileId;
 
     const nodes: any[] = geometry.nodes;
-    const instancedMesh = new InstancedMesh(nodes.length, fileId);
+
+    let didCreateNewInstancedMesh = false;
+    if (instancedMeshMap[fileId] == null) {
+      instancedMeshMap[fileId] = new InstancedMesh(fileId);
+      didCreateNewInstancedMesh = true;
+    }
+    const instancedMesh = instancedMeshMap[fileId];
+
     nodes.forEach(node => {
-      const { triangleCount, triangleOffset } = node;
-      const collection = new InstancedMeshCollection(
-        triangleOffset,
-        triangleCount,
-        node.properties.length,
-      );
-      // @ts-ignore
-      node.properties.forEach(property => {
-        const nodeId = Number(property.nodeId);
-        const { color, treeIndex, transformMatrix } = property;
-        globalColor.setHex(color.rgb);
-        parseInstancedMeshTransformMatrix(globalMatrix, transformMatrix);
-        collection.addMapping(nodeId, treeIndex, globalColor, globalMatrix);
-      });
-      instancedMesh.addCollection(collection);
+      instancedMesh.addCollection(createCollection(node));
     });
-    group.addMesh(instancedMesh);
+
+    // Only add it to the group if we created a new one. If we didn't,
+    // the instanced mesh is on another sector.
+    if (didCreateNewInstancedMesh) {
+      group.addMesh(instancedMesh);
+    }
 
   });
 

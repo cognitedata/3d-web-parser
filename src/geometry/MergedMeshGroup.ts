@@ -10,6 +10,12 @@ export class MergedMeshMappings {
   public nodeId: Float64Array;
   public treeIndex: Float32Array;
 
+  // The transformX arrays contain contain transformation matrix
+  public transform0: Float32Array[];
+  public transform1: Float32Array[];
+  public transform2: Float32Array[];
+  public transform3: Float32Array[];
+
   constructor(capacity: number) {
     this.count = 0;
     this.capacity = capacity;
@@ -18,6 +24,11 @@ export class MergedMeshMappings {
     this.color = new Float32Array(3 * this.capacity);
     this.nodeId = new Float64Array(this.capacity);
     this.treeIndex = new Float32Array(this.capacity);
+
+    this.transform0 = []; this.transform0.length = capacity;
+    this.transform1 = []; this.transform1.length = capacity;
+    this.transform2 = []; this.transform2.length = capacity;
+    this.transform3 = []; this.transform3.length = capacity;
 }
 
   public add(
@@ -26,13 +37,20 @@ export class MergedMeshMappings {
     nodeId: number,
     treeIndex: number,
     color: THREE.Color,
+    transformMatrix?: THREE.Matrix4,
   ) {
+    if (this.count + 1 > this.capacity) {
+      throw 'Error in MergedMeshMappings::add. Trying to add more than capacity.';
+    }
+
     this.setTriangleOffset(triangleOffset, this.count);
     this.setTriangleCount(triangleCount, this.count);
     this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
     this.setColor(color, this.count);
-
+    if (transformMatrix !== undefined) {
+      this.setTransform(transformMatrix, this.count);
+    }
     this.count += 1;
   }
 
@@ -52,6 +70,29 @@ export class MergedMeshMappings {
 
   public getTreeIndex(index: number): number {
     return this.treeIndex[index];
+  }
+
+  public hasTransform(index: number): boolean {
+    return this.transform0[index] !== undefined;
+  }
+
+  public getTransformMatrix(target: THREE.Matrix4, index: number) {
+    const columns = [0, 1, 2, 3].map(columnIndex => {
+      // @ts-ignore
+      const transform = this[`transform${columnIndex}`];
+      return transform[index];
+    });
+    const [ n11, n21, n31 ] = columns[0];
+    const [ n12, n22, n32 ] = columns[1];
+    const [ n13, n23, n33 ] = columns[2];
+    const [ n14, n24, n34 ] = columns[3];
+    target.set(
+      n11, n12, n13, n14,
+      n21, n22, n23, n24,
+      n31, n32, n33, n34,
+      0,   0,   0,   1,
+    );
+    return target;
   }
 
   public getTriangleCount(index: number) {
@@ -84,6 +125,20 @@ export class MergedMeshMappings {
   private setTreeIndex(value: number, index: number) {
     this.treeIndex[index] = value;
   }
+
+  private setTransform(source: THREE.Matrix4, index: number) {
+    const columns = [0, 1, 2, 3].map(columnIndex => {
+      // @ts-ignore
+      const transform = this[`transform${columnIndex}`];
+      return transform[this.count] = new Float32Array(3);
+    });
+    let matrixIndex = 0;
+    for (let columnIndex = 0; columnIndex < 4; ++columnIndex, ++matrixIndex) {
+      for (let rowIndex = 0; rowIndex < 3; ++rowIndex) {
+        columns[columnIndex][rowIndex] = source.elements[matrixIndex++];
+      }
+    }
+  }
 }
 
 export class MergedMesh {
@@ -91,11 +146,13 @@ export class MergedMesh {
   fileId: number;
   geometry: null|THREE.Mesh;
   treeIndexMap: { [s: number]: number; };
-  constructor(capacity: number, fileId: number) {
+  createdByInstancedMesh: boolean;
+  constructor(capacity: number, fileId: number, createdByInstancedMesh: boolean = false) {
     this.mappings = new MergedMeshMappings(capacity);
     this.geometry = null;
     this.fileId = fileId;
     this.treeIndexMap = {};
+    this.createdByInstancedMesh = createdByInstancedMesh;
   }
 }
 
@@ -107,7 +164,7 @@ export class MergedMeshGroup extends GeometryGroup {
     this.type = 'MergedMesh';
   }
 
-  add(mesh: MergedMesh) {
+  addMesh(mesh: MergedMesh) {
     this.meshes.push(mesh);
   }
 

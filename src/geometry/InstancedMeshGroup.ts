@@ -186,7 +186,7 @@ export class InstancedMesh {
   geometry: null|THREE.Mesh;
   treeIndexMap: { [s: number]: number; };
   collectionByTriangleOffset: { [s: number]: InstancedMeshCollection; };
-  constructor(capacity: number, fileId: number) {
+  constructor(fileId: number) {
     this.collections = [];
     this.geometry = null;
     this.fileId = fileId;
@@ -195,11 +195,16 @@ export class InstancedMesh {
   }
 
   addCollection(collection: InstancedMeshCollection) {
+    // A collection is a geometry with a specific triangleOffset in a file.
+    // If another collection shares the same file and triangleOffset, we can merge
+    // the two collections to render them in the same draw call.
     const existingCollection = this.collectionByTriangleOffset[collection.triangleOffset];
     if (existingCollection != null) {
-
+      existingCollection.mappings.mergeWithMappings(collection.mappings);
+    } else {
+      this.collections.push(collection);
+      this.collectionByTriangleOffset[collection.triangleOffset] = collection;
     }
-    this.collections.push(collection);
   }
 }
 
