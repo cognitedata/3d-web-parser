@@ -1,6 +1,6 @@
-import { Counts } from './sharedFileParserTypes';
+import { Counts, SectorInformation } from './sharedFileParserTypes';
 
-export default function countGeometries(segmentInformation: any) {
+export default function countGeometries(segmentInformation: SectorInformation) {
   const counts: Counts = {
     box: 0,
     circle: 0,
@@ -18,9 +18,10 @@ export default function countGeometries(segmentInformation: any) {
     instancedMesh: 0,
   };
 
-  for (let i = 0; i < segmentInformation.geometryIndexes.length; i++) {
-    const geometryInfo = segmentInformation.geometryIndexes[i];
-    switch (segmentInformation.geometryIndexes[i].name) {
+  const keys = Object.keys(segmentInformation.geometryIndexes);
+  for (let i = 0; i < keys.length; i++) {
+    const geometryInfo = segmentInformation.geometryIndexes[keys[i]];
+    switch (geometryInfo.name) {
       case 'Box':
         counts.box += geometryInfo.geometryCount;
         break;

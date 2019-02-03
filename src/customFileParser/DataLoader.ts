@@ -13,7 +13,7 @@ export default class DataLoader {
   public radiusA = 0;
   public radiusB = 0;
   public capNormal = new THREE.Vector3();
-  public rotationalAngle = 0;
+  public rotationAngle = 0;
   public arcAngle = 0;
 
   // unique to general cylinder

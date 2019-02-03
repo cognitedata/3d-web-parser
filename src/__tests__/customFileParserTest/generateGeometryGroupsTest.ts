@@ -1,7 +1,9 @@
 import readSegmentFile from '../../customFileParser/readSegmentFile';
-import generateGeometryGroups from '../../customFileParser/generateGeometryGroups';
+import loadGeometryGroup from '../../customFileParser/generateGeometryGroups';
+import countGeometries from '../../customFileParser/countGeometries';
 import * as THREE from 'three';
 const fs = require('fs');
+import { GeometryGroups } from '../../customFileParser/sharedFileParserTypes';
 
 describe('generateGeometryGroups', () => {
   test('generate groups', async() => {
@@ -14,14 +16,15 @@ describe('generateGeometryGroups', () => {
     }
 
     const parsedFile = readSegmentFile(asArrayBuffer, true);
-    const geometryGroups = generateGeometryGroups(parsedFile);
+    const counts = countGeometries(parsedFile);
+    const geometryGroups = new GeometryGroups(counts);
 
-    console.log(geometryGroups);
+    loadGeometryGroup(geometryGroups, parsedFile, 'Box');
 
     expect(geometryGroups).toBeDefined();
 
     expect(geometryGroups.box.capacity).toBe(327);
-    expect(geometryGroups.circle.capacity).toBe(251 + 2 * 435);
-    expect(geometryGroups.cone.capacity).toBe(435);
+    // expect(geometryGroups.circle.capacity).toBe(251 + 2 * 435);
+    // expect(geometryGroups.cone.capacity).toBe(435);
   });
 });

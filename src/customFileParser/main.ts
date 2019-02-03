@@ -5,45 +5,40 @@ import * as THREE from 'three';
 
 import countGeometries from './countGeometries';
 
-import BoxGroup from '../geometry/BoxGroup';
-import CircleGroup from '../geometry/CircleGroup';
-import ConeGroup from '../geometry/ConeGroup';
-import EccentricConeGroup from '../geometry/EccentricConeGroup';
-import EllipsoidSegmentGroup from '../geometry/EllipsoidSegmentGroup';
-import GeneralCylinderGroup from '../geometry/GeneralCylinderGroup';
-import GeneralRingGroup from '../geometry/GeneralRingGroup';
-import NutGroup from '../geometry/NutGroup';
-import QuadGroup from '../geometry/QuadGroup';
-import SphericalSegmentGroup from '../geometry/SphericalSegmentGroup';
-import TorusSegmentGroup from '../geometry/TorusSegmentGroup';
-import TrapeziumGroup from '../geometry/TrapeziumGroup';
-import { MergedMeshMappings } from '../geometry/MergedMeshGroup';
-import { InstancedMeshMappings } from '../geometry/InstancedMeshGroup';
-
 import { GeometryGroups } from './sharedFileParserTypes';
 
-export default function parseCustomFile(incomingFile: Uint8Array) {
+export default function parseCustomFile(incomingFile: ArrayBuffer) {
   const parsedFile = readSegmentFile(incomingFile, true);
   const counts = countGeometries(parsedFile);
 
-  const groups: GeometryGroups = {
-    box: new BoxGroup(counts.box),
-    circle: new CircleGroup(counts.circle),
-    cone: new ConeGroup(counts.cone),
-    eccentricCone: new EccentricConeGroup(counts.eccentricCone),
-    ellipsoidSegment: new EllipsoidSegmentGroup(counts.ellipsoidSegment),
-    generalCylinder: new GeneralCylinderGroup(counts.generalCylinder),
-    generalRing: new GeneralRingGroup(counts.generalRing),
-    nut: new NutGroup(counts.nut),
-    quad: new QuadGroup(counts.quad),
-    sphericalSegment: new SphericalSegmentGroup(counts.generalCylinder),
-    torusSegment: new TorusSegmentGroup(counts.torusSegment),
-    trapezium: new TrapeziumGroup(counts.trapezium),
-    triangleMesh: new MergedMeshMappings(counts.triangleMesh),
-    instancedMesh: new InstancedMeshMappings(counts.instancedMesh),
-  };
+  const groups = new GeometryGroups(counts);
 
   loadGeometryGroup(groups, parsedFile, 'Box');
+  loadGeometryGroup(groups, parsedFile, 'Circle');
+  loadGeometryGroup(groups, parsedFile, 'ClosedCone');
+  loadGeometryGroup(groups, parsedFile, 'ClosedCylinder');
+  loadGeometryGroup(groups, parsedFile, 'ClosedEccentricCone');
+  loadGeometryGroup(groups, parsedFile, 'ClosedEllipsoidSegment');
+  loadGeometryGroup(groups, parsedFile, 'ClosedExtrudedRingSegment');
+  loadGeometryGroup(groups, parsedFile, 'ClosedGeneralCylinder');
+  loadGeometryGroup(groups, parsedFile, 'ClosedSphericalSegment');
+  loadGeometryGroup(groups, parsedFile, 'ClosedTorusSegment');
+  loadGeometryGroup(groups, parsedFile, 'Ellipsoid');
+  loadGeometryGroup(groups, parsedFile, 'ExtrudedRing');
+  loadGeometryGroup(groups, parsedFile, 'Nut');
+  loadGeometryGroup(groups, parsedFile, 'OpenCone');
+  loadGeometryGroup(groups, parsedFile, 'OpenCylinder');
+  loadGeometryGroup(groups, parsedFile, 'OpenEccentricCone');
+  loadGeometryGroup(groups, parsedFile, 'OpenEllipsoidSegment');
+  loadGeometryGroup(groups, parsedFile, 'OpenExtrudedRingSegment');
+  loadGeometryGroup(groups, parsedFile, 'OpenGeneralCylinder');
+  loadGeometryGroup(groups, parsedFile, 'OpenSphericalSegment');
+  loadGeometryGroup(groups, parsedFile, 'OpenTorusSegment');
+  loadGeometryGroup(groups, parsedFile, 'Ring');
+  loadGeometryGroup(groups, parsedFile, 'Sphere');
+  loadGeometryGroup(groups, parsedFile, 'Torus');
+  loadGeometryGroup(groups, parsedFile, 'TriangleMesh');
+  loadGeometryGroup(groups, parsedFile, 'InstancedMesh');
 
   const sector = new Sector(new THREE.Vector3(0, 0, 0), new THREE.Vector3(1000, 1000, 1000));
 

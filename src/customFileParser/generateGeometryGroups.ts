@@ -1,143 +1,102 @@
 import * as THREE from 'three';
-
-<<<<<<< HEAD
 import { SectorInformation, GeometryGroups } from './sharedFileParserTypes';
-
 import DataLoader from './DataLoader';
 
-export default function loadGeometryGroup(groups: GeometryGroups, segmentInformation: SectorInformation, groupName: string) {
-=======
-import { propertyNames, GeometryGroups } from './sharedFileParserTypes';
-import countGeometries from './countGeometries';
-import BoxGroup from '../geometry/BoxGroup';
-import CircleGroup from '../geometry/CircleGroup';
-import ConeGroup from '../geometry/ConeGroup';
-import EccentricConeGroup from '../geometry/EccentricConeGroup';
-import GeneralCylinderGroup from '../geometry/GeneralCylinderGroup';
-import GeneralRingGroup from '../geometry/GeneralRingGroup';
-import NutGroup from '../geometry/NutGroup';
-import QuadGroup from '../geometry/QuadGroup';
-import SphericalSegmentGroup from '../geometry/SphericalSegmentGroup';
-import TorusSegmentGroup from '../geometry/TorusSegmentGroup';
-import TrapeziumGroup from '../geometry/TrapeziumGroup';
-
-import DataLoader from './DataLoader';
-
-export default function generateGeometryGroups(segmentInformation: any) {
-  const counts = countGeometries(segmentInformation);
-
-  const groups: GeometryGroups = {
-    box: new BoxGroup(counts.box),
-    circle: new CircleGroup(counts.circle),
-    cone: new ConeGroup(counts.cone),
-    eccentricCone: new EccentricConeGroup(counts.eccentricCone),
-    generalCylinder: new GeneralCylinderGroup(counts.generalCylinder),
-    generalRing: new GeneralRingGroup(counts.generalRing),
-    nut: new NutGroup(counts.nut),
-    quad: new QuadGroup(counts.quad),
-    sphericalSegment: new SphericalSegmentGroup(counts.generalCylinder),
-    torusSegment: new TorusSegmentGroup(counts.torusSegment),
-    trapezium: new TrapeziumGroup(counts.trapezium),
-  };
->>>>>>> 30f6a6c200fb85fcbe9e7ae9df94c8bec61b658c
+export default function loadGeometryGroup(
+  groups: GeometryGroups, segmentInformation: SectorInformation, groupName: string) {
 
   const data = new DataLoader(segmentInformation.propertyTrueValues);
   const centerA = new THREE.Vector3();
   const centerB = new THREE.Vector3();
 
-<<<<<<< HEAD
-    const geometryInfo = segmentInformation.geometryIndexes[groupName];
-=======
-  for (let i = 0; i < segmentInformation.geometryIndexes.length; i++) {
-    const geometryInfo = segmentInformation.geometryIndexes[i];
->>>>>>> 30f6a6c200fb85fcbe9e7ae9df94c8bec61b658c
+  const geometryInfo = segmentInformation.geometryIndexes[groupName];
 
-    for (let j = 0; j < geometryInfo.geometryCount; j++) {
-      data.loadData(geometryInfo);
-      switch (geometryInfo.name) {
-        case 'Box':
-          groups.box.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal,
-            data.rotationalAngle, data.delta);
-          break;
-        case 'Circle':
-          groups.circle.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal,
-            data.radiusA);
-          break;
-        case 'ClosedCone':
+  if (!geometryInfo) {
+    console.log('type ' + groupName + ' not found in file');
+    return;
+  }
+
+  for (let j = 0; j < geometryInfo.geometryCount; j++) {
+    data.loadData(geometryInfo);
+    switch (geometryInfo.name) {
+      case 'Box':
+        groups.box.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal,
+          data.rotationAngle, data.delta);
+        break;
+      case 'Circle':
+        groups.circle.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal,
+          data.radiusA);
+        break;
+      case 'ClosedCone':
         // center +/- normal*height/2
-          centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
-          centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
-          groups.cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB,
-            data.radiusA, data.radiusB, data.rotationalAngle);
-          groups.circle.add(data.nodeId, data.treeIndex, data.color, centerA, data.normal, data.radiusA);
-          groups.circle.add(data.nodeId, data.treeIndex, data.color, centerB, data.normal, data.radiusB);
-          break;
-        case 'ClosedCylinder':
-          centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
-          centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
-          groups.cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB,
-            data.radiusA, data.radiusA, data.rotationalAngle);
-          groups.circle.add(data.nodeId, data.treeIndex, data.color, centerA, data.normal, data.radiusA);
-          groups.circle.add(data.nodeId, data.treeIndex, data.color, centerB, data.normal, data.radiusA);
-          break;
-        case 'ClosedEccentricCone':
-          centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
-          centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
-          groups.eccentricCone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB,
-<<<<<<< HEAD
-            data.radiusA, data.radiusA, data.normal);
-=======
-            data.radiusA, data.radiusA, data.rotationalAngle);
->>>>>>> 30f6a6c200fb85fcbe9e7ae9df94c8bec61b658c
-          groups.circle.add(data.nodeId, data.treeIndex, data.color, centerA, data.normal, data.radiusA);
-          groups.circle.add(data.nodeId, data.treeIndex, data.color, centerB, data.normal, data.radiusA);
-          break;
-        case 'ClosedElipsoidSegment':
-<<<<<<< HEAD
-          groups.ellipsoidSegment.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal, data.radiusA,
-            data.radiusB, data.height);
-          // And something else
-          break;
-        case 'ClosedExtrudedRingSegment':
-          centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
-          centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
-          groups.generalRing.add(data.nodeId, data.treeIndex, data.color, centerA, data.normal,
-            new THREE.Vector3(0, 0, 1), data.radiusA, data.radiusA, data.radiusA - data.radiusB,
-            data.rotationalAngle, data.arcAngle);
-          groups.generalRing.add(data.nodeId, data.treeIndex, data.color, centerB, data.normal,
-            new THREE.Vector3(0, 0, 1), data.radiusA, data.radiusA, data.radiusA - data.radiusB,
-            data.rotationalAngle, data.arcAngle);
-          groups.cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB, data.radiusA,
-            data.radiusA, data.rotationalAngle, data.arcAngle);
-          groups.cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB, data.radiusB,
-            data.radiusB, data.rotationalAngle, data.arcAngle);
-          // groups.quad.add
-          // groups.quad.add
-          break;
-        case 'ClosedGeneralCylinder':
-          groups.generalCylinder.add(data.nodeId, data.treeIndex, data.color, centerA, centerB, data.radiusA,
-            data.height / 2, data.height / 2, data.slopeA, data.slopeB, data.zAngleA, data.zAngleB,
-            data.rotationalAngle, data.arcAngle);
-          // groups.generalRing.add
-          // groups.generalRing.add
-          break;
-        case 'ClosedSphericalSegment':
-          groups.circle.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal, data.radiusA);
-          groups.sphericalSegment.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal,
-            data.radiusA, data.height);
-          break;
-        case 'ClosedTorusSegment':
-          // groups.circle.add
-          // groups.circle.add
-          groups.torusSegment.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal, data.radiusA,
-            data.radiusB, data.rotationalAngle, data.arcAngle);
-          break;
-        case 'Ellipsoid':
-          groups.ellipsoidSegment.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal, data.radiusA,
-            data.radiusB, data.radiusB * 2);
-          // And something else
-          break;
-        case 'ExtrudedRing':
+        centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
+        centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
+        groups.cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB,
+          data.radiusA, data.radiusB, data.rotationAngle);
+        groups.circle.add(data.nodeId, data.treeIndex, data.color, centerA, data.normal, data.radiusA);
+        groups.circle.add(data.nodeId, data.treeIndex, data.color, centerB, data.normal, data.radiusB);
+        break;
+      case 'ClosedCylinder':
+        centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
+        centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
+        groups.cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB,
+          data.radiusA, data.radiusA, data.rotationAngle);
+        groups.circle.add(data.nodeId, data.treeIndex, data.color, centerA, data.normal, data.radiusA);
+        groups.circle.add(data.nodeId, data.treeIndex, data.color, centerB, data.normal, data.radiusA);
+        break;
+      case 'ClosedEccentricCone':
+        centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
+        centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
+        groups.eccentricCone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB,
+          data.radiusA, data.radiusA, data.normal);
+        groups.circle.add(data.nodeId, data.treeIndex, data.color, centerA, data.normal, data.radiusA);
+        groups.circle.add(data.nodeId, data.treeIndex, data.color, centerB, data.normal, data.radiusA);
+        break;
+      case 'ClosedElipsoidSegment':
+        groups.ellipsoidSegment.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal, data.radiusA,
+          data.radiusB, data.height);
+        // And something else
+        break;
+      case 'ClosedExtrudedRingSegment':
+        centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
+        centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
+        groups.generalRing.add(data.nodeId, data.treeIndex, data.color, centerA, data.normal,
+          new THREE.Vector3(0, 0, 1), data.radiusA, data.radiusA, data.radiusA - data.radiusB,
+          data.rotationAngle, data.arcAngle);
+        groups.generalRing.add(data.nodeId, data.treeIndex, data.color, centerB, data.normal,
+          new THREE.Vector3(0, 0, 1), data.radiusA, data.radiusA, data.radiusA - data.radiusB,
+          data.rotationAngle, data.arcAngle);
+        groups.cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB, data.radiusA,
+          data.radiusA, data.rotationAngle, data.arcAngle);
+        groups.cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB, data.radiusB,
+          data.radiusB, data.rotationAngle, data.arcAngle);
+        // groups.quad.add
+        // groups.quad.add
+        break;
+      case 'ClosedGeneralCylinder':
+        groups.generalCylinder.add(data.nodeId, data.treeIndex, data.color, centerA, centerB, data.radiusA,
+          data.height / 2, data.height / 2, data.slopeA, data.slopeB, data.zAngleA, data.zAngleB,
+          data.rotationAngle, data.arcAngle);
+        // groups.generalRing.add
+        // groups.generalRing.add
+        break;
+      case 'ClosedSphericalSegment':
+        groups.circle.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal, data.radiusA);
+        groups.sphericalSegment.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal,
+          data.radiusA, data.height);
+        break;
+      case 'ClosedTorusSegment':
+        // groups.circle.add
+        // groups.circle.add
+        groups.torusSegment.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal, data.radiusA,
+          data.radiusB, data.rotationAngle, data.arcAngle);
+        break;
+      case 'Ellipsoid':
+        groups.ellipsoidSegment.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal, data.radiusA,
+          data.radiusB, data.radiusB * 2);
+        // And something else
+        break;
+      case 'ExtrudedRing':
         centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
         centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
         groups.generalRing.add(data.nodeId, data.treeIndex, data.color, centerA, data.normal,
@@ -148,155 +107,83 @@ export default function generateGeometryGroups(segmentInformation: any) {
           data.radiusA);
         groups.cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB, data.radiusA,
           data.radiusA);
-          break;
-        case 'Nut':
-          centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
-          centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
-          groups.nut.add(data.nodeId, data.treeIndex, data.color, centerA, centerB,
-            data.radiusA, data.rotationalAngle);
-          break;
-        case 'OpenCone':
-          centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
-          centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
-          groups.cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB,
-          data.radiusA, data.radiusB, data.rotationalAngle);
-          break;
-        case 'OpenCylinder':
-          centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
-          centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
-          groups.cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB,
-          data.radiusA, data.radiusA, data.rotationalAngle);
-          break;
-        case 'OpenEccentricCone':
-          centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
-          centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
-          groups.eccentricCone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB,
-            data.radiusA, data.radiusA, data.normal);
-          break;
-        case 'OpenEllipsoidSegment':
-          groups.ellipsoidSegment.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal, data.radiusA,
-            data.radiusB, data.radiusB * 2);
-          break;
-        case 'OpenExtrudedRingSegment':
-          centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
-          centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
-          groups.generalRing.add(data.nodeId, data.treeIndex, data.color, centerA, data.normal,
-            new THREE.Vector3(0, 0, 1), data.radiusA, data.radiusA, data.radiusA - data.radiusB,
-            data.rotationalAngle, data.arcAngle);
-          groups.generalRing.add(data.nodeId, data.treeIndex, data.color, centerB, data.normal,
-            new THREE.Vector3(0, 0, 1), data.radiusA, data.radiusA, data.radiusA - data.radiusB,
-            data.rotationalAngle, data.arcAngle);
-          groups.cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB, data.radiusA,
-            data.radiusA, data.rotationalAngle, data.arcAngle);
-          groups.cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB, data.radiusB,
-            data.radiusB, data.rotationalAngle, data.arcAngle);
-          break;
-        case 'OpenGeneralCylinder':
-          groups.generalCylinder.add(data.nodeId, data.treeIndex, data.color, centerA, centerB, data.radiusA,
-            data.height/2, data.height/2, data.slopeA, data.slopeB, data.zAngleA, data.zAngleB, data.rotationalAngle,
-            data.arcAngle);
-          break;
-        case 'OpenSphericalSegment':
-          groups.sphericalSegment.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal,
-            data.radiusA, data.height);
-          break;
-        case 'OpenTorusSegment':
-          groups.torusSegment.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal, data.radiusA,
-            data.radiusB, data.rotationalAngle, data.arcAngle);
-          break;
-        case 'Ring':
-          groups.generalRing.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal, new THREE.Vector3(1,0,0),
-          data.radiusA, data.radiusA, data.radiusA - data.radiusB, data.rotationalAngle, data.arcAngle);
-          break;
-        case 'Sphere':
-          groups.sphericalSegment.add(data.nodeId, data.treeIndex, data.color, data.center, new THREE.Vector3(1,0,0), data.radiusA, 2 * data.radiusA);
-          break;
-        case 'Torus':
-          groups.torusSegment.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal, data.radiusA, data.radiusB,
-            data.rotationalAngle, data.arcAngle);
-          break;
-        case 'TriangleMesh':
-          // groups.triangleMesh.add(data.triangleOffset, data.triangleCount, data.nodeId, data.treeIndex, data.color);
-          break;
-        case 'InstancedMesh':
-          // groups.instancedMesh.add(data.nodeId, data.treeIndex, data.color, data.)
-=======
-          // Group.add(nodeId, treeIndex, data.color);
-          break;
-        case 'ClosedExtrudedRingSegment':
-          // groups.generalRing.add(nodeId, treeIndex, data.color, center, data.normal,
-          // localXAxis, xRadius, yRadius, thickness, angle? arcAngle?);
-          break;
-        case 'ClosedGeneralCylinder':
-          // groups.generalCylinder.add(nodeId, treeIndex, data.color);
-          break;
-        case 'ClosedSphericalSegment':
-          // groups.sphericalSegment.add(nodeId, treeIndex, data.color);
-          break;
-        case 'ClosedTorusSegment':
-          // groups.torusSegment.add(nodeId, treeIndex, data.color);
-          break;
-        case 'Ellipsoid':
-          // Group.add(nodeId, treeIndex, data.color);
-          break;
-        case 'ExtrudedRing':
-          // groups.generalRing.add(nodeId, treeIndex, data.color);
-          break;
-        case 'Nut':
-          // groups.nut.add(nodeId, treeIndex, data.color);
-          break;
-        case 'OpenCone':
-          // groups.cone.add(nodeId, treeIndex, data.color);
-          break;
-        case 'OpenCylinder':
-          // groups.generalCylinder.add(nodeId, treeIndex, data.color);
-          break;
-        case 'OpenEccentricCone':
-          // groups.cone.add(nodeId, treeIndex, data.color);
-          break;
-        case 'OpenEllipsoidSegment':
-          // Group.add(nodeId, treeIndex, data.color);
-          break;
-        case 'OpenExtrudedRingSegment':
-          // groups.generalRing.add(nodeId, treeIndex, color);
-          break;
-        case 'OpenGeneralCylinder':
-          // groups.generalCylinder.add(nodeId, treeIndex, color);
-          break;
-        case 'OpenSphericalSegment':
-          // groups.sphericalSegment.add(nodeId, treeIndex, color);
-          break;
-        case 'OpenTorusSegment':
-          // blah
-          break;
-        case 'Ring':
-          // groups.generalRing.add(nodeId, treeIndex, color);
-          break;
-        case 'Sphere':
-          // groups.sphericalSegment.add(nodeId, treeIndex, color);
-          break;
-        case 'Torus':
-          // groups.torusSegment.add(nodeId, treeIndex, color);
-          break;
-        case 'TriangleMesh':
-          // asdf
-          break;
-        case 'InstancedMesh':
-          //
->>>>>>> 30f6a6c200fb85fcbe9e7ae9df94c8bec61b658c
-          break;
-        default:
-          throw Error('Unrecognized geometry name ' + geometryInfo.name);
-      }
-<<<<<<< HEAD
-  }
-  return groups;
-}
-=======
+        break;
+      case 'Nut':
+        centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
+        centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
+        groups.nut.add(data.nodeId, data.treeIndex, data.color, centerA, centerB,
+          data.radiusA, data.rotationAngle);
+        break;
+      case 'OpenCone':
+        centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
+        centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
+        groups.cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB,
+        data.radiusA, data.radiusB, data.rotationAngle);
+        break;
+      case 'OpenCylinder':
+        centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
+        centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
+        groups.cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB,
+        data.radiusA, data.radiusA, data.rotationAngle);
+        break;
+      case 'OpenEccentricCone':
+        centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
+        centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
+        groups.eccentricCone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB,
+          data.radiusA, data.radiusA, data.normal);
+        break;
+      case 'OpenEllipsoidSegment':
+        groups.ellipsoidSegment.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal, data.radiusA,
+          data.radiusB, data.radiusB * 2);
+        break;
+      case 'OpenExtrudedRingSegment':
+        centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
+        centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
+        groups.generalRing.add(data.nodeId, data.treeIndex, data.color, centerA, data.normal,
+          new THREE.Vector3(0, 0, 1), data.radiusA, data.radiusA, data.radiusA - data.radiusB,
+          data.rotationAngle, data.arcAngle);
+        groups.generalRing.add(data.nodeId, data.treeIndex, data.color, centerB, data.normal,
+          new THREE.Vector3(0, 0, 1), data.radiusA, data.radiusA, data.radiusA - data.radiusB,
+          data.rotationAngle, data.arcAngle);
+        groups.cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB, data.radiusA,
+          data.radiusA, data.rotationAngle, data.arcAngle);
+        groups.cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB, data.radiusB,
+          data.radiusB, data.rotationAngle, data.arcAngle);
+        break;
+      case 'OpenGeneralCylinder':
+        groups.generalCylinder.add(data.nodeId, data.treeIndex, data.color, centerA, centerB, data.radiusA,
+          data.height / 2, data.height / 2, data.slopeA, data.slopeB, data.zAngleA, data.zAngleB, data.rotationAngle,
+          data.arcAngle);
+        break;
+      case 'OpenSphericalSegment':
+        groups.sphericalSegment.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal,
+          data.radiusA, data.height);
+        break;
+      case 'OpenTorusSegment':
+        groups.torusSegment.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal, data.radiusA,
+          data.radiusB, data.rotationAngle, data.arcAngle);
+        break;
+      case 'Ring':
+        groups.generalRing.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal,
+          new THREE.Vector3(1, 0, 0), data.radiusA, data.radiusA, data.radiusA - data.radiusB,
+          data.rotationAngle, data.arcAngle);
+        break;
+      case 'Sphere':
+        groups.sphericalSegment.add(data.nodeId, data.treeIndex, data.color, data.center, new THREE.Vector3(1, 0, 0),
+        data.radiusA, 2 * data.radiusA);
+        break;
+      case 'Torus':
+        groups.torusSegment.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal,
+        data.radiusA, data.radiusB, 0, Math.PI * 2);
+        break;
+      case 'TriangleMesh':
+        // groups.triangleMesh.add(data.triangleOffset, data.triangleCount, data.nodeId, data.treeIndex, data.color);
+        break;
+      case 'InstancedMesh':
+        // groups.instancedMesh.add(data.nodeId, data.treeIndex, data.color, data.)
+        break;
+      default:
+        throw Error('Unrecognized geometry name ' + geometryInfo.name);
     }
   }
-  return groups;
 }
-
-export { generateGeometryGroups };
->>>>>>> 30f6a6c200fb85fcbe9e7ae9df94c8bec61b658c

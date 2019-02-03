@@ -11,12 +11,9 @@ import QuadGroup from '../geometry/QuadGroup';
 import SphericalSegmentGroup from '../geometry/SphericalSegmentGroup';
 import TorusSegmentGroup from '../geometry/TorusSegmentGroup';
 import TrapeziumGroup from '../geometry/TrapeziumGroup';
-<<<<<<< HEAD
 import { MergedMeshMappings } from '../geometry/MergedMeshGroup';
 import { InstancedMeshMappings } from '../geometry/InstancedMeshGroup';
 import EllipsoidSegmentGroup from '../geometry/EllipsoidSegmentGroup';
-=======
->>>>>>> 30f6a6c200fb85fcbe9e7ae9df94c8bec61b658c
 
 const BYTES_PER_NODE_ID = 7;
 class NodeIdReader {
@@ -104,37 +101,14 @@ const extraGeometryProperties: {[name: string]: string[]} = {
   // 'scale'],
 };
 
-<<<<<<< HEAD
-=======
-interface Counts {
-  box: number;
-  circle: number;
-  cone: number;
-  eccentricCone: number;
-  generalCylinder: number;
-  generalRing: number;
-  nut: number;
-  quad: number;
-  sphericalSegment: number;
-  torusSegment: number;
-  trapezium: number;
-}
-
->>>>>>> 30f6a6c200fb85fcbe9e7ae9df94c8bec61b658c
 interface GeometryIndexInformation {
   name: string;
   properties: string[];
   nodeIds: NodeIdReader;
   indexes: FibonacciDecoder;
-<<<<<<< HEAD
   geometryCount: number;
   byteCount: number;
   attributeCount: number;
-=======
-  geometryCount?: number;
-  byteCount?: number;
-  attributeCount?: number;
->>>>>>> 30f6a6c200fb85fcbe9e7ae9df94c8bec61b658c
 }
 
 interface TrueValues {
@@ -163,7 +137,6 @@ interface SectorInformation {
   parentSectorId?: number;
   arrayCount?: number;
   propertyTrueValues: TrueValues;
-<<<<<<< HEAD
   geometryIndexes: {[name: string]: GeometryIndexInformation };
 }
 
@@ -184,34 +157,39 @@ interface Counts {
   instancedMesh: number;
 }
 
-interface GeometryGroups {
+class GeometryGroups {
   [name: string]: any;
-=======
-  geometryIndexes: GeometryIndexInformation[];
-}
+  public circle: CircleGroup;
+  public box: BoxGroup;
+  public cone: ConeGroup;
+  public eccentricCone: EccentricConeGroup;
+  public ellipsoidSegment: EllipsoidSegmentGroup;
+  public generalCylinder: GeneralCylinderGroup;
+  public generalRing: GeneralRingGroup;
+  public nut: NutGroup;
+  public quad: QuadGroup;
+  public sphericalSegment: SphericalSegmentGroup;
+  public torusSegment: TorusSegmentGroup;
+  public trapezium: TrapeziumGroup;
+  public triangleMesh: MergedMeshMappings;
+  public instancedMesh: InstancedMeshMappings;
 
-interface GeometryGroups {
->>>>>>> 30f6a6c200fb85fcbe9e7ae9df94c8bec61b658c
-  circle: CircleGroup;
-  box: BoxGroup;
-  cone: ConeGroup;
-  eccentricCone: EccentricConeGroup;
-<<<<<<< HEAD
-  ellipsoidSegment: EllipsoidSegmentGroup;
-=======
->>>>>>> 30f6a6c200fb85fcbe9e7ae9df94c8bec61b658c
-  generalCylinder: GeneralCylinderGroup;
-  generalRing: GeneralRingGroup;
-  nut: NutGroup;
-  quad: QuadGroup;
-  sphericalSegment: SphericalSegmentGroup;
-  torusSegment: TorusSegmentGroup;
-  trapezium: TrapeziumGroup;
-<<<<<<< HEAD
-  triangleMesh: MergedMeshMappings;
-  instancedMesh: InstancedMeshMappings;
-=======
->>>>>>> 30f6a6c200fb85fcbe9e7ae9df94c8bec61b658c
+  constructor(counts: Counts) {
+    this.box = new BoxGroup(counts.box);
+    this.circle = new CircleGroup(counts.circle);
+    this.cone = new ConeGroup(counts.cone);
+    this.eccentricCone = new EccentricConeGroup(counts.eccentricCone);
+    this.ellipsoidSegment = new EllipsoidSegmentGroup(counts.ellipsoidSegment);
+    this.generalCylinder = new GeneralCylinderGroup(counts.generalCylinder);
+    this.generalRing = new GeneralRingGroup(counts.generalRing);
+    this.nut = new NutGroup(counts.nut);
+    this.quad = new QuadGroup(counts.quad);
+    this.sphericalSegment = new SphericalSegmentGroup(counts.generalCylinder);
+    this.torusSegment = new TorusSegmentGroup(counts.torusSegment);
+    this.trapezium = new TrapeziumGroup(counts.trapezium);
+    this.triangleMesh = new MergedMeshMappings(counts.triangleMesh);
+    this.instancedMesh = new InstancedMeshMappings(counts.instancedMesh);
+  }
 }
 
 export { propertyNames, allGeometryNames, extraGeometryProperties, GeometryIndexInformation,

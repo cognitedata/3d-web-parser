@@ -131,8 +131,8 @@ describe('readSegmentFile', () => {
     };
 
     for (let k = 0; k < 3; k++) {
-      const name = parsedFile.geometryIndexes[k].name;
-      const indexes = parsedFile.geometryIndexes[k].indexes;
+      const name = ['Box', 'Circle', 'ClosedCone', 'ClosedCylinder'][k];
+      const indexes = parsedFile.geometryIndexes[name].indexes;
       for (let m = 0; m < Math.min(20, expectedGeometryIndexes[name].length); m++) {
         // @ts-ignore
         expect(indexes.nextValue() === expectedGeometryIndexes[name][m]);
