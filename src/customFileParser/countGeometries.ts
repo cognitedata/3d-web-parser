@@ -6,6 +6,7 @@ export default function countGeometries(segmentInformation: any) {
     circle: 0,
     cone: 0,
     eccentricCone: 0,
+    ellipsoidSegment: 0,
     generalCylinder: 0,
     generalRing: 0,
     nut: 0,
@@ -38,7 +39,8 @@ export default function countGeometries(segmentInformation: any) {
         counts.circle += 2 * geometryInfo.geometryCount;
         counts.eccentricCone += geometryInfo.geometryCount;
       case 'ClosedElipsoidSegment':
-        // IDK
+        counts.ellipsoidSegment += geometryInfo.geometryCount;
+        // Something else?
         break;
       case 'ClosedExtrudedRingSegment':
         counts.cone += 2 * geometryInfo.geometryCount;
@@ -58,7 +60,7 @@ export default function countGeometries(segmentInformation: any) {
         // counts.circle += 2 * geometryInfo.geometryCount;
         break;
       case 'Ellipsoid':
-        // IDK
+        counts.ellipsoidSegment += geometryInfo.geometryCount;
         break;
       case 'ExtrudedRing':
         counts.generalCylinder += 2 * geometryInfo.geometryCount;
@@ -102,10 +104,10 @@ export default function countGeometries(segmentInformation: any) {
         counts.torusSegment += geometryInfo.geometryCount;
         break;
       case 'TriangleMesh':
-        // 
+        counts.triangleMesh += geometryInfo.geometryCount;
         break;
       case 'InstancedMesh':
-        //
+        counts.instancedMesh += geometryInfo.geometryCount;
         break;
       default:
         throw Error('Unknown geometry type ' +

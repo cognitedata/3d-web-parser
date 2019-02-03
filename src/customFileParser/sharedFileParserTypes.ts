@@ -11,9 +11,12 @@ import QuadGroup from '../geometry/QuadGroup';
 import SphericalSegmentGroup from '../geometry/SphericalSegmentGroup';
 import TorusSegmentGroup from '../geometry/TorusSegmentGroup';
 import TrapeziumGroup from '../geometry/TrapeziumGroup';
+<<<<<<< HEAD
 import { MergedMeshMappings } from '../geometry/MergedMeshGroup';
 import { InstancedMeshMappings } from '../geometry/InstancedMeshGroup';
 import EllipsoidSegmentGroup from '../geometry/EllipsoidSegmentGroup';
+=======
+>>>>>>> 30f6a6c200fb85fcbe9e7ae9df94c8bec61b658c
 
 const BYTES_PER_NODE_ID = 7;
 class NodeIdReader {
@@ -101,14 +104,37 @@ const extraGeometryProperties: {[name: string]: string[]} = {
   // 'scale'],
 };
 
+<<<<<<< HEAD
+=======
+interface Counts {
+  box: number;
+  circle: number;
+  cone: number;
+  eccentricCone: number;
+  generalCylinder: number;
+  generalRing: number;
+  nut: number;
+  quad: number;
+  sphericalSegment: number;
+  torusSegment: number;
+  trapezium: number;
+}
+
+>>>>>>> 30f6a6c200fb85fcbe9e7ae9df94c8bec61b658c
 interface GeometryIndexInformation {
   name: string;
   properties: string[];
   nodeIds: NodeIdReader;
   indexes: FibonacciDecoder;
+<<<<<<< HEAD
   geometryCount: number;
   byteCount: number;
   attributeCount: number;
+=======
+  geometryCount?: number;
+  byteCount?: number;
+  attributeCount?: number;
+>>>>>>> 30f6a6c200fb85fcbe9e7ae9df94c8bec61b658c
 }
 
 interface TrueValues {
@@ -137,6 +163,7 @@ interface SectorInformation {
   parentSectorId?: number;
   arrayCount?: number;
   propertyTrueValues: TrueValues;
+<<<<<<< HEAD
   geometryIndexes: {[name: string]: GeometryIndexInformation };
 }
 
@@ -159,11 +186,20 @@ interface Counts {
 
 interface GeometryGroups {
   [name: string]: any;
+=======
+  geometryIndexes: GeometryIndexInformation[];
+}
+
+interface GeometryGroups {
+>>>>>>> 30f6a6c200fb85fcbe9e7ae9df94c8bec61b658c
   circle: CircleGroup;
   box: BoxGroup;
   cone: ConeGroup;
   eccentricCone: EccentricConeGroup;
+<<<<<<< HEAD
   ellipsoidSegment: EllipsoidSegmentGroup;
+=======
+>>>>>>> 30f6a6c200fb85fcbe9e7ae9df94c8bec61b658c
   generalCylinder: GeneralCylinderGroup;
   generalRing: GeneralRingGroup;
   nut: NutGroup;
@@ -171,8 +207,11 @@ interface GeometryGroups {
   sphericalSegment: SphericalSegmentGroup;
   torusSegment: TorusSegmentGroup;
   trapezium: TrapeziumGroup;
+<<<<<<< HEAD
   triangleMesh: MergedMeshMappings;
   instancedMesh: InstancedMeshMappings;
+=======
+>>>>>>> 30f6a6c200fb85fcbe9e7ae9df94c8bec61b658c
 }
 
 export { propertyNames, allGeometryNames, extraGeometryProperties, GeometryIndexInformation,

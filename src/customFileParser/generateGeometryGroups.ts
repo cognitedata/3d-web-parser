@@ -1,16 +1,56 @@
 import * as THREE from 'three';
 
+<<<<<<< HEAD
 import { SectorInformation, GeometryGroups } from './sharedFileParserTypes';
 
 import DataLoader from './DataLoader';
 
 export default function loadGeometryGroup(groups: GeometryGroups, segmentInformation: SectorInformation, groupName: string) {
+=======
+import { propertyNames, GeometryGroups } from './sharedFileParserTypes';
+import countGeometries from './countGeometries';
+import BoxGroup from '../geometry/BoxGroup';
+import CircleGroup from '../geometry/CircleGroup';
+import ConeGroup from '../geometry/ConeGroup';
+import EccentricConeGroup from '../geometry/EccentricConeGroup';
+import GeneralCylinderGroup from '../geometry/GeneralCylinderGroup';
+import GeneralRingGroup from '../geometry/GeneralRingGroup';
+import NutGroup from '../geometry/NutGroup';
+import QuadGroup from '../geometry/QuadGroup';
+import SphericalSegmentGroup from '../geometry/SphericalSegmentGroup';
+import TorusSegmentGroup from '../geometry/TorusSegmentGroup';
+import TrapeziumGroup from '../geometry/TrapeziumGroup';
+
+import DataLoader from './DataLoader';
+
+export default function generateGeometryGroups(segmentInformation: any) {
+  const counts = countGeometries(segmentInformation);
+
+  const groups: GeometryGroups = {
+    box: new BoxGroup(counts.box),
+    circle: new CircleGroup(counts.circle),
+    cone: new ConeGroup(counts.cone),
+    eccentricCone: new EccentricConeGroup(counts.eccentricCone),
+    generalCylinder: new GeneralCylinderGroup(counts.generalCylinder),
+    generalRing: new GeneralRingGroup(counts.generalRing),
+    nut: new NutGroup(counts.nut),
+    quad: new QuadGroup(counts.quad),
+    sphericalSegment: new SphericalSegmentGroup(counts.generalCylinder),
+    torusSegment: new TorusSegmentGroup(counts.torusSegment),
+    trapezium: new TrapeziumGroup(counts.trapezium),
+  };
+>>>>>>> 30f6a6c200fb85fcbe9e7ae9df94c8bec61b658c
 
   const data = new DataLoader(segmentInformation.propertyTrueValues);
   const centerA = new THREE.Vector3();
   const centerB = new THREE.Vector3();
 
+<<<<<<< HEAD
     const geometryInfo = segmentInformation.geometryIndexes[groupName];
+=======
+  for (let i = 0; i < segmentInformation.geometryIndexes.length; i++) {
+    const geometryInfo = segmentInformation.geometryIndexes[i];
+>>>>>>> 30f6a6c200fb85fcbe9e7ae9df94c8bec61b658c
 
     for (let j = 0; j < geometryInfo.geometryCount; j++) {
       data.loadData(geometryInfo);
@@ -44,11 +84,16 @@ export default function loadGeometryGroup(groups: GeometryGroups, segmentInforma
           centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
           centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
           groups.eccentricCone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB,
+<<<<<<< HEAD
             data.radiusA, data.radiusA, data.normal);
+=======
+            data.radiusA, data.radiusA, data.rotationalAngle);
+>>>>>>> 30f6a6c200fb85fcbe9e7ae9df94c8bec61b658c
           groups.circle.add(data.nodeId, data.treeIndex, data.color, centerA, data.normal, data.radiusA);
           groups.circle.add(data.nodeId, data.treeIndex, data.color, centerB, data.normal, data.radiusA);
           break;
         case 'ClosedElipsoidSegment':
+<<<<<<< HEAD
           groups.ellipsoidSegment.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal, data.radiusA,
             data.radiusB, data.height);
           // And something else
@@ -175,10 +220,83 @@ export default function loadGeometryGroup(groups: GeometryGroups, segmentInforma
           break;
         case 'InstancedMesh':
           // groups.instancedMesh.add(data.nodeId, data.treeIndex, data.color, data.)
+=======
+          // Group.add(nodeId, treeIndex, data.color);
+          break;
+        case 'ClosedExtrudedRingSegment':
+          // groups.generalRing.add(nodeId, treeIndex, data.color, center, data.normal,
+          // localXAxis, xRadius, yRadius, thickness, angle? arcAngle?);
+          break;
+        case 'ClosedGeneralCylinder':
+          // groups.generalCylinder.add(nodeId, treeIndex, data.color);
+          break;
+        case 'ClosedSphericalSegment':
+          // groups.sphericalSegment.add(nodeId, treeIndex, data.color);
+          break;
+        case 'ClosedTorusSegment':
+          // groups.torusSegment.add(nodeId, treeIndex, data.color);
+          break;
+        case 'Ellipsoid':
+          // Group.add(nodeId, treeIndex, data.color);
+          break;
+        case 'ExtrudedRing':
+          // groups.generalRing.add(nodeId, treeIndex, data.color);
+          break;
+        case 'Nut':
+          // groups.nut.add(nodeId, treeIndex, data.color);
+          break;
+        case 'OpenCone':
+          // groups.cone.add(nodeId, treeIndex, data.color);
+          break;
+        case 'OpenCylinder':
+          // groups.generalCylinder.add(nodeId, treeIndex, data.color);
+          break;
+        case 'OpenEccentricCone':
+          // groups.cone.add(nodeId, treeIndex, data.color);
+          break;
+        case 'OpenEllipsoidSegment':
+          // Group.add(nodeId, treeIndex, data.color);
+          break;
+        case 'OpenExtrudedRingSegment':
+          // groups.generalRing.add(nodeId, treeIndex, color);
+          break;
+        case 'OpenGeneralCylinder':
+          // groups.generalCylinder.add(nodeId, treeIndex, color);
+          break;
+        case 'OpenSphericalSegment':
+          // groups.sphericalSegment.add(nodeId, treeIndex, color);
+          break;
+        case 'OpenTorusSegment':
+          // blah
+          break;
+        case 'Ring':
+          // groups.generalRing.add(nodeId, treeIndex, color);
+          break;
+        case 'Sphere':
+          // groups.sphericalSegment.add(nodeId, treeIndex, color);
+          break;
+        case 'Torus':
+          // groups.torusSegment.add(nodeId, treeIndex, color);
+          break;
+        case 'TriangleMesh':
+          // asdf
+          break;
+        case 'InstancedMesh':
+          //
+>>>>>>> 30f6a6c200fb85fcbe9e7ae9df94c8bec61b658c
           break;
         default:
           throw Error('Unrecognized geometry name ' + geometryInfo.name);
       }
+<<<<<<< HEAD
   }
   return groups;
 }
+=======
+    }
+  }
+  return groups;
+}
+
+export { generateGeometryGroups };
+>>>>>>> 30f6a6c200fb85fcbe9e7ae9df94c8bec61b658c
