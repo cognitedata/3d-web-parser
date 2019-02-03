@@ -9,7 +9,7 @@ import { InstancedMeshGroup } from './geometry/InstancedMeshGroup';
 interface GeometryNode {
   treeIndex: number;
   nodeId: number;
-  color: THREE.Color;
+  color?: THREE.Color;
 }
 
 export default class Sector {
@@ -61,7 +61,7 @@ export default class Sector {
     }
   }
 
-  *traverseGeometryNodes(color: THREE.Color): IterableIterator<GeometryNode> {
+  *traverseGeometryNodes(color?: THREE.Color): IterableIterator<GeometryNode> {
     // Will traverse all geometries and yield
     // nodeId and treeIndex
     for (const child of this.traverseSectors()) {
@@ -69,8 +69,12 @@ export default class Sector {
         for (let i = 0; i < geometryGroup.count; i++) {
           const treeIndex = geometryGroup.getTreeIndex(i);
           const nodeId = geometryGroup.getNodeId(i);
-          geometryGroup.getColor(color, i);
-          yield { treeIndex, nodeId, color };
+          if (color != null) {
+            geometryGroup.getColor(color, i);
+            yield { treeIndex, nodeId, color };
+          } else {
+            yield { treeIndex, nodeId };
+          }
         }
       }
 
@@ -79,8 +83,12 @@ export default class Sector {
         for (let i = 0; i < mappings.count; i++) {
           const treeIndex = mappings.getTreeIndex(i);
           const nodeId = mappings.getNodeId(i);
-          mappings.getColor(color, i);
-          yield { treeIndex, nodeId, color };
+          if (color != null) {
+            mappings.getColor(color, i);
+            yield { treeIndex, nodeId, color };
+          } else {
+            yield { treeIndex, nodeId };
+          }
         }
       }
 
@@ -91,8 +99,12 @@ export default class Sector {
           for (let i = 0; i < mappings.count; i++) {
             const treeIndex = mappings.getTreeIndex(i);
             const nodeId = mappings.getNodeId(i);
-            mappings.getColor(color, i);
-            yield { treeIndex, nodeId, color };
+            if (color != null) {
+              mappings.getColor(color, i);
+              yield { treeIndex, nodeId, color };
+            } else {
+              yield { treeIndex, nodeId };
+            }
           }
         }
       }
