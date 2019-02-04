@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import GeometryGroup from './GeometryGroup';
-import { TypedArray } from 'three';
+import { TypedArray, MeshNormalMaterial } from 'three';
+import { computeBoundingBox } from './GeometryUtils';
+
+const globalMatrix = new THREE.Matrix4();
 
 export class InstancedMeshMappings {
   public count: number;
@@ -186,7 +189,7 @@ export class InstancedMeshCollection {
 export class InstancedMesh {
   collections: InstancedMeshCollection[];
   fileId: number;
-  geometry: null|THREE.Mesh;
+  geometry: null|THREE.BufferGeometry;
   treeIndexMap: { [s: number]: number; };
   collectionByTriangleOffset: { [s: number]: InstancedMeshCollection; };
   constructor(fileId: number) {
@@ -211,23 +214,66 @@ export class InstancedMesh {
   }
 }
 
+interface MappingData {
+  meshIndex: number;
+  collectionIndex: number;
+  mappingIndex: number;
+}
+
+interface TreeIndexMap {
+  [s: number]: MappingData;
+}
+
 export class InstancedMeshGroup extends GeometryGroup {
   meshes: InstancedMesh[];
+  treeIndexMap: TreeIndexMap;
   constructor() {
     super();
     this.meshes = [];
     this.type = 'InstancedMesh';
+    this.treeIndexMap = {};
+  }
+
+  createTreeIndexMap() {
+    this.meshes.forEach((instancedMesh, meshIndex) => {
+      instancedMesh.collections.forEach( (collection, collectionIndex) => {
+        for (let mappingIndex = 0; mappingIndex < collection.mappings.count; mappingIndex++) {
+          const treeIndex = collection.mappings.getTreeIndex(mappingIndex);
+          this.treeIndexMap[treeIndex] = {
+            meshIndex,
+            collectionIndex,
+            mappingIndex,
+          };
+        }
+      });
+    });
   }
 
   addMesh(mesh: InstancedMesh) {
     this.meshes.push(mesh);
   }
 
-  computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
-    return outputMatrix;
-  }
+  computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, treeIndex: number): THREE.Box3 {
+    box.makeEmpty();
 
-  computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
-    return box;
+    // Extract data about geometry
+    const { meshIndex, collectionIndex, mappingIndex } = this.treeIndexMap[treeIndex];
+    const instancedMesh = this.meshes[meshIndex];
+    const geometry = instancedMesh.geometry;
+    if (geometry == null) {
+      // Geometry may not be loaded yet, just return empty box.
+      return box;
+    }
+    const collection = instancedMesh.collections[collectionIndex];
+    collection.mappings.getTransformMatrix(globalMatrix, mappingIndex);
+    const triangleCount = collection.triangleCount;
+    const triangleOffset = collection.triangleOffset;
+
+    const index = geometry.getIndex();
+    const position = geometry.getAttribute('position');
+
+    globalMatrix.multiplyMatrices(matrix, globalMatrix);
+
+    return computeBoundingBox(box, matrix, position, index, triangleOffset, triangleCount);
   }
 }
