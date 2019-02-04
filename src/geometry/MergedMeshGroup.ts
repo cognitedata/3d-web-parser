@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import GeometryGroup from './GeometryGroup';
 
 import { identityMatrix4 } from '../constants';
-const globalVector = new THREE.Vector3();
+import { computeBoundingBox } from './GeometryUtils';
 
 export class MergedMeshMappings {
   public count: number;
@@ -214,20 +214,6 @@ export class MergedMeshGroup extends GeometryGroup {
     const index = geometry!.getIndex();
     const position = geometry!.getAttribute('position');
 
-    // Calculate bounding box using the geometry defined by triangleOffset and triangleCount
-    const start = 3 * triangleOffset;
-    const end = start + 3 * triangleCount;
-    const { array } = index;
-    const isIdentity = matrix.equals(identityMatrix4);
-    for (let i = start; i < end; i++) {
-      const idx = array[i];
-      globalVector.set(position.getX(idx), position.getY(idx), position.getZ(idx));
-      if (!isIdentity) {
-        globalVector.applyMatrix4(matrix);
-      }
-      box.expandByPoint(globalVector);
-    }
-
-    return box;
+    return computeBoundingBox(box, matrix, position, index, triangleOffset, triangleCount);
   }
 }
