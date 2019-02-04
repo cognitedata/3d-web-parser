@@ -171,6 +171,7 @@ export class InstancedMeshMappings {
 export class InstancedMeshCollection {
   triangleOffset: number;
   triangleCount: number;
+  geometry?: THREE.InstancedBufferGeometry;
   mappings: InstancedMeshMappings;
   constructor(triangleOffset: number, triangleCount: number, capacity: number) {
     this.triangleOffset = triangleOffset;
@@ -189,7 +190,6 @@ export class InstancedMeshCollection {
 export class InstancedMesh {
   collections: InstancedMeshCollection[];
   fileId: number;
-  geometry?: THREE.InstancedBufferGeometry;
   treeIndexMap: { [s: number]: number; };
   collectionByTriangleOffset: { [s: number]: InstancedMeshCollection; };
   constructor(fileId: number) {
@@ -254,25 +254,24 @@ export class InstancedMeshGroup extends GeometryGroup {
 
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, treeIndex: number): THREE.Box3 {
     box.makeEmpty();
-
     // Extract data about geometry
     const { meshIndex, collectionIndex, mappingIndex } = this.treeIndexMap[treeIndex];
     const instancedMesh = this.meshes[meshIndex];
-    const geometry = instancedMesh.geometry;
+    const collection = instancedMesh.collections[collectionIndex];
+
+    const geometry = collection.geometry;
     if (geometry == null) {
       // Geometry may not be loaded yet, just return empty box.
       return box;
     }
-    const collection = instancedMesh.collections[collectionIndex];
     collection.mappings.getTransformMatrix(globalMatrix, mappingIndex);
     const triangleCount = collection.triangleCount;
-    const triangleOffset = collection.triangleOffset;
-
+    // TriangleOffset is 0 since each collection contains exactly one geometry
     const index = geometry.getIndex();
     const position = geometry.getAttribute('position');
 
     globalMatrix.multiplyMatrices(matrix, globalMatrix);
 
-    return computeBoundingBox(box, matrix, position, index, triangleOffset, triangleCount);
+    return computeBoundingBox(box, matrix, position, index, 0, triangleCount);
   }
 }
