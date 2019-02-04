@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import GeometryGroup from './GeometryGroup';
 
+import { identityMatrix4 } from '../constants';
+const globalVector = new THREE.Vector3();
+
 export class MergedMeshMappings {
   public count: number;
   public capacity: number;
@@ -145,7 +148,7 @@ export class MergedMeshMappings {
 export class MergedMesh {
   mappings: MergedMeshMappings;
   fileId: number;
-  geometry: null|THREE.Mesh;
+  geometry: null|THREE.BufferGeometry;
   treeIndexMap: { [s: number]: number; };
   createdByInstancedMesh: boolean;
   constructor(capacity: number, fileId: number, createdByInstancedMesh: boolean = false) {
@@ -157,23 +160,74 @@ export class MergedMesh {
   }
 }
 
+interface MappingData {
+  meshIndex: number;
+  mappingIndex: number;
+}
+
+interface TreeIndexMap {
+  [s: number]: MappingData;
+}
+
 export class MergedMeshGroup extends GeometryGroup {
   meshes: MergedMesh[];
-  constructor() {
+  treeIndexMap: TreeIndexMap;
+  constructor () {
     super();
     this.meshes = [];
     this.type = 'MergedMesh';
+    this.treeIndexMap = {};
+  }
+
+  createTreeIndexMap() {
+    this.meshes.forEach((mergedMesh, meshIndex) => {
+      for (let mappingIndex = 0; mappingIndex < mergedMesh.mappings.count; mappingIndex++) {
+        const treeIndex = mergedMesh.mappings.getTreeIndex(mappingIndex);
+        this.treeIndexMap[treeIndex] = {
+          meshIndex,
+          mappingIndex,
+        };
+      }
+    });
   }
 
   addMesh(mesh: MergedMesh) {
     this.meshes.push(mesh);
   }
 
-  computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
-    return outputMatrix;
-  }
+  computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, treeIndex: number): THREE.Box3 {
+    box.makeEmpty();
 
-  computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
+    // Extract data about geometry
+    const { meshIndex, mappingIndex } = this.treeIndexMap[treeIndex];
+    const mergedMesh = this.meshes[meshIndex];
+    const geometry = mergedMesh.geometry;
+
+    if (geometry == null) {
+      // Geometry may not be loaded yet, just return empty box.
+      return box;
+    }
+    const triangleCount = mergedMesh.mappings.getTriangleCount(mappingIndex);
+    const triangleOffset = mergedMesh.mappings.getTriangleOffset(mappingIndex);
+
+    // index and position buffer containing the merged mesh
+    const index = geometry!.getIndex();
+    const position = geometry!.getAttribute('position');
+
+    // Calculate bounding box using the geometry defined by triangleOffset and triangleCount
+    const start = 3 * triangleOffset;
+    const end = start + 3 * triangleCount;
+    const { array } = index;
+    const isIdentity = matrix.equals(identityMatrix4);
+    for (let i = start; i < end; i++) {
+      const idx = array[i];
+      globalVector.set(position.getX(idx), position.getY(idx), position.getZ(idx));
+      if (!isIdentity) {
+        globalVector.applyMatrix4(matrix);
+      }
+      box.expandByPoint(globalVector);
+    }
+
     return box;
   }
 }
