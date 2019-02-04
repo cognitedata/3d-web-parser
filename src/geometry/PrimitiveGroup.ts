@@ -41,6 +41,10 @@ export interface Attribute {
   itemSize: number;
 }
 
+interface TreeIndexMap {
+  [s: number]: number;
+}
+
 export default abstract class PrimitiveGroup extends GeometryGroup {
   public count: number;
   public capacity: number;
@@ -48,6 +52,7 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
   public treeIndex: Float32Array;
   public color: Float32Array;
   public maxTreeIndex: number;
+  public treeIndexMap: TreeIndexMap;
 
   // The transformX arrays contain contain transformation matrix
   public transform0: Float32Array;
@@ -60,6 +65,7 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     super();
     this.count = 0;
     this.capacity = capacity;
+    this.treeIndexMap = {};
 
     this.maxTreeIndex = -1;
     this.nodeId = new Float64Array(this.capacity);
@@ -160,6 +166,7 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
 
   setTreeIndex(value: number, index: number) {
     this.maxTreeIndex = Math.max(this.maxTreeIndex, value);
+    this.treeIndexMap[value] = index;
     this.treeIndex[index] = value;
   }
 
