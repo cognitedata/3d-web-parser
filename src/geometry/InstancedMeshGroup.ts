@@ -67,7 +67,6 @@ export class InstancedMeshMappings {
   }
 
   public getTransformMatrix(target: THREE.Matrix4, index: number) {
-
     const start = 3 * index;
     const end = 3 * (index + 1);
     const columns = [this.transform0, this.transform1, this.transform2, this.transform3];
@@ -234,10 +233,16 @@ export class InstancedMeshGroup extends GeometryGroup {
   }
 
   createTreeIndexMap() {
+    this.treeIndexMap = {};
+
     this.meshes.forEach((instancedMesh, meshIndex) => {
       instancedMesh.collections.forEach( (collection, collectionIndex) => {
         for (let mappingIndex = 0; mappingIndex < collection.mappings.count; mappingIndex++) {
           const treeIndex = collection.mappings.getTreeIndex(mappingIndex);
+          if (this.treeIndexMap[treeIndex] != null) {
+            throw `Error, trying to add treeIndex
+                   ${treeIndex} to InstancedMeshGroup.treeIndexMap, but it already exists.`;
+          }
           this.treeIndexMap[treeIndex] = {
             meshIndex,
             collectionIndex,

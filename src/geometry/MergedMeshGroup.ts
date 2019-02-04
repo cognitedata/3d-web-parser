@@ -4,6 +4,8 @@ import GeometryGroup from './GeometryGroup';
 import { identityMatrix4 } from '../constants';
 import { computeBoundingBox } from './GeometryUtils';
 
+interface IndexMap { [s: number]: boolean; }
+
 export class MergedMeshMappings {
   public count: number;
   public capacity: number;
@@ -32,7 +34,7 @@ export class MergedMeshMappings {
     this.transform1 = []; this.transform1.length = capacity;
     this.transform2 = []; this.transform2.length = capacity;
     this.transform3 = []; this.transform3.length = capacity;
-}
+  }
 
   public add(
     triangleOffset: number,
@@ -45,7 +47,6 @@ export class MergedMeshMappings {
     if (this.count + 1 > this.capacity) {
       throw 'Error in MergedMeshMappings::add. Trying to add more than capacity.';
     }
-
     this.setTriangleOffset(triangleOffset, this.count);
     this.setTriangleCount(triangleCount, this.count);
     this.setNodeId(nodeId, this.count);
@@ -106,31 +107,55 @@ export class MergedMeshMappings {
     return this.triangleOffsets[index];
   }
 
-  private setColor(source: THREE.Color, index: number) {
+  public removeIndices(indicesToRemove: IndexMap) {
+    let newIndex = 0;
+    for (let i = 0; i < this.count; i++) {
+      if (!indicesToRemove[i]) {
+        this.triangleOffsets[newIndex] = this.triangleOffsets[i];
+        this.triangleCounts[newIndex] = this.triangleCounts[i];
+
+        this.color[3 * newIndex + 0] = this.color[3 * i + 0];
+        this.color[3 * newIndex + 1] = this.color[3 * i + 1];
+        this.color[3 * newIndex + 2] = this.color[3 * i + 2];
+
+        this.nodeId[newIndex] = this.nodeId[i];
+        this.treeIndex[newIndex] = this.treeIndex[i];
+        this.transform0[newIndex] = this.transform0[i];
+        this.transform1[newIndex] = this.transform1[i];
+        this.transform2[newIndex] = this.transform2[i];
+        this.transform3[newIndex] = this.transform3[i];
+        newIndex++;
+      }
+    }
+
+    this.count = newIndex;
+  }
+
+  public setColor(source: THREE.Color, index: number) {
     let nextIndex = 3 * index;
     this.color[nextIndex++] = source.r;
     this.color[nextIndex++] = source.g;
     this.color[nextIndex++] = source.b;
   }
 
-  private setTriangleCount(value: number, index: number) {
+  public setTriangleCount(value: number, index: number) {
     this.triangleCounts[index] = value;
   }
 
-  private setTriangleOffset(value: number, index: number) {
+  public setTriangleOffset(value: number, index: number) {
     this.triangleOffsets[index] = value;
   }
 
-  private setNodeId(value: number, index: number) {
+  public setNodeId(value: number, index: number) {
     this.nodeId[index] = value;
   }
 
-  private setTreeIndex(value: number, index: number) {
+  public setTreeIndex(value: number, index: number) {
     this.maxTreeIndex = Math.max(this.maxTreeIndex, value);
     this.treeIndex[index] = value;
   }
 
-  private setTransform(source: THREE.Matrix4, index: number) {
+  public setTransform(source: THREE.Matrix4, index: number) {
     const columns = [0, 1, 2, 3].map(columnIndex => {
       // @ts-ignore
       const transform = this[`transform${columnIndex}`];
@@ -179,9 +204,14 @@ export class MergedMeshGroup extends GeometryGroup {
   }
 
   createTreeIndexMap() {
+    this.treeIndexMap = {};
     this.meshes.forEach((mergedMesh, meshIndex) => {
       for (let mappingIndex = 0; mappingIndex < mergedMesh.mappings.count; mappingIndex++) {
         const treeIndex = mergedMesh.mappings.getTreeIndex(mappingIndex);
+        if (this.treeIndexMap[treeIndex] != null) {
+          throw `Error, trying to add treeIndex ${treeIndex} to MergedMeshGroup.treeIndexMap, but it already exists.`;
+        }
+
         this.treeIndexMap[treeIndex] = {
           meshIndex,
           mappingIndex,
@@ -194,18 +224,26 @@ export class MergedMeshGroup extends GeometryGroup {
     this.meshes.push(mesh);
   }
 
-  computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, treeIndex: number): THREE.Box3 {
+  computeBoundingBox(
+    matrix: THREE.Matrix4,
+    box: THREE.Box3,
+    treeIndex: number,
+    geometry?: THREE.BufferGeometry,
+  ): THREE.Box3 {
     box.makeEmpty();
 
     // Extract data about geometry
     const { meshIndex, mappingIndex } = this.treeIndexMap[treeIndex];
     const mergedMesh = this.meshes[meshIndex];
-    const geometry = mergedMesh.geometry;
 
     if (geometry == null) {
-      // Geometry may not be loaded yet, just return empty box.
-      return box;
+      if (mergedMesh.geometry == null) {
+        // Geometry may not be loaded yet, just return empty box.
+        return box;
+      }
+      geometry = mergedMesh.geometry;
     }
+
     const triangleCount = mergedMesh.mappings.getTriangleCount(mappingIndex);
     const triangleOffset = mergedMesh.mappings.getTriangleOffset(mappingIndex);
 
@@ -214,5 +252,15 @@ export class MergedMeshGroup extends GeometryGroup {
     const position = geometry!.getAttribute('position');
 
     return computeBoundingBox(box, matrix, position, index, triangleOffset, triangleCount);
+  }
+
+  removeTreeIndicesFromMesh(treeIndices: number[], mergedMesh: MergedMesh) {
+    const indicesToRemove: IndexMap = {};
+    treeIndices.forEach(treeIndex => {
+      const { meshIndex, mappingIndex } = this.treeIndexMap[treeIndex];
+      indicesToRemove[mappingIndex] = true;
+    });
+    mergedMesh.mappings.removeIndices(indicesToRemove);
+    this.createTreeIndexMap();
   }
 }
