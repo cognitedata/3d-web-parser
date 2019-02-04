@@ -143,6 +143,8 @@ export default async function parseProtobuf(protobufData: Uint8Array, printParsi
   const rootSector = sectors['0/'];
   for (const sector of rootSector.traverseSectors()) {
     mergeInstancedMeshes(sector, 2500, sceneStats);
+    sector.mergedMeshGroup.createTreeIndexMap();
+    sector.instancedMeshGroup.createTreeIndexMap();
   }
   if (printParsingTime) {
     // tslint:disable-next-line
