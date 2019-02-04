@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { InstancedMeshGroup, InstancedMesh, InstancedMeshCollection } from '../geometry/InstancedMeshGroup';
 import { MatchingGeometries, parseInstancedMeshTransformMatrix } from './parseUtils';
+import SceneStats from '../SceneStats';
+import { Scene } from 'three';
 const globalColor = new THREE.Color();
 const globalMatrix = new THREE.Matrix4();
 
@@ -39,7 +41,8 @@ function createCollection(node: any) {
 }
 
 export default function parse(geometries: any[],
-                              instancedMeshMap: { [key: number]: InstancedMesh }): InstancedMeshGroup {
+                              instancedMeshMap: { [key: number]: InstancedMesh },
+                              sceneStats: SceneStats): InstancedMeshGroup {
   const matchingGeometries = findMatchingGeometries(geometries);
   const group = new InstancedMeshGroup();
 
@@ -62,6 +65,7 @@ export default function parse(geometries: any[],
     // Only add it to the group if we created a new one. If we didn't,
     // the instanced mesh is on another sector.
     if (didCreateNewInstancedMesh) {
+      sceneStats.numInstancedMeshes += 1;
       group.addMesh(instancedMesh);
     }
 

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { MergedMeshGroup, MergedMesh } from '../geometry/MergedMeshGroup';
 import { MatchingGeometries } from './parseUtils';
+import SceneStats from '../SceneStats';
 const globalColor = new THREE.Color();
 
 function findMatchingGeometries(geometries: any[]): MatchingGeometries {
@@ -19,7 +20,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-export default function parse(geometries: any[]): MergedMeshGroup {
+export default function parse(geometries: any[], sceneStats: SceneStats): MergedMeshGroup {
   const matchingGeometries = findMatchingGeometries(geometries);
   const group = new MergedMeshGroup();
 
@@ -38,6 +39,8 @@ export default function parse(geometries: any[]): MergedMeshGroup {
       mergedMesh.mappings.add(triangleOffset, triangleCount, nodeId, treeIndex, globalColor);
       triangleOffset += triangleCount;
     });
+
+    sceneStats.numMergedMeshes += 1;
     group.addMesh(mergedMesh);
   });
 

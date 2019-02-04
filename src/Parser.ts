@@ -40,6 +40,8 @@ import SphericalSegmentGroup from './geometry/SphericalSegmentGroup';
 import TorusSegmentGroup from './geometry/TorusSegmentGroup';
 import TrapeziumGroup from './geometry/TrapeziumGroup';
 
+import SceneStats from './SceneStats';
+
 import mergeInstancedMeshes from './optimizations/mergeInstancedMeshes';
 import { MergedMeshGroup } from './geometry/MergedMeshGroup';
 import { PrimitiveGroupMap } from './geometry/PrimitiveGroup';
@@ -63,7 +65,8 @@ interface InstancedMeshMap { [key: number]: InstancedMesh; }
 
 function parseGeometries(geometries: GeometryGroup[],
                          instancedMeshMap: InstancedMeshMap,
-                         primitiveGroupMap: PrimitiveGroupMap) {
+                         primitiveGroupMap: PrimitiveGroupMap,
+                         sceneStats: SceneStats) {
   const primitiveGroups: PrimitiveGroup[] = [];
   primitiveParsers.forEach(({ type, parser }) => {
     const didCreateNewGroup = parser(geometries, primitiveGroupMap);
@@ -74,8 +77,8 @@ function parseGeometries(geometries: GeometryGroup[],
     }
   });
 
-  const mergedMeshGroup = parseMergedMeshes(geometries);
-  const instancedMeshGroup = parseInstancedMeshes(geometries, instancedMeshMap);
+  const mergedMeshGroup = parseMergedMeshes(geometries, sceneStats);
+  const instancedMeshGroup = parseInstancedMeshes(geometries, instancedMeshMap, sceneStats);
 
   return { primitiveGroups, mergedMeshGroup, instancedMeshGroup };
 }
@@ -85,7 +88,10 @@ export default async function parseProtobuf(protobufData: Uint8Array, printParsi
 
   const sectors: { [path: string]: Sector } = { };
   const instancedMeshMap: { [key: number]: InstancedMesh } = {};
-
+  const sceneStats: SceneStats = {
+    numInstancedMeshes: 0,
+    numMergedMeshes: 0,
+  };
   // Create map since we will reuse primitive groups until the count is above some threshold.
   // This reduces the number of draw calls.
   const primitiveGroupMap: PrimitiveGroupMap = {
@@ -115,7 +121,7 @@ export default async function parseProtobuf(protobufData: Uint8Array, printParsi
       primitiveGroups,
       mergedMeshGroup,
       instancedMeshGroup,
-    } = parseGeometries(webNode.geometries, instancedMeshMap, primitiveGroupMap);
+    } = parseGeometries(webNode.geometries, instancedMeshMap, primitiveGroupMap, sceneStats);
 
     sector.primitiveGroups = primitiveGroups;
     sector.mergedMeshGroup = mergedMeshGroup;
@@ -136,12 +142,12 @@ export default async function parseProtobuf(protobufData: Uint8Array, printParsi
   t0 = performance.now();
   const rootSector = sectors['0/'];
   for (const sector of rootSector.traverseSectors()) {
-    mergeInstancedMeshes(sector, 2500);
+    mergeInstancedMeshes(sector, 2500, sceneStats);
   }
   if (printParsingTime) {
     // tslint:disable-next-line
     console.log('Optimizing instanced meshes took ', performance.now() - t0, ' ms.');
   }
 
-  return { rootSector, sectors };
+  return { rootSector, sectors, sceneStats };
 }
