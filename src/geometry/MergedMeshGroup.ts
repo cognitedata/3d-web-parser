@@ -148,12 +148,11 @@ export class MergedMeshMappings {
 export class MergedMesh {
   mappings: MergedMeshMappings;
   fileId: number;
-  geometry: null|THREE.BufferGeometry;
+  geometry?: THREE.BufferGeometry;
   treeIndexMap: { [s: number]: number; };
   createdByInstancedMesh: boolean;
   constructor(capacity: number, fileId: number, createdByInstancedMesh: boolean = false) {
     this.mappings = new MergedMeshMappings(capacity);
-    this.geometry = null;
     this.fileId = fileId;
     this.treeIndexMap = {};
     this.createdByInstancedMesh = createdByInstancedMesh;

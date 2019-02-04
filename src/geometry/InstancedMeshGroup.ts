@@ -189,12 +189,11 @@ export class InstancedMeshCollection {
 export class InstancedMesh {
   collections: InstancedMeshCollection[];
   fileId: number;
-  geometry: null|THREE.BufferGeometry;
+  geometry?: THREE.InstancedBufferGeometry;
   treeIndexMap: { [s: number]: number; };
   collectionByTriangleOffset: { [s: number]: InstancedMeshCollection; };
   constructor(fileId: number) {
     this.collections = [];
-    this.geometry = null;
     this.fileId = fileId;
     this.treeIndexMap = {};
     this.collectionByTriangleOffset = {};
