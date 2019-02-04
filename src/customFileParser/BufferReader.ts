@@ -4,8 +4,8 @@ export default class BufferReader {
 
   private flip: boolean;
 
-  constructor(arrayBuffer: ArrayBuffer, flip: boolean) {
-    this.dataView = new DataView(arrayBuffer);
+  constructor(arrayBuffer: ArrayBuffer, start: number, length: number, flip: boolean) {
+    this.dataView = new DataView(arrayBuffer, start, length);
     this.location = 0;
     // FLIP ONLY IF READING A NODE FILE
     this.flip = Boolean(flip);
@@ -22,6 +22,12 @@ export default class BufferReader {
     value = value << 8;
     value += this.dataView.getUint32(this.location + 4, this.flip);
     this.location += 8;
+    return value;
+  }
+
+  readFloat32() {
+    const value = this.dataView.getFloat32(this.location, this.flip);
+    this.location += 4;
     return value;
   }
 

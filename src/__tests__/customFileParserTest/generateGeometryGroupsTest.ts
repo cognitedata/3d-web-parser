@@ -1,5 +1,5 @@
-import readSegmentFile from '../../customFileParser/readSegmentFile';
-import loadGeometryGroup from '../../customFileParser/generateGeometryGroups';
+import loadSectorOutline from '../../customFileParser/loadSectorOutline';
+import unpackGeometry from '../../customFileParser/unpackGeometry/main';
 import countGeometries from '../../customFileParser/countGeometries';
 import * as THREE from 'three';
 const fs = require('fs');
@@ -15,11 +15,11 @@ describe('generateGeometryGroups', () => {
       arrayBufferCopier[i] = incomingFile[i];
     }
 
-    const parsedFile = readSegmentFile(asArrayBuffer, true);
+    const parsedFile = loadSectorOutline(asArrayBuffer, 0, asArrayBuffer.byteLength, true);
     const counts = countGeometries(parsedFile);
     const geometryGroups = new GeometryGroups(counts);
 
-    loadGeometryGroup(geometryGroups, parsedFile, 'Box');
+    unpackGeometry(geometryGroups, parsedFile, 'Box');
 
     expect(geometryGroups).toBeDefined();
 

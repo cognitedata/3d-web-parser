@@ -112,5 +112,6 @@ export default class DataLoader {
           }
       }
     }
+    console.log(this.trueValuesArray);
   }
 }

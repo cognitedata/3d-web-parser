@@ -1,6 +1,6 @@
 import { Counts, SectorInformation } from './sharedFileParserTypes';
 
-export default function countGeometries(segmentInformation: SectorInformation) {
+export default function countGeometries(sectorInformation: SectorInformation) {
   const counts: Counts = {
     box: 0,
     circle: 0,
@@ -18,9 +18,11 @@ export default function countGeometries(segmentInformation: SectorInformation) {
     instancedMesh: 0,
   };
 
-  const keys = Object.keys(segmentInformation.geometryIndexes);
+  const keys = Object.keys(sectorInformation.geometryIndexes);
   for (let i = 0; i < keys.length; i++) {
-    const geometryInfo = segmentInformation.geometryIndexes[keys[i]];
+    const geometryInfo = sectorInformation.geometryIndexes[keys[i]];
+    console.log(keys[i]);
+    if (geometryInfo === undefined) { throw Error('Missing geometry ' + keys[i]); }
     switch (geometryInfo.name) {
       case 'Box':
         counts.box += geometryInfo.geometryCount;
@@ -39,14 +41,15 @@ export default function countGeometries(segmentInformation: SectorInformation) {
       case 'ClosedEccentricCone':
         counts.circle += 2 * geometryInfo.geometryCount;
         counts.eccentricCone += geometryInfo.geometryCount;
-      case 'ClosedElipsoidSegment':
+        break;
+      case 'ClosedEllipsoidSegment':
         counts.ellipsoidSegment += geometryInfo.geometryCount;
         // Something else?
         break;
       case 'ClosedExtrudedRingSegment':
         counts.cone += 2 * geometryInfo.geometryCount;
         counts.generalRing += 2 * geometryInfo.geometryCount;
-        // counts.quad += 2
+        counts.quad += 2 * geometryInfo.geometryCount;
         break;
       case 'ClosedGeneralCylinder':
         counts.generalCylinder += geometryInfo.geometryCount;
@@ -65,6 +68,7 @@ export default function countGeometries(segmentInformation: SectorInformation) {
         break;
       case 'ExtrudedRing':
         counts.generalCylinder += 2 * geometryInfo.geometryCount;
+        counts.generalRing += 2 * geometryInfo.geometryCount;
         counts.cone += 2 * geometryInfo.geometryCount;
         break;
       case 'Nut':
@@ -112,7 +116,7 @@ export default function countGeometries(segmentInformation: SectorInformation) {
         break;
       default:
         throw Error('Unknown geometry type ' +
-        segmentInformation.geometryIndexes[i].name);
+        sectorInformation.geometryIndexes[i].name);
     }
   }
 

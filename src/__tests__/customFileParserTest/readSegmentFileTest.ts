@@ -1,4 +1,4 @@
-import readSegmentFile from '../../customFileParser/readSegmentFile';
+import loadSectorOutline from '../../customFileParser/loadSectorOutline';
 import * as THREE from 'three';
 
 // @ts-ignore
@@ -11,7 +11,7 @@ function checkFloatArrayMatch(arrayA: any, arrayB: any) {
   }
 }
 
-describe('readSegmentFile', () => {
+describe('loadSectorOutline', () => {
   test('parse file', async() => {
     const incomingFile = fs.readFileSync('./src/__tests__/customFileParserTest/Pipes.c3d', null);
 
@@ -21,7 +21,7 @@ describe('readSegmentFile', () => {
       arrayBufferCopier[i] = incomingFile[i];
     }
 
-    const parsedFile = readSegmentFile(asArrayBuffer, true);
+    const parsedFile = loadSectorOutline(asArrayBuffer, 0, asArrayBuffer.byteLength, true);
 
     expect(parsedFile.magicBytes).toBe(1178874697);
     expect(parsedFile.formatVersion).toBe(2147483647);

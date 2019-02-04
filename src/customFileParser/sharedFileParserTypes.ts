@@ -96,9 +96,9 @@ const extraGeometryProperties: {[name: string]: string[]} = {
   Ring: ['treeIndex', 'color', 'center', 'normal', 'radiusA', 'radiusB'],
   Sphere: ['treeIndex', 'color', 'center', 'radiusA'],
   Torus: ['treeIndex', 'color', 'center', 'normal', 'radiusA', 'radiusB'],
-  TriangleMesh: ['treeIndex', 'fileId'], // 'triangleOffset', 'triangleCount', 'color'],
-  InstancedMesh: ['treeIndex', 'fileId', 'triangleOffset', 'triangleCount', 'color', 'translation', 'rotation3'],
-  // 'scale'],
+  TriangleMesh: ['treeIndex', 'fileId', 'triangleOffset', 'triangleCount', 'color'],
+  InstancedMesh: ['treeIndex', 'fileId', 'triangleOffset', 'triangleCount', 'color', 'translation', 'rotation3',
+  'scale'],
 };
 
 interface GeometryIndexInformation {
@@ -130,13 +130,14 @@ interface TrueValues {
 }
 
 interface SectorInformation {
-  magicBytes?: number;
-  formatVersion?: number;
-  optimizerVersion?: number;
-  sectorId?: number;
-  parentSectorId?: number;
-  arrayCount?: number;
-  propertyTrueValues: TrueValues;
+  magicBytes: number;
+  formatVersion: number;
+  optimizerVersion: number;
+  sectorId: number;
+  parentSectorId: number;
+  arrayCount: number;
+  sectorBBoxMin: THREE.Vector3;
+  sectorBBoxMax: THREE.Vector3;
   geometryIndexes: {[name: string]: GeometryIndexInformation };
 }
 

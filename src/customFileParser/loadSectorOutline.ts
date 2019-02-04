@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import FibonacciDecoder from './FibonacciDecoder';
 import BufferReader from './BufferReader';
 import { propertyNames, allGeometryNames, SectorInformation, GeometryIndexInformation,
-  extraGeometryProperties, NodeIdReader } from './sharedFileParserTypes';
+  extraGeometryProperties, NodeIdReader, TrueValues } from './sharedFileParserTypes';
 
 const specialByteSizes: {[index: string]: number} = {
   'color': 4,
@@ -11,10 +11,27 @@ const specialByteSizes: {[index: string]: number} = {
 
 const defaultColor = new THREE.Color(42, 42, 42);
 
-export default function readSegmentFile(asArrayBuffer: ArrayBuffer, flip: boolean): SectorInformation {
-  const fileReader = new BufferReader(asArrayBuffer, true);
-  const sectorInformation: SectorInformation = {
-    propertyTrueValues: {
+export default function loadSectorOutline(
+  asArrayBuffer: ArrayBuffer, start: number, length: number, flip: boolean) {
+  const fileReader = new BufferReader(asArrayBuffer, start, length, true);
+
+  const magicBytes = fileReader.readUint32();
+  const formatVersion = fileReader.readUint32();
+  const optimizerVersion = fileReader.readUint32();
+  const sectorId = fileReader.readUint64();
+  const parentSectorId = fileReader.readUint64();
+  const sectorBBoxMin = new THREE.Vector3(
+    fileReader.readFloat32(), fileReader.readFloat32(), fileReader.readFloat32());
+  const sectorBBoxMax = new THREE.Vector3(
+    fileReader.readFloat32(), fileReader.readFloat32(), fileReader.readFloat32());
+
+  const arrayCount = fileReader.readUint32();
+
+  let trueValueArrays = undefined;
+  if (arrayCount !== 0) {
+    trueValueArrays = loadValueArrays(fileReader);
+  } else {
+    trueValueArrays = {
       color: [defaultColor],
       centerX: [],
       centerY: [],
@@ -30,18 +47,46 @@ export default function readSegmentFile(asArrayBuffer: ArrayBuffer, flip: boolea
       scaleX: [],
       scaleY: [],
       scaleZ: [],
-    },
-    geometryIndexes: {},
+    };
+  }
+
+  const geometryIndexes = loadGeometryIndexPointers(fileReader, asArrayBuffer, start);
+
+  const sectorInformation: SectorInformation = {
+    magicBytes: magicBytes,
+    formatVersion: formatVersion,
+    optimizerVersion: optimizerVersion,
+    sectorId: sectorId,
+    parentSectorId: parentSectorId,
+    arrayCount: arrayCount,
+    sectorBBoxMin: sectorBBoxMin,
+    sectorBBoxMax: sectorBBoxMax,
+    geometryIndexes: geometryIndexes,
   };
 
-  sectorInformation.magicBytes = fileReader.readUint32();
-  sectorInformation.formatVersion = fileReader.readUint32();
-  sectorInformation.optimizerVersion = fileReader.readUint32();
-  sectorInformation.sectorId = fileReader.readUint64();
-  sectorInformation.parentSectorId = fileReader.readUint64();
-  sectorInformation.arrayCount = fileReader.readUint32();
+  return { metadata: sectorInformation, trueValueArrays: trueValueArrays };
+}
 
-  for (let arrayId = 0; arrayId < sectorInformation.arrayCount;  arrayId++) {
+function loadValueArrays(fileReader: BufferReader) {
+  const propertyTrueValues: TrueValues = {
+    color: [defaultColor],
+    centerX: [],
+    centerY: [],
+    centerZ: [],
+    normal: [],
+    delta: [],
+    height: [],
+    radius: [],
+    angle: [],
+    translationX: [],
+    translationY: [],
+    translationZ: [],
+    scaleX: [],
+    scaleY: [],
+    scaleZ: [],
+  };
+
+  for (let arrayId = 0; arrayId < 15;  arrayId++) {
     const clusterCount = fileReader.readUint32();
     const bytesForOneValue = fileReader.readUint32();
     const propertyName = propertyNames[arrayId];
@@ -61,26 +106,29 @@ export default function readSegmentFile(asArrayBuffer: ArrayBuffer, flip: boolea
           const g = colorValues[j * 4 + 1];
           const b = colorValues[j * 4 + 2];
           // ignoring a, it's not used by PrimitiveGroup.
-          sectorInformation.propertyTrueValues.color.push(new THREE.Color(r, g, b));
+          propertyTrueValues.color.push(new THREE.Color(r, g, b));
         }
         break;
       case 'normal':
         const normalValues = fileReader.readFloat32Array(clusterCount * 3);
         for (let j = 0; j < clusterCount; j++) {
           const newNormal = new THREE.Vector3(normalValues[j * 3], normalValues[j * 3 + 1], normalValues[j * 3 + 2]);
-          sectorInformation.propertyTrueValues.normal.push(newNormal);
+          propertyTrueValues.normal.push(newNormal);
         }
         break;
       default:
         // @ts-ignore
-        sectorInformation.propertyTrueValues[propertyName] = fileReader.readFloat32Array(clusterCount);
+        propertyTrueValues[propertyName] = fileReader.readFloat32Array(clusterCount);
         break;
     }
   }
+}
 
-  sectorInformation.geometryIndexes = {};
-  while (fileReader.location < asArrayBuffer.byteLength) {
+function loadGeometryIndexPointers(fileReader: BufferReader, asArrayBuffer: ArrayBuffer, start: number) {
+  const geometryIndexes: {[name: string]: any} = {};
+  while (fileReader.location < length) {
     const name = allGeometryNames[fileReader.readUint32()];
+    console.log(name);
     const geometryCount = fileReader.readUint32();
     const attributeCount = fileReader.readUint32();
     const byteCount = fileReader.readUint32();
@@ -107,9 +155,9 @@ export default function readSegmentFile(asArrayBuffer: ArrayBuffer, flip: boolea
       attributeCount);
     }
 
-    const nodeIds = new NodeIdReader(asArrayBuffer, fileReader.location, geometryCount * 7);
+    const nodeIds = new NodeIdReader(asArrayBuffer, fileReader.location + start, geometryCount * 7);
     fileReader.skip(geometryCount * 7);
-    const indexes = new FibonacciDecoder(asArrayBuffer, fileReader.location, byteCount);
+    const indexes = new FibonacciDecoder(asArrayBuffer, fileReader.location + start, byteCount);
     fileReader.skip(byteCount);
 
     const newGeometry: GeometryIndexInformation = {
@@ -122,8 +170,8 @@ export default function readSegmentFile(asArrayBuffer: ArrayBuffer, flip: boolea
       attributeCount: attributeCount,
     };
 
-    sectorInformation.geometryIndexes[newGeometry.name] = newGeometry;
+    geometryIndexes[newGeometry.name] = newGeometry;
   }
 
-  return sectorInformation;
+  return geometryIndexes;
 }
