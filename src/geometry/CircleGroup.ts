@@ -3,6 +3,7 @@
 import * as THREE from 'three';
 import PlaneGroup from './PlaneGroup';
 import { zAxis } from '../constants';
+import { FilterOptions } from '../parsers/parseUtils';
 
 // reusable variables
 const globalDot = new THREE.Vector3();
@@ -55,6 +56,7 @@ export default class CircleGroup extends PlaneGroup {
     center: THREE.Vector3,
     normal: THREE.Vector3,
     radius: number,
+    filterOptions?: FilterOptions,
   ) {
     this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
@@ -63,6 +65,10 @@ export default class CircleGroup extends PlaneGroup {
     this.setNormal(normal, this.count);
     this.setRadius(radius, this.count);
     this.count += 1;
+
+    if (filterOptions) {
+      this.filterLastObject(filterOptions);
+    }
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {

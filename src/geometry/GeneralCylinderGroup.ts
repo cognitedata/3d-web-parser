@@ -3,6 +3,7 @@
 import * as THREE from 'three';
 import BaseCylinderGroup from './BaseCylinderGroup';
 import { xAxis, yAxis, zAxis } from '../constants';
+import { FilterOptions } from '../parsers/parseUtils';
 
 const globalNormal = new THREE.Vector3();
 const globalVector = new THREE.Vector3();
@@ -226,6 +227,7 @@ export default class GeneralCylinderGroup extends BaseCylinderGroup {
     zAngleB: number,
     angle: number = 0,
     arcAngle: number = Math.PI * 2.0,
+    filterOptions?: FilterOptions,
   ) {
     this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
@@ -263,6 +265,10 @@ export default class GeneralCylinderGroup extends BaseCylinderGroup {
     this.setLocalXAxis(globalVector.copy(xAxis).applyQuaternion(globalRotation), this.count);
 
     this.count += 1;
+
+    if (filterOptions) {
+      this.filterLastObject(filterOptions);
+    }
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {

@@ -1,12 +1,12 @@
 import * as THREE from 'three';
 import BoxGroup from '../geometry/BoxGroup';
 import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
-
 import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
          parsePrimitiveTreeIndex,
-         getPrimitiveType } from './parseUtils';
+         getPrimitiveType,
+         ParsePrimitiveArguments } from './parseUtils';
 
 const color = new THREE.Color();
 const center = new THREE.Vector3();
@@ -38,7 +38,8 @@ function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumReq
   return false;
 }
 
-export default function parse(geometries: any[], primitiveGroupMap: PrimitiveGroupMap): boolean {
+export default function parse(args: ParsePrimitiveArguments): boolean {
+  const { geometries, primitiveGroupMap, filterOptions } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
   const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
   const group = primitiveGroupMap.Box.group;
@@ -60,7 +61,7 @@ export default function parse(geometries: any[], primitiveGroupMap: PrimitiveGro
     delta.set(x, y, z);
 
     const { angle = 0 } = geometry.primitiveInfo.box;
-    group.add(nodeId, treeIndex, color, center, normal, angle, delta);
+    group.add(nodeId, treeIndex, color, center, normal, angle, delta, filterOptions);
   });
   return didCreateNewGroup;
 }

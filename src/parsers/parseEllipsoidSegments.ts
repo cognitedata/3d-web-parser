@@ -5,7 +5,8 @@ import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
          parsePrimitiveTreeIndex,
-         getPrimitiveType } from './parseUtils';
+         getPrimitiveType,
+         ParsePrimitiveArguments } from './parseUtils';
 
 const color = new THREE.Color();
 const center = new THREE.Vector3();
@@ -38,7 +39,8 @@ function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumReq
   return false;
 }
 
-export default function parse(geometries: any[], primitiveGroupMap: PrimitiveGroupMap): boolean {
+export default function parse(args: ParsePrimitiveArguments): boolean {
+  const { geometries, primitiveGroupMap, filterOptions } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
   const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
   const group = primitiveGroupMap.EllipsoidSegment.group;
@@ -62,7 +64,7 @@ export default function parse(geometries: any[], primitiveGroupMap: PrimitiveGro
       height = primitiveInfo.height;
     }
 
-    group.add(nodeId, treeIndex, color, center, normal, horizontalRadius, verticalRadius, height);
+    group.add(nodeId, treeIndex, color, center, normal, horizontalRadius, verticalRadius, height, filterOptions);
   });
   return didCreateNewGroup;
 }

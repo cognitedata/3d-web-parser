@@ -15,7 +15,11 @@ import QuadGroup from './QuadGroup';
 import SphericalSegmentGroup from './SphericalSegmentGroup';
 import TorusSegmentGroup from './TorusSegmentGroup';
 import TrapeziumGroup from './TrapeziumGroup';
+import { FilterOptions } from '../parsers/parseUtils';
+import { identityMatrix4 } from '../constants';
+
 const matrix = new THREE.Matrix4();
+const globalBox = new THREE.Box3();
 
 type TypedArray = Float32Array | Float64Array;
 type THREEVector = THREE.Vector2 | THREE.Vector3 | THREE.Vector4;
@@ -83,6 +87,19 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
 
   abstract computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4;
   abstract computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3;
+
+  filterLastObject(filterOptions: FilterOptions) {
+    const index = this.count - 1;
+    this.computeBoundingBox(identityMatrix4, globalBox, index);
+    const boundingBoxFilterResult = filterOptions.boundingBoxFilter
+                                    && !filterOptions.boundingBoxFilter.intersectsBox(globalBox);
+    const nodeId = this.getNodeId(index);
+    const nodeIdFilterResult = filterOptions.nodeIdFilter && filterOptions.nodeIdFilter.indexOf(nodeId) === -1;
+    if (boundingBoxFilterResult || nodeIdFilterResult) {
+      // Reduce count, i.e. remove last element
+      this.count -= 1;
+    }
+  }
 
   setVector<T extends TypedArray, U extends THREEVector>(
     source: U,

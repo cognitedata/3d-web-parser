@@ -6,7 +6,8 @@ import { MatchingGeometries,
   parsePrimitiveNodeId,
   parsePrimitiveTreeIndex,
   getPrimitiveType,
-  isPrimitive } from './parseUtils';
+  isPrimitive,
+         ParsePrimitiveArguments } from './parseUtils';
 import { zAxis } from '../constants';
 
 const globalColor = new THREE.Color();
@@ -57,7 +58,8 @@ function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumReq
   return false;
 }
 
-export default function parse(geometries: any[], primitiveGroupMap: PrimitiveGroupMap): boolean {
+export default function parse(args: ParsePrimitiveArguments): boolean {
+  const { geometries, primitiveGroupMap, filterOptions } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
 
   const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
@@ -77,17 +79,44 @@ export default function parse(geometries: any[], primitiveGroupMap: PrimitiveGro
 
     if (geometry.type === 'cylinder') {
       const { radius } = primitiveInfo;
-      group.add(nodeId, treeIndex, globalColor, globalCenterA, globalCenterB, radius, radius);
+      group.add(nodeId,
+        treeIndex,
+        globalColor,
+        globalCenterA,
+        globalCenterB,
+        radius,
+        radius,
+        0,
+        2 * Math.PI,
+        filterOptions);
     } else if (geometry.type === 'cone' || geometry.type === 'generalCylinder') {
       let { radiusA, radiusB } = primitiveInfo;
       const { angle = 0, arcAngle  = 2.0 * Math.PI, thickness = 0 } = primitiveInfo;
-      group.add(nodeId, treeIndex, globalColor, globalCenterA, globalCenterB, radiusA, radiusB, angle, arcAngle);
+      group.add(nodeId,
+        treeIndex,
+        globalColor,
+        globalCenterA,
+        globalCenterB,
+        radiusA,
+        radiusB,
+        angle,
+        arcAngle,
+        filterOptions);
 
       if (thickness > 0) {
         // Create the inner cone if it has a thickness
         radiusA -= thickness;
         radiusB -= thickness;
-        group.add(nodeId, treeIndex, globalColor, globalCenterA, globalCenterB, radiusA, radiusB, angle, arcAngle);
+        group.add(nodeId,
+          treeIndex,
+          globalColor,
+          globalCenterA,
+          globalCenterB,
+          radiusA,
+          radiusB,
+          angle,
+          arcAngle,
+          filterOptions);
       }
     } else if (geometry.type === 'extrudedRing' || geometry.type === 'extrudedRingSegment') {
       const { innerRadius, outerRadius, angle = 0, arcAngle = 2.0 * Math.PI } = primitiveInfo;
@@ -99,7 +128,8 @@ export default function parse(geometries: any[], primitiveGroupMap: PrimitiveGro
         innerRadius,
         innerRadius,
         angle,
-        arcAngle);
+        arcAngle,
+        filterOptions);
 
       group.add(nodeId,
         treeIndex,
@@ -109,7 +139,8 @@ export default function parse(geometries: any[], primitiveGroupMap: PrimitiveGro
         outerRadius,
         outerRadius,
         angle,
-        arcAngle);
+        arcAngle,
+        filterOptions);
     }
   });
   return didCreateNewGroup;

@@ -3,6 +3,7 @@
 import * as THREE from 'three';
 import BaseCylinderGroup from './BaseCylinderGroup';
 import { computeCircleBoundingBox } from './CircleGroup';
+import { FilterOptions } from '../parsers/parseUtils';
 
 // reusable variables
 const globalNormalMatrix = new THREE.Matrix3();
@@ -77,6 +78,7 @@ export default class EccentricConeGroup extends BaseCylinderGroup {
     radiusA: number,
     radiusB: number,
     normal: THREE.Vector3,
+    filterOptions?: FilterOptions,
   ) {
     this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
@@ -88,6 +90,10 @@ export default class EccentricConeGroup extends BaseCylinderGroup {
     this.setNormal(normal, this.count);
 
     this.count += 1;
+
+    if (filterOptions) {
+      this.filterLastObject(filterOptions);
+    }
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {

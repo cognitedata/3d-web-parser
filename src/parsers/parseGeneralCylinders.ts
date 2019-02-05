@@ -7,7 +7,8 @@ import { MatchingGeometries,
   parsePrimitiveTreeIndex,
   getPrimitiveType,
   isPrimitive,
-  normalizeRadians } from './parseUtils';
+  normalizeRadians,
+         ParsePrimitiveArguments } from './parseUtils';
 import { zAxis } from '../constants';
 
 // reusable variables
@@ -62,7 +63,8 @@ function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumReq
   return false;
 }
 
-export default function parse(geometries: any[], primitiveGroupMap: PrimitiveGroupMap): boolean {
+export default function parse(args: ParsePrimitiveArguments): boolean {
+  const { geometries, primitiveGroupMap, filterOptions } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
   const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
   const group = primitiveGroupMap.GeneralCylinder.group;
@@ -114,13 +116,13 @@ export default function parse(geometries: any[], primitiveGroupMap: PrimitiveGro
     group.add(nodeId, treeIndex, color, extA, extB,
               radiusA, heightA,
               heightB, slopeA, slopeB, zAngleA, zAngleB,
-              angle, arcAngle);
+              angle, arcAngle, filterOptions);
     if (thickness > 0) {
       if (thickness !== radiusA) {
         group.add(nodeId, treeIndex, color, extA, extB,
                   radiusA - thickness, heightA,
                   heightB, slopeA, slopeB, zAngleA, zAngleB,
-                  angle, arcAngle);
+                  angle, arcAngle, filterOptions);
       }
     }
   });

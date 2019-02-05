@@ -6,7 +6,8 @@ import { MatchingGeometries,
          parsePrimitiveNodeId,
          parsePrimitiveTreeIndex,
          getPrimitiveType,
-         isPrimitive } from './parseUtils';
+         isPrimitive,
+         ParsePrimitiveArguments } from './parseUtils';
 import { zAxis } from '../constants';
 
 const color = new THREE.Color();
@@ -54,7 +55,8 @@ function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumReq
   return false;
 }
 
-export default function parse(geometries: any[], primitiveGroupMap: PrimitiveGroupMap): boolean {
+export default function parse(args: ParsePrimitiveArguments): boolean {
+  const { geometries, primitiveGroupMap, filterOptions } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
   const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
   const group = primitiveGroupMap.Quad.group;
@@ -101,9 +103,9 @@ export default function parse(geometries: any[], primitiveGroupMap: PrimitiveGro
 
       if (isSecondQuad) {
         // swap the order of vertex1 and vertex2 to flip the normal
-        group.add(nodeId, treeIndex, color, vertex2, vertex1, vertex3);
+        group.add(nodeId, treeIndex, color, vertex2, vertex1, vertex3, filterOptions);
       } else {
-        group.add(nodeId, treeIndex, color, vertex1, vertex2, vertex3);
+        group.add(nodeId, treeIndex, color, vertex1, vertex2, vertex3, filterOptions);
       }
     });
   });

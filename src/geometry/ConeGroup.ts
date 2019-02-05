@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import BaseCylinderGroup from './BaseCylinderGroup';
 import { computeCircleBoundingBox } from './CircleGroup';
 import { xAxis, zAxis } from '../constants';
+import { FilterOptions } from '../parsers/parseUtils';
 
 // reusable variables
 const vector1 = new THREE.Vector3();
@@ -110,8 +111,9 @@ export default class ConeGroup extends BaseCylinderGroup {
     centerB: THREE.Vector3,
     radiusA: number,
     radiusB: number,
-    angle: number = 0,
-    arcAngle: number = 2 * Math.PI,
+    angle: number,
+    arcAngle: number,
+    filterOptions?: FilterOptions,
   ) {
     this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
@@ -128,6 +130,10 @@ export default class ConeGroup extends BaseCylinderGroup {
     this.setLocalXAxis(vector1.copy(xAxis).applyQuaternion(rotation), this.count);
 
     this.count += 1;
+
+    if (filterOptions) {
+      this.filterLastObject(filterOptions);
+    }
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {

@@ -3,6 +3,7 @@
 import * as THREE from 'three';
 import PrimitiveGroup from './PrimitiveGroup';
 import { computeCircleBoundingBox } from './CircleGroup';
+import { FilterOptions } from '../parsers/parseUtils';
 
 // constants
 type triplet = [number, number, number];
@@ -112,6 +113,7 @@ export default class SphericalSegmentGroup extends PrimitiveGroup {
     normal: THREE.Vector3,
     radius: number,
     height: number,
+    filterOptions?: FilterOptions,
   ) {
     this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
@@ -121,6 +123,10 @@ export default class SphericalSegmentGroup extends PrimitiveGroup {
     this.setNormal(normal, this.count);
     this.setHeight(height, this.count);
     this.count += 1;
+
+    if (filterOptions) {
+      this.filterLastObject(filterOptions);
+    }
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {

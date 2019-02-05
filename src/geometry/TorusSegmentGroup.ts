@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import PlaneGroup from './PlaneGroup';
 import { computeCircleBoundingBox } from './CircleGroup';
 import { zAxis, twoPI } from './../constants';
+import { FilterOptions } from '../parsers/parseUtils';
 
 // reusable variables
 const firstRotation = new THREE.Quaternion();
@@ -92,6 +93,7 @@ export default class TorusSegmentGroup extends PlaneGroup {
     tubeRadius: number,
     angle: number,
     arcAngle: number,
+    filterOptions?: FilterOptions,
   ) {
     this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
@@ -103,6 +105,10 @@ export default class TorusSegmentGroup extends PlaneGroup {
     this.setAngle(angle, this.count);
     this.setArcAngle(arcAngle, this.count);
     this.count += 1;
+
+    if (filterOptions) {
+      this.filterLastObject(filterOptions);
+    }
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {

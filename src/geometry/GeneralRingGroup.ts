@@ -3,6 +3,7 @@
 import * as THREE from 'three';
 import PlaneGroup from './PlaneGroup';
 import { computeEllipsoidBoundingBox } from './EllipsoidSegmentGroup';
+import { FilterOptions } from '../parsers/parseUtils';
 
 // reusable variables
 const rotation = new THREE.Quaternion();
@@ -110,8 +111,9 @@ export default class GeneralRingGroup extends PlaneGroup {
     xRadius: number,
     yRadius: number,
     thickness: number,
-    angle: number = 0,
-    arcAngle: number = 2 * Math.PI,
+    angle: number,
+    arcAngle: number,
+    filterOptions?: FilterOptions,
   ) {
     this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
@@ -125,6 +127,10 @@ export default class GeneralRingGroup extends PlaneGroup {
     this.setAngle(angle, this.count);
     this.setArcAngle(arcAngle, this.count);
     this.count += 1;
+
+    if (filterOptions) {
+      this.filterLastObject(filterOptions);
+    }
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {

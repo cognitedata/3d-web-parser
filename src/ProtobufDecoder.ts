@@ -19,7 +19,7 @@ export default class ProtobufDecoder {
     this.root = Root.fromJSON(WebSceneProto);
   }
 
-  async decode(type: string, dataArray: Uint8Array) {
+  decode(type: string, dataArray: Uint8Array) {
     if (type === ProtobufDecoder.Types.WEB_SCENE) {
       return this.decodeWebScene(dataArray);
     }

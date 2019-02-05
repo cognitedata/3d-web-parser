@@ -77,7 +77,7 @@ export class MergedMeshMappings {
   }
 
   public hasTransform(index: number): boolean {
-    return this.transform0[index] !== undefined;
+  return this.transform0[index] !== undefined;
   }
 
   public getTransformMatrix(target: THREE.Matrix4, index: number) {

@@ -10,6 +10,7 @@ import { InstancedMesh, InstancedMeshGroup } from './geometry/InstancedMeshGroup
 import { MergedMesh } from './geometry/MergedMeshGroup';
 import PrimitiveGroup from './geometry/PrimitiveGroup';
 import GeometryGroup from './geometry/GeometryGroup';
+import { FilterOptions, ParsePrimitiveArguments } from './parsers/parseUtils';
 
 import parseBoxes from './parsers/parseBoxes';
 import parseCircles from './parsers/parseCircles';
@@ -66,10 +67,16 @@ interface InstancedMeshMap { [key: number]: InstancedMesh; }
 function parseGeometries(geometries: GeometryGroup[],
                          instancedMeshMap: InstancedMeshMap,
                          primitiveGroupMap: PrimitiveGroupMap,
-                         sceneStats: SceneStats) {
+                         sceneStats: SceneStats,
+                         filterOptions?: FilterOptions) {
   const primitiveGroups: PrimitiveGroup[] = [];
   primitiveParsers.forEach(({ type, parser }) => {
-    const didCreateNewGroup = parser(geometries, primitiveGroupMap);
+    const didCreateNewGroup = parser({
+      geometries,
+      primitiveGroupMap,
+      sceneStats,
+      filterOptions,
+    });
     if (didCreateNewGroup) {
       // TODO(anders.hafreager) Learn TypeScript and fix this
       // @ts-ignore
@@ -83,7 +90,12 @@ function parseGeometries(geometries: GeometryGroup[],
   return { primitiveGroups, mergedMeshGroup, instancedMeshGroup };
 }
 
-export default async function parseProtobuf(protobufData: Uint8Array, printParsingTime: boolean = false) {
+export default async function parseProtobuf(
+  protobufData?: Uint8Array,
+  protobufDataList?: Uint8Array[],
+  printParsingTime: boolean = false,
+  filterOptions?: FilterOptions,
+) {
   const protobufDecoder = new ProtobufDecoder();
 
   const sectors: { [path: string]: Sector } = { };
@@ -111,7 +123,8 @@ export default async function parseProtobuf(protobufData: Uint8Array, printParsi
 
   const mergedMeshMap: InstancedMeshMap = {};
   let t0 = performance.now();
-  for (const webNode of protobufDecoder.decodeWebScene(protobufData)) {
+
+  const handleWebNode = (webNode: any) => {
     const { boundingBox, path } = webNode;
     const boundingBoxMin = new Vector3(boundingBox.min.x, boundingBox.min.y, boundingBox.min.z);
     const boundingBoxMax = new Vector3(boundingBox.max.x, boundingBox.max.y, boundingBox.max.z);
@@ -121,7 +134,13 @@ export default async function parseProtobuf(protobufData: Uint8Array, printParsi
       primitiveGroups,
       mergedMeshGroup,
       instancedMeshGroup,
-    } = parseGeometries(webNode.geometries, instancedMeshMap, primitiveGroupMap, sceneStats);
+    } = parseGeometries(
+      webNode.geometries,
+      instancedMeshMap,
+      primitiveGroupMap,
+      sceneStats,
+      filterOptions,
+    );
 
     sector.primitiveGroups = primitiveGroups;
     sector.mergedMeshGroup = mergedMeshGroup;
@@ -133,7 +152,24 @@ export default async function parseProtobuf(protobufData: Uint8Array, printParsi
       sectors[parentPath].addChild(sector);
       sectors[parentPath].object3d.add(sector.object3d);
     }
+  };
+
+  if (protobufData) {
+    for (const webNode of protobufDecoder.decodeWebScene(protobufData)) {
+      handleWebNode(webNode);
+    }
+  } else if (protobufDataList) {
+    protobufDataList.forEach(data => {
+      const webNode = protobufDecoder.decode(
+        ProtobufDecoder.Types.WEB_NODE,
+        data,
+      );
+      handleWebNode(webNode);
+    });
+  } else {
+    throw 'parseProtobuf did not get data to parse';
   }
+
   if (printParsingTime) {
     // tslint:disable-next-line
     console.log('Parsing protobuf took ', performance.now() - t0, ' ms.');
@@ -150,6 +186,6 @@ export default async function parseProtobuf(protobufData: Uint8Array, printParsi
     // tslint:disable-next-line
     console.log('Optimizing instanced meshes took ', performance.now() - t0, ' ms.');
   }
-
+  console.log('Will return ', { rootSector, sectors, sceneStats });
   return { rootSector, sectors, sceneStats };
 }

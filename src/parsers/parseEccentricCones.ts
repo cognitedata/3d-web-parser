@@ -5,7 +5,8 @@ import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
          parsePrimitiveTreeIndex,
-         getPrimitiveType } from './parseUtils';
+         getPrimitiveType,
+         ParsePrimitiveArguments } from './parseUtils';
 import { zAxis } from '../constants';
 
 const color = new THREE.Color();
@@ -41,7 +42,8 @@ function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumReq
   return false;
 }
 
-export default function parse(geometries: any[], primitiveGroupMap: PrimitiveGroupMap): boolean {
+export default function parse(args: ParsePrimitiveArguments): boolean {
+  const { geometries, primitiveGroupMap, filterOptions } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
   const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
   const group = primitiveGroupMap.EccentricCone.group;
@@ -68,7 +70,7 @@ export default function parse(geometries: any[], primitiveGroupMap: PrimitiveGro
       normal.negate();
     }
 
-    group.add(nodeId, treeIndex, color, centerA, centerB, radiusA, radiusB, normal);
+    group.add(nodeId, treeIndex, color, centerA, centerB, radiusA, radiusB, normal, filterOptions);
   });
   return didCreateNewGroup;
 }

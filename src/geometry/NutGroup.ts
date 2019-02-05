@@ -3,6 +3,7 @@
 import * as THREE from 'three';
 import BaseCylinderGroup from './BaseCylinderGroup';
 import { zAxis } from './../constants';
+import { FilterOptions } from '../parsers/parseUtils';
 
 // reusable variables
 const firstRotation = new THREE.Quaternion();
@@ -51,6 +52,7 @@ export default class NutGroup extends BaseCylinderGroup {
     centerB: THREE.Vector3,
     radius: number,
     rotationAngle: number,
+    filterOptions?: FilterOptions,
   ) {
     this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
@@ -61,6 +63,10 @@ export default class NutGroup extends BaseCylinderGroup {
     this.setRotationAngle(rotationAngle, this.count);
 
     this.count += 1;
+
+    if (filterOptions) {
+      this.filterLastObject(filterOptions);
+    }
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
