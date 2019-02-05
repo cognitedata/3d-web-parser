@@ -46,7 +46,7 @@ export interface Attribute {
 }
 
 interface TreeIndexMap {
-  [s: number]: number;
+  [s: number]: number[];
 }
 
 export default abstract class PrimitiveGroup extends GeometryGroup {
@@ -183,7 +183,12 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
 
   setTreeIndex(value: number, index: number) {
     this.maxTreeIndex = Math.max(this.maxTreeIndex, value);
-    this.treeIndexMap[value] = index;
+    if (this.treeIndexMap[value] == null) {
+      this.treeIndexMap[value] = [index];
+    } else {
+      this.treeIndexMap[value].push(index);
+    }
+
     this.treeIndex[index] = value;
   }
 
