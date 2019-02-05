@@ -17,9 +17,9 @@ const centerA = new THREE.Vector3();
 const centerB = new THREE.Vector3();
 const extA = new THREE.Vector3();
 const extB = new THREE.Vector3();
-const rotation = new THREE.Quaternion();
+const globalRotation = new THREE.Quaternion();
 const slicingPlane = new THREE.Vector4();
-const axis = new THREE.Vector3();
+const globalAxis = new THREE.Vector3();
 const vertex = new THREE.Vector3();
 const planes = [new THREE.Plane(), new THREE.Plane()];
 const line = new THREE.Line3();
@@ -98,18 +98,19 @@ export default function parse(args: ParsePrimitiveArguments): boolean {
 
     const thickness = primitiveInfo.thickness || (isClosed ? radiusA : 0);
 
-    const distFromBToA = axis.subVectors(centerA, centerB).length();
-    rotation.setFromUnitVectors(zAxis, axis.normalize());
+    globalAxis.subVectors(centerA, centerB);
+    const distFromBToA = globalAxis.length();
+    globalRotation.setFromUnitVectors(zAxis, globalAxis.normalize());
 
     const distFromAToExtA = radiusA * Math.tan(slopeA);
     const distFromBToExtB = radiusA * Math.tan(slopeB);
     const heightA = distFromBToExtB + distFromBToA;
     const heightB = distFromBToExtB;
 
-    extA.copy(axis)
+    extA.copy(globalAxis)
       .multiplyScalar(distFromAToExtA)
       .add(centerA);
-    extB.copy(axis)
+    extB.copy(globalAxis)
       .multiplyScalar(-distFromBToExtB)
       .add(centerB);
 
