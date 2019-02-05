@@ -1,11 +1,11 @@
-import loadSectorOutline from '../../customFileParser/loadSectorOutline';
+import loadSectorOutline from '../../customFileParser/loadSectorMetadata';
 import unpackGeometry from '../../customFileParser/unpackGeometry/main';
-import countGeometries from '../../customFileParser/countGeometries';
+import countRenderedGeometries from '../../customFileParser/countRenderedGeometries';
 import * as THREE from 'three';
 const fs = require('fs');
-import { GeometryGroups } from '../../customFileParser/sharedFileParserTypes';
+import { RenderedGeometryGroups } from '../../customFileParser/sharedFileParserTypes';
 
-describe('generateGeometryGroups', () => {
+describe('generateRenderedGeometryGroups', () => {
   test('generate groups', async() => {
     const incomingFile = fs.readFileSync('./src/__tests__/customFileParserTest/Pipes.c3d', null);
 
@@ -16,8 +16,8 @@ describe('generateGeometryGroups', () => {
     }
 
     const parsedFile = loadSectorOutline(asArrayBuffer, 0, asArrayBuffer.byteLength, true);
-    const counts = countGeometries(parsedFile);
-    const geometryGroups = new GeometryGroups(counts);
+    const counts = countRenderedGeometries(parsedFile);
+    const geometryGroups = new RenderedGeometryGroups(counts);
 
     unpackGeometry(geometryGroups, parsedFile, 'Box');
 

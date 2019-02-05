@@ -166,7 +166,7 @@ function parseGeneralCylinder(primitiveInfo: any,
                               treeIndex: number,
                               color: THREE.Color,
                               group: GeneralRingGroup) {
-  //
+
   const {
     radiusA,
     radiusB,

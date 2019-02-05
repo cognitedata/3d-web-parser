@@ -1,7 +1,8 @@
 import * as THREE from 'three';
-import { GeometryIndexInformation } from './sharedFileParserTypes';
+import { GeometryIndexHandler } from './sharedFileParserTypes';
+import { fileGeometryProperties } from './parserParameters';
 
-export default class DataLoader {
+export default class PropertyLoader {
   public nodeId = 0;
 
   public treeIndex = 0;
@@ -37,11 +38,10 @@ export default class DataLoader {
     this.trueValuesArray = trueValuesArray;
   }
 
-  loadData(geometryInfo: GeometryIndexInformation) {
+  loadData(geometryInfo: GeometryIndexHandler) {
     this.nodeId =    geometryInfo.nodeIds.nextNodeId();
 
-    for (let i = 0; i < geometryInfo.properties.length; i++) {
-      const property = geometryInfo.properties[i];
+    fileGeometryProperties[geometryInfo.name].forEach(property => {
       switch (property) {
         case 'treeIndex':
           this.treeIndex = geometryInfo.indexes.nextValue();
@@ -111,7 +111,6 @@ export default class DataLoader {
             throw Error('Unknown property name ' + property);
           }
       }
-    }
-    console.log(this.trueValuesArray);
+    });
   }
 }

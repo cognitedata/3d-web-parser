@@ -1,14 +1,23 @@
-export default class BufferReader {
-  public dataView: DataView;
+
+import loadSectorMetadata from './loadSectorMetadata';
+import loadTrueValueArrays from './loadTrueValueArrays';
+import loadGeometryIndexHandlers from './loadGeometryIndexHandlers';
+import FibonacciDecoder from './FibonacciDecoder';
+import { NodeIdReader, GeometryIndexHandler } from './sharedFileParserTypes';
+
+export default class CustomFileReader {
   public location: number;
 
   private flip: boolean;
+  private originalBuffer: ArrayBuffer;
+  private dataView: DataView;
 
-  constructor(arrayBuffer: ArrayBuffer, start: number, length: number, flip: boolean) {
-    this.dataView = new DataView(arrayBuffer, start, length);
+  constructor(arrayBuffer: ArrayBuffer) {
+    this.originalBuffer = arrayBuffer;
+    this.dataView = new DataView(arrayBuffer);
     this.location = 0;
-    // FLIP ONLY IF READING A NODE FILE
-    this.flip = Boolean(flip);
+    // Little endian / big endinan
+    this.flip = true;
   }
 
   readUint32(): number {
@@ -69,5 +78,29 @@ export default class BufferReader {
 
   skip(numberOfBytes: number) {
     this.location += numberOfBytes;
+  }
+
+  readSectorMetadata(sectorByteLength: number) {
+    return loadSectorMetadata(this, sectorByteLength);
+  }
+
+  readTrueValueArrays() {
+    return loadTrueValueArrays(this);
+  }
+
+  readSectorGeometryIndexHandlers(sectorEndLocation: number): GeometryIndexHandler[] {
+    return loadGeometryIndexHandlers(this, sectorEndLocation);
+  }
+
+  getNodeIdReader(geometryCount: number): NodeIdReader {
+    const nodeIds = new NodeIdReader(this.originalBuffer, this.location, geometryCount * 7);
+    this.location += geometryCount * 7;
+    return nodeIds;
+  }
+
+  getFibonacciDecoder(byteCount: number): FibonacciDecoder {
+    const indexes = new FibonacciDecoder(this.originalBuffer, this.location, byteCount);
+    this.location += byteCount;
+    return indexes;
   }
 }

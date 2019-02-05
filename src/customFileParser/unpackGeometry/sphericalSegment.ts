@@ -1,12 +1,12 @@
-import { GeometryGroups } from '../sharedFileParserTypes';
-import DataLoader from '../DataLoader';
+import { RenderedGeometryGroups } from '../sharedFileParserTypes';
+import PropertyLoader from '../PropertyLoader';
 
-function addOpenSphericalSegment(groups: GeometryGroups, data: DataLoader) {
+function addOpenSphericalSegment(groups: RenderedGeometryGroups, data: PropertyLoader) {
   groups.sphericalSegment.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal,
     data.radiusA, data.height);
 }
 
-function addClosedSphericalSegment(groups: GeometryGroups, data: DataLoader) {
+function addClosedSphericalSegment(groups: RenderedGeometryGroups, data: PropertyLoader) {
   addOpenSphericalSegment(groups, data);
   groups.circle.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal, data.radiusA);
 }

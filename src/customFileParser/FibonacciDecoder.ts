@@ -5,10 +5,8 @@ for (let i = 2; i <= 77; i++) {
 
 export default class FibonacciDecoder {
   public numberRead: number;
-
   private buffer: ArrayBuffer;
   private data: Uint8Array;
-
   private readBitId: number;
   private currentValue: number;
   private nextFibIndex: number;

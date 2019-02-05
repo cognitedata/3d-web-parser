@@ -1,5 +1,5 @@
-import { SectorInformation, GeometryGroups } from '../sharedFileParserTypes';
-import DataLoader from '../DataLoader';
+import { RenderedGeometryGroups } from '../sharedFileParserTypes';
+import PropertyLoader from '../PropertyLoader';
 import * as THREE from 'three';
 import { xAxis, zAxis } from './../../constants';
 
@@ -14,8 +14,7 @@ const quadNorm = new THREE.Vector3();
 const axisRotation = new THREE.Quaternion();
 const localXAxis = new THREE.Vector3();
 
-function addOpenExtrudedRingSegment(groups: GeometryGroups, data: DataLoader) {
-  console.log(data);
+function addOpenExtrudedRingSegment(groups: RenderedGeometryGroups, data: PropertyLoader) {
   centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
   centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
   localXAxis.copy(xAxis).applyQuaternion(axisRotation.setFromUnitVectors(zAxis, data.normal));
@@ -32,7 +31,7 @@ function addOpenExtrudedRingSegment(groups: GeometryGroups, data: DataLoader) {
     data.radiusB, data.rotationAngle, data.arcAngle);
 }
 
-function addClosedExtrudedRingSegment(groups: GeometryGroups, data: DataLoader) {
+function addClosedExtrudedRingSegment(groups: RenderedGeometryGroups, data: PropertyLoader) {
   addOpenExtrudedRingSegment(groups, data);
 
   // quad 1
@@ -59,7 +58,7 @@ function addClosedExtrudedRingSegment(groups: GeometryGroups, data: DataLoader) 
   groups.quad.add(data.nodeId, data.treeIndex, data.color, vertex1, vertex2, vertex3);
 }
 
-function addExtrudedRing(groups: GeometryGroups, data: DataLoader) {
+function addExtrudedRing(groups: RenderedGeometryGroups, data: PropertyLoader) {
   data.rotationAngle = 0;
   data.arcAngle = Math.PI * 2;
   addClosedExtrudedRingSegment(groups, data);

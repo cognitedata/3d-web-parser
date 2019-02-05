@@ -1,11 +1,11 @@
-import { GeometryGroups } from '../sharedFileParserTypes';
-import DataLoader from '../DataLoader';
+import { RenderedGeometryGroups } from '../sharedFileParserTypes';
+import PropertyLoader from '../PropertyLoader';
 
-function addTriangleMesh(groups: GeometryGroups, data: DataLoader) {
+function addTriangleMesh(groups: RenderedGeometryGroups, data: PropertyLoader) {
   // todo
 }
 
-function addInstancedMesh(groups: GeometryGroups, data: DataLoader) {
+function addInstancedMesh(groups: RenderedGeometryGroups, data: PropertyLoader) {
   // todo
 }
 
