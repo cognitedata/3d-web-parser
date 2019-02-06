@@ -186,6 +186,7 @@ export default async function parseProtobuf(
     // tslint:disable-next-line
     console.log('Optimizing instanced meshes took ', performance.now() - t0, ' ms.');
   }
+  // tslint:disable-next-line
   console.log('Will return ', { rootSector, sectors, sceneStats });
   return { rootSector, sectors, sceneStats };
 }

@@ -177,14 +177,9 @@ function parseGeneralCylinder(primitiveInfo: any,
                               nodeId: number,
                               treeIndex: number,
                               color: THREE.Color,
-<<<<<<< HEAD
-                              group: GeneralRingGroup) {
-
-=======
                               group: GeneralRingGroup,
                               filterOptions?: FilterOptions) {
   //
->>>>>>> a7f2a60bbcb80aaad4a8cb078c61bab82b9118c2
   const {
     radiusA,
     radiusB,
