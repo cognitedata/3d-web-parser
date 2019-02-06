@@ -7,9 +7,9 @@ import { fileGeometries, filePropertyArrayNames } from '../../customFileParser/p
 // @ts-ignore
 const fs = require('fs');
 
-const rootSectorFilePath = './src/__tests__/customFileParserTest/testFiles/web_node_4_0.i3d';
-const nonRootSectorFilePath = './src/__tests__/customFileParserTest/testFiles/web_node_4_3.i3d';
-const multiSectorFilePath = './src/__tests__/customFileParserTest/testFiles/web_scene.pi3d';
+const rootSectorFilePath = './src/__tests__/fixtures/web_node_4_0.i3d';
+const nonRootSectorFilePath = './src/__tests__/fixtures/web_node_4_3.i3d';
+const multiSectorFilePath = './src/__tests__/fixtures/web_scene.pi3d';
 
 function fileToArrayBuffer(filePath: string) {
   const incomingFile = fs.readFileSync(filePath, null);
