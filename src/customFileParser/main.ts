@@ -20,9 +20,9 @@ function fillSector(
 
   const groupNames = ['Box', 'Circle', 'ClosedCone', 'ClosedCylinder', 'ClosedEccentricCone', 'ClosedEllipsoidSegment',
     'ClosedExtrudedRingSegment', 'ClosedGeneralCylinder', 'ClosedSphericalSegment', 'ClosedTorusSegment', 'Ellipsoid',
-    /*'ExtrudedRing', */'Nut', 'OpenCone', 'OpenCylinder', /*'OpenEccentricCone', 'OpenEllipsoidSegment',
+    'ExtrudedRing', 'Nut', 'OpenCone', 'OpenCylinder', 'OpenEccentricCone', 'OpenEllipsoidSegment',
     'OpenExtrudedRingSegment', 'OpenGeneralCylinder', 'OpenSphericalSegment', 'OpenTorusSegment', 'Ring', 'Sphere',
-    'Torus', 'TriangleMesh', 'InstancedMesh'*/];
+    'Torus', 'TriangleMesh', 'InstancedMesh'];
   groupNames.forEach(name => {
     unpackGeometry(renderedGeometryGroups, geometryIndexHandlers, trueValueArrays, name);
   });
@@ -53,7 +53,6 @@ function parseManySectors(incomingFile: ArrayBuffer): Sector {
     sectorMetadata = file.readSectorMetadata(sectorByteLength);
     geometryIndexHandlers = file.readSectorGeometryIndexHandlers(sectorStartLocation + sectorByteLength);
     const newSectorObject = fillSector(geometryIndexHandlers, sectorMetadata, trueValueArrays);
-    console.log(newSectorObject);
     const parentSector = sectors[sectorMetadata.parentSectorId];
     if (parentSector !== undefined) {
       parentSector.addChild(newSectorObject);

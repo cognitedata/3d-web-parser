@@ -61,8 +61,11 @@ const IdToFileGeometryName: {[id: number]: string} = {
   101: 'InstancedMesh',
 };
 
-const fileProperties = ['color', 'centerX', 'centerY', 'centerZ', 'normal', 'delta', 'height', 'radius',
+const filePropertyArrayNames = ['color', 'centerX', 'centerY', 'centerZ', 'normal', 'delta', 'height', 'radius',
 'angle', 'translationX', 'translationY', 'translationZ', 'scaleX', 'scaleY', 'scaleZ'];
+
+const fileProperties = ['treeIndex', 'color', 'center', 'normal', 'delta', 'radiusA', 'radiusB', 'rotationAngle',
+'capNormal', 'thickness', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB'];
 
 const fileGeometryProperties: {[name: string]: string[]} = {
   Box: ['treeIndex', 'color', 'center', 'normal', 'delta', 'rotationAngle'],
@@ -98,38 +101,6 @@ const fileGeometryProperties: {[name: string]: string[]} = {
   'scale'],
 };
 
-const renderedGeometries = ['box', 'circle', 'cone', 'eccentricCone', 'ellipsoidSegment', 'generalCylinder',
-  'generalRing', 'nut', 'quad', 'sphericalSegment', 'torusSegment', 'trapezium', 'triangleMesh', 'instancedMesh'];
-
-const renderedGeometriesPerFileGeometry: {[name: string]: string[]} = {
-  Box: ['box'],
-  Circle: ['circle'],
-  ClosedCone: ['circle', 'circle', 'cone'],
-  ClosedCylinder: ['circle', 'circle', 'cone'],
-  ClosedEccentricCone: ['circle', 'circle', 'eccentricCone'],
-  ClosedEllipsoidSegment: ['ellipsoidSegment'],
-  ClosedExtrudedRingSegment: ['cone', 'cone', 'generalRing', 'generalRing', 'quad', 'quad'],
-  ClosedGeneralCylinder: ['generalCylinder'],
-  ClosedSphericalSegment: ['circle', 'sphericalSegment'],
-  ClosedTorusSegment: ['torusSegment'],
-  Ellipsoid: ['ellipsoidSegment'],
-  ExtrudedRing: ['extrudedRing'],
-  Nut: ['nut'],
-  OpenCone: ['cone'],
-  OpenCylinder: ['cone'],
-  OpenEccentricCone: ['eccentricCone'],
-  OpenEllipsoidSegment: ['openEllipsoidSegment'],
-  OpenExtrudedRingSegment: ['cone', 'cone', 'generalRing', 'generalRing'],
-  OpenGeneralCylinder: ['generalCylinder'],
-  OpenSphericalSegment: ['sphericalSegment'],
-  OpenTorusSegment: ['torusSegment'],
-  Ring: ['generalRing'],
-  Sphere: ['sphericalSegment'],
-  Torus: ['torusSegment'],
-  TriangleMesh: ['triangleMesh'],
-  InstancedMesh: ['instancedMesh'],
-};
-
 const renderedGeometryToAddFunction: {[name: string]: Function} = {
   'Box': addBox,
   'Circle': addCircle,
@@ -159,6 +130,38 @@ const renderedGeometryToAddFunction: {[name: string]: Function} = {
   'InstancedMesh': addInstancedMesh,
 };
 
+const renderedGeometries = ['box', 'circle', 'cone', 'eccentricCone', 'ellipsoidSegment', 'generalCylinder',
+  'generalRing', 'nut', 'quad', 'sphericalSegment', 'torusSegment', 'trapezium', 'triangleMesh', 'instancedMesh'];
+
+const renderedGeometriesPerFileGeometry: {[name: string]: string[]} = {
+  Box: ['box'],
+  Circle: ['circle'],
+  ClosedCone: ['circle', 'circle', 'cone'],
+  ClosedCylinder: ['circle', 'circle', 'cone'],
+  ClosedEccentricCone: ['circle', 'circle', 'eccentricCone'],
+  ClosedEllipsoidSegment: ['ellipsoidSegment'],
+  ClosedExtrudedRingSegment: ['cone', 'cone', 'generalRing', 'generalRing', 'quad', 'quad'],
+  ClosedGeneralCylinder: ['generalCylinder'],
+  ClosedSphericalSegment: ['circle', 'sphericalSegment'],
+  ClosedTorusSegment: ['torusSegment'],
+  Ellipsoid: ['ellipsoidSegment'],
+  ExtrudedRing: ['cone', 'cone', 'generalRing', 'generalRing'],
+  Nut: ['nut'],
+  OpenCone: ['cone'],
+  OpenCylinder: ['cone'],
+  OpenEccentricCone: ['eccentricCone'],
+  OpenEllipsoidSegment: ['ellipsoidSegment'],
+  OpenExtrudedRingSegment: ['cone', 'cone', 'generalRing', 'generalRing'],
+  OpenGeneralCylinder: ['generalCylinder'],
+  OpenSphericalSegment: ['sphericalSegment'],
+  OpenTorusSegment: ['torusSegment'],
+  Ring: ['generalRing'],
+  Sphere: ['sphericalSegment'],
+  Torus: ['torusSegment'],
+  TriangleMesh: ['triangleMesh'],
+  InstancedMesh: ['instancedMesh'],
+};
+
 const renderedGeometryToGroup: {[name: string]: any } = {
   box: BoxGroup,
   circle: CircleGroup,
@@ -176,6 +179,7 @@ const renderedGeometryToGroup: {[name: string]: any } = {
   instancedMesh: InstancedMeshMappings,
 };
 
-export { fileGeometries, IdToFileGeometryName, fileProperties, fileGeometryProperties,
+export { filePropertyArrayNames,
+  fileGeometries, IdToFileGeometryName, fileProperties, fileGeometryProperties,
   renderedGeometries, renderedGeometriesPerFileGeometry, renderedGeometryToGroup,
   renderedGeometryToAddFunction };

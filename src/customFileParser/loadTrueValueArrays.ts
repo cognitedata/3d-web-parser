@@ -1,10 +1,11 @@
 import CustomFileReader from './CustomFileReader';
-import { fileProperties } from './parserParameters';
+import { filePropertyArrayNames } from './parserParameters';
 import * as THREE from 'three';
 
+// Debugging note: This function should never be called on a sector with arrayCount == 0.
 export default function loadTrueValueArrays(file: CustomFileReader) {
   const propertyTrueValues: {[name: string]: any[]} = {};
-  fileProperties.forEach(property => {
+  filePropertyArrayNames.forEach(property => {
     propertyTrueValues[property] = [];
     const clusterCount = file.readUint32();
     // This value is only used for debugging
