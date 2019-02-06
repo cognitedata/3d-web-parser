@@ -28,10 +28,16 @@ function fillSector(
   });
 
   const sectorObject = new Sector(sectorMetadata.sectorBBoxMin, sectorMetadata.sectorBBoxMax);
-  const keys = Object.keys(renderedGeometryGroups);
-  for (let i = 0; i < keys.length; i++) {
-    sectorObject.primitiveGroups.push(renderedGeometryGroups[keys[i]]);
-  }
+  Object.keys(renderedGeometryGroups).forEach(renderedGeometryName => {
+    if (renderedGeometryName === 'TriangleMesh') {
+
+    } else if (renderedGeometryName === 'InstancedMesh') {
+
+    } else {
+      sectorObject.primitiveGroups.push(renderedGeometryGroups[renderedGeometryName]);
+    }
+  });
+
   return sectorObject;
 }
 
@@ -64,4 +70,12 @@ function parseManySectors(incomingFile: ArrayBuffer): Sector {
   return rootSector;
 }
 
-export { parseManySectors };
+function parseSingleSector(incomingFile: ArrayBuffer): Sector {
+  const file = new CustomFileReader(incomingFile);
+  const sectorMetadata = file.readSectorMetadata(incomingFile.byteLength);
+  const trueValueArrays = file.readTrueValueArrays();
+  const geometryIndexHandlers = file.readSectorGeometryIndexHandlers(incomingFile.byteLength);
+  return fillSector(geometryIndexHandlers, sectorMetadata, trueValueArrays);
+}
+
+export { parseManySectors, parseSingleSector };

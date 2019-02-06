@@ -13,8 +13,8 @@ export default function unpackGeometry(
         data.loadData(geometryIndexHandler);
         // @ts-ignore
         renderedGeometryToAddFunction[geometryIndexHandler.name].call(this, renderedGeometryGroups, data);
-        return;
       }
+      return;
     }
   });
 

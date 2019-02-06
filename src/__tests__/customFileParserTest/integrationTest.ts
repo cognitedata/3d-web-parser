@@ -1,4 +1,3 @@
-import loadSectorOutline from '../../customFileParser/loadSectorMetadata';
 import * as THREE from 'three';
 import CustomFileReader from '../../customFileParser/CustomFileReader';
 import { parseManySectors } from '../../customFileParser/main';
@@ -73,7 +72,6 @@ describe('customFileIntegrationTest', () => {
     expect(geometryIndexHandlers.length).toBeGreaterThan(0);
 
     geometryIndexHandlers.forEach(geometryIndexHandler => {
-      console.log(geometryIndexHandler.name);
       expect(fileGeometries.indexOf(geometryIndexHandler.name)).not.toBe(-1);
       expect(geometryIndexHandler.nodeIds).toBeDefined();
       expect(geometryIndexHandler.indexes).toBeDefined();
@@ -83,12 +81,9 @@ describe('customFileIntegrationTest', () => {
     });
   });
 
-  // The true integration test :)
   test('read multi-sector file', async() => {
     const incomingFile = fileToArrayBuffer(multiSectorFilePath);
     const rootSector = parseManySectors(incomingFile);
-
-    console.log(rootSector);
 
     const sectors = [rootSector];
     while (sectors.length > 0) {
@@ -106,11 +101,8 @@ describe('customFileIntegrationTest', () => {
         expect(primitiveGroup.count).toBeDefined();
         expect(primitiveGroup.capacity).toBeDefined();
         expect(primitiveGroup.nodeId).toBeDefined();
-        console.log(primitiveGroup.type);
         expect(primitiveGroup.count).toBe(primitiveGroup.capacity);
       });
     }
-
-    // expect(blah);
   });
 });

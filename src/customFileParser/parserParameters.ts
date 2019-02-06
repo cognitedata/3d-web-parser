@@ -1,4 +1,4 @@
-// After making changes to this file, run <test> to make sure everything is still valid
+// After making changes to this file, run parserParametersTest to make sure everything is still valid
 
 import BoxGroup from '../geometry/BoxGroup';
 import CircleGroup from '../geometry/CircleGroup';
@@ -11,20 +11,20 @@ import QuadGroup from '../geometry/QuadGroup';
 import SphericalSegmentGroup from '../geometry/SphericalSegmentGroup';
 import TorusSegmentGroup from '../geometry/TorusSegmentGroup';
 import TrapeziumGroup from '../geometry/TrapeziumGroup';
-import { MergedMeshMappings } from '../geometry/MergedMeshGroup';
-import { InstancedMeshMappings } from '../geometry/InstancedMeshGroup';
+import { MergedMeshGroup } from '../geometry/MergedMeshGroup';
+import { InstancedMeshGroup } from '../geometry/InstancedMeshGroup';
 import EllipsoidSegmentGroup from '../geometry/EllipsoidSegmentGroup';
 
-import { addBox, addCircle, addNut, addRing, addSphere } from './unpackGeometry/basic';
-import { addClosedCone, addClosedEccentricCone, addOpenCone, addOpenEccentricCone } from './unpackGeometry/cone';
+import { addBox, addCircle, addNut, addRing, addSphere } from './unpackGeometry/Basic';
+import { addClosedCone, addClosedEccentricCone, addOpenCone, addOpenEccentricCone } from './unpackGeometry/Cone';
 import { addExtrudedRing, addClosedExtrudedRingSegment, addOpenExtrudedRingSegment }
-  from './unpackGeometry/extrudedRing';
+  from './unpackGeometry/ExtrudedRing';
 import { addClosedCylinder, addClosedGeneralCylinder, addOpenCylinder, addOpenGeneralCylinder }
-  from './unpackGeometry/cylinder';
-import { addClosedEllipsoidSegment, addOpenEllipsoidSegment, addEllipsoid } from './unpackGeometry/ellipsoid';
-import { addClosedTorusSegment, addOpenTorusSegment, addTorus } from './unpackGeometry/torus';
-import { addClosedSphericalSegment, addOpenSphericalSegment } from './unpackGeometry/sphericalSegment';
-import { addTriangleMesh, addInstancedMesh } from './unpackGeometry/mesh';
+  from './unpackGeometry/Cylinder';
+import { addClosedEllipsoidSegment, addOpenEllipsoidSegment, addEllipsoid } from './unpackGeometry/Ellipsoid';
+import { addClosedTorusSegment, addOpenTorusSegment, addTorus } from './unpackGeometry/Torus';
+import { addClosedSphericalSegment, addOpenSphericalSegment } from './unpackGeometry/SphericalSegment';
+import { addTriangleMesh, addInstancedMesh } from './unpackGeometry/Mesh';
 
 const fileGeometries = ['Box', 'Circle', 'ClosedCone', 'ClosedCylinder', 'ClosedEccentricCone',
 'ClosedEllipsoidSegment', 'ClosedExtrudedRingSegment', 'ClosedGeneralCylinder', 'ClosedSphericalSegment',
@@ -130,53 +130,53 @@ const renderedGeometryToAddFunction: {[name: string]: Function} = {
   'InstancedMesh': addInstancedMesh,
 };
 
-const renderedGeometries = ['box', 'circle', 'cone', 'eccentricCone', 'ellipsoidSegment', 'generalCylinder',
-  'generalRing', 'nut', 'quad', 'sphericalSegment', 'torusSegment', 'trapezium', 'triangleMesh', 'instancedMesh'];
+const renderedGeometries = ['Box', 'Circle', 'Cone', 'EccentricCone', 'EllipsoidSegment', 'GeneralCylinder',
+  'GeneralRing', 'Nut', 'Quad', 'SphericalSegment', 'TorusSegment', 'Trapezium', 'TriangleMesh', 'InstancedMesh'];
 
 const renderedGeometriesPerFileGeometry: {[name: string]: string[]} = {
-  Box: ['box'],
-  Circle: ['circle'],
-  ClosedCone: ['circle', 'circle', 'cone'],
-  ClosedCylinder: ['circle', 'circle', 'cone'],
-  ClosedEccentricCone: ['circle', 'circle', 'eccentricCone'],
-  ClosedEllipsoidSegment: ['ellipsoidSegment'],
-  ClosedExtrudedRingSegment: ['cone', 'cone', 'generalRing', 'generalRing', 'quad', 'quad'],
-  ClosedGeneralCylinder: ['generalCylinder'],
-  ClosedSphericalSegment: ['circle', 'sphericalSegment'],
-  ClosedTorusSegment: ['torusSegment'],
-  Ellipsoid: ['ellipsoidSegment'],
-  ExtrudedRing: ['cone', 'cone', 'generalRing', 'generalRing'],
-  Nut: ['nut'],
-  OpenCone: ['cone'],
-  OpenCylinder: ['cone'],
-  OpenEccentricCone: ['eccentricCone'],
-  OpenEllipsoidSegment: ['ellipsoidSegment'],
-  OpenExtrudedRingSegment: ['cone', 'cone', 'generalRing', 'generalRing'],
-  OpenGeneralCylinder: ['generalCylinder'],
-  OpenSphericalSegment: ['sphericalSegment'],
-  OpenTorusSegment: ['torusSegment'],
-  Ring: ['generalRing'],
-  Sphere: ['sphericalSegment'],
-  Torus: ['torusSegment'],
-  TriangleMesh: ['triangleMesh'],
-  InstancedMesh: ['instancedMesh'],
+  Box: ['Box'],
+  Circle: ['Circle'],
+  ClosedCone: ['Circle', 'Circle', 'Cone'],
+  ClosedCylinder: ['Circle', 'Circle', 'Cone'],
+  ClosedEccentricCone: ['Circle', 'Circle', 'EccentricCone'],
+  ClosedEllipsoidSegment: ['EllipsoidSegment'],
+  ClosedExtrudedRingSegment: ['Cone', 'Cone', 'GeneralRing', 'GeneralRing', 'Quad', 'Quad'],
+  ClosedGeneralCylinder: ['GeneralCylinder'],
+  ClosedSphericalSegment: ['Circle', 'SphericalSegment'],
+  ClosedTorusSegment: ['TorusSegment'],
+  Ellipsoid: ['EllipsoidSegment'],
+  ExtrudedRing: ['Cone', 'Cone', 'GeneralRing', 'GeneralRing'],
+  Nut: ['Nut'],
+  OpenCone: ['Cone'],
+  OpenCylinder: ['Cone'],
+  OpenEccentricCone: ['EccentricCone'],
+  OpenEllipsoidSegment: ['EllipsoidSegment'],
+  OpenExtrudedRingSegment: ['Cone', 'Cone', 'GeneralRing', 'GeneralRing'],
+  OpenGeneralCylinder: ['GeneralCylinder'],
+  OpenSphericalSegment: ['SphericalSegment'],
+  OpenTorusSegment: ['TorusSegment'],
+  Ring: ['GeneralRing'],
+  Sphere: ['SphericalSegment'],
+  Torus: ['TorusSegment'],
+  TriangleMesh: ['TriangleMesh'],
+  InstancedMesh: ['InstancedMesh'],
 };
 
 const renderedGeometryToGroup: {[name: string]: any } = {
-  box: BoxGroup,
-  circle: CircleGroup,
-  cone: ConeGroup,
-  eccentricCone: EccentricConeGroup,
-  ellipsoidSegment: EllipsoidSegmentGroup,
-  generalCylinder: GeneralCylinderGroup,
-  generalRing: GeneralRingGroup,
-  nut: NutGroup,
-  quad: QuadGroup,
-  sphericalSegment: SphericalSegmentGroup,
-  torusSegment: TorusSegmentGroup,
-  trapezium: TrapeziumGroup,
-  triangleMesh: MergedMeshMappings,
-  instancedMesh: InstancedMeshMappings,
+  Box: BoxGroup,
+  Circle: CircleGroup,
+  Cone: ConeGroup,
+  EccentricCone: EccentricConeGroup,
+  EllipsoidSegment: EllipsoidSegmentGroup,
+  GeneralCylinder: GeneralCylinderGroup,
+  GeneralRing: GeneralRingGroup,
+  Nut: NutGroup,
+  Quad: QuadGroup,
+  SphericalSegment: SphericalSegmentGroup,
+  TorusSegment: TorusSegmentGroup,
+  Trapezium: TrapeziumGroup,
+  TriangleMesh: MergedMeshGroup,
+  InstancedMesh: InstancedMeshGroup,
 };
 
 export { filePropertyArrayNames,

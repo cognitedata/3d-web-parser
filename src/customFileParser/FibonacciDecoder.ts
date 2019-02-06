@@ -1,5 +1,7 @@
+const FIBONACCI_MAX_LENGTH = 77; // Any 53 bit integer will take at most 77 bits in a fibonacci encoding.
+
 const fibonacciLookup = [1, 2];
-for (let i = 2; i <= 77; i++) {
+for (let i = 2; i <= FIBONACCI_MAX_LENGTH; i++) {
   fibonacciLookup.push(fibonacciLookup[i - 1] + fibonacciLookup[i - 2]);
 }
 
@@ -30,7 +32,7 @@ export default class FibonacciDecoder {
     this.numberRead++;
 
     // read rest of file
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < FIBONACCI_MAX_LENGTH; i++) {
       const currentBit8 = this.data[Math.floor(this.readBitId / 8)] & 1 << (7 - (this.readBitId % 8));
       if (currentBit8 !== 0) {
 
@@ -52,6 +54,6 @@ export default class FibonacciDecoder {
       this.readBitId++;
     }
 
-    throw Error('THIS IS REALLY BAD');
+    throw Error('Did not find termination bit');
   }
 }
