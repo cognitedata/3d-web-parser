@@ -1,11 +1,13 @@
 import * as THREE from 'three';
 import ConeGroup from '../geometry/ConeGroup';
+import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
 import { MatchingGeometries,
   parsePrimitiveColor,
   parsePrimitiveNodeId,
   parsePrimitiveTreeIndex,
   getPrimitiveType,
-  isPrimitive } from './parseUtils';
+  isPrimitive,
+         ParsePrimitiveArguments } from './parseUtils';
 import { zAxis } from '../constants';
 
 const globalColor = new THREE.Color();
@@ -47,11 +49,23 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-export default function parse(geometries: any[]): ConeGroup {
-const matchingGeometries = findMatchingGeometries(geometries);
-const group = new ConeGroup(matchingGeometries.count);
+function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
+  if (primitiveGroupMap.Cone.group.count + minimumRequiredCapacity > primitiveGroupMap.Cone.group.capacity) {
+      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Cone.capacity);
+      primitiveGroupMap.Cone.group = new ConeGroup(capacity);
+      return true;
+  }
+  return false;
+}
 
-matchingGeometries.geometries.forEach(geometry => {
+export default function parse(args: ParsePrimitiveArguments): boolean {
+  const { geometries, primitiveGroupMap, filterOptions } = args;
+  const matchingGeometries = findMatchingGeometries(geometries);
+
+  const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
+  const group = primitiveGroupMap.Cone.group;
+
+  matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
     const nodeId = parsePrimitiveNodeId(geometry);
     const treeIndex = parsePrimitiveTreeIndex(geometry);
@@ -65,17 +79,44 @@ matchingGeometries.geometries.forEach(geometry => {
 
     if (geometry.type === 'cylinder') {
       const { radius } = primitiveInfo;
-      group.add(nodeId, treeIndex, globalColor, globalCenterA, globalCenterB, radius, radius);
+      group.add(nodeId,
+        treeIndex,
+        globalColor,
+        globalCenterA,
+        globalCenterB,
+        radius,
+        radius,
+        0,
+        2 * Math.PI,
+        filterOptions);
     } else if (geometry.type === 'cone' || geometry.type === 'generalCylinder') {
       let { radiusA, radiusB } = primitiveInfo;
       const { angle = 0, arcAngle  = 2.0 * Math.PI, thickness = 0 } = primitiveInfo;
-      group.add(nodeId, treeIndex, globalColor, globalCenterA, globalCenterB, radiusA, radiusB, angle, arcAngle);
+      group.add(nodeId,
+        treeIndex,
+        globalColor,
+        globalCenterA,
+        globalCenterB,
+        radiusA,
+        radiusB,
+        angle,
+        arcAngle,
+        filterOptions);
 
       if (thickness > 0) {
         // Create the inner cone if it has a thickness
         radiusA -= thickness;
         radiusB -= thickness;
-        group.add(nodeId, treeIndex, globalColor, globalCenterA, globalCenterB, radiusA, radiusB, angle, arcAngle);
+        group.add(nodeId,
+          treeIndex,
+          globalColor,
+          globalCenterA,
+          globalCenterB,
+          radiusA,
+          radiusB,
+          angle,
+          arcAngle,
+          filterOptions);
       }
     } else if (geometry.type === 'extrudedRing' || geometry.type === 'extrudedRingSegment') {
       const { innerRadius, outerRadius, angle = 0, arcAngle = 2.0 * Math.PI } = primitiveInfo;
@@ -87,7 +128,8 @@ matchingGeometries.geometries.forEach(geometry => {
         innerRadius,
         innerRadius,
         angle,
-        arcAngle);
+        arcAngle,
+        filterOptions);
 
       group.add(nodeId,
         treeIndex,
@@ -97,8 +139,9 @@ matchingGeometries.geometries.forEach(geometry => {
         outerRadius,
         outerRadius,
         angle,
-        arcAngle);
+        arcAngle,
+        filterOptions);
     }
   });
-return group;
+  return didCreateNewGroup;
 }

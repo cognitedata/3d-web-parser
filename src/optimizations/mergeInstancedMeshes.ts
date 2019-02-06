@@ -2,6 +2,7 @@ import Sector from '../Sector';
 import { MergedMesh, MergedMeshMappings } from '../geometry/MergedMeshGroup';
 import * as THREE from 'three';
 import { InstancedMeshCollection } from '../geometry/InstancedMeshGroup';
+import SceneStats from '../SceneStats';
 
 const globalMatrix = new THREE.Matrix4();
 const globalColor = new THREE.Color();
@@ -17,7 +18,7 @@ function countMappingsToMerge(collections: InstancedMeshCollection[], triangleCo
   return numMappings;
 }
 
-export default function mergedInstancedMeshes(sector: Sector, triangleCountLimit: number) {
+export default function mergedInstancedMeshes(sector: Sector, triangleCountLimit: number, sceneStats: SceneStats) {
   sector.instancedMeshGroup.meshes.forEach(instancedMesh => {
     const mergedMesh = new MergedMesh(
       countMappingsToMerge(instancedMesh.collections, triangleCountLimit),
@@ -48,6 +49,7 @@ export default function mergedInstancedMeshes(sector: Sector, triangleCountLimit
         instancedMesh.collections.splice(index, 1);
       }
     }
+    sceneStats.numMergedMeshes += 1;
     sector.mergedMeshGroup.addMesh(mergedMesh);
   });
 

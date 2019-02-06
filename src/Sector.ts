@@ -1,16 +1,10 @@
 // Copyright 2019 Cognite AS
 
 import * as THREE from 'three';
-import GeometryGroup from './geometry/GeometryGroup';
+import { GeometryNode, GeometryMap, GeometryGroup } from './geometry/GeometryGroup';
 import PrimitiveGroup from './geometry/PrimitiveGroup';
 import { MergedMeshGroup } from './geometry/MergedMeshGroup';
 import { InstancedMeshGroup } from './geometry/InstancedMeshGroup';
-
-interface GeometryNode {
-  treeIndex: number;
-  nodeId: number;
-  color: THREE.Color;
-}
 
 export default class Sector {
   public readonly min: THREE.Vector3;
@@ -22,6 +16,7 @@ export default class Sector {
   public primitiveGroups: PrimitiveGroup[];
   public mergedMeshGroup: MergedMeshGroup;
   public instancedMeshGroup: InstancedMeshGroup;
+  public geometryMap: GeometryMap;
   public readonly object3d: THREE.Object3D;
 
   constructor(min: THREE.Vector3, max: THREE.Vector3) {
@@ -35,6 +30,7 @@ export default class Sector {
     this.object3d = new THREE.Object3D();
     this.object3d.frustumCulled = false;
     this.children = [];
+    this.geometryMap = {};
   }
 
   addChild(child: Sector) {
@@ -61,26 +57,58 @@ export default class Sector {
     }
   }
 
-  *traverseGeometryNodes(color: THREE.Color): IterableIterator<GeometryNode> {
+  findMaxTreeIndex() {
+    let maxTreeIndex = -1;
+    for (const child of this.traverseSectors()) {
+      for (const geometryGroup of child.primitiveGroups) {
+        maxTreeIndex = Math.max(geometryGroup.maxTreeIndex, maxTreeIndex);
+      }
+
+      for (let meshIndex = 0; meshIndex < child.mergedMeshGroup.meshes.length; meshIndex++) {
+        const mappings = child.mergedMeshGroup.meshes[meshIndex].mappings;
+        maxTreeIndex = Math.max(mappings.maxTreeIndex, maxTreeIndex);
+      }
+
+      for (let meshIndex = 0; meshIndex < child.instancedMeshGroup.meshes.length; meshIndex++) {
+        const instancedMesh = child.instancedMeshGroup.meshes[meshIndex];
+        for (let collectionIndex = 0; collectionIndex < instancedMesh.collections.length; collectionIndex++) {
+          const mappings = instancedMesh.collections[collectionIndex].mappings;
+          maxTreeIndex = Math.max(mappings.maxTreeIndex, maxTreeIndex);
+        }
+      }
+    }
+
+    return maxTreeIndex;
+  }
+
+  *traverseGeometryNodes(color?: THREE.Color): IterableIterator<GeometryNode> {
     // Will traverse all geometries and yield
     // nodeId and treeIndex
     for (const child of this.traverseSectors()) {
       for (const geometryGroup of child.primitiveGroups) {
-        for (let i = 0; i < geometryGroup.count; i++) {
-          const treeIndex = geometryGroup.getTreeIndex(i);
-          const nodeId = geometryGroup.getNodeId(i);
-          geometryGroup.getColor(color, i);
-          yield { treeIndex, nodeId, color };
+        for (let mappingIndex = 0; mappingIndex < geometryGroup.count; mappingIndex++) {
+          const treeIndex = geometryGroup.getTreeIndex(mappingIndex);
+          const nodeId = geometryGroup.getNodeId(mappingIndex);
+          if (color != null) {
+            geometryGroup.getColor(color, mappingIndex);
+            yield { treeIndex, nodeId, geometryGroup, groupIndex: { mappingIndex }, color };
+          } else {
+            yield { treeIndex, nodeId, geometryGroup, groupIndex: { mappingIndex } };
+          }
         }
       }
 
       for (let meshIndex = 0; meshIndex < child.mergedMeshGroup.meshes.length; meshIndex++) {
         const mappings = child.mergedMeshGroup.meshes[meshIndex].mappings;
-        for (let i = 0; i < mappings.count; i++) {
-          const treeIndex = mappings.getTreeIndex(i);
-          const nodeId = mappings.getNodeId(i);
-          mappings.getColor(color, i);
-          yield { treeIndex, nodeId, color };
+        for (let mappingIndex = 0; mappingIndex < mappings.count; mappingIndex++) {
+          const treeIndex = mappings.getTreeIndex(mappingIndex);
+          const nodeId = mappings.getNodeId(mappingIndex);
+          if (color != null) {
+            mappings.getColor(color, mappingIndex);
+            yield { treeIndex, nodeId, geometryGroup: child.mergedMeshGroup, groupIndex: { mappingIndex }, color };
+          } else {
+            yield { treeIndex, nodeId, geometryGroup: child.mergedMeshGroup, groupIndex: { mappingIndex } };
+          }
         }
       }
 
@@ -88,11 +116,32 @@ export default class Sector {
         const instancedMesh = child.instancedMeshGroup.meshes[meshIndex];
         for (let collectionIndex = 0; collectionIndex < instancedMesh.collections.length; collectionIndex++) {
           const mappings = instancedMesh.collections[collectionIndex].mappings;
-          for (let i = 0; i < mappings.count; i++) {
-            const treeIndex = mappings.getTreeIndex(i);
-            const nodeId = mappings.getNodeId(i);
-            mappings.getColor(color, i);
-            yield { treeIndex, nodeId, color };
+          for (let mappingIndex = 0; mappingIndex < mappings.count; mappingIndex++) {
+            const treeIndex = mappings.getTreeIndex(mappingIndex);
+            const nodeId = mappings.getNodeId(mappingIndex);
+            if (color != null) {
+              mappings.getColor(color, mappingIndex);
+              yield {
+                treeIndex,
+                nodeId,
+                geometryGroup: child.instancedMeshGroup,
+                groupIndex: {
+                  collectionIndex,
+                  mappingIndex,
+                },
+              color,
+            };
+            } else {
+              yield {
+                treeIndex,
+                nodeId,
+                geometryGroup: child.instancedMeshGroup,
+                groupIndex: {
+                  collectionIndex,
+                  mappingIndex,
+                },
+              };
+            }
           }
         }
       }

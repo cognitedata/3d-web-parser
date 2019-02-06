@@ -2,6 +2,7 @@
 
 import * as THREE from 'three';
 import PrimitiveGroup from './PrimitiveGroup';
+import { FilterOptions } from '../parsers/parseUtils';
 
 // reusable variables
 const basis = new THREE.Matrix4();
@@ -62,6 +63,7 @@ export default class QuadGroup extends PrimitiveGroup {
     vertex1: THREE.Vector3,
     vertex2: THREE.Vector3,
     vertex3: THREE.Vector3,
+    filterOptions?: FilterOptions,
   ) {
     this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
@@ -71,6 +73,10 @@ export default class QuadGroup extends PrimitiveGroup {
     this.setVertex3(vertex3, this.count);
 
     this.count += 1;
+
+    if (filterOptions) {
+      this.filterLastObject(filterOptions);
+    }
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {

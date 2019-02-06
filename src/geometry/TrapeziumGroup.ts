@@ -2,6 +2,7 @@
 
 import * as THREE from 'three';
 import PrimitiveGroup from './PrimitiveGroup';
+import { FilterOptions } from '../parsers/parseUtils';
 
 // reusable variables
 const point = new THREE.Vector3();
@@ -86,6 +87,7 @@ export default class TrapeziumGroup extends PrimitiveGroup {
     vertex2: THREE.Vector3,
     vertex3: THREE.Vector3,
     vertex4: THREE.Vector3,
+    filterOptions?: FilterOptions,
   ) {
     this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
@@ -96,6 +98,10 @@ export default class TrapeziumGroup extends PrimitiveGroup {
     this.setVertex4(vertex4, this.count);
 
     this.count += 1;
+
+    if (filterOptions) {
+      this.filterLastObject(filterOptions);
+    }
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {

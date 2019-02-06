@@ -1,11 +1,14 @@
 import * as THREE from 'three';
 import CircleGroup from '../geometry/CircleGroup';
+import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
 import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
          parsePrimitiveTreeIndex,
          getPrimitiveType,
-         isPrimitive } from './parseUtils';
+         isPrimitive,
+         ParsePrimitiveArguments,
+         FilterOptions} from './parseUtils';
 
 const color = new THREE.Color();
 const center = new THREE.Vector3();
@@ -67,7 +70,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup) {
+function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup, filterOptions?: FilterOptions) {
   // @ts-ignore
   const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
   const nodeId = parsePrimitiveNodeId(geometry);
@@ -85,8 +88,8 @@ function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup) {
     normal.copy(centerA)
     .sub(centerB)
     .normalize();
-    group.add(nodeId, treeIndex, color, centerA, normal, radius);
-    group.add(nodeId, treeIndex, color, centerB, normal, radius);
+    group.add(nodeId, treeIndex, color, centerA, normal, radius, filterOptions);
+    group.add(nodeId, treeIndex, color, centerB, normal, radius, filterOptions);
   // @ts-ignore
   } else if (geometry.type === 'cone') {
     const { radiusA = 0, radiusB = 0 } = primitiveInfo;
@@ -95,8 +98,8 @@ function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup) {
     .sub(centerB)
     .normalize();
 
-    group.add(nodeId, treeIndex, color, centerA, normal, radiusA);
-    group.add(nodeId, treeIndex, color, centerB, normal, radiusA);
+    group.add(nodeId, treeIndex, color, centerA, normal, radiusA, filterOptions);
+    group.add(nodeId, treeIndex, color, centerB, normal, radiusA, filterOptions);
   // @ts-ignore
   } else if (geometry.type === 'eccentricCone') {
     const { radiusA, radiusB } = primitiveInfo;
@@ -108,18 +111,30 @@ function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup) {
     if (dotProduct > 0) {
       normal.negate();
     }
-    group.add(nodeId, treeIndex, color, centerA, normal, radiusA);
-    group.add(nodeId, treeIndex, color, centerB, normal, radiusB);
+    group.add(nodeId, treeIndex, color, centerA, normal, radiusA, filterOptions);
+    group.add(nodeId, treeIndex, color, centerB, normal, radiusB, filterOptions);
   }
 }
 
-export default function parse(geometries: any[]): CircleGroup {
+function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
+  if (primitiveGroupMap.Circle.group.count + minimumRequiredCapacity > primitiveGroupMap.Circle.group.capacity) {
+      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Circle.capacity);
+      primitiveGroupMap.Circle.group = new CircleGroup(capacity);
+      return true;
+  }
+  return false;
+}
+
+export default function parse(args: ParsePrimitiveArguments): boolean {
+  const { geometries, primitiveGroupMap, filterOptions } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
-  const group = new CircleGroup(matchingGeometries.count);
+
+  const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
+  const group = primitiveGroupMap.Circle.group;
 
   matchingGeometries.geometries.forEach(geometry => {
     if (['cylinder', 'cone', 'eccentricCone'].indexOf(geometry.type) !== -1) {
-      parseConeEccentricConeCylinder(geometry, group);
+      parseConeEccentricConeCylinder(geometry, group, filterOptions);
     } else {
       const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
       const nodeId = parsePrimitiveNodeId(geometry);
@@ -138,7 +153,7 @@ export default function parse(geometries: any[]): CircleGroup {
         const { height } = primitiveInfo;
         const circleRadius = Math.sqrt(height * (2 * radius - height));
         center.add(vector.copy(normal).multiplyScalar(radius - height));
-        group.add(nodeId, treeIndex, color, center, normal, circleRadius);
+        group.add(nodeId, treeIndex, color, center, normal, circleRadius, filterOptions);
       } else if (geometry.type === 'ellipsoidSegment') {
         const { verticalRadius, horizontalRadius, height } = primitiveInfo;
         const length = verticalRadius - height;
@@ -146,13 +161,12 @@ export default function parse(geometries: any[]): CircleGroup {
               (Math.sqrt(verticalRadius * verticalRadius - length * length) * horizontalRadius)
               / verticalRadius;
         center.add(vector.copy(normal).normalize().multiplyScalar(length));
-        group.add(nodeId, treeIndex, color, center, normal, circleRadius);
+        group.add(nodeId, treeIndex, color, center, normal, circleRadius, filterOptions);
       } else {
         // Regular circles
-        group.add(nodeId, treeIndex, color, center, normal, radius);
+        group.add(nodeId, treeIndex, color, center, normal, radius, filterOptions);
       }
-
     }
   });
-  return group;
+  return didCreateNewGroup;
 }

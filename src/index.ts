@@ -21,4 +21,8 @@ export { default as SphericalSegmentGroup } from './geometry/SphericalSegmentGro
 export { default as TorusSegmentGroup } from './geometry/TorusSegmentGroup';
 export { default as TrapeziumGroup } from './geometry/TrapeziumGroup';
 export { Attribute }  from './geometry/PrimitiveGroup';
+<<<<<<< HEAD
 export { parseManySectors } from './customFileParser/main';
+=======
+export { computeBoundingBox } from './geometry/GeometryUtils';
+>>>>>>> a7f2a60bbcb80aaad4a8cb078c61bab82b9118c2

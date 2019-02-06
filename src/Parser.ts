@@ -10,6 +10,7 @@ import { InstancedMesh, InstancedMeshGroup } from './geometry/InstancedMeshGroup
 import { MergedMesh } from './geometry/MergedMeshGroup';
 import PrimitiveGroup from './geometry/PrimitiveGroup';
 import GeometryGroup from './geometry/GeometryGroup';
+import { FilterOptions, ParsePrimitiveArguments } from './parsers/parseUtils';
 
 import parseBoxes from './parsers/parseBoxes';
 import parseCircles from './parsers/parseCircles';
@@ -26,59 +27,120 @@ import parseTrapeziums from './parsers/parseTrapeziums';
 import parseMergedMeshes from './parsers/parseMergedMeshes';
 import parseInstancedMeshes from './parsers/parseInstancedMeshes';
 
+import BoxGroup from './geometry/BoxGroup';
+import CircleGroup from './geometry/CircleGroup';
+import ConeGroup from './geometry/ConeGroup';
+import EccentricConeGroup from './geometry/EccentricConeGroup';
+import EllipsoidSegmentGroup from './geometry/EllipsoidSegmentGroup';
+import GeneralCylinderGroup from './geometry/GeneralCylinderGroup';
+import GeneralRingGroup from './geometry/GeneralRingGroup';
+import NutGroup from './geometry/NutGroup';
+import PlaneGroup from './geometry/PlaneGroup';
+import QuadGroup from './geometry/QuadGroup';
+import SphericalSegmentGroup from './geometry/SphericalSegmentGroup';
+import TorusSegmentGroup from './geometry/TorusSegmentGroup';
+import TrapeziumGroup from './geometry/TrapeziumGroup';
+
+import SceneStats from './SceneStats';
+
 import mergeInstancedMeshes from './optimizations/mergeInstancedMeshes';
 import { MergedMeshGroup } from './geometry/MergedMeshGroup';
+import { PrimitiveGroupMap } from './geometry/PrimitiveGroup';
 
 const primitiveParsers = [
-  parseBoxes,
-  parseCircles,
-  parseCones,
-  parseEccentricCones,
-  parseEllipsoidSegments,
-  parseGeneralCylinders,
-  parseGeneralRings,
-  parseNuts,
-  parseQuads,
-  parseSphericalSegments,
-  parseTorusSegments,
-  parseTrapeziums,
+  { type: 'Box', parser: parseBoxes },
+  { type: 'Circle', parser: parseCircles },
+  { type: 'Cone', parser: parseCones },
+  { type: 'EccentricCone', parser: parseEccentricCones },
+  { type: 'EllipsoidSegment', parser: parseEllipsoidSegments },
+  { type: 'GeneralCylinder', parser: parseGeneralCylinders },
+  { type: 'GeneralRing', parser: parseGeneralRings },
+  { type: 'Nut', parser: parseNuts },
+  { type: 'Quad', parser: parseQuads },
+  { type: 'SphericalSegment', parser: parseSphericalSegments },
+  { type: 'TorusSegment', parser: parseTorusSegments },
+  { type: 'Trapezium', parser: parseTrapeziums },
 ];
 
 interface InstancedMeshMap { [key: number]: InstancedMesh; }
 
 function parseGeometries(geometries: GeometryGroup[],
-                         instancedMeshMap: InstancedMeshMap) {
+                         instancedMeshMap: InstancedMeshMap,
+                         primitiveGroupMap: PrimitiveGroupMap,
+                         sceneStats: SceneStats,
+                         filterOptions?: FilterOptions) {
   const primitiveGroups: PrimitiveGroup[] = [];
-  primitiveParsers.forEach(parser => {
-    const group: PrimitiveGroup = parser(geometries);
-    if (group.capacity > 0) {
-      primitiveGroups.push(group);
+  primitiveParsers.forEach(({ type, parser }) => {
+    const didCreateNewGroup = parser({
+      geometries,
+      primitiveGroupMap,
+      sceneStats,
+      filterOptions,
+    });
+    if (didCreateNewGroup) {
+      // TODO(anders.hafreager) Learn TypeScript and fix this
+      // @ts-ignore
+      primitiveGroups.push(primitiveGroupMap[type].group);
     }
   });
 
-  const mergedMeshGroup = parseMergedMeshes(geometries);
-  const instancedMeshGroup = parseInstancedMeshes(geometries, instancedMeshMap);
+  const mergedMeshGroup = parseMergedMeshes(geometries, sceneStats);
+  const instancedMeshGroup = parseInstancedMeshes(geometries, instancedMeshMap, sceneStats);
 
   return { primitiveGroups, mergedMeshGroup, instancedMeshGroup };
 }
 
-export default async function parseProtobuf(protobufData: Uint8Array) {
+export default async function parseProtobuf(
+  protobufData?: Uint8Array,
+  protobufDataList?: Uint8Array[],
+  printParsingTime: boolean = false,
+  filterOptions?: FilterOptions,
+) {
   const protobufDecoder = new ProtobufDecoder();
 
-  const nodes: { [path: string]: Sector } = { };
+  const sectors: { [path: string]: Sector } = { };
   const instancedMeshMap: { [key: number]: InstancedMesh } = {};
-  const mergedMeshMap: { [key: number]: MergedMesh } = {};
-  for (const webNode of protobufDecoder.decodeWebScene(protobufData)) {
+  const sceneStats: SceneStats = {
+    numInstancedMeshes: 0,
+    numMergedMeshes: 0,
+  };
+  // Create map since we will reuse primitive groups until the count is above some threshold.
+  // This reduces the number of draw calls.
+  const primitiveGroupMap: PrimitiveGroupMap = {
+    Box: { capacity: 5000, group: new BoxGroup(0) },
+    Circle: { capacity: 5000, group: new CircleGroup(0) },
+    Cone: { capacity: 5000, group: new ConeGroup(0) },
+    EccentricCone: { capacity: 5000, group: new EccentricConeGroup(0) },
+    EllipsoidSegment: { capacity: 5000, group: new EllipsoidSegmentGroup(0) },
+    GeneralCylinder: { capacity: 5000, group: new GeneralCylinderGroup(0) },
+    GeneralRing: { capacity: 5000, group: new GeneralRingGroup(0) },
+    Nut: { capacity: 5000, group: new NutGroup(0) },
+    Quad: { capacity: 5000, group: new QuadGroup(0) },
+    SphericalSegment: { capacity: 5000, group: new SphericalSegmentGroup(0) },
+    TorusSegment: { capacity: 5000, group: new TorusSegmentGroup(0) },
+    Trapezium: { capacity: 5000, group: new TrapeziumGroup(0) },
+  };
+
+  const mergedMeshMap: InstancedMeshMap = {};
+  let t0 = performance.now();
+
+  const handleWebNode = (webNode: any) => {
     const { boundingBox, path } = webNode;
     const boundingBoxMin = new Vector3(boundingBox.min.x, boundingBox.min.y, boundingBox.min.z);
     const boundingBoxMax = new Vector3(boundingBox.max.x, boundingBox.max.y, boundingBox.max.z);
     const sector = new Sector(boundingBoxMin, boundingBoxMax);
-    nodes[path] = sector;
+    sectors[path] = sector;
     const {
       primitiveGroups,
       mergedMeshGroup,
       instancedMeshGroup,
-    } = parseGeometries(webNode.geometries, instancedMeshMap);
+    } = parseGeometries(
+      webNode.geometries,
+      instancedMeshMap,
+      primitiveGroupMap,
+      sceneStats,
+      filterOptions,
+    );
 
     sector.primitiveGroups = primitiveGroups;
     sector.mergedMeshGroup = mergedMeshGroup;
@@ -87,16 +149,43 @@ export default async function parseProtobuf(protobufData: Uint8Array) {
     // attach to parent
     const parentPath = getParentPath(path);
     if (parentPath !== undefined) {
-      nodes[parentPath].addChild(sector);
-      nodes[parentPath].object3d.add(sector.object3d);
+      sectors[parentPath].addChild(sector);
+      sectors[parentPath].object3d.add(sector.object3d);
     }
+  };
+
+  if (protobufData) {
+    for (const webNode of protobufDecoder.decodeWebScene(protobufData)) {
+      handleWebNode(webNode);
+    }
+  } else if (protobufDataList) {
+    protobufDataList.forEach(data => {
+      const webNode = protobufDecoder.decode(
+        ProtobufDecoder.Types.WEB_NODE,
+        data,
+      );
+      handleWebNode(webNode);
+    });
+  } else {
+    throw 'parseProtobuf did not get data to parse';
   }
 
-  const rootSector = nodes['0/'];
+  if (printParsingTime) {
+    // tslint:disable-next-line
+    console.log('Parsing protobuf took ', performance.now() - t0, ' ms.');
+  }
+
+  t0 = performance.now();
+  const rootSector = sectors['0/'];
   for (const sector of rootSector.traverseSectors()) {
-    mergeInstancedMeshes(sector, 5000);
+    mergeInstancedMeshes(sector, 2500, sceneStats);
+    sector.mergedMeshGroup.createTreeIndexMap();
+    sector.instancedMeshGroup.createTreeIndexMap();
   }
-
-  // return root sector
-  return rootSector;
+  if (printParsingTime) {
+    // tslint:disable-next-line
+    console.log('Optimizing instanced meshes took ', performance.now() - t0, ' ms.');
+  }
+  console.log('Will return ', { rootSector, sectors, sceneStats });
+  return { rootSector, sectors, sceneStats };
 }

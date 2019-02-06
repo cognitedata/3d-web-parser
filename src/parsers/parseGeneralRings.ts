@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import GeneralRingGroup from '../geometry/GeneralRingGroup';
 import GeneralCylinderGroup from '../geometry/GeneralCylinderGroup';
+import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
 import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
@@ -8,7 +9,9 @@ import { MatchingGeometries,
          getPrimitiveType,
          isPrimitive,
          angleBetweenVector3s,
-         normalizeRadians } from './parseUtils';
+         normalizeRadians,
+         ParsePrimitiveArguments,
+         FilterOptions} from './parseUtils';
 import { xAxis, yAxis, zAxis } from '../constants';
 
 const globalColor = new THREE.Color();
@@ -42,6 +45,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
     }
     const treeIndex = parsePrimitiveTreeIndex(geometry);
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
+
     const { thickness = 0 } = primitiveInfo;
 
     if (geometry.type === 'ring') {
@@ -63,7 +67,8 @@ function parseRing(primitiveInfo: any,
                    nodeId: number,
                    treeIndex: number,
                    color: THREE.Color,
-                   group: GeneralRingGroup) {
+                   group: GeneralRingGroup,
+                   filterOptions?: FilterOptions) {
 
   let { x = 0, y = 0, z = 0 } = primitiveInfo.center;
   globalCenter.set(x, y, z);
@@ -82,6 +87,9 @@ function parseRing(primitiveInfo: any,
             outerRadius,
             outerRadius,
             outerRadius - innerRadius,
+            0,
+            2 * Math.PI,
+            filterOptions,
             );
 }
 
@@ -89,7 +97,8 @@ function parseCone(primitiveInfo: any,
                    nodeId: number,
                    treeIndex: number,
                    color: THREE.Color,
-                   group: GeneralRingGroup) {
+                   group: GeneralRingGroup,
+                   filterOptions?: FilterOptions) {
   let { x = 0, y = 0, z = 0 } = primitiveInfo.centerA;
   globalCenterA.set(x, y, z);
 
@@ -109,17 +118,18 @@ function parseCone(primitiveInfo: any,
 
   group.add(nodeId, treeIndex, color, globalCenterA,
             globalCapZAxis, globalCapXAxis, radiusA,
-            radiusA, thickness, angle, arcAngle);
+            radiusA, thickness, angle, arcAngle, filterOptions);
   group.add(nodeId, treeIndex, color, globalCenterB,
             globalCapZAxis, globalCapXAxis, radiusB,
-            radiusB, thickness, angle, arcAngle);
+            radiusB, thickness, angle, arcAngle, filterOptions);
 }
 
 function parseExtrudedRing(primitiveInfo: any,
                            nodeId: number,
                            treeIndex: number,
                            color: THREE.Color,
-                           group: GeneralRingGroup) {
+                           group: GeneralRingGroup,
+                           filterOptions?: FilterOptions) {
   const {
     angle = 0,
     arcAngle = 2 * Math.PI,
@@ -147,7 +157,8 @@ function parseExtrudedRing(primitiveInfo: any,
             outerRadius,
             outerRadius - innerRadius,
             angle,
-            arcAngle);
+            arcAngle,
+            filterOptions);
   group.add(nodeId,
               treeIndex,
               color,
@@ -158,15 +169,22 @@ function parseExtrudedRing(primitiveInfo: any,
               outerRadius,
               outerRadius - innerRadius,
               angle,
-              arcAngle);
+              arcAngle,
+              filterOptions);
 }
 
 function parseGeneralCylinder(primitiveInfo: any,
                               nodeId: number,
                               treeIndex: number,
                               color: THREE.Color,
+<<<<<<< HEAD
                               group: GeneralRingGroup) {
 
+=======
+                              group: GeneralRingGroup,
+                              filterOptions?: FilterOptions) {
+  //
+>>>>>>> a7f2a60bbcb80aaad4a8cb078c61bab82b9118c2
   const {
     radiusA,
     radiusB,
@@ -254,14 +272,27 @@ function parseGeneralCylinder(primitiveInfo: any,
     if (thickness > 0) {
       group.add(nodeId, treeIndex, color, center, normal,
                 capXAxis, radius / Math.abs(Math.cos(slope)),
-                radius, thickness, normalizeRadians(capAngle), arcAngle);
+                radius, thickness, normalizeRadians(capAngle), arcAngle, filterOptions);
     }
   });
 }
 
-export default function parse(geometries: any[]): GeneralRingGroup {
+function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
+  if (
+    primitiveGroupMap.GeneralRing.group.count + minimumRequiredCapacity
+    > primitiveGroupMap.GeneralRing.group.capacity) {
+      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.GeneralRing.capacity);
+      primitiveGroupMap.GeneralRing.group = new GeneralRingGroup(capacity);
+      return true;
+  }
+  return false;
+}
+
+export default function parse(args: ParsePrimitiveArguments): boolean {
+  const { geometries, primitiveGroupMap, filterOptions } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
-  const group = new GeneralRingGroup(matchingGeometries.count);
+  const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
+  const group = primitiveGroupMap.GeneralRing.group;
 
   matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
@@ -270,14 +301,14 @@ export default function parse(geometries: any[]): GeneralRingGroup {
     globalColor.setHex(parsePrimitiveColor(geometry));
 
     if (geometry.type === 'ring') {
-      parseRing(primitiveInfo, nodeId, treeIndex, globalColor, group);
+      parseRing(primitiveInfo, nodeId, treeIndex, globalColor, group, filterOptions);
     } else if (geometry.type === 'cone') {
-      parseCone(primitiveInfo, nodeId, treeIndex, globalColor, group);
+      parseCone(primitiveInfo, nodeId, treeIndex, globalColor, group, filterOptions);
     } else if (geometry.type === 'extrudedRing' || geometry.type === 'extrudedRingSegment') {
-      parseExtrudedRing(primitiveInfo, nodeId, treeIndex, globalColor, group);
+      parseExtrudedRing(primitiveInfo, nodeId, treeIndex, globalColor, group, filterOptions);
     } else if (geometry.type === 'generalCylinder') {
-      parseGeneralCylinder(primitiveInfo, nodeId, treeIndex, globalColor, group);
+      parseGeneralCylinder(primitiveInfo, nodeId, treeIndex, globalColor, group, filterOptions);
     }
   });
-  return group;
+  return didCreateNewGroup;
 }

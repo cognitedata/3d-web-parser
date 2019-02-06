@@ -1,7 +1,21 @@
 import * as THREE from 'three';
+import GeometryGroup from '../geometry/GeometryGroup';
+import SceneStats from '../SceneStats';
+import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
 
 // reusable variables
 const globalVector = new THREE.Vector3();
+export interface FilterOptions {
+  boundingBoxFilter?: THREE.Box3;
+  nodeIdFilter?: number[];
+}
+
+export interface ParsePrimitiveArguments {
+  primitiveGroupMap: PrimitiveGroupMap;
+  geometries: GeometryGroup[];
+  sceneStats: SceneStats;
+  filterOptions?: FilterOptions;
+}
 
 export function parsePrimitiveNodeId(data: any): number {
   return Number(data.nodes[0].properties[0].nodeId);

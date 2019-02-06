@@ -1,6 +1,6 @@
 {
   "name": "@cognite/3d-web-parser",
-  "version": "0.0.1",
+  "version": "0.4.0",
   "description": "Parser for Cognite 3D viewer",
   "browser": "dist/main.js",
   "contributors": [
@@ -10,9 +10,7 @@
   "author": "Anders Hafreager (anders.hafreager@cognite.com)",
   "license": "Apache-2.0",
   "files": [
-    "dist/index.js",
-    "dist/index.es.js",
-    "dist/index.d.ts"
+    "dist"
   ],
   "main": "dist/index.js",
   "module": "dist/index.es.js",
@@ -43,7 +41,6 @@
     "es-check": "^5.0.0",
     "jest": "^23.6.0",
     "prettier": "^1.15.2",
-    "protobufjs": "^6.8.8",
     "rollup": "^1.1.0",
     "rollup-plugin-typescript2": "^0.19.0",
     "rollup-plugin-json": "^3.1.0",
@@ -65,7 +62,8 @@
     "registry": "https://registry.npmjs.org/"
   },
   "peerDependencies": {
-    "three": ">=0.82.0"
+    "three": ">=0.96.0",
+    "protobufjs": "^6.8.8"
   },
   "repository": {
     "type": "git",

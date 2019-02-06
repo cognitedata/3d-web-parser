@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 import GeometryGroup from './GeometryGroup';
-import { TypedArray } from 'three';
+import { TypedArray, MeshNormalMaterial } from 'three';
+import { computeBoundingBox } from './GeometryUtils';
+
+const globalMatrix = new THREE.Matrix4();
+interface IndexMap { [s: number]: boolean; }
 
 export class InstancedMeshMappings {
   public count: number;
@@ -8,6 +12,7 @@ export class InstancedMeshMappings {
   public color: Float32Array;
   public nodeId: Float64Array;
   public treeIndex: Float32Array;
+  public maxTreeIndex: number;
   // The transformX arrays contain contain transformation matrix
   public transform0: Float32Array;
   public transform1: Float32Array;
@@ -21,11 +26,45 @@ export class InstancedMeshMappings {
     this.color = new Float32Array(3 * this.capacity);
     this.nodeId = new Float64Array(this.capacity);
     this.treeIndex = new Float32Array(this.capacity);
+    this.maxTreeIndex = -1;
 
     this.transform0 = new Float32Array(3 * this.capacity);
     this.transform1 = new Float32Array(3 * this.capacity);
     this.transform2 = new Float32Array(3 * this.capacity);
     this.transform3 = new Float32Array(3 * this.capacity);
+  }
+
+  public removeIndices(indicesToRemove: IndexMap) {
+    let newIndex = 0;
+    for (let i = 0; i < this.count; i++) {
+      if (!indicesToRemove[i]) {
+        this.color[3 * newIndex + 0] = this.color[3 * i + 0];
+        this.color[3 * newIndex + 1] = this.color[3 * i + 1];
+        this.color[3 * newIndex + 2] = this.color[3 * i + 2];
+
+        this.nodeId[newIndex] = this.nodeId[i];
+        this.treeIndex[newIndex] = this.treeIndex[i];
+        this.transform0[3 * newIndex + 0] = this.transform0[3 * i + 0];
+        this.transform0[3 * newIndex + 1] = this.transform0[3 * i + 1];
+        this.transform0[3 * newIndex + 2] = this.transform0[3 * i + 2];
+
+        this.transform1[3 * newIndex + 0] = this.transform1[3 * i + 0];
+        this.transform1[3 * newIndex + 1] = this.transform1[3 * i + 1];
+        this.transform1[3 * newIndex + 2] = this.transform1[3 * i + 2];
+
+        this.transform2[3 * newIndex + 0] = this.transform2[3 * i + 0];
+        this.transform2[3 * newIndex + 1] = this.transform2[3 * i + 1];
+        this.transform2[3 * newIndex + 2] = this.transform2[3 * i + 2];
+
+        this.transform3[3 * newIndex + 0] = this.transform1[3 * i + 0];
+        this.transform3[3 * newIndex + 1] = this.transform1[3 * i + 1];
+        this.transform3[3 * newIndex + 2] = this.transform1[3 * i + 2];
+
+        newIndex++;
+      }
+    }
+
+    this.count = newIndex;
   }
 
   public add(
@@ -62,7 +101,6 @@ export class InstancedMeshMappings {
   }
 
   public getTransformMatrix(target: THREE.Matrix4, index: number) {
-
     const start = 3 * index;
     const end = 3 * (index + 1);
     const columns = [this.transform0, this.transform1, this.transform2, this.transform3];
@@ -146,6 +184,7 @@ export class InstancedMeshMappings {
   }
 
   private setTreeIndex(value: number, index: number) {
+    this.maxTreeIndex = Math.max(this.maxTreeIndex, value);
     this.treeIndex[index] = value;
   }
 
@@ -165,6 +204,7 @@ export class InstancedMeshMappings {
 export class InstancedMeshCollection {
   triangleOffset: number;
   triangleCount: number;
+  geometry?: THREE.InstancedBufferGeometry;
   mappings: InstancedMeshMappings;
   constructor(triangleOffset: number, triangleCount: number, capacity: number) {
     this.triangleOffset = triangleOffset;
@@ -183,12 +223,10 @@ export class InstancedMeshCollection {
 export class InstancedMesh {
   collections: InstancedMeshCollection[];
   fileId: number;
-  geometry: null|THREE.Mesh;
   treeIndexMap: { [s: number]: number; };
   collectionByTriangleOffset: { [s: number]: InstancedMeshCollection; };
   constructor(fileId: number) {
     this.collections = [];
-    this.geometry = null;
     this.fileId = fileId;
     this.treeIndexMap = {};
     this.collectionByTriangleOffset = {};
@@ -208,23 +246,87 @@ export class InstancedMesh {
   }
 }
 
+interface MappingData {
+  meshIndex: number;
+  collectionIndex: number;
+  mappingIndex: number;
+}
+
+interface TreeIndexMap {
+  [s: number]: MappingData;
+}
+
 export class InstancedMeshGroup extends GeometryGroup {
   meshes: InstancedMesh[];
+  treeIndexMap: TreeIndexMap;
   constructor() {
     super();
     this.meshes = [];
     this.type = 'InstancedMesh';
+    this.treeIndexMap = {};
+  }
+
+  createTreeIndexMap() {
+    this.treeIndexMap = {};
+
+    this.meshes.forEach((instancedMesh, meshIndex) => {
+      instancedMesh.collections.forEach( (collection, collectionIndex) => {
+        for (let mappingIndex = 0; mappingIndex < collection.mappings.count; mappingIndex++) {
+          const treeIndex = collection.mappings.getTreeIndex(mappingIndex);
+          if (this.treeIndexMap[treeIndex] != null) {
+            throw `Error, trying to add treeIndex
+                   ${treeIndex} to InstancedMeshGroup.treeIndexMap, but it already exists.`;
+          }
+          this.treeIndexMap[treeIndex] = {
+            meshIndex,
+            collectionIndex,
+            mappingIndex,
+          };
+        }
+      });
+    });
   }
 
   addMesh(mesh: InstancedMesh) {
     this.meshes.push(mesh);
   }
 
-  computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
-    return outputMatrix;
+  removeTreeIndicesFromCollection(treeIndices: number[], collection: InstancedMeshCollection) {
+    const indicesToRemove: IndexMap = {};
+    treeIndices.forEach(treeIndex => {
+      const { meshIndex, mappingIndex, collectionIndex } = this.treeIndexMap[treeIndex];
+      indicesToRemove[mappingIndex] = true;
+    });
+    collection.mappings.removeIndices(indicesToRemove);
+    this.createTreeIndexMap();
   }
 
-  computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
-    return box;
+  computeBoundingBox(matrix: THREE.Matrix4,
+                     box: THREE.Box3,
+                     treeIndex: number,
+                     geometry?: THREE.BufferGeometry): THREE.Box3 {
+    box.makeEmpty();
+    // Extract data about geometry
+    const { meshIndex, collectionIndex, mappingIndex } = this.treeIndexMap[treeIndex];
+    const instancedMesh = this.meshes[meshIndex];
+    const collection = instancedMesh.collections[collectionIndex];
+
+    if (geometry == null) {
+      if (collection.geometry == null) {
+        // Geometry may not be loaded yet, just return empty box.
+        return box;
+      }
+      geometry = collection.geometry;
+    }
+
+    collection.mappings.getTransformMatrix(globalMatrix, mappingIndex);
+    const triangleCount = collection.triangleCount;
+    // TriangleOffset is 0 since each collection contains exactly one geometry
+    const index = geometry.getIndex();
+    const position = geometry.getAttribute('position');
+
+    globalMatrix.multiplyMatrices(matrix, globalMatrix);
+
+    return computeBoundingBox(box, matrix, position, index, 0, triangleCount);
   }
 }

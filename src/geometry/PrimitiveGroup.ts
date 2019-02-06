@@ -3,15 +3,50 @@
 import * as THREE from 'three';
 import GeometryGroup from './GeometryGroup';
 
+import BoxGroup from './BoxGroup';
+import CircleGroup from './CircleGroup';
+import ConeGroup from './ConeGroup';
+import EccentricConeGroup from './EccentricConeGroup';
+import EllipsoidSegmentGroup from './EllipsoidSegmentGroup';
+import GeneralCylinderGroup from './GeneralCylinderGroup';
+import GeneralRingGroup from './GeneralRingGroup';
+import NutGroup from './NutGroup';
+import QuadGroup from './QuadGroup';
+import SphericalSegmentGroup from './SphericalSegmentGroup';
+import TorusSegmentGroup from './TorusSegmentGroup';
+import TrapeziumGroup from './TrapeziumGroup';
+import { FilterOptions } from '../parsers/parseUtils';
+import { identityMatrix4 } from '../constants';
+
 const matrix = new THREE.Matrix4();
+const globalBox = new THREE.Box3();
 
 type TypedArray = Float32Array | Float64Array;
 type THREEVector = THREE.Vector2 | THREE.Vector3 | THREE.Vector4;
+
+export interface PrimitiveGroupMap {
+  Box: {capacity: number, group: BoxGroup};
+  Circle: {capacity: number, group: CircleGroup};
+  Cone: {capacity: number, group: ConeGroup};
+  EccentricCone: {capacity: number, group: EccentricConeGroup};
+  EllipsoidSegment: {capacity: number, group: EllipsoidSegmentGroup};
+  GeneralCylinder: {capacity: number, group: GeneralCylinderGroup};
+  GeneralRing: {capacity: number, group: GeneralRingGroup};
+  Nut: {capacity: number, group: NutGroup};
+  Quad: {capacity: number, group: QuadGroup};
+  SphericalSegment: {capacity: number, group: SphericalSegmentGroup};
+  TorusSegment: {capacity: number, group: TorusSegmentGroup};
+  Trapezium: {capacity: number, group: TrapeziumGroup};
+}
 
 export interface Attribute {
   name: string;
   array: TypedArray;
   itemSize: number;
+}
+
+interface TreeIndexMap {
+  [s: number]: number;
 }
 
 export default abstract class PrimitiveGroup extends GeometryGroup {
@@ -20,6 +55,8 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
   public nodeId: Float64Array;
   public treeIndex: Float32Array;
   public color: Float32Array;
+  public maxTreeIndex: number;
+  public treeIndexMap: TreeIndexMap;
 
   // The transformX arrays contain contain transformation matrix
   public transform0: Float32Array;
@@ -28,14 +65,13 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
   public transform3: Float32Array;
   public hasCustomTransformAttributes: boolean;
   public attributes: Attribute[];
-  // _parents: BasePrimitive[];
-  // _children: BasePrimitive[];
-  // abstract: boolean;
   constructor(capacity: number) {
     super();
     this.count = 0;
     this.capacity = capacity;
+    this.treeIndexMap = {};
 
+    this.maxTreeIndex = -1;
     this.nodeId = new Float64Array(this.capacity);
     this.treeIndex = new Float32Array(this.capacity);
     this.color = new Float32Array(3 * this.capacity);
@@ -43,13 +79,26 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     this.transform1 = new Float32Array(0);
     this.transform2 = new Float32Array(0);
     this.transform3 = new Float32Array(0);
-    // this._parent = null;
-    // this._children = [];
-    // this.abstract = false;
     this.attributes = [
       { name: 'treeIndex', array: this.treeIndex, itemSize: 1 },
     ];
     this.hasCustomTransformAttributes = false;
+  }
+
+  abstract computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4;
+  abstract computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3;
+
+  filterLastObject(filterOptions: FilterOptions) {
+    const index = this.count - 1;
+    this.computeBoundingBox(identityMatrix4, globalBox, index);
+    const boundingBoxFilterResult = filterOptions.boundingBoxFilter
+                                    && !filterOptions.boundingBoxFilter.intersectsBox(globalBox);
+    const nodeId = this.getNodeId(index);
+    const nodeIdFilterResult = filterOptions.nodeIdFilter && filterOptions.nodeIdFilter.indexOf(nodeId) === -1;
+    if (boundingBoxFilterResult || nodeIdFilterResult) {
+      // Reduce count, i.e. remove last element
+      this.count -= 1;
+    }
   }
 
   setVector<T extends TypedArray, U extends THREEVector>(
@@ -133,6 +182,8 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
   }
 
   setTreeIndex(value: number, index: number) {
+    this.maxTreeIndex = Math.max(this.maxTreeIndex, value);
+    this.treeIndexMap[value] = index;
     this.treeIndex[index] = value;
   }
 

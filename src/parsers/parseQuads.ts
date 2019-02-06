@@ -1,11 +1,13 @@
 import * as THREE from 'three';
 import QuadGroup from '../geometry/QuadGroup';
+import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
 import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
          parsePrimitiveTreeIndex,
          getPrimitiveType,
-         isPrimitive } from './parseUtils';
+         isPrimitive,
+         ParsePrimitiveArguments } from './parseUtils';
 import { zAxis } from '../constants';
 
 const color = new THREE.Color();
@@ -44,9 +46,20 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-export default function parse(geometries: any[]): QuadGroup {
+function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
+  if (primitiveGroupMap.Quad.group.count + minimumRequiredCapacity > primitiveGroupMap.Quad.group.capacity) {
+      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Quad.capacity);
+      primitiveGroupMap.Quad.group = new QuadGroup(capacity);
+      return true;
+  }
+  return false;
+}
+
+export default function parse(args: ParsePrimitiveArguments): boolean {
+  const { geometries, primitiveGroupMap, filterOptions } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
-  const group = new QuadGroup(matchingGeometries.count);
+  const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
+  const group = primitiveGroupMap.Quad.group;
 
   matchingGeometries.geometries.forEach(geometry => {
     // Only extruded rings will produce quads
@@ -90,11 +103,11 @@ export default function parse(geometries: any[]): QuadGroup {
 
       if (isSecondQuad) {
         // swap the order of vertex1 and vertex2 to flip the normal
-        group.add(nodeId, treeIndex, color, vertex2, vertex1, vertex3);
+        group.add(nodeId, treeIndex, color, vertex2, vertex1, vertex3, filterOptions);
       } else {
-        group.add(nodeId, treeIndex, color, vertex1, vertex2, vertex3);
+        group.add(nodeId, treeIndex, color, vertex1, vertex2, vertex3, filterOptions);
       }
     });
   });
-  return group;
+  return didCreateNewGroup;
 }

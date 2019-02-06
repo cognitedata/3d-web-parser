@@ -1,10 +1,12 @@
 import * as THREE from 'three';
 import SphericalSegmentGroup from '../geometry/SphericalSegmentGroup';
+import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
 import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
          parsePrimitiveTreeIndex,
-         getPrimitiveType } from './parseUtils';
+         getPrimitiveType,
+         ParsePrimitiveArguments } from './parseUtils';
 
 const color = new THREE.Color();
 const center = new THREE.Vector3();
@@ -26,9 +28,22 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-export default function parse(geometries: any[]): SphericalSegmentGroup {
+function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
+  if (
+    primitiveGroupMap.SphericalSegment.group.count + minimumRequiredCapacity
+    > primitiveGroupMap.SphericalSegment.group.capacity) {
+      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.SphericalSegment.capacity);
+      primitiveGroupMap.SphericalSegment.group = new SphericalSegmentGroup(capacity);
+      return true;
+  }
+  return false;
+}
+
+export default function parse(args: ParsePrimitiveArguments): boolean {
+  const { geometries, primitiveGroupMap, filterOptions } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
-  const group = new SphericalSegmentGroup(matchingGeometries.count);
+  const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
+  const group = primitiveGroupMap.SphericalSegment.group;
 
   matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
@@ -50,7 +65,7 @@ export default function parse(geometries: any[]): SphericalSegmentGroup {
       normal.set(0, -1, 0);
     }
 
-    group.add(nodeId, treeIndex, color, center, normal, radius, height);
+    group.add(nodeId, treeIndex, color, center, normal, radius, height, filterOptions);
   });
-  return group;
+  return didCreateNewGroup;
 }

@@ -1,10 +1,12 @@
 import * as THREE from 'three';
 import TorusSegmentGroup from '../geometry/TorusSegmentGroup';
+import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
 import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
          parsePrimitiveTreeIndex,
-         getPrimitiveType } from './parseUtils';
+         getPrimitiveType,
+         ParsePrimitiveArguments } from './parseUtils';
 
 const color = new THREE.Color();
 const center = new THREE.Vector3();
@@ -26,9 +28,22 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-export default function parse(geometries: any[]): TorusSegmentGroup {
+function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
+  if (
+    primitiveGroupMap.TorusSegment.group.count + minimumRequiredCapacity
+    > primitiveGroupMap.TorusSegment.group.capacity) {
+      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.TorusSegment.capacity);
+      primitiveGroupMap.TorusSegment.group = new TorusSegmentGroup(capacity);
+      return true;
+  }
+  return false;
+}
+
+export default function parse(args: ParsePrimitiveArguments): boolean {
+  const { geometries, primitiveGroupMap, filterOptions } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
-  const group = new TorusSegmentGroup(matchingGeometries.count);
+  const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
+  const group = primitiveGroupMap.TorusSegment.group;
 
   matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
@@ -50,7 +65,7 @@ export default function parse(geometries: any[]): TorusSegmentGroup {
       arcAngle = 2 * Math.PI,
     } = primitiveInfo;
 
-    group.add(nodeId, treeIndex, color, center, normal, radius, tubeRadius, angle, arcAngle);
+    group.add(nodeId, treeIndex, color, center, normal, radius, tubeRadius, angle, arcAngle, filterOptions);
   });
-  return group;
+  return didCreateNewGroup;
 }

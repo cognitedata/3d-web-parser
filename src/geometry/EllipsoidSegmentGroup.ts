@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import PlaneGroup from './PlaneGroup';
 import { computeCircleBoundingBox } from './CircleGroup';
 import { zAxis } from './../constants';
+import { FilterOptions } from '../parsers/parseUtils';
 
 // reusable variables
 const rotation = new THREE.Quaternion();
@@ -145,6 +146,7 @@ export default class EllipsoidSegmentGroup extends PlaneGroup {
     horizontalRadius: number,
     verticalRadius: number,
     height: number,
+    filterOptions?: FilterOptions,
   ) {
     this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
@@ -155,6 +157,10 @@ export default class EllipsoidSegmentGroup extends PlaneGroup {
     this.setVerticalRadius(verticalRadius, this.count);
     this.setHeight(height, this.count);
     this.count += 1;
+
+    if (filterOptions) {
+      this.filterLastObject(filterOptions);
+    }
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {

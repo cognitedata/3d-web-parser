@@ -1,13 +1,16 @@
 import * as THREE from 'three';
 import TrapeziumGroup from '../geometry/TrapeziumGroup';
+import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
+import GeneralCylinderGroup from '../geometry/GeneralCylinderGroup';
 import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
          parsePrimitiveTreeIndex,
          getPrimitiveType,
-         isPrimitive } from './parseUtils';
+         isPrimitive,
+         ParsePrimitiveArguments,
+         FilterOptions} from './parseUtils';
 import { xAxis, zAxis } from '../constants';
-import { GeneralCylinderGroup } from '..';
 
 const globalColor = new THREE.Color();
 const globalCenterA = new THREE.Vector3();
@@ -61,7 +64,8 @@ function parseCone(primitiveInfo: any,
                    nodeId: number,
                    treeIndex: number,
                    color: THREE.Color,
-                   group: TrapeziumGroup) {
+                   group: TrapeziumGroup,
+                   filterOptions?: FilterOptions) {
   let { x = 0, y = 0, z = 0 } = primitiveInfo.centerA;
   globalCenterA.set(x, y, z);
 
@@ -100,7 +104,7 @@ function parseCone(primitiveInfo: any,
         );
       });
     });
-    group.add(nodeId, treeIndex, color, vertices[0], vertices[1], vertices[2], vertices[3]);
+    group.add(nodeId, treeIndex, color, vertices[0], vertices[1], vertices[2], vertices[3], filterOptions);
   });
 }
 
@@ -108,7 +112,8 @@ function parseGeneralCylinder(primitiveInfo: any,
                               nodeId: number,
                               treeIndex: number,
                               color: THREE.Color,
-                              group: TrapeziumGroup) {
+                              group: TrapeziumGroup,
+                              filterOptions?: FilterOptions) {
   //
   const {
     radiusA,
@@ -192,13 +197,32 @@ function parseGeneralCylinder(primitiveInfo: any,
       });
     });
 
-    group.add(nodeId, treeIndex, color, globalVertices[0], globalVertices[1], globalVertices[2], globalVertices[3]);
+    group.add(nodeId,
+      treeIndex,
+      color,
+      globalVertices[0],
+      globalVertices[1],
+      globalVertices[2],
+      globalVertices[3],
+      filterOptions);
   });
 }
 
-export default function parse(geometries: any[]): TrapeziumGroup {
+function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
+  if (primitiveGroupMap.Trapezium.group.count + minimumRequiredCapacity > primitiveGroupMap.Trapezium.group.capacity) {
+      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Trapezium.capacity);
+      primitiveGroupMap.Trapezium.group = new TrapeziumGroup(capacity);
+      return true;
+  }
+  return false;
+}
+
+export default function parse(args: ParsePrimitiveArguments): boolean {
+  const { geometries, primitiveGroupMap, filterOptions } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
-  const group = new TrapeziumGroup(matchingGeometries.count);
+
+  const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
+  const group = primitiveGroupMap.Trapezium.group;
 
   matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
@@ -207,15 +231,15 @@ export default function parse(geometries: any[]): TrapeziumGroup {
     globalColor.setHex(parsePrimitiveColor(geometry));
 
     if (geometry.type === 'cone') {
-      parseCone(primitiveInfo, nodeId, treeIndex, globalColor, group);
+      parseCone(primitiveInfo, nodeId, treeIndex, globalColor, group, filterOptions);
     } else if (geometry.type === 'generalCylinder') {
       const { radiusA, radiusB } = primitiveInfo;
       if (radiusA !== radiusB) {
-        parseCone(primitiveInfo, nodeId, treeIndex, globalColor, group);
+        parseCone(primitiveInfo, nodeId, treeIndex, globalColor, group, filterOptions);
       } else {
-        parseGeneralCylinder(primitiveInfo, nodeId, treeIndex, globalColor, group);
+        parseGeneralCylinder(primitiveInfo, nodeId, treeIndex, globalColor, group, filterOptions);
       }
     }
   });
-  return group;
+  return didCreateNewGroup;
 }

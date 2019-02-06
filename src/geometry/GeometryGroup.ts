@@ -1,13 +1,23 @@
 // Copyright 2019 Cognite AS
 import * as THREE from 'three';
 
-export default abstract class GeometryGroup {
+export interface GeometryNode {
+  groupIndex: {collectionIndex?: number, mappingIndex: number};
+  treeIndex: number;
+  nodeId: number;
+  color?: THREE.Color;
+  geometryGroup: GeometryGroup;
+}
+
+export interface GeometryMap {
+  [s: number]: GeometryNode[];
+}
+
+export abstract class GeometryGroup {
   public type: string;
   constructor() {
     this.type = '';
   }
-  abstract computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4;
-  abstract computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3;
 
   memoryUsage(usage: any) {
     Object.keys(this).forEach(key => {
@@ -30,3 +40,4 @@ export default abstract class GeometryGroup {
     return usage;
   }
 }
+export default GeometryGroup;

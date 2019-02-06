@@ -1,10 +1,12 @@
 import * as THREE from 'three';
 import EllipsoidSegmentGroup from '../geometry/EllipsoidSegmentGroup';
+import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
 import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
          parsePrimitiveTreeIndex,
-         getPrimitiveType } from './parseUtils';
+         getPrimitiveType,
+         ParsePrimitiveArguments } from './parseUtils';
 
 const color = new THREE.Color();
 const center = new THREE.Vector3();
@@ -26,9 +28,22 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-export default function parse(geometries: any[]): EllipsoidSegmentGroup {
+function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
+  if (
+    primitiveGroupMap.EllipsoidSegment.group.count + minimumRequiredCapacity
+    > primitiveGroupMap.EllipsoidSegment.group.capacity) {
+      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.EllipsoidSegment.capacity);
+      primitiveGroupMap.EllipsoidSegment.group = new EllipsoidSegmentGroup(capacity);
+      return true;
+  }
+  return false;
+}
+
+export default function parse(args: ParsePrimitiveArguments): boolean {
+  const { geometries, primitiveGroupMap, filterOptions } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
-  const group = new EllipsoidSegmentGroup(matchingGeometries.count);
+  const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
+  const group = primitiveGroupMap.EllipsoidSegment.group;
 
   matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
@@ -49,7 +64,7 @@ export default function parse(geometries: any[]): EllipsoidSegmentGroup {
       height = primitiveInfo.height;
     }
 
-    group.add(nodeId, treeIndex, color, center, normal, horizontalRadius, verticalRadius, height);
+    group.add(nodeId, treeIndex, color, center, normal, horizontalRadius, verticalRadius, height, filterOptions);
   });
-  return group;
+  return didCreateNewGroup;
 }

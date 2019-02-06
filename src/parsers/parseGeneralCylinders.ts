@@ -1,12 +1,14 @@
 import * as THREE from 'three';
 import GeneralCylinderGroup from '../geometry/GeneralCylinderGroup';
+import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
 import { MatchingGeometries,
   parsePrimitiveColor,
   parsePrimitiveNodeId,
   parsePrimitiveTreeIndex,
   getPrimitiveType,
   isPrimitive,
-  normalizeRadians } from './parseUtils';
+  normalizeRadians,
+         ParsePrimitiveArguments } from './parseUtils';
 import { zAxis } from '../constants';
 
 // reusable variables
@@ -50,9 +52,22 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-export default function parse(geometries: any[]): GeneralCylinderGroup {
+function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
+  if (
+    primitiveGroupMap.GeneralCylinder.group.count + minimumRequiredCapacity
+    > primitiveGroupMap.GeneralCylinder.group.capacity) {
+      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.GeneralCylinder.capacity);
+      primitiveGroupMap.GeneralCylinder.group = new GeneralCylinderGroup(capacity);
+      return true;
+  }
+  return false;
+}
+
+export default function parse(args: ParsePrimitiveArguments): boolean {
+  const { geometries, primitiveGroupMap, filterOptions } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
-  const group = new GeneralCylinderGroup(matchingGeometries.count);
+  const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
+  const group = primitiveGroupMap.GeneralCylinder.group;
 
   matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
@@ -101,15 +116,15 @@ export default function parse(geometries: any[]): GeneralCylinderGroup {
     group.add(nodeId, treeIndex, color, extA, extB,
               radiusA, heightA,
               heightB, slopeA, slopeB, zAngleA, zAngleB,
-              angle, arcAngle);
+              angle, arcAngle, filterOptions);
     if (thickness > 0) {
       if (thickness !== radiusA) {
         group.add(nodeId, treeIndex, color, extA, extB,
                   radiusA - thickness, heightA,
                   heightB, slopeA, slopeB, zAngleA, zAngleB,
-                  angle, arcAngle);
+                  angle, arcAngle, filterOptions);
       }
     }
   });
-  return group;
+  return didCreateNewGroup;
 }

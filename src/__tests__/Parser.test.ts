@@ -9,7 +9,7 @@ import { expectBoundingBoxEqual } from '../TestUtils';
 describe('Parser', () => {
   test('parse sector', async () => {
     const protobufData = fs.readFileSync('./src/__tests__/fixtures/test_scene.pb', null);
-    const rootSector = await parse(protobufData);
+    const { rootSector, sectors } = await parse(protobufData);
     expect(rootSector).toBeInstanceOf(Sector);
 
     // validate bounding box

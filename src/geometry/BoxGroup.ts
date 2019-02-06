@@ -3,6 +3,7 @@
 import * as THREE from 'three';
 import PlaneGroup from './PlaneGroup';
 import { zAxis } from '../constants';
+import { FilterOptions } from '../parsers/parseUtils';
 
 // reusable variables
 const firstRotation = new THREE.Quaternion();
@@ -48,6 +49,7 @@ export default class BoxGroup extends PlaneGroup {
     normal: THREE.Vector3,
     angle: number,
     delta: THREE.Vector3,
+    filterOptions?: FilterOptions,
   ) {
     this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
@@ -57,6 +59,10 @@ export default class BoxGroup extends PlaneGroup {
     this.setAngle(angle, this.count);
     this.setDelta(delta, this.count);
     this.count += 1;
+
+    if (filterOptions) {
+      this.filterLastObject(filterOptions);
+    }
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
