@@ -6,16 +6,16 @@ import { fileGeometries, filePropertyArrayNames } from '../../customFileParser/p
 // @ts-ignore
 const fs = require('fs');
 
-const rootSectorFilePath = './src/__tests__/fixtures/web_node_4_0.i3d';
-const nonRootSectorFilePath = './src/__tests__/fixtures/web_node_4_3.i3d';
-const multiSectorFilePath = './src/__tests__/fixtures/web_scene.pi3d';
+const rootSectorFilePath = './src/__tests__/fixtures/all_primitives/web_node_4_0.i3d';
+const nonRootSectorFilePath = './src/__tests__/fixtures/all_primitives/web_node_4_0.i3d';
+const multiSectorFilePath = './src/__tests__/fixtures/all_primitives/web_scene.pi3d';
 
 function fileToArrayBuffer(filePath: string) {
-  const incomingFile = fs.readFileSync(filePath, null);
-  const asArrayBuffer = new ArrayBuffer(incomingFile.length);
+  const fileBuffer = fs.readFileSync(filePath, null);
+  const asArrayBuffer = new ArrayBuffer(fileBuffer.length);
   const arrayBufferCopier = new Uint8Array(asArrayBuffer);
-  for (let i = 0; i < incomingFile.length; i++) {
-    arrayBufferCopier[i] = incomingFile[i];
+  for (let i = 0; i < fileBuffer.length; i++) {
+    arrayBufferCopier[i] = fileBuffer[i];
   }
 
   return asArrayBuffer;
@@ -23,9 +23,9 @@ function fileToArrayBuffer(filePath: string) {
 
 describe('customFileIntegrationTest', () => {
   test('read any sector metadata', async() => {
-    const incomingFile = fileToArrayBuffer(rootSectorFilePath);
-    const file = new CustomFileReader(incomingFile);
-    const sectorMetadata = file.readSectorMetadata(incomingFile.byteLength);
+    const fileBuffer = fileToArrayBuffer(rootSectorFilePath);
+    const fileReader = new CustomFileReader(fileBuffer);
+    const sectorMetadata = fileReader.readSectorMetadata(fileBuffer.byteLength);
 
     expect(sectorMetadata.magicBytes).toBe(1178874697);
     expect(sectorMetadata.formatVersion).toBeDefined();
@@ -40,33 +40,40 @@ describe('customFileIntegrationTest', () => {
     expect(sectorMetadata.sectorBBoxMax.z).toBeGreaterThan(sectorMetadata.sectorBBoxMin.z);
   });
 
-  test('read root-sector TrueValueArrays', async() => {
-    const incomingFile = fileToArrayBuffer(rootSectorFilePath);
-    const file = new CustomFileReader(incomingFile);
-    file.readSectorMetadata(incomingFile.byteLength);
-    expect(file.location).toBeLessThan(incomingFile.byteLength);
-    const trueValueArrays = file.readTrueValueArrays();
+  test('read root-sector UncompressedValues', async() => {
+    const fileBuffer = fileToArrayBuffer(rootSectorFilePath);
+    const fileReader = new CustomFileReader(fileBuffer);
+    const sectorMetadata = fileReader.readSectorMetadata(fileBuffer.byteLength);
+    expect(sectorMetadata.arrayCount).toBe(filePropertyArrayNames.length);
 
-    expect(Object.keys(trueValueArrays).length).toBe(filePropertyArrayNames.length);
-    Object.keys(trueValueArrays).forEach(parameterName => {
+    const uncompressedValues = fileReader.readUncompressedValues();
+
+    expect(Object.keys(uncompressedValues).length).toBe(filePropertyArrayNames.length);
+    Object.keys(uncompressedValues).forEach(parameterName => {
       expect(filePropertyArrayNames.indexOf(parameterName)).not.toBe(-1);
-      expect(trueValueArrays[parameterName].length).toBeGreaterThan(0);
-      if (parameterName === 'color') {
-        expect(trueValueArrays[parameterName][0] instanceof THREE.Color);
-      } else if (parameterName === 'normal') {
-        expect(trueValueArrays[parameterName][0] instanceof THREE.Vector3);
+      if (uncompressedValues[parameterName].length > 0) {
+        if (parameterName === 'color') {
+          expect(uncompressedValues[parameterName][0] instanceof THREE.Color);
+        } else if (parameterName === 'normal') {
+          expect(uncompressedValues[parameterName][0] instanceof THREE.Vector3);
+        } else {
+          expect(uncompressedValues[parameterName][0] instanceof Number);
+        }
       } else {
-        expect(trueValueArrays[parameterName][0] instanceof Number);
+        // tslint:disable-next-line
+        console.log('Test is missing uncompressedValues of type ' + parameterName);
       }
     });
   });
 
   test('read any sector geometry group index pointers', async() => {
-    const incomingFile = fileToArrayBuffer(nonRootSectorFilePath);
-    const file = new CustomFileReader(incomingFile);
-    const sectorMetadata = file.readSectorMetadata(incomingFile.byteLength);
-    expect(sectorMetadata.arrayCount).toBe(0);
-    const geometryIndexHandlers = file.readSectorGeometryIndexHandlers(incomingFile.byteLength);
+    const fileBuffer = fileToArrayBuffer(nonRootSectorFilePath);
+    const fileReader = new CustomFileReader(fileBuffer);
+    const sectorMetadata = fileReader.readSectorMetadata(fileBuffer.byteLength);
+    if (sectorMetadata.arrayCount !== 0) {
+      fileReader.readUncompressedValues();
+    }
+    const geometryIndexHandlers = fileReader.readSectorGeometryIndexHandlers(fileBuffer.byteLength);
 
     // Check that the sector has geometries. If it doesn't, run this test on a different file.
     expect(geometryIndexHandlers.length).toBeGreaterThan(0);
@@ -82,21 +89,19 @@ describe('customFileIntegrationTest', () => {
   });
 
   test('read multi-sector file', async() => {
-    const incomingFile = fileToArrayBuffer(multiSectorFilePath);
-    const rootSector = parseManySectors(incomingFile);
+    const fileBuffer = fileToArrayBuffer(multiSectorFilePath);
+    const rootSector = parseManySectors(fileBuffer);
 
     const sectors = [rootSector];
     while (sectors.length > 0) {
       const sector = sectors.pop();
       expect(sector).toBeDefined();
 
-      // @ts-ignore. Sector is not undefined
-      sector.children.forEach(child => {
+      sector!.children.forEach(child => {
         sectors.push(child);
       });
 
-      // @ts-ignore. Sector is not undefined
-      sector.primitiveGroups.forEach(primitiveGroup => {
+      sector!.primitiveGroups.forEach(primitiveGroup => {
         expect(primitiveGroup.type).toBeDefined();
         expect(primitiveGroup.count).toBeDefined();
         expect(primitiveGroup.capacity).toBeDefined();

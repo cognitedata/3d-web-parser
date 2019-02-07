@@ -4,8 +4,8 @@ import { renderedGeometryToAddFunction } from '../parserParameters';
 
 export default function unpackGeometry(
   renderedGeometryGroups: RenderedGeometryGroups, geometryIndexHandlers: GeometryIndexHandler[],
-  trueValueArrays: any, groupName: string) {
-  const data = new PropertyLoader(trueValueArrays);
+  uncompressedValues: any, groupName: string) {
+  const data = new PropertyLoader(uncompressedValues);
 
   geometryIndexHandlers.forEach(geometryIndexHandler => {
     if (geometryIndexHandler.name === groupName) {

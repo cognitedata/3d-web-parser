@@ -7,9 +7,9 @@ export default function loadGeometryIndexes(file: CustomFileReader, sectorEndLoc
 
   const geometryIndexes: GeometryIndexHandler[] = [];
   while (file.location < sectorEndLocation) {
-    const name = IdToFileGeometryName[file.readUint32()];
+    const name = IdToFileGeometryName[file.readUint8()];
     const geometryCount = file.readUint32();
-    const attributeCount = file.readUint32();
+    const attributeCount = file.readUint8();
     const byteCount = file.readUint32();
     const nodeIds = file.getNodeIdReader(geometryCount);
     const indexes = file.getFibonacciDecoder(byteCount);

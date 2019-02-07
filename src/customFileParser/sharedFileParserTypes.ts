@@ -1,4 +1,5 @@
 import FibonacciDecoder from './FibonacciDecoder';
+import { BYTES_PER_NODE_ID } from './parserParameters';
 import * as THREE from 'three';
 
 interface SectorMetadata {
@@ -25,11 +26,10 @@ interface RenderedGeometryGroups {
   [name: string]: any;
 }
 
-interface TrueValueArrays {
+interface UncompressedValues {
   [name: string]: any[];
 }
 
-const BYTES_PER_NODE_ID = 7;
 class NodeIdReader {
   private dataView: DataView;
   private location = 0;
@@ -38,7 +38,6 @@ class NodeIdReader {
     this.dataView = new DataView(arrayBuffer, startLocation, lengthBytes);
     this.location = 0;
   }
-  // Node ID is saved as a 7 byte integer
   nextNodeId(): number {
     let readValue = 0;
     for (let i = 0; i < BYTES_PER_NODE_ID; i++) {
@@ -50,4 +49,4 @@ class NodeIdReader {
 }
 
 export { GeometryIndexHandler, SectorMetadata, NodeIdReader, RenderedGeometryGroups,
-  TrueValueArrays };
+  UncompressedValues, BYTES_PER_NODE_ID };

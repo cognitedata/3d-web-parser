@@ -1,9 +1,10 @@
 
 import loadSectorMetadata from './loadSectorMetadata';
-import loadTrueValueArrays from './loadTrueValueArrays';
+import loadUncompressedValues from './loadUncompressedValues';
 import loadGeometryIndexHandlers from './loadGeometryIndexHandlers';
 import FibonacciDecoder from './FibonacciDecoder';
 import { NodeIdReader, GeometryIndexHandler } from './sharedFileParserTypes';
+import { BYTES_PER_NODE_ID } from './parserParameters';
 
 export default class CustomFileReader {
   public location: number;
@@ -20,6 +21,25 @@ export default class CustomFileReader {
     this.flip = true;
   }
 
+  dumpHex(numberOfValues: number) {
+    for (let i = -numberOfValues; i < 0; i++) {
+      // tslint:disable-next-line
+      console.log(('00' + this.dataView.getUint8(this.location + i).toString(16)).slice(-2));
+    }
+    // tslint:disable-next-line
+    console.log('~~~');
+    for (let i = 0; i < numberOfValues; i++) {
+      // tslint:disable-next-line
+      console.log(('00' + this.dataView.getUint8(this.location + i).toString(16)).slice(-2));
+    }
+  }
+
+  readUint8(): number {
+    const value = this.dataView.getUint8(this.location);
+    this.location += 1;
+    return value;
+  }
+
   readUint32(): number {
     const value = this.dataView.getUint32(this.location, this.flip);
     this.location += 4;
@@ -28,7 +48,7 @@ export default class CustomFileReader {
 
   readUint64() {
     let value = this.dataView.getUint32(this.location, this.flip);
-    value = value << 8;
+    value = value * Math.pow(2, 8);
     value += this.dataView.getUint32(this.location + 4, this.flip);
     this.location += 8;
     return value;
@@ -84,8 +104,8 @@ export default class CustomFileReader {
     return loadSectorMetadata(this, sectorByteLength);
   }
 
-  readTrueValueArrays() {
-    return loadTrueValueArrays(this);
+  readUncompressedValues() {
+    return loadUncompressedValues(this);
   }
 
   readSectorGeometryIndexHandlers(sectorEndLocation: number): GeometryIndexHandler[] {
@@ -93,8 +113,8 @@ export default class CustomFileReader {
   }
 
   getNodeIdReader(geometryCount: number): NodeIdReader {
-    const nodeIds = new NodeIdReader(this.originalBuffer, this.location, geometryCount * 7);
-    this.location += geometryCount * 7;
+    const nodeIds = new NodeIdReader(this.originalBuffer, this.location, geometryCount * BYTES_PER_NODE_ID);
+    this.location += geometryCount * BYTES_PER_NODE_ID;
     return nodeIds;
   }
 

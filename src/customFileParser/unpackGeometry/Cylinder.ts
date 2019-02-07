@@ -1,9 +1,13 @@
 import { RenderedGeometryGroups } from '../sharedFileParserTypes';
 import PropertyLoader from '../PropertyLoader';
 import * as THREE from 'three';
+import { xAxis, zAxis } from './../../constants';
 
 const centerA = new THREE.Vector3();
 const centerB = new THREE.Vector3();
+
+const localXAxis = new THREE.Vector3();
+const rotation = new THREE.Quaternion();
 
 function addClosedCylinder(groups: RenderedGeometryGroups, data: PropertyLoader) {
   centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
@@ -14,12 +18,8 @@ function addClosedCylinder(groups: RenderedGeometryGroups, data: PropertyLoader)
   groups.Circle.add(data.nodeId, data.treeIndex, data.color, centerB, data.normal, data.radiusA);
 }
 
-function addClosedGeneralCylinder(groups: RenderedGeometryGroups, data: PropertyLoader) {
-  groups.GeneralCylinder.add(data.nodeId, data.treeIndex, data.color, centerA, centerB, data.radiusA,
-    data.height / 2, data.height / 2, data.slopeA, data.slopeB, data.zAngleA, data.zAngleB,
-    data.rotationAngle, data.arcAngle);
-  // groups.generalRing.add
-  // groups.generalRing.add
+function addGeneralCylinder(groups: RenderedGeometryGroups, data: PropertyLoader) {
+  // TODO
 }
 
 function addOpenCylinder(groups: RenderedGeometryGroups, data: PropertyLoader) {
@@ -29,10 +29,4 @@ function addOpenCylinder(groups: RenderedGeometryGroups, data: PropertyLoader) {
   data.radiusA, data.radiusA, data.rotationAngle);
 }
 
-function addOpenGeneralCylinder(groups: RenderedGeometryGroups, data: PropertyLoader) {
-  groups.GeneralCylinder.add(data.nodeId, data.treeIndex, data.color, centerA, centerB, data.radiusA,
-    data.height / 2, data.height / 2, data.slopeA, data.slopeB, data.zAngleA, data.zAngleB, data.rotationAngle,
-    data.arcAngle);
-}
-
-export { addClosedCylinder, addClosedGeneralCylinder, addOpenCylinder, addOpenGeneralCylinder };
+export { addClosedCylinder, addOpenCylinder, addGeneralCylinder };

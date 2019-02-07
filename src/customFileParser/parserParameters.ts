@@ -1,4 +1,5 @@
 // After making changes to this file, run parserParametersTest to make sure everything is still valid
+import * as THREE from 'three';
 
 import BoxGroup from '../geometry/BoxGroup';
 import CircleGroup from '../geometry/CircleGroup';
@@ -19,8 +20,7 @@ import { addBox, addCircle, addNut, addRing, addSphere } from './unpackGeometry/
 import { addClosedCone, addClosedEccentricCone, addOpenCone, addOpenEccentricCone } from './unpackGeometry/Cone';
 import { addExtrudedRing, addClosedExtrudedRingSegment, addOpenExtrudedRingSegment }
   from './unpackGeometry/ExtrudedRing';
-import { addClosedCylinder, addClosedGeneralCylinder, addOpenCylinder, addOpenGeneralCylinder }
-  from './unpackGeometry/Cylinder';
+import { addClosedCylinder, addGeneralCylinder, addOpenCylinder } from './unpackGeometry/Cylinder';
 import { addClosedEllipsoidSegment, addOpenEllipsoidSegment, addEllipsoid } from './unpackGeometry/Ellipsoid';
 import { addClosedTorusSegment, addOpenTorusSegment, addTorus } from './unpackGeometry/Torus';
 import { addClosedSphericalSegment, addOpenSphericalSegment } from './unpackGeometry/SphericalSegment';
@@ -61,12 +61,16 @@ const IdToFileGeometryName: {[id: number]: string} = {
   101: 'InstancedMesh',
 };
 
-const filePropertyArrayNames = ['color', 'centerX', 'centerY', 'centerZ', 'normal', 'delta', 'height', 'radius',
-'angle', 'translationX', 'translationY', 'translationZ', 'scaleX', 'scaleY', 'scaleZ'];
+const BYTES_PER_NODE_ID = 7;
+const DEFAULT_COLOR = new THREE.Color(0, 0, 100);
 
-const fileProperties = ['treeIndex', 'color', 'center', 'normal', 'delta', 'radiusA', 'radiusB', 'rotationAngle',
-'capNormal', 'thickness', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB'];
+const filePropertyArrayNames = ['color', 'centerX', 'centerY', 'centerZ', 'normal', 'delta', 'height',
+'radius', 'angle', 'translationX', 'translationY', 'translationZ', 'scaleX', 'scaleY', 'scaleZ', 'fileId'];
 
+const fileProperties = ['treeIndex', 'color', 'center', 'normal', 'delta', 'height', 'radiusA', 'radiusB',
+'rotationAngle', 'capNormal', 'thickness', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB', 'fileId'];
+
+// If adding new parameters, also update PropertyLoader.
 const fileGeometryProperties: {[name: string]: string[]} = {
   Box: ['treeIndex', 'color', 'center', 'normal', 'delta', 'rotationAngle'],
   Circle: ['treeIndex', 'color', 'center', 'normal', 'radiusA'],
@@ -109,7 +113,7 @@ const renderedGeometryToAddFunction: {[name: string]: Function} = {
   'ClosedEccentricCone': addClosedEccentricCone,
   'ClosedEllipsoidSegment': addClosedEllipsoidSegment,
   'ClosedExtrudedRingSegment': addClosedExtrudedRingSegment,
-  'ClosedGeneralCylinder': addClosedGeneralCylinder,
+  'ClosedGeneralCylinder': addGeneralCylinder,
   'ClosedSphericalSegment': addClosedSphericalSegment,
   'ClosedTorusSegment': addClosedTorusSegment,
   'Ellipsoid': addEllipsoid,
@@ -120,7 +124,7 @@ const renderedGeometryToAddFunction: {[name: string]: Function} = {
   'OpenEccentricCone': addOpenEccentricCone,
   'OpenEllipsoidSegment': addOpenEllipsoidSegment,
   'OpenExtrudedRingSegment': addOpenExtrudedRingSegment,
-  'OpenGeneralCylinder': addOpenGeneralCylinder,
+  'OpenGeneralCylinder': addGeneralCylinder,
   'OpenSphericalSegment': addOpenSphericalSegment,
   'OpenTorusSegment': addOpenTorusSegment,
   'Ring': addRing,
@@ -139,9 +143,9 @@ const renderedGeometriesPerFileGeometry: {[name: string]: string[]} = {
   ClosedCone: ['Circle', 'Circle', 'Cone'],
   ClosedCylinder: ['Circle', 'Circle', 'Cone'],
   ClosedEccentricCone: ['Circle', 'Circle', 'EccentricCone'],
-  ClosedEllipsoidSegment: ['EllipsoidSegment'],
+  ClosedEllipsoidSegment: ['EllipsoidSegment', 'Circle'],
   ClosedExtrudedRingSegment: ['Cone', 'Cone', 'GeneralRing', 'GeneralRing', 'Quad', 'Quad'],
-  ClosedGeneralCylinder: ['GeneralCylinder'],
+  ClosedGeneralCylinder: [/* TODO */],
   ClosedSphericalSegment: ['Circle', 'SphericalSegment'],
   ClosedTorusSegment: ['TorusSegment'],
   Ellipsoid: ['EllipsoidSegment'],
@@ -152,7 +156,7 @@ const renderedGeometriesPerFileGeometry: {[name: string]: string[]} = {
   OpenEccentricCone: ['EccentricCone'],
   OpenEllipsoidSegment: ['EllipsoidSegment'],
   OpenExtrudedRingSegment: ['Cone', 'Cone', 'GeneralRing', 'GeneralRing'],
-  OpenGeneralCylinder: ['GeneralCylinder'],
+  OpenGeneralCylinder: [/* TODO */],
   OpenSphericalSegment: ['SphericalSegment'],
   OpenTorusSegment: ['TorusSegment'],
   Ring: ['GeneralRing'],
@@ -182,4 +186,4 @@ const renderedGeometryToGroup: {[name: string]: any } = {
 export { filePropertyArrayNames,
   fileGeometries, IdToFileGeometryName, fileProperties, fileGeometryProperties,
   renderedGeometries, renderedGeometriesPerFileGeometry, renderedGeometryToGroup,
-  renderedGeometryToAddFunction };
+  renderedGeometryToAddFunction, BYTES_PER_NODE_ID, DEFAULT_COLOR };
