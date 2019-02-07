@@ -91,7 +91,7 @@ describe('customFileIntegrationTest', () => {
       expect(sector).toBeDefined();
 
       // @ts-ignore. Sector is not undefined
-      sector.children.forEach(child => {
+      sector!.children.forEach(child => {
         sectors.push(child);
       });
 
