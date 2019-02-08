@@ -1,15 +1,15 @@
 // Copyright 2019 Cognite AS
 import * as THREE from 'three';
-import parseBoxes from '../parsers/parseBoxes';
-import { expectVector3Equal, expectColorEqual, expectVector3Valid, expectColorValid } from '../TestUtils';
-import BoxGroup from '../geometry/BoxGroup';
-import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
+import parseBoxes from '../../parsers/protobuf/parseBoxes';
+import { expectVector3Equal, expectColorEqual, expectVector3Valid, expectColorValid } from '../../TestUtils';
+import BoxGroup from '../../geometry/BoxGroup';
+import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
 
-import * as TestScene from './fixtures/test_scene.json';
+import * as TestScene from '../fixtures/test_scene.json';
 import {MatchingGeometries,
         parsePrimitiveColor,
         parsePrimitiveNodeId,
-        parsePrimitiveTreeIndex } from '../parsers/parseUtils';
+        parsePrimitiveTreeIndex } from '../../parsers/protobuf/protobufUtils';
 
 const color = new THREE.Color();
 describe('parseBoxes', () => {

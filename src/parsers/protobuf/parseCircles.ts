@@ -1,14 +1,14 @@
 import * as THREE from 'three';
-import CircleGroup from '../geometry/CircleGroup';
-import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
+import CircleGroup from '../../geometry/CircleGroup';
+import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
 import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
          parsePrimitiveTreeIndex,
          getPrimitiveType,
-         isPrimitive,
-         ParsePrimitiveArguments,
-         FilterOptions} from './parseUtils';
+         isPrimitive } from './protobufUtils';
+
+import { ParsePrimitiveData, FilterOptions } from '../parseUtils';
 
 const color = new THREE.Color();
 const center = new THREE.Vector3();
@@ -125,7 +125,7 @@ function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumReq
   return false;
 }
 
-export default function parse(args: ParsePrimitiveArguments): boolean {
+export default function parse(args: ParsePrimitiveData): boolean {
   const { geometries, primitiveGroupMap, filterOptions } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
 

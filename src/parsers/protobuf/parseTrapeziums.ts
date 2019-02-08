@@ -1,16 +1,15 @@
 import * as THREE from 'three';
-import TrapeziumGroup from '../geometry/TrapeziumGroup';
-import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
-import GeneralCylinderGroup from '../geometry/GeneralCylinderGroup';
+import TrapeziumGroup from '../../geometry/TrapeziumGroup';
+import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
+import GeneralCylinderGroup from '../../geometry/GeneralCylinderGroup';
 import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
          parsePrimitiveTreeIndex,
          getPrimitiveType,
-         isPrimitive,
-         ParsePrimitiveArguments,
-         FilterOptions} from './parseUtils';
-import { xAxis, zAxis } from '../constants';
+         isPrimitive} from './protobufUtils';
+import { ParsePrimitiveData, FilterOptions } from '../parseUtils';
+import { xAxis, zAxis } from '../../constants';
 
 const globalColor = new THREE.Color();
 const globalCenterA = new THREE.Vector3();
@@ -217,7 +216,7 @@ function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumReq
   return false;
 }
 
-export default function parse(args: ParsePrimitiveArguments): boolean {
+export default function parse(args: ParsePrimitiveData): boolean {
   const { geometries, primitiveGroupMap, filterOptions } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
 

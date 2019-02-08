@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { InstancedMeshGroup, InstancedMesh, InstancedMeshCollection } from '../geometry/InstancedMeshGroup';
-import { MatchingGeometries, parseInstancedMeshTransformMatrix } from './parseUtils';
-import SceneStats from '../SceneStats';
+import { InstancedMeshGroup, InstancedMesh, InstancedMeshCollection } from '../../geometry/InstancedMeshGroup';
+import { MatchingGeometries, parseInstancedMeshTransformMatrix } from './protobufUtils';
+import SceneStats from '../../SceneStats';
 import { Scene } from 'three';
 const globalColor = new THREE.Color();
 const globalMatrix = new THREE.Matrix4();

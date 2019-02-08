@@ -1,15 +1,15 @@
 import * as THREE from 'three';
-import GeneralCylinderGroup from '../geometry/GeneralCylinderGroup';
-import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
+import GeneralCylinderGroup from '../../geometry/GeneralCylinderGroup';
+import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
 import { MatchingGeometries,
   parsePrimitiveColor,
   parsePrimitiveNodeId,
   parsePrimitiveTreeIndex,
   getPrimitiveType,
   isPrimitive,
-  normalizeRadians,
-         ParsePrimitiveArguments } from './parseUtils';
-import { zAxis } from '../constants';
+  normalizeRadians } from './protobufUtils';
+import { ParsePrimitiveData } from '../parseUtils';
+import { zAxis } from '../../constants';
 
 // reusable variables
 const color = new THREE.Color();
@@ -63,7 +63,7 @@ function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumReq
   return false;
 }
 
-export default function parse(args: ParsePrimitiveArguments): boolean {
+export default function parse(args: ParsePrimitiveData): boolean {
   const { geometries, primitiveGroupMap, filterOptions } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
   const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);

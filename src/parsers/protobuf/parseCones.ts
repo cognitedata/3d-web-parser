@@ -1,14 +1,14 @@
 import * as THREE from 'three';
-import ConeGroup from '../geometry/ConeGroup';
-import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
+import ConeGroup from '../../geometry/ConeGroup';
+import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
 import { MatchingGeometries,
   parsePrimitiveColor,
   parsePrimitiveNodeId,
   parsePrimitiveTreeIndex,
   getPrimitiveType,
-  isPrimitive,
-         ParsePrimitiveArguments } from './parseUtils';
-import { zAxis } from '../constants';
+  isPrimitive } from './protobufUtils';
+import { zAxis } from '../../constants';
+import { ParsePrimitiveData } from '../parseUtils';
 
 const globalColor = new THREE.Color();
 const globalCenterA = new THREE.Vector3();
@@ -58,7 +58,7 @@ function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumReq
   return false;
 }
 
-export default function parse(args: ParsePrimitiveArguments): boolean {
+export default function parse(args: ParsePrimitiveData): boolean {
   const { geometries, primitiveGroupMap, filterOptions } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
 
