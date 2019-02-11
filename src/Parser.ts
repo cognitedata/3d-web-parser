@@ -10,36 +10,36 @@ import { InstancedMesh, InstancedMeshGroup } from './geometry/InstancedMeshGroup
 import { MergedMesh } from './geometry/MergedMeshGroup';
 import PrimitiveGroup from './geometry/PrimitiveGroup';
 import GeometryGroup from './geometry/GeometryGroup';
-import { FilterOptions, ParsePrimitiveArguments } from './parsers/parseUtils';
+import { FilterOptions, ParsePrimitiveData } from './parsers/parseUtils';
 
-import parseBoxes from './parsers/parseBoxes';
-import parseCircles from './parsers/parseCircles';
-import parseCones from './parsers/parseCones';
-import parseEccentricCones from './parsers/parseEccentricCones';
-import parseEllipsoidSegments from './parsers/parseEllipsoidSegments';
-import parseGeneralCylinders from './parsers/parseGeneralCylinders';
-import parseGeneralRings from './parsers/parseGeneralRings';
-import parseNuts from './parsers/parseNuts';
-import parseQuads from './parsers/parseQuads';
-import parseSphericalSegments from './parsers/parseSphericalSegments';
-import parseTorusSegments from './parsers/parseTorusSegments';
-import parseTrapeziums from './parsers/parseTrapeziums';
-import parseMergedMeshes from './parsers/parseMergedMeshes';
-import parseInstancedMeshes from './parsers/parseInstancedMeshes';
+import parseBoxes from './parsers/protobuf/parseBoxes';
+import parseCircles from './parsers/protobuf/parseCircles';
+import parseCones from './parsers/protobuf/parseCones';
+import parseEccentricCones from './parsers/protobuf/parseEccentricCones';
+import parseEllipsoidSegments from './parsers/protobuf/parseEllipsoidSegments';
+import parseGeneralCylinders from './parsers/protobuf/parseGeneralCylinders';
+import parseGeneralRings from './parsers/protobuf/parseGeneralRings';
+import parseNuts from './parsers/protobuf/parseNuts';
+import parseQuads from './parsers/protobuf/parseQuads';
+import parseSphericalSegments from './parsers/protobuf/parseSphericalSegments';
+import parseTorusSegments from './parsers/protobuf/parseTorusSegments';
+import parseTrapeziums from './parsers/protobuf/parseTrapeziums';
+import parseMergedMeshes from './parsers/protobuf/parseMergedMeshes';
+import parseInstancedMeshes from './parsers/protobuf/parseInstancedMeshes';
 
-import BoxGroup from './geometry/BoxGroup';
-import CircleGroup from './geometry/CircleGroup';
-import ConeGroup from './geometry/ConeGroup';
-import EccentricConeGroup from './geometry/EccentricConeGroup';
-import EllipsoidSegmentGroup from './geometry/EllipsoidSegmentGroup';
-import GeneralCylinderGroup from './geometry/GeneralCylinderGroup';
-import GeneralRingGroup from './geometry/GeneralRingGroup';
-import NutGroup from './geometry/NutGroup';
-import PlaneGroup from './geometry/PlaneGroup';
-import QuadGroup from './geometry/QuadGroup';
-import SphericalSegmentGroup from './geometry/SphericalSegmentGroup';
-import TorusSegmentGroup from './geometry/TorusSegmentGroup';
-import TrapeziumGroup from './geometry/TrapeziumGroup';
+import { BoxGroup,
+  CircleGroup,
+  ConeGroup,
+  EccentricConeGroup,
+  EllipsoidSegmentGroup,
+  GeneralCylinderGroup,
+  GeneralRingGroup,
+  NutGroup,
+  PlaneGroup,
+  QuadGroup,
+  SphericalSegmentGroup,
+  TorusSegmentGroup,
+  TrapeziumGroup } from './geometry/GeometryGroups';
 
 import SceneStats from './SceneStats';
 
@@ -186,7 +186,5 @@ export default async function parseProtobuf(
     // tslint:disable-next-line
     console.log('Optimizing instanced meshes took ', performance.now() - t0, ' ms.');
   }
-  // tslint:disable-next-line
-  console.log('Will return ', { rootSector, sectors, sceneStats });
   return { rootSector, sectors, sceneStats };
 }

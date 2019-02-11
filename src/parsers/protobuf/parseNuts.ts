@@ -1,19 +1,15 @@
 import * as THREE from 'three';
-import EccentricConeGroup from '../geometry/EccentricConeGroup';
-import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
+import NutGroup from '../../geometry/NutGroup';
+import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
 import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
          parsePrimitiveTreeIndex,
-         getPrimitiveType,
-         ParsePrimitiveArguments } from './parseUtils';
-import { zAxis } from '../constants';
-
+         getPrimitiveType} from './protobufUtils';
+import { ParsePrimitiveData } from '../parseUtils';
 const color = new THREE.Color();
 const centerA = new THREE.Vector3();
 const centerB = new THREE.Vector3();
-const normal = new THREE.Vector3();
-const vector = new THREE.Vector3();
 
 function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   const matchingGeometries: MatchingGeometries = {
@@ -22,7 +18,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   };
 
   geometries.forEach(geometry => {
-    if (geometry.type === 'eccentricCone') {
+    if (geometry.type === 'nut') {
       matchingGeometries.geometries.push(geometry);
       matchingGeometries.count += 1;
     }
@@ -32,24 +28,23 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 }
 
 function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
-  if (
-    primitiveGroupMap.EccentricCone.group.count + minimumRequiredCapacity
-    > primitiveGroupMap.EccentricCone.group.capacity) {
-      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.EccentricCone.capacity);
-      primitiveGroupMap.EccentricCone.group = new EccentricConeGroup(capacity);
+  if (primitiveGroupMap.Nut.group.count + minimumRequiredCapacity > primitiveGroupMap.Nut.group.capacity) {
+      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Nut.capacity);
+      primitiveGroupMap.Nut.group = new NutGroup(capacity);
       return true;
   }
   return false;
 }
 
-export default function parse(args: ParsePrimitiveArguments): boolean {
+export default function parse(args: ParsePrimitiveData): boolean {
   const { geometries, primitiveGroupMap, filterOptions } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
   const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
-  const group = primitiveGroupMap.EccentricCone.group;
+  const group = primitiveGroupMap.Nut.group;
 
   matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
+
     const nodeId = parsePrimitiveNodeId(geometry);
     const treeIndex = parsePrimitiveTreeIndex(geometry);
     color.setHex(parsePrimitiveColor(geometry));
@@ -59,18 +54,10 @@ export default function parse(args: ParsePrimitiveArguments): boolean {
 
     ({ x = 0, y = 0, z = 0 } = primitiveInfo.centerB);
     centerB.set(x, y, z);
+    const { radius = 0, rotationAngle = 0 } = primitiveInfo;
 
-    const { radiusA, radiusB } = primitiveInfo;
-
-    ({ x = 0, y = 0, z = 0 } = primitiveInfo.normalA);
-    normal.set(x, y, z);
-
-    const dotProduct = normal.dot(vector.copy(centerA).sub(centerB));
-    if (dotProduct < 0) {
-      normal.negate();
-    }
-
-    group.add(nodeId, treeIndex, color, centerA, centerB, radiusA, radiusB, normal, filterOptions);
+    group.add(nodeId, treeIndex, color, centerA, centerB, radius, rotationAngle, filterOptions);
   });
+
   return didCreateNewGroup;
 }

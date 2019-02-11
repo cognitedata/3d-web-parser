@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import GeneralRingGroup from '../geometry/GeneralRingGroup';
-import GeneralCylinderGroup from '../geometry/GeneralCylinderGroup';
-import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
+import GeneralRingGroup from '../../geometry/GeneralRingGroup';
+import GeneralCylinderGroup from '../../geometry/GeneralCylinderGroup';
+import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
 import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
@@ -9,10 +9,9 @@ import { MatchingGeometries,
          getPrimitiveType,
          isPrimitive,
          angleBetweenVector3s,
-         normalizeRadians,
-         ParsePrimitiveArguments,
-         FilterOptions} from './parseUtils';
-import { xAxis, yAxis, zAxis } from '../constants';
+         normalizeRadians} from './protobufUtils';
+import { ParsePrimitiveData, FilterOptions } from '../parseUtils';
+import { xAxis, yAxis, zAxis } from '../../constants';
 
 const globalColor = new THREE.Color();
 const globalCenter = new THREE.Vector3();
@@ -283,7 +282,7 @@ function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumReq
   return false;
 }
 
-export default function parse(args: ParsePrimitiveArguments): boolean {
+export default function parse(args: ParsePrimitiveData): boolean {
   const { geometries, primitiveGroupMap, filterOptions } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
   const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);

@@ -1,14 +1,14 @@
 import * as THREE from 'three';
-import QuadGroup from '../geometry/QuadGroup';
-import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
+import QuadGroup from '../../geometry/QuadGroup';
+import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
 import { MatchingGeometries,
          parsePrimitiveColor,
          parsePrimitiveNodeId,
          parsePrimitiveTreeIndex,
          getPrimitiveType,
-         isPrimitive,
-         ParsePrimitiveArguments } from './parseUtils';
-import { zAxis } from '../constants';
+         isPrimitive} from './protobufUtils';
+import { ParsePrimitiveData } from '../parseUtils';
+import { zAxis } from '../../constants';
 
 const color = new THREE.Color();
 const vertex = new THREE.Vector3();
@@ -55,7 +55,7 @@ function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumReq
   return false;
 }
 
-export default function parse(args: ParsePrimitiveArguments): boolean {
+export default function parse(args: ParsePrimitiveData): boolean {
   const { geometries, primitiveGroupMap, filterOptions } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
   const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);

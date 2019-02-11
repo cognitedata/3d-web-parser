@@ -4,10 +4,13 @@ import * as THREE from 'three';
 import BaseCylinderGroup from './BaseCylinderGroup';
 import { xAxis, yAxis, zAxis } from '../constants';
 import { FilterOptions } from '../parsers/parseUtils';
+import { computeEllipsoidBoundingBox } from './GeometryUtils';
 
+const globalBox = new THREE.Box3();
 const globalNormal = new THREE.Vector3();
 const globalVector = new THREE.Vector3();
-const globalPlane = new THREE.Vector4();
+const globalVector2 = new THREE.Vector3();
+let globalPlane = new THREE.Vector4();
 const globalRotation = new THREE.Quaternion();
 const globalSlicingPlaneNormal = new THREE.Vector3();
 
@@ -45,6 +48,8 @@ export default class GeneralCylinderGroup extends BaseCylinderGroup {
     public zAngleB: Float32Array;
     public planeA: Float32Array;
     public planeB: Float32Array;
+    public capNormalA: Float32Array;
+    public capNormalB: Float32Array;
     public localXAxis: Float32Array;
 
   constructor(capacity: number) {
@@ -61,6 +66,8 @@ export default class GeneralCylinderGroup extends BaseCylinderGroup {
     this.zAngleB = new Float32Array(capacity);
     this.planeA = new Float32Array(4 * capacity);
     this.planeB = new Float32Array(4 * capacity);
+    this.capNormalA = new Float32Array(3 * capacity);
+    this.capNormalB = new Float32Array(3 * capacity);
     this.localXAxis = new Float32Array(3 * capacity);
     this.hasCustomTransformAttributes = true;
 
@@ -201,6 +208,22 @@ export default class GeneralCylinderGroup extends BaseCylinderGroup {
     return this.getVector(this.planeB, target, index);
   }
 
+  setCapNormalA(value: THREE.Vector3, index: number) {
+    this.setVector(value, this.capNormalA, index);
+  }
+
+  getCapNormalA(target: THREE.Vector3, index: number): THREE.Vector3 {
+    return this.getVector(this.capNormalA, target, index);
+  }
+
+  setCapNormalB(value: THREE.Vector3, index: number) {
+    this.setVector(value, this.capNormalB, index);
+  }
+
+  getCapNormalB(target: THREE.Vector3, index: number): THREE.Vector3 {
+    return this.getVector(this.capNormalB, target, index);
+  }
+
   setLocalXAxis(value: THREE.Vector3, index: number) {
     this.setVector(value, this.localXAxis, index);
   }
@@ -243,14 +266,29 @@ export default class GeneralCylinderGroup extends BaseCylinderGroup {
     this.setZAngleB(zAngleB, this.count);
     this.setAngle(angle, this.count);
     this.setArcAngle(arcAngle, this.count);
-    this.setPlaneA(
-      GeneralCylinderGroup.slicingPlane(
-        globalPlane,
-        this.getSlopeA(this.count),
-        this.getZAngleA(this.count),
-        this.getHeightA(this.count),
-        false),
-      this.count);
+
+    globalNormal.subVectors(centerA, centerB).normalize();
+    globalRotation.setFromUnitVectors(zAxis, globalNormal);
+
+    // Calculate global plane (also used to calculate normal A and B)
+    globalPlane = GeneralCylinderGroup.slicingPlane(
+      globalPlane,
+      this.getSlopeA(this.count),
+      this.getZAngleA(this.count),
+      this.getHeightA(this.count),
+      false);
+    this.setPlaneA(globalPlane, this.count);
+
+    globalNormal.set(globalPlane.x, globalPlane.y, globalPlane.z).applyQuaternion(globalRotation);
+    this.setCapNormalA(globalNormal, this.count);
+
+    globalPlane = GeneralCylinderGroup.slicingPlane(
+      globalPlane,
+      this.getSlopeB(this.count),
+      this.getZAngleB(this.count),
+      this.getHeightB(this.count),
+      true);
+
     this.setPlaneB(
       GeneralCylinderGroup.slicingPlane(
         globalPlane,
@@ -260,8 +298,9 @@ export default class GeneralCylinderGroup extends BaseCylinderGroup {
         true),
       this.count);
 
-    globalNormal.subVectors(centerA, centerB).normalize();
-    globalRotation.setFromUnitVectors(zAxis, globalNormal);
+    globalNormal.set(globalPlane.x, globalPlane.y, globalPlane.z).applyQuaternion(globalRotation);
+    this.setCapNormalB(globalNormal, this.count);
+
     this.setLocalXAxis(globalVector.copy(xAxis).applyQuaternion(globalRotation), this.count);
 
     this.count += 1;
@@ -276,7 +315,31 @@ export default class GeneralCylinderGroup extends BaseCylinderGroup {
   }
 
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
-    // console.log('TODO: implement computeBoundingBox for general cylinder');
+    box.makeEmpty();
+
+    globalBox.makeEmpty();
+    computeEllipsoidBoundingBox(
+      this.getCenterA(globalVector, index),
+      this.getCapNormalA(globalVector2, index),
+      this.getRadius(index) / Math.abs(Math.cos(this.getSlopeA(index))),
+      this.getRadius(index),
+      0,
+      matrix,
+      globalBox,
+    );
+
+    box.union(globalBox);
+    globalBox.makeEmpty();
+    computeEllipsoidBoundingBox(
+      this.getCenterB(globalVector, index),
+      this.getCapNormalB(globalVector2, index),
+      this.getRadius(index) / Math.abs(Math.cos(this.getSlopeB(index))),
+      this.getRadius(index),
+      0,
+      matrix,
+      globalBox,
+    );
+    box.union(globalBox);
     return box;
   }
 }

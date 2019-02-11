@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { MergedMeshGroup, MergedMesh } from '../geometry/MergedMeshGroup';
-import { MatchingGeometries } from './parseUtils';
-import SceneStats from '../SceneStats';
+import { MergedMeshGroup, MergedMesh } from '../../geometry/MergedMeshGroup';
+import { MatchingGeometries } from './protobufUtils';
+import SceneStats from '../../SceneStats';
 const globalColor = new THREE.Color();
 
 function findMatchingGeometries(geometries: any[]): MatchingGeometries {

@@ -110,10 +110,10 @@ export default class TrapeziumGroup extends PrimitiveGroup {
 
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
     box.makeEmpty();
-    box.expandByPoint(this.getVertex1(vertex, index));
-    box.expandByPoint(this.getVertex2(vertex, index));
-    box.expandByPoint(this.getVertex3(vertex, index));
-    box.expandByPoint(this.getVertex4(vertex, index));
+    box.expandByPoint(this.getVertex1(vertex, index).applyMatrix4(matrix));
+    box.expandByPoint(this.getVertex2(vertex, index).applyMatrix4(matrix));
+    box.expandByPoint(this.getVertex3(vertex, index).applyMatrix4(matrix));
+    box.expandByPoint(this.getVertex4(vertex, index).applyMatrix4(matrix));
     return box;
   }
 }
