@@ -1,29 +1,28 @@
-import { fileGeometries, IdToFileGeometryName, fileProperties, fileGeometryProperties,
-  renderedGeometries, renderedGeometriesPerFileGeometry, renderedGeometryToGroup,
-  renderedGeometryToAddFunction } from '../../customFileParser/parserParameters';
+import { filePrimitives, IdToFileGeometryName, fileGeometryProperties,
+  renderedPrimitives, renderedPrimitivesPerFilePrimitive, renderedPrimitiveToGroup,
+  renderedPrimitiveToAddFunction,  fileMeshes} from '../../customFileParser/parserParameters';
 
 describe('parserParameter', () => {
-  test('fileGeometryDictionaries', async() => {
-    expect(Object.keys(IdToFileGeometryName).length).toBe(fileGeometries.length);
-    expect(Object.keys(renderedGeometriesPerFileGeometry).length).toBe(fileGeometries.length);
+  test('filePrimitiveDictionaries', async() => {
+    expect(Object.keys(IdToFileGeometryName).length).toBe(filePrimitives.length + fileMeshes.length);
+    expect(Object.keys(renderedPrimitivesPerFilePrimitive).length).toBe(filePrimitives.length);
     const idKeys = Object.keys(IdToFileGeometryName);
-    for (let i = 0; i < fileGeometries.length; i++) {
-      const fileGeometry: string = fileGeometries[i];
-      expect(IdToFileGeometryName[parseInt(idKeys[i], 10)]).toBe(fileGeometry);
-      expect(fileGeometryProperties[fileGeometry]).toBeDefined();
+    for (let i = 0; i < filePrimitives.length; i++) {
+      const filePrimitive: string = filePrimitives[i];
+      expect(IdToFileGeometryName[parseInt(idKeys[i], 10)]).toBe(filePrimitive);
+      expect(fileGeometryProperties[filePrimitive]).toBeDefined();
 
-      const localRenderedGeometries = renderedGeometriesPerFileGeometry[fileGeometry];
+      const localRenderedPrimitives = renderedPrimitivesPerFilePrimitive[filePrimitive];
 
-      for (let j = 0; j < localRenderedGeometries.length; j++) {
-        const renderedGeometry = localRenderedGeometries[j];
-        expect(renderedGeometries.indexOf(renderedGeometry)).not.toBe(-1);
+      for (let j = 0; j < localRenderedPrimitives.length; j++) {
+        const renderedPrimitive = localRenderedPrimitives[j];
+        expect(renderedPrimitives.indexOf(renderedPrimitive)).not.toBe(-1);
       }
     }
 
-    expect(Object.keys(renderedGeometryToGroup).length).toBe(renderedGeometries.length);
-    for (let i = 0; i < renderedGeometries.length; i++) {
-      const renderedGeometry = renderedGeometries[i];
-      expect(renderedGeometryToGroup[Object.keys(renderedGeometryToGroup)[i]]).toBeDefined();
+    expect(Object.keys(renderedPrimitiveToGroup).length).toBe(renderedPrimitives.length);
+    for (let i = 0; i < renderedPrimitives.length; i++) {
+      expect(renderedPrimitiveToGroup[Object.keys(renderedPrimitiveToGroup)[i]]).toBeDefined();
     }
   });
 });
