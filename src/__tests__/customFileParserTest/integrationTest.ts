@@ -77,6 +77,7 @@ describe('customFileIntegrationTest', () => {
 
     // Check that the sector has geometries. If it doesn't, run this test on a different file.
 <<<<<<< HEAD
+<<<<<<< HEAD
     expect(geometryIndexHandlers.length).toBeGreaterThan(0);
 
     geometryIndexHandlers.forEach(geometryIndexHandler => {
@@ -86,6 +87,8 @@ describe('customFileIntegrationTest', () => {
       expect(geometryIndexHandler.byteCount).toBeGreaterThan(0);
       expect(geometryIndexHandler.attributeCount).toBeDefined();
 =======
+=======
+>>>>>>> Triangle meshes done, pending tests
     expect(primitiveIndexHandlers.length).toBeGreaterThan(0);
 
     primitiveIndexHandlers.forEach(primitiveIndexHandler => {
@@ -95,6 +98,9 @@ describe('customFileIntegrationTest', () => {
       expect(primitiveIndexHandler.count).toBeGreaterThan(0);
       expect(primitiveIndexHandler.byteCount).toBeGreaterThan(0);
       expect(primitiveIndexHandler.attributeCount).toBeDefined();
+<<<<<<< HEAD
+>>>>>>> Triangle meshes done, pending tests
+=======
 >>>>>>> Triangle meshes done, pending tests
     });
   });
