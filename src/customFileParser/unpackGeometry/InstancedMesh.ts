@@ -44,6 +44,8 @@ export default function unpackInstancedMesh(geometryInfo: GeometryIndexHandler, 
 
   for (let i = 0; i < geometryInfo.count; i++) {
     data.loadData(geometryInfo);
+
+    matrix.makeRotationAxis(data.rotation3, 0).scale(data.scale).setPosition(data.translation);
     instancedMeshCollections[data.fileId][data.triangleOffset].addMapping(
       data.nodeId, data.treeIndex, data.color, matrix);
   }
