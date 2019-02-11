@@ -6,22 +6,28 @@ for (let i = 2; i <= FIBONACCI_MAX_LENGTH; i++) {
 }
 
 export default class FibonacciDecoder {
-  public numberRead: number;
+  public numberRead = -1;
+  public readonly numberOfValues: number;
   private buffer: ArrayBuffer;
   private data: Uint8Array;
-  private readBitId: number;
-  private currentValue: number;
-  private nextFibIndex: number;
+  private readBitId = -1;
+  private currentValue = -1;
+  private nextFibIndex = -1;
 
-  constructor(compressedBuffer: ArrayBuffer, startByte?: number, length?: number) {
+  constructor(compressedBuffer: ArrayBuffer, numberOfValues: number, startByte?: number, length?: number) {
+    this.numberOfValues = numberOfValues;
     if (!startByte) { startByte = 0; }
     if (!length) { length = compressedBuffer.byteLength - startByte; }
 
-    this.numberRead = 0;
     this.buffer = compressedBuffer;
     this.data = new Uint8Array(this.buffer, startByte, length);
+    this.rewind();
+  }
 
-    // read first bit
+  // Get ready to read the first value
+  rewind() {
+    this.numberRead = 0;
+    // load first bit
     this.currentValue = (this.data[0] & (1 << 7)) >> 7;
     this.nextFibIndex = 1;
     this.readBitId = 1;
@@ -29,9 +35,10 @@ export default class FibonacciDecoder {
 
   // Read next encoded value
   nextValue() {
+    if (this.numberRead >= this.numberOfValues) { throw Error('Reading past end of FibonacciDecoder'); }
+
     this.numberRead++;
 
-    // read rest of file
     for (let i = 0; i < FIBONACCI_MAX_LENGTH; i++) {
       const currentBit8 = this.data[Math.floor(this.readBitId / 8)] & 1 << (7 - (this.readBitId % 8));
       if (currentBit8 !== 0) {

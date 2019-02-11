@@ -1,44 +1,43 @@
-import unpackGeometry from './unpackGeometry/main';
+import { unpackPrimitive, unpackInstancedMesh, unpackTriangleMesh } from './unpackGeometry/main';
 import Sector from './../Sector';
-import countRenderedGeometries from './countRenderedGeometries';
-import { SectorMetadata, GeometryIndexHandler, UncompressedValues, RenderedGeometryGroups }
+import countRenderedPrimitives from './countRenderedPrimitives';
+import { SectorMetadata, GeometryIndexHandler, UncompressedValues, RenderedPrimitiveGroups }
   from './sharedFileParserTypes';
 import CustomFileReader from './CustomFileReader';
-import { renderedGeometries, renderedGeometryToGroup } from './parserParameters';
+import { renderedPrimitives, renderedPrimitiveToGroup } from './parserParameters';
 
 function createSector(
   sectorMetadata: SectorMetadata,
   uncompressedValues: UncompressedValues,
-  geometryIndexHandlers: GeometryIndexHandler[]): Sector {
+  primitiveIndexHandlers: GeometryIndexHandler[],
+  meshIndexHandlers: GeometryIndexHandler[]): Sector {
 
-  const counts = countRenderedGeometries(geometryIndexHandlers);
-  const renderedGeometryGroups: RenderedGeometryGroups = {};
-  renderedGeometries.forEach(renderedGeometry => {
-    const count = counts[renderedGeometry];
-    renderedGeometryGroups[renderedGeometry] = new renderedGeometryToGroup[renderedGeometry](count);
+  const sector = new Sector(sectorMetadata.sectorBBoxMin, sectorMetadata.sectorBBoxMax);
+
+  // Unpack primitives
+  const counts = countRenderedPrimitives(primitiveIndexHandlers);
+  const renderedPrimitiveGroups: RenderedPrimitiveGroups = {};
+  renderedPrimitives.forEach(renderedPrimitive => {
+    const count = counts[renderedPrimitive];
+    renderedPrimitiveGroups[renderedPrimitive] = new renderedPrimitiveToGroup[renderedPrimitive](count);
+  });
+  primitiveIndexHandlers.forEach(primitiveIndexHandler => {
+    unpackPrimitive(renderedPrimitiveGroups, primitiveIndexHandler, uncompressedValues);
+  });
+  Object.keys(renderedPrimitiveGroups).forEach(renderedPrimitiveName => {
+    sector.primitiveGroups.push(renderedPrimitiveGroups[renderedPrimitiveName]);
   });
 
-  const groupNames = ['Box', 'Circle', 'ClosedCone', 'ClosedCylinder', 'ClosedEccentricCone', 'ClosedEllipsoidSegment',
-    'ClosedExtrudedRingSegment', 'ClosedGeneralCylinder', 'ClosedSphericalSegment', 'ClosedTorusSegment', 'Ellipsoid',
-    'ExtrudedRing', 'Nut', 'OpenCone', 'OpenCylinder', 'OpenEccentricCone', 'OpenEllipsoidSegment',
-    'OpenExtrudedRingSegment', 'OpenGeneralCylinder', 'OpenSphericalSegment', 'OpenTorusSegment', 'Ring', 'Sphere',
-    'Torus', 'TriangleMesh', 'InstancedMesh'];
-  groupNames.forEach(name => {
-    unpackGeometry(renderedGeometryGroups, geometryIndexHandlers, uncompressedValues, name);
-  });
-
-  const sectorObject = new Sector(sectorMetadata.sectorBBoxMin, sectorMetadata.sectorBBoxMax);
-  Object.keys(renderedGeometryGroups).forEach(renderedGeometryName => {
-    if (renderedGeometryName === 'TriangleMesh') {
-
-    } else if (renderedGeometryName === 'InstancedMesh') {
-
-    } else {
-      sectorObject.primitiveGroups.push(renderedGeometryGroups[renderedGeometryName]);
+  // Unpack meshes
+  meshIndexHandlers.forEach(meshIndexHandler => {
+    if (meshIndexHandler.name === 'InstancedMesh') {
+      sector.instancedMeshGroup = unpackInstancedMesh(meshIndexHandler, uncompressedValues);
+    } else if (meshIndexHandler.name === 'TriangleMesh') {
+      sector.mergedMeshGroup = unpackTriangleMesh(meshIndexHandler, uncompressedValues);
     }
   });
 
-  return sectorObject;
+  return sector;
 }
 
 function parseManySectors(fileBuffer: ArrayBuffer): Sector {
@@ -49,16 +48,20 @@ function parseManySectors(fileBuffer: ArrayBuffer): Sector {
   let sectorByteLength = fileReader.readUint32();
   let sectorMetadata = fileReader.readSectorMetadata(sectorByteLength);
   const uncompressedValues = fileReader.readUncompressedValues();
-  let geometryIndexHandlers = fileReader.readSectorGeometryIndexHandlers(sectorStartLocation + sectorByteLength);
-  const rootSector = createSector(sectorMetadata, uncompressedValues, geometryIndexHandlers);
+  let geometries = fileReader.readSectorGeometryIndexHandlers(sectorStartLocation + sectorByteLength);
+  let primitiveIndexHandlers = geometries.primitives;
+  let meshIndexHandlers = geometries.meshes;
+  const rootSector = createSector(sectorMetadata, uncompressedValues, primitiveIndexHandlers, meshIndexHandlers);
   sectors[sectorMetadata.sectorId] = rootSector;
 
   while (fileReader.location < fileBuffer.byteLength) {
     sectorStartLocation = fileReader.location;
     sectorByteLength = fileReader.readUint32();
     sectorMetadata = fileReader.readSectorMetadata(sectorByteLength);
-    geometryIndexHandlers = fileReader.readSectorGeometryIndexHandlers(sectorStartLocation + sectorByteLength);
-    const newSectorObject = createSector(sectorMetadata, uncompressedValues, geometryIndexHandlers);
+    geometries = fileReader.readSectorGeometryIndexHandlers(sectorStartLocation + sectorByteLength);
+    primitiveIndexHandlers = geometries.primitives;
+    meshIndexHandlers = geometries.meshes;
+    const newSectorObject = createSector(sectorMetadata, uncompressedValues, primitiveIndexHandlers, meshIndexHandlers);
     const parentSector = sectors[sectorMetadata.parentSectorId];
     if (parentSector !== undefined) {
       parentSector.addChild(newSectorObject);
@@ -74,8 +77,10 @@ function parseSingleSector(fileBuffer: ArrayBuffer): Sector {
   const fileReader = new CustomFileReader(fileBuffer);
   const sectorMetadata = fileReader.readSectorMetadata(fileBuffer.byteLength);
   const uncompressedValues = fileReader.readUncompressedValues();
-  const geometryIndexHandlers = fileReader.readSectorGeometryIndexHandlers(fileBuffer.byteLength);
-  return createSector(sectorMetadata, uncompressedValues, geometryIndexHandlers);
+  const geometries = fileReader.readSectorGeometryIndexHandlers(fileBuffer.byteLength);
+  const primitiveIndexHandlers = geometries.primitives;
+  const meshIndexHandlers = geometries.meshes;
+  return createSector(sectorMetadata, uncompressedValues, primitiveIndexHandlers, meshIndexHandlers);
 }
 
 export { parseManySectors, parseSingleSector };

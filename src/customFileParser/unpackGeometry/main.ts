@@ -1,22 +1,19 @@
-import { RenderedGeometryGroups, GeometryIndexHandler } from './../sharedFileParserTypes';
+import { RenderedPrimitiveGroups, GeometryIndexHandler } from './../sharedFileParserTypes';
 import PropertyLoader from './../PropertyLoader';
-import { renderedGeometryToAddFunction } from '../parserParameters';
+import { renderedPrimitiveToAddFunction } from '../parserParameters';
+import unpackInstancedMesh from './InstancedMesh';
+import unpackTriangleMesh from './TriangleMesh';
 
-export default function unpackGeometry(
-  renderedGeometryGroups: RenderedGeometryGroups, geometryIndexHandlers: GeometryIndexHandler[],
-  uncompressedValues: any, groupName: string) {
+export function unpackPrimitive(
+  renderedPrimitiveGroups: RenderedPrimitiveGroups, primitiveIndexHandler: GeometryIndexHandler,
+  uncompressedValues: any) {
+
   const data = new PropertyLoader(uncompressedValues);
-
-  geometryIndexHandlers.forEach(geometryIndexHandler => {
-    if (geometryIndexHandler.name === groupName) {
-      for (let j = 0; j < geometryIndexHandler.geometryCount; j++) {
-        data.loadData(geometryIndexHandler);
-        // @ts-ignore
-        renderedGeometryToAddFunction[geometryIndexHandler.name].call(this, renderedGeometryGroups, data);
-      }
-      return;
-    }
-  });
-
-  // some geometryNames won't be found in geometryIndexHandlers -- that's ok
+  for (let j = 0; j < primitiveIndexHandler.count; j++) {
+    data.loadData(primitiveIndexHandler);
+    // @ts-ignore
+    renderedPrimitiveToAddFunction[primitiveIndexHandler.name].call(this, renderedPrimitiveGroups, data);
+  }
 }
+
+export { unpackInstancedMesh, unpackTriangleMesh };

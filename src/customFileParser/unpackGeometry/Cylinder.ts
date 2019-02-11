@@ -1,4 +1,4 @@
-import { RenderedGeometryGroups } from '../sharedFileParserTypes';
+import { RenderedPrimitiveGroups } from '../sharedFileParserTypes';
 import PropertyLoader from '../PropertyLoader';
 import * as THREE from 'three';
 import { xAxis, zAxis } from './../../constants';
@@ -9,7 +9,7 @@ const centerB = new THREE.Vector3();
 const localXAxis = new THREE.Vector3();
 const rotation = new THREE.Quaternion();
 
-function addClosedCylinder(groups: RenderedGeometryGroups, data: PropertyLoader) {
+function addClosedCylinder(groups: RenderedPrimitiveGroups, data: PropertyLoader) {
   centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
   centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
   groups.Cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB,
@@ -18,11 +18,11 @@ function addClosedCylinder(groups: RenderedGeometryGroups, data: PropertyLoader)
   groups.Circle.add(data.nodeId, data.treeIndex, data.color, centerB, data.normal, data.radiusA);
 }
 
-function addGeneralCylinder(groups: RenderedGeometryGroups, data: PropertyLoader) {
+function addGeneralCylinder(groups: RenderedPrimitiveGroups, data: PropertyLoader) {
   // TODO
 }
 
-function addOpenCylinder(groups: RenderedGeometryGroups, data: PropertyLoader) {
+function addOpenCylinder(groups: RenderedPrimitiveGroups, data: PropertyLoader) {
   centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
   centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
   groups.Cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB,

@@ -1,10 +1,9 @@
-
 import loadSectorMetadata from './loadSectorMetadata';
 import loadUncompressedValues from './loadUncompressedValues';
 import loadGeometryIndexHandlers from './loadGeometryIndexHandlers';
 import FibonacciDecoder from './FibonacciDecoder';
 import { NodeIdReader, GeometryIndexHandler } from './sharedFileParserTypes';
-import { BYTES_PER_NODE_ID } from './parserParameters';
+import { filePrimitives, fileMeshes, BYTES_PER_NODE_ID } from './parserParameters';
 
 export default class CustomFileReader {
   public location: number;
@@ -21,6 +20,7 @@ export default class CustomFileReader {
     this.flip = true;
   }
 
+  // Use for debugging
   dumpHex(numberOfValues: number) {
     for (let i = -numberOfValues; i < 0; i++) {
       // tslint:disable-next-line
@@ -108,8 +108,11 @@ export default class CustomFileReader {
     return loadUncompressedValues(this);
   }
 
-  readSectorGeometryIndexHandlers(sectorEndLocation: number): GeometryIndexHandler[] {
-    return loadGeometryIndexHandlers(this, sectorEndLocation);
+  readSectorGeometryIndexHandlers(sectorEndLocation: number): {[name: string]: GeometryIndexHandler[]} {
+    const allHandlers = loadGeometryIndexHandlers(this, sectorEndLocation);
+    const primitiveHandlers = allHandlers.filter(handler => { return (filePrimitives.indexOf(handler.name) !== -1); });
+    const meshHandlers = allHandlers.filter(handler => { return (fileMeshes.indexOf(handler.name) !== -1); });
+    return { primitives: primitiveHandlers, meshes: meshHandlers };
   }
 
   getNodeIdReader(geometryCount: number): NodeIdReader {
@@ -118,8 +121,8 @@ export default class CustomFileReader {
     return nodeIds;
   }
 
-  getFibonacciDecoder(byteCount: number): FibonacciDecoder {
-    const indexes = new FibonacciDecoder(this.originalBuffer, this.location, byteCount);
+  getFibonacciDecoder(byteCount: number, numberOfValues: number): FibonacciDecoder {
+    const indexes = new FibonacciDecoder(this.originalBuffer, numberOfValues, this.location, byteCount);
     this.location += byteCount;
     return indexes;
   }

@@ -12,8 +12,6 @@ import QuadGroup from '../geometry/QuadGroup';
 import SphericalSegmentGroup from '../geometry/SphericalSegmentGroup';
 import TorusSegmentGroup from '../geometry/TorusSegmentGroup';
 import TrapeziumGroup from '../geometry/TrapeziumGroup';
-import { MergedMeshGroup } from '../geometry/MergedMeshGroup';
-import { InstancedMeshGroup } from '../geometry/InstancedMeshGroup';
 import EllipsoidSegmentGroup from '../geometry/EllipsoidSegmentGroup';
 
 import { addBox, addCircle, addNut, addRing, addSphere } from './unpackGeometry/Basic';
@@ -24,13 +22,14 @@ import { addClosedCylinder, addGeneralCylinder, addOpenCylinder } from './unpack
 import { addClosedEllipsoidSegment, addOpenEllipsoidSegment, addEllipsoid } from './unpackGeometry/Ellipsoid';
 import { addClosedTorusSegment, addOpenTorusSegment, addTorus } from './unpackGeometry/Torus';
 import { addClosedSphericalSegment, addOpenSphericalSegment } from './unpackGeometry/SphericalSegment';
-import { addTriangleMesh, addInstancedMesh } from './unpackGeometry/Mesh';
 
-const fileGeometries = ['Box', 'Circle', 'ClosedCone', 'ClosedCylinder', 'ClosedEccentricCone',
+const filePrimitives = ['Box', 'Circle', 'ClosedCone', 'ClosedCylinder', 'ClosedEccentricCone',
 'ClosedEllipsoidSegment', 'ClosedExtrudedRingSegment', 'ClosedGeneralCylinder', 'ClosedSphericalSegment',
 'ClosedTorusSegment', 'Ellipsoid', 'ExtrudedRing', 'Nut', 'OpenCone', 'OpenCylinder', 'OpenEccentricCone',
 'OpenEllipsoidSegment', 'OpenExtrudedRingSegment', 'OpenGeneralCylinder', 'OpenSphericalSegment',
-'OpenTorusSegment', 'Ring', 'Sphere', 'Torus', 'TriangleMesh', 'InstancedMesh'];
+'OpenTorusSegment', 'Ring', 'Sphere', 'Torus'];
+
+const fileMeshes = ['TriangleMesh', 'InstancedMesh'];
 
 const IdToFileGeometryName: {[id: number]: string} = {
   1: 'Box',
@@ -100,12 +99,12 @@ const fileGeometryProperties: {[name: string]: string[]} = {
   Ring: ['treeIndex', 'color', 'center', 'normal', 'radiusA', 'radiusB'],
   Sphere: ['treeIndex', 'color', 'center', 'radiusA'],
   Torus: ['treeIndex', 'color', 'center', 'normal', 'radiusA', 'radiusB'],
-  TriangleMesh: ['treeIndex', 'fileId', 'triangleOffset', 'triangleCount', 'color'],
+  TriangleMesh: ['treeIndex', 'fileId', 'triangleOffset', 'color'],
   InstancedMesh: ['treeIndex', 'fileId', 'triangleOffset', 'triangleCount', 'color', 'translation', 'rotation3',
   'scale'],
 };
 
-const renderedGeometryToAddFunction: {[name: string]: Function} = {
+const renderedPrimitiveToAddFunction: {[name: string]: Function} = {
   'Box': addBox,
   'Circle': addCircle,
   'ClosedCone': addClosedCone,
@@ -130,14 +129,12 @@ const renderedGeometryToAddFunction: {[name: string]: Function} = {
   'Ring': addRing,
   'Sphere': addSphere,
   'Torus': addTorus,
-  'TriangleMesh': addTriangleMesh,
-  'InstancedMesh': addInstancedMesh,
 };
 
-const renderedGeometries = ['Box', 'Circle', 'Cone', 'EccentricCone', 'EllipsoidSegment', 'GeneralCylinder',
-  'GeneralRing', 'Nut', 'Quad', 'SphericalSegment', 'TorusSegment', 'Trapezium', 'TriangleMesh', 'InstancedMesh'];
+const renderedPrimitives = ['Box', 'Circle', 'Cone', 'EccentricCone', 'EllipsoidSegment', 'GeneralCylinder',
+  'GeneralRing', 'Nut', 'Quad', 'SphericalSegment', 'TorusSegment', 'Trapezium'];
 
-const renderedGeometriesPerFileGeometry: {[name: string]: string[]} = {
+const renderedPrimitivesPerFilePrimitive: {[name: string]: string[]} = {
   Box: ['Box'],
   Circle: ['Circle'],
   ClosedCone: ['Circle', 'Circle', 'Cone'],
@@ -162,11 +159,9 @@ const renderedGeometriesPerFileGeometry: {[name: string]: string[]} = {
   Ring: ['GeneralRing'],
   Sphere: ['SphericalSegment'],
   Torus: ['TorusSegment'],
-  TriangleMesh: ['TriangleMesh'],
-  InstancedMesh: ['InstancedMesh'],
 };
 
-const renderedGeometryToGroup: {[name: string]: any } = {
+const renderedPrimitiveToGroup: {[name: string]: any } = {
   Box: BoxGroup,
   Circle: CircleGroup,
   Cone: ConeGroup,
@@ -179,11 +174,9 @@ const renderedGeometryToGroup: {[name: string]: any } = {
   SphericalSegment: SphericalSegmentGroup,
   TorusSegment: TorusSegmentGroup,
   Trapezium: TrapeziumGroup,
-  TriangleMesh: MergedMeshGroup,
-  InstancedMesh: InstancedMeshGroup,
 };
 
-export { filePropertyArrayNames,
-  fileGeometries, IdToFileGeometryName, fileProperties, fileGeometryProperties,
-  renderedGeometries, renderedGeometriesPerFileGeometry, renderedGeometryToGroup,
-  renderedGeometryToAddFunction, BYTES_PER_NODE_ID, DEFAULT_COLOR };
+export { filePropertyArrayNames, filePrimitives, fileMeshes,
+  IdToFileGeometryName, fileProperties, fileGeometryProperties,
+  renderedPrimitives, renderedPrimitivesPerFilePrimitive, renderedPrimitiveToGroup,
+  renderedPrimitiveToAddFunction, BYTES_PER_NODE_ID, DEFAULT_COLOR };

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import CustomFileReader from '../../customFileParser/CustomFileReader';
 import { parseManySectors } from '../../customFileParser/main';
-import { fileGeometries, filePropertyArrayNames } from '../../customFileParser/parserParameters';
+import { filePrimitives, filePropertyArrayNames, fileMeshes  } from '../../customFileParser/parserParameters';
 
 // @ts-ignore
 const fs = require('fs');
@@ -73,18 +73,18 @@ describe('customFileIntegrationTest', () => {
     if (sectorMetadata.arrayCount !== 0) {
       fileReader.readUncompressedValues();
     }
-    const geometryIndexHandlers = fileReader.readSectorGeometryIndexHandlers(fileBuffer.byteLength);
+    const primitiveIndexHandlers = fileReader.readSectorGeometryIndexHandlers(fileBuffer.byteLength).primitives;
 
     // Check that the sector has geometries. If it doesn't, run this test on a different file.
-    expect(geometryIndexHandlers.length).toBeGreaterThan(0);
+    expect(primitiveIndexHandlers.length).toBeGreaterThan(0);
 
-    geometryIndexHandlers.forEach(geometryIndexHandler => {
-      expect(fileGeometries.indexOf(geometryIndexHandler.name)).not.toBe(-1);
-      expect(geometryIndexHandler.nodeIds).toBeDefined();
-      expect(geometryIndexHandler.indexes).toBeDefined();
-      expect(geometryIndexHandler.geometryCount).toBeGreaterThan(0);
-      expect(geometryIndexHandler.byteCount).toBeGreaterThan(0);
-      expect(geometryIndexHandler.attributeCount).toBeDefined();
+    primitiveIndexHandlers.forEach(primitiveIndexHandler => {
+      expect((filePrimitives.concat(fileMeshes)).indexOf(primitiveIndexHandler.name)).not.toBe(-1);
+      expect(primitiveIndexHandler.nodeIds).toBeDefined();
+      expect(primitiveIndexHandler.indexes).toBeDefined();
+      expect(primitiveIndexHandler.count).toBeGreaterThan(0);
+      expect(primitiveIndexHandler.byteCount).toBeGreaterThan(0);
+      expect(primitiveIndexHandler.attributeCount).toBeDefined();
     });
   });
 

@@ -16,7 +16,7 @@ describe('FibonacciDecoder', () => {
     uncompressedView[9] = parseInt('00000010', 2);
     uncompressedView[10] = parseInt('01011110', 2);
     uncompressedView[11] = parseInt('10110000', 2);
-    const decoder = new FibonacciDecoder(uncompressedData);
+    const decoder = new FibonacciDecoder(uncompressedData, 6);
     expect(decoder.nextValue()).toBe(0);
     expect(decoder.nextValue()).toBe(0);
     expect(decoder.nextValue()).toBe(2);
