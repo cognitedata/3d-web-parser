@@ -17,12 +17,12 @@ interface GeometryIndexHandler {
   name: string;
   nodeIds: NodeIdReader;
   indexes: FibonacciDecoder;
-  geometryCount: number;
+  count: number;
   byteCount: number;
   attributeCount: number;
 }
 
-interface RenderedGeometryGroups {
+interface RenderedPrimitiveGroups {
   [name: string]: any;
 }
 
@@ -46,7 +46,10 @@ class NodeIdReader {
     this.location += BYTES_PER_NODE_ID;
     return readValue;
   }
+  rewind() {
+    this.location = 0;
+  }
 }
 
-export { GeometryIndexHandler, SectorMetadata, NodeIdReader, RenderedGeometryGroups,
+export { GeometryIndexHandler, SectorMetadata, NodeIdReader, RenderedPrimitiveGroups,
   UncompressedValues, BYTES_PER_NODE_ID };

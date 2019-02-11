@@ -85,14 +85,10 @@ export default class PropertyLoader {
       const scaleZ                              = this.values.scaleZ[geometry.indexes.nextValue()];
       this.scale.set(scaleX, scaleY, scaleZ);
     },
-    'triangleOffset': (geometry: GIH) => {
-      this.triangleOffset = this.values.triangleOffset[geometry.indexes.nextValue()]; },
-    'triangleCount':  (geometry: GIH) => {
-      this.triangleCount  = this.values.triangleCount [geometry.indexes.nextValue()]; },
-    'thickness':      (geometry: GIH) => {
-      this.thickness      = this.values.radius        [geometry.indexes.nextValue()]; },
-    'fileId':      (geometry: GIH) => {
-      this.fileId         = this.values.fileId        [geometry.indexes.nextValue()]; },
+    'triangleOffset': (geometry: GIH) => { this.triangleOffset               = geometry.indexes.nextValue() ; },
+    'triangleCount':  (geometry: GIH) => { this.triangleCount                = geometry.indexes.nextValue() ; },
+    'thickness':      (geometry: GIH) => { this.thickness = this.values.radius[geometry.indexes.nextValue()]; },
+    'fileId':         (geometry: GIH) => { this.fileId    = this.values.fileId[geometry.indexes.nextValue()]; },
   };
 
   constructor(uncompressedValues: any) {

@@ -1,0 +1,17 @@
+1332265303	processed.cog3d
+984297953	mesh_1_0_0.ctm
+1015133982	mesh_1_0_1.ctm
+765652210	web_node_1_0.pb
+504330003	web_scene_1.pb
+1067174911	mesh_2_0_0.ctm
+818018101	mesh_2_0_1.ctm
+1735400160	web_node_2_0.pb
+1121352028	web_scene_2.pb
+1724426471	mesh_3_0_0.ctm
+1081023365	mesh_3_0_1.ctm
+1293448665	web_node_3_0.pb
+1067406406	web_scene_3.pb
+344294001	mesh_4_0_0.ctm
+776860701	mesh_4_0_1.ctm
+1559635575	web_node_4_0.i3d
+1007092910	web_scene_4.pi3d
