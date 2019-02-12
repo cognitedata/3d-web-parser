@@ -46,7 +46,7 @@ export default class TorusSegmentGroup extends PrimitiveGroup {
     this.setTreeIndex(treeIndex, this.data.count);
     this.setColor(color, this.data.count);
     this.data.add({
-      centerA: center,
+      center: center,
       normal: normal,
       radiusA: radius,
       radiusB: tubeRadius,

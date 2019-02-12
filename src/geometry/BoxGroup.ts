@@ -54,7 +54,7 @@ export default class BoxGroup extends PrimitiveGroup {
     secondRotation.setFromUnitVectors(zAxis, this.data.getVector3('normal', globalNormal, index));
     const scale = this.data.getVector3('delta', globalDelta, index);
     return outputMatrix.compose(
-      this.data.getVector3('centerA', globalCenter, index),
+      this.data.getVector3('center', globalCenter, index),
       secondRotation.multiply(firstRotation), // A.multiply(B) === A*B
       scale,
     );

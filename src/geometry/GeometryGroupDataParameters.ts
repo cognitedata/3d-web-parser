@@ -10,17 +10,17 @@ export type propertyName = 'nodeId' | 'treeIndex' | 'color' | 'center' | 'center
 export const primitiveProperties: { [name in primitiveName]: propertyName[]} = {
   Box: ['center', 'normal', 'angle', 'delta'],
   Circle: ['center', 'normal', 'radiusA'],
-  Cone: ['centerA', 'centerB', 'radiusA', 'radiusB', 'angle', 'arcAngle'],
+  Cone: ['centerA', 'centerB', 'radiusA', 'radiusB', 'angle', 'arcAngle', 'localXAxis'],
   EccentricCone: ['centerA', 'centerB', 'radiusA', 'radiusB', 'normal'],
   EllipsoidSegment: ['center', 'normal', 'hRadius', 'vRadius', 'height'],
   GeneralCylinder: ['centerA', 'centerB', 'radiusA', 'heightA', 'heightB', 'slopeA',
     'slopeB', 'zAngleA', 'zAngleB', 'angle', 'arcAngle', 'planeA', 'planeB', 'capNormalA', 'capNormalB', 'localXAxis'],
-  GeneralRing: ['centerA', 'normal', 'localXAxis', 'radiusA', 'radiusB', 'thickness',
-    'angle', 'arcAngle'],
+  GeneralRing: ['center', 'normal', 'radiusA', 'radiusB', 'thickness',
+    'angle', 'arcAngle', 'localXAxis'],
   Nut: ['centerA', 'centerB', 'radiusA', 'rotationAngle'],
   Quad: ['vertex1', 'vertex2', 'vertex3'],
   SphericalSegment: ['center', 'normal', 'hRadius', 'height'],
-  TorusSegment: ['centerA', 'normal', 'radiusA', 'radiusB', 'angle', 'arcAngle'],
+  TorusSegment: ['center', 'normal', 'radiusA', 'radiusB', 'angle', 'arcAngle'],
   Trapezium: ['vertex1', 'vertex2', 'vertex3', 'vertex4'],
 };
 
@@ -56,7 +56,7 @@ vertex4?: any;
 
 export const float64Properties: propertyName[] = ['nodeId'];
 export const float32Properties: propertyName[] =
-  ['nodeId', 'treeIndex', 'radiusA', 'radiusB', 'angle', 'arcAngle', 'heightA', 'heightB', 'slopeA',
+  ['treeIndex', 'radiusA', 'radiusB', 'angle', 'arcAngle', 'heightA', 'heightB', 'slopeA',
    'slopeB', 'zAngleA', 'zAngleB', 'thickness', 'triangleOffset', 'triangleCount', 'rotationAngle',
    'radius', 'tubeRadius', 'height', 'vRadius', 'hRadius'];
 export const vector3Properties: propertyName[] =

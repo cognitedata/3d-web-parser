@@ -52,11 +52,6 @@ export default class GeometryGroupData {
           array: this.arrays[property],
           itemSize: getAttributeItemSize(property),
         });
-        console.log({
-          name: 'a_' + property,
-          array: this.arrays[property],
-          itemSize: getAttributeItemSize(property),
-        });
       }
     });
   }

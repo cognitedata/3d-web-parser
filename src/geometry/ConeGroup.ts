@@ -14,6 +14,7 @@ const center = new THREE.Vector3();
 const normal = new THREE.Vector3();
 const normalMatrix = new THREE.Matrix3();
 const reusableBox = new THREE.Box3();
+const localXAxis = new THREE.Vector3();
 const rotation = new THREE.Quaternion();
 
 export default class ConeGroup extends PrimitiveGroup {
@@ -40,6 +41,11 @@ export default class ConeGroup extends PrimitiveGroup {
     this.setNodeId(nodeId, this.data.count);
     this.setTreeIndex(treeIndex, this.data.count);
     this.setColor(color, this.data.count);
+
+    normal.subVectors(centerA, centerB).normalize();
+    rotation.setFromUnitVectors(zAxis, normal);
+    localXAxis.copy(xAxis).applyQuaternion(rotation);
+
     this.data.add({
       centerA: centerA,
       centerB: centerB,
@@ -47,6 +53,7 @@ export default class ConeGroup extends PrimitiveGroup {
       radiusB: radiusB,
       angle: angle,
       arcAngle: arcAngle,
+      localXAxis: localXAxis,
     });
 
     this.count += 1;

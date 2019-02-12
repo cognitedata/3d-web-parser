@@ -39,7 +39,7 @@ export default class SphericalSegmentGroup extends PrimitiveGroup {
     this.attributes.push({
       name: 'a_vRadius',
       array: this.data.arrays.hRadius,
-      itemSize: 3,
+      itemSize: 1,
     });
   }
 

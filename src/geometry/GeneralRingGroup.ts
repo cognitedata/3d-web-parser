@@ -46,7 +46,7 @@ export default class GeneralRingGroup extends PrimitiveGroup {
     this.setTreeIndex(treeIndex, this.data.count);
     this.setColor(color, this.data.count);
     this.data.add({
-      centerA: center,
+      center: center,
       normal: normal,
       localXAxis: localXAxis,
       radiusA: xRadius,
@@ -76,7 +76,7 @@ export default class GeneralRingGroup extends PrimitiveGroup {
     rotation.setFromRotationMatrix(rotationMatrix);
     scale.set(2 * this.data.getNumber('radiusA', index), 2 * this.data.getNumber('radiusB', index), 1);
     return outputMatrix.compose(
-      this.data.getVector3('centerA', globalCenter, index),
+      this.data.getVector3('center', globalCenter, index),
       rotation,
       scale,
     );
@@ -84,7 +84,7 @@ export default class GeneralRingGroup extends PrimitiveGroup {
 
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
     return computeEllipsoidBoundingBox(
-      this.data.getVector3('centerA', globalCenter, index),
+      this.data.getVector3('center', globalCenter, index),
       this.data.getVector3('normal', globalNormal, index),
       this.data.getNumber('radiusA', index),
       this.data.getNumber('radiusB', index),
