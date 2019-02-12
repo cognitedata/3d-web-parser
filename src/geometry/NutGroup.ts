@@ -1,9 +1,11 @@
 // Copyright 2019 Cognite AS
 
 import * as THREE from 'three';
-import BaseCylinderGroup from './BaseCylinderGroup';
+import PrimitiveGroup from './PrimitiveGroup';
 import { zAxis } from './../constants';
 import { FilterOptions } from '../parsers/parseUtils';
+import GeometryGroupData from './GeometryGroupData';
+import { colorProperties } from './GeometryGroupDataParameters';
 
 // reusable variables
 const firstRotation = new THREE.Quaternion();
@@ -17,31 +19,13 @@ const globalCenterA = new THREE.Vector3();
 const globalCenterB = new THREE.Vector3();
 const globalPoint = new THREE.Vector3();
 
-export default class NutGroup extends BaseCylinderGroup {
-    public radius: Float32Array;
-    public rotationAngle: Float32Array;
+export default class NutGroup extends PrimitiveGroup {
+    public data: GeometryGroupData;
 
-    constructor(capacity: number) {
+  constructor(capacity: number) {
     super(capacity);
     this.type = 'Nut';
-    this.radius = new Float32Array(capacity);
-    this.rotationAngle = new Float32Array(capacity);
-  }
-
-  setRadius(value: number, index: number) {
-    this.radius[index] = value;
-  }
-
-  getRadius(index: number): number {
-    return this.radius[index];
-  }
-
-  setRotationAngle(value: number, index: number) {
-    this.rotationAngle[index] = value;
-  }
-
-  getRotationAngle(index: number): number {
-    return this.rotationAngle[index];
+    this.data = new GeometryGroupData('Nut', capacity);
   }
 
   add(
@@ -54,31 +38,33 @@ export default class NutGroup extends BaseCylinderGroup {
     rotationAngle: number,
     filterOptions?: FilterOptions,
   ) {
-    this.setNodeId(nodeId, this.count);
-    this.setTreeIndex(treeIndex, this.count);
-    this.setColor(color, this.count);
-    this.setCenterA(centerA, this.count);
-    this.setCenterB(centerB, this.count);
-    this.setRadius(radius, this.count);
-    this.setRotationAngle(rotationAngle, this.count);
-
-    this.count += 1;
-
+    this.setNodeId(nodeId, this.data.count);
+    this.setTreeIndex(treeIndex, this.data.count);
+    this.setColor(color, this.data.count);
+    this.data.add({
+      nodeId: nodeId,
+      treeIndex: treeIndex,
+      color: color,
+      centerA: centerA,
+      centerB: centerB,
+      radiusA: radius,
+      rotationAngle: rotationAngle,
+    });
     if (filterOptions) {
       this.filterLastObject(filterOptions);
     }
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
-    this.getCenterA(globalCenterA, index);
-    this.getCenterB(globalCenterB, index);
+    this.data.getVector3('centerA', globalCenterA, index);
+    this.data.getVector3('centerB', globalCenterB, index);
     globalCenter.addVectors(globalCenterA, globalCenterB).multiplyScalar(0.5);
     globalNormal.subVectors(globalCenterA, globalCenterB);
     const height = globalNormal.length();
-    firstRotation.setFromAxisAngle(zAxis, this.getRotationAngle(index));
+    firstRotation.setFromAxisAngle(zAxis, this.data.getNumber('rotationAngle', index));
     secondRotation.setFromUnitVectors(zAxis, globalNormal.normalize());
 
-    const diameter = 2 * this.getRadius(index);
+    const diameter = 2 * this.data.getNumber('radiusA', index);
     globalScale.set(diameter, diameter, height);
     return outputMatrix.compose(
       globalCenter,
@@ -90,7 +76,7 @@ export default class NutGroup extends BaseCylinderGroup {
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
     box.makeEmpty();
     this.computeModelMatrix(fullMatrix, index).premultiply(matrix);
-    let angle = this.getRotationAngle(index) + Math.PI / 6;
+    let angle = this.data.getNumber('rotationAngle', index) + Math.PI / 6;
 
     for (let i = 0; i < 6; i++, angle += Math.PI / 3) {
       const sin = 0.5 * Math.sin(angle);

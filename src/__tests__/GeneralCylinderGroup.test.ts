@@ -7,18 +7,6 @@ import { expectColorEqual, expectVector3Equal } from '../TestUtils';
 describe('GeneralCylinderGroup', () => {
   test('constructor', () => {
     const group = new GeneralCylinderGroup(2);
-    expect(group.angle.length).toBe(2);
-    expect(group.arcAngle.length).toBe(2);
-    expect(group.radius.length).toBe(2);
-    expect(group.heightA.length).toBe(2);
-    expect(group.heightB.length).toBe(2);
-    expect(group.slopeA.length).toBe(2);
-    expect(group.slopeB.length).toBe(2);
-    expect(group.zAngleA.length).toBe(2);
-    expect(group.zAngleB.length).toBe(2);
-    expect(group.localXAxis.length).toBe(6);
-    expect(group.planeA.length).toBe(8);
-    expect(group.planeB.length).toBe(8);
     expect(group.hasCustomTransformAttributes).toBeTruthy();
 
     expect(group.type).toBe('GeneralCylinder');
@@ -28,64 +16,64 @@ describe('GeneralCylinderGroup', () => {
     const group = new GeneralCylinderGroup(2);
 
     const value = 1.0;
-    group.setAngle(value, 0);
-    expect(group.getAngle(0)).toBeCloseTo(value);
+    group.data.setNumber('angle', value, 0);
+    expect(group.data.getNumber('angle',  0)).toBeCloseTo(value);
   });
 
   test('(set/get)ArcAngle', () => {
     const group = new GeneralCylinderGroup(2);
 
     const value = 1.0;
-    group.setArcAngle(value, 0);
-    expect(group.getArcAngle(0)).toBeCloseTo(value);
+    group.data.setNumber('arcAngle', value, 0);
+    expect(group.data.getNumber('arcAngle',  0)).toBeCloseTo(value);
   });
 
   test('(set/get)HeightA', () => {
     const group = new GeneralCylinderGroup(2);
 
     const value = 1.0;
-    group.setHeightA(value, 0);
-    expect(group.getHeightA(0)).toBeCloseTo(value);
+    group.data.setNumber('heightA', value, 0);
+    expect(group.data.getNumber('heightA', 0)).toBeCloseTo(value);
   });
 
   test('(set/get)HeightB', () => {
     const group = new GeneralCylinderGroup(2);
 
     const value = 1.0;
-    group.setHeightB(value, 0);
-    expect(group.getHeightB(0)).toBeCloseTo(value);
+    group.data.setNumber('heightB', value, 0);
+    expect(group.data.getNumber('heightB', 0)).toBeCloseTo(value);
   });
 
   test('(set/get)SlopeA', () => {
     const group = new GeneralCylinderGroup(2);
 
     const value = 1.0;
-    group.setSlopeA(value, 0);
-    expect(group.getSlopeA(0)).toBeCloseTo(value);
+    group.data.setNumber('slopeA', value, 0);
+    expect(group.data.getNumber('slopeA', 0)).toBeCloseTo(value);
   });
 
   test('(set/get)SlopeB', () => {
     const group = new GeneralCylinderGroup(2);
 
     const value = 1.0;
-    group.setSlopeB(value, 0);
-    expect(group.getSlopeB(0)).toBeCloseTo(value);
+    group.data.setNumber('slopeB', value, 0);
+    expect(group.data.getNumber('slopeB', 0)).toBeCloseTo(value);
   });
 
   test('(set/get)ZAngleA', () => {
     const group = new GeneralCylinderGroup(2);
 
     const value = 1.0;
-    group.setZAngleA(value, 0);
-    expect(group.getZAngleA(0)).toBeCloseTo(value);
+    group.data.setNumber('zAngleA', value, 0);
+    expect(group.data.getNumber('zAngleA', 0)).toBeCloseTo(value);
   });
 
   test('(set/get)ZAngleB', () => {
     const group = new GeneralCylinderGroup(2);
 
     const value = 1.0;
-    group.setZAngleB(value, 0);
-    expect(group.getZAngleB(0)).toBeCloseTo(value);
+    group.data.setNumber('zAngleB', value, 0);
+    expect(group.data.getNumber('zAngleB', 0)).toBeCloseTo(value);
   });
 
   test('add', () => {
@@ -124,7 +112,7 @@ describe('GeneralCylinderGroup', () => {
     const targetVector = new THREE.Vector3();
     const targetColor = new THREE.Color();
 
-    expect(group.count).toBe(1);
+    expect(group.data.count).toBe(1);
 
     expect(group.getNodeId(0)).toBe(nodeId);
     expect(group.getTreeIndex(0)).toBe(treeIndex);
@@ -132,20 +120,20 @@ describe('GeneralCylinderGroup', () => {
     group.getColor(targetColor, 0);
     expectColorEqual(targetColor, color);
 
-    group.getCenterA(targetVector, 0);
+    group.data.getVector3('centerA', targetVector, 0);
     expectVector3Equal(targetVector, centerA);
 
-    group.getCenterB(targetVector, 0);
+    group.data.getVector3('centerB', targetVector, 0);
     expectVector3Equal(targetVector, centerB);
 
-    expect(group.getRadius(0)).toBeCloseTo(radius);
-    expect(group.getHeightA(0)).toBeCloseTo(heightA);
-    expect(group.getHeightB(0)).toBeCloseTo(heightB);
-    expect(group.getSlopeA(0)).toBeCloseTo(slopeA);
-    expect(group.getSlopeB(0)).toBeCloseTo(slopeB);
-    expect(group.getZAngleA(0)).toBeCloseTo(zAngleA);
-    expect(group.getZAngleB(0)).toBeCloseTo(zAngleB);
-    expect(group.getAngle(0)).toBeCloseTo(angle);
-    expect(group.getArcAngle(0)).toBeCloseTo(arcAngle);
+    expect(group.data.getNumber('radiusA', 0)).toBeCloseTo(radius);
+    expect(group.data.getNumber('heightA', 0)).toBeCloseTo(heightA);
+    expect(group.data.getNumber('heightB', 0)).toBeCloseTo(heightB);
+    expect(group.data.getNumber('slopeA', 0)).toBeCloseTo(slopeA);
+    expect(group.data.getNumber('slopeB', 0)).toBeCloseTo(slopeB);
+    expect(group.data.getNumber('zAngleA', 0)).toBeCloseTo(zAngleA);
+    expect(group.data.getNumber('zAngleB', 0)).toBeCloseTo(zAngleB);
+    expect(group.data.getNumber('angle',  0)).toBeCloseTo(angle);
+    expect(group.data.getNumber('arcAngle',  0)).toBeCloseTo(arcAngle);
   });
 });

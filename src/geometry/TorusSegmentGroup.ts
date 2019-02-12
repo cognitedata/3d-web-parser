@@ -1,10 +1,13 @@
 // Copyright 2019 Cognite AS
 
 import * as THREE from 'three';
-import PlaneGroup from './PlaneGroup';
+import PrimitiveGroup from './PrimitiveGroup';
 import { computeCircleBoundingBox } from './CircleGroup';
 import { zAxis, twoPI } from './../constants';
 import { FilterOptions } from '../parsers/parseUtils';
+import GeometryGroupData from './GeometryGroupData';
+import { colorProperties } from './GeometryGroupDataParameters';
+import { Geometry } from 'three';
 
 // reusable variables
 const firstRotation = new THREE.Quaternion();
@@ -18,68 +21,12 @@ const normalMatrix = new THREE.Matrix3();
 const vector1 = new THREE.Vector3();
 const vector2 = new THREE.Vector3();
 
-export default class TorusSegmentGroup extends PlaneGroup {
-  public radius: Float32Array;
-  public tubeRadius: Float32Array;
-  public angle: Float32Array;
-  public arcAngle: Float32Array;
+export default class TorusSegmentGroup extends PrimitiveGroup {
+  public data: GeometryGroupData;
   constructor(capacity: number) {
     super(capacity);
     this.type = 'TorusSegment';
-    this.radius = new Float32Array(capacity);
-    this.tubeRadius = new Float32Array(capacity);
-    this.angle = new Float32Array(capacity);
-    this.arcAngle = new Float32Array(capacity);
-
-    this.attributes.push({
-      name: 'arc',
-      array: this.arcAngle,
-      itemSize: 1,
-    });
-
-    this.attributes.push({
-      name: 'radius',
-      array: this.radius,
-      itemSize: 1,
-    });
-
-    this.attributes.push({
-      name: 'tubeRadius',
-      array: this.tubeRadius,
-      itemSize: 1,
-    });
-  }
-
-  setRadius(value: number, index: number) {
-    this.radius[index] = value;
-  }
-
-  getRadius(index: number): number {
-    return this.radius[index];
-  }
-
-  setTubeRadius(value: number, index: number) {
-    this.tubeRadius[index] = value;
-  }
-
-  getTubeRadius(index: number): number {
-    return this.tubeRadius[index];
-  }
-
-  setAngle(value: number, index: number) {
-    this.angle[index] = value;
-  }
-
-  getAngle(index: number): number {
-    return this.angle[index];
-  }
-
-  setArcAngle(value: number, index: number) {
-    this.arcAngle[index] = value;
-  }
-
-  getArcAngle(index: number): number {
-    return this.arcAngle[index];
+    this.data = new GeometryGroupData('TorusSegment', capacity);
   }
 
   // @ts-ignore
@@ -95,16 +42,20 @@ export default class TorusSegmentGroup extends PlaneGroup {
     arcAngle: number,
     filterOptions?: FilterOptions,
   ) {
-    this.setNodeId(nodeId, this.count);
-    this.setTreeIndex(treeIndex, this.count);
-    this.setColor(color, this.count);
-    this.setCenter(center, this.count);
-    this.setNormal(normal, this.count);
-    this.setRadius(radius, this.count);
-    this.setTubeRadius(tubeRadius, this.count);
-    this.setAngle(angle, this.count);
-    this.setArcAngle(arcAngle, this.count);
-    this.count += 1;
+    this.setNodeId(nodeId, this.data.count);
+    this.setTreeIndex(treeIndex, this.data.count);
+    this.setColor(color, this.data.count);
+    this.data.add({
+      nodeId: nodeId,
+      treeIndex: treeIndex,
+      color: color,
+      centerA: center,
+      normal: normal,
+      radiusA: radius,
+      radiusB: tubeRadius,
+      angle: angle,
+      arcAngle: arcAngle,
+    });
 
     if (filterOptions) {
       this.filterLastObject(filterOptions);
@@ -112,12 +63,12 @@ export default class TorusSegmentGroup extends PlaneGroup {
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
-    firstRotation.setFromAxisAngle(zAxis, this.getAngle(index));
-    secondRotation.setFromUnitVectors(zAxis, this.getNormal(vector1, index));
+    firstRotation.setFromAxisAngle(zAxis, this.data.getNumber('angle',  index));
+    secondRotation.setFromUnitVectors(zAxis, this.data.getVector3('normal', vector1, index));
     scale.set(1, 1, 1);
 
     return outputMatrix.compose(
-      this.getCenter(vector2, index),
+      this.data.getVector3('centerA', vector2, index),
       secondRotation.multiply(firstRotation), // A.multiply(B) === A*B
       scale,
     );
@@ -127,12 +78,12 @@ export default class TorusSegmentGroup extends PlaneGroup {
     box.makeEmpty();
 
     normalMatrix.setFromMatrix4(matrix);
-    secondRotation.setFromUnitVectors(zAxis, this.getNormal(vector1, index));
+    secondRotation.setFromUnitVectors(zAxis, this.data.getVector3('normal', vector1, index));
 
     const radialSegmentAngle = twoPI / 24;
-    const angle = this.getAngle(index);
-    const arcAngle = this.getArcAngle(index);
-    const radius = this.getRadius(index);
+    const angle = this.data.getNumber('angle',  index);
+    const arcAngle = this.data.getNumber('arcAngle',  index);
+    const radius = this.data.getNumber('radiusA', index);
 
     const iterations = Math.ceil(arcAngle / radialSegmentAngle) + 1;
     for (let i = 0; i < iterations; ++i) {
@@ -142,7 +93,7 @@ export default class TorusSegmentGroup extends PlaneGroup {
       tubeCenter
         .set(x * radius, y * radius, 0)
         .applyQuaternion(secondRotation)
-        .add(this.getCenter(vector2, index))
+        .add(this.data.getVector3('centerA', vector2, index))
         .applyMatrix4(matrix);
       tubeNormal
         .set(y, -x, 0)
@@ -152,7 +103,7 @@ export default class TorusSegmentGroup extends PlaneGroup {
         computeCircleBoundingBox(
           tubeCenter,
           tubeNormal,
-          this.getTubeRadius(index),
+          this.data.getNumber('radiusB', index),
           reusableBox,
         ),
       );

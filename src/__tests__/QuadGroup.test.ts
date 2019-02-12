@@ -7,9 +7,6 @@ import { expectColorEqual, expectVector3Equal } from '../TestUtils';
 describe('QuadGroup', () => {
   test('constructor', () => {
     const group = new QuadGroup(2);
-    expect(group.vertex1.length).toBe(6);
-    expect(group.vertex2.length).toBe(6);
-    expect(group.vertex3.length).toBe(6);
     expect(group.hasCustomTransformAttributes).toBeFalsy();
     expect(group.type).toBe('Quad');
   });
@@ -18,10 +15,10 @@ describe('QuadGroup', () => {
     const group = new QuadGroup(2);
 
     const vertex = new THREE.Vector3(1, 2, 3);
-    group.setVertex1(vertex, 0);
+    group.data.setVector3('vertex1', vertex, 0);
 
     const target = new THREE.Vector3();
-    group.getVertex1(target, 0);
+    group.data.getVector3('vertex1', target, 0);
     expect(target).toEqual(vertex);
   });
 
@@ -29,10 +26,10 @@ describe('QuadGroup', () => {
     const group = new QuadGroup(2);
 
     const vertex = new THREE.Vector3(1, 2, 3);
-    group.setVertex2(vertex, 0);
+    group.data.setVector3('vertex2', vertex, 0);
 
     const target = new THREE.Vector3();
-    group.getVertex2(target, 0);
+    group.data.getVector3('vertex2', target, 0);
     expect(target).toEqual(vertex);
   });
 
@@ -40,10 +37,10 @@ describe('QuadGroup', () => {
     const group = new QuadGroup(2);
 
     const vertex = new THREE.Vector3(1, 2, 3);
-    group.setVertex3(vertex, 0);
+    group.data.setVector3('vertex3', vertex, 0);
 
     const target = new THREE.Vector3();
-    group.getVertex3(target, 0);
+    group.data.getVector3('vertex3', target, 0);
     expect(target).toEqual(vertex);
   });
 
@@ -61,7 +58,7 @@ describe('QuadGroup', () => {
     const targetVector = new THREE.Vector3();
     const targetColor = new THREE.Color();
 
-    expect(group.count).toBe(1);
+    expect(group.data.count).toBe(1);
 
     expect(group.getNodeId(0)).toBe(nodeId);
     expect(group.getTreeIndex(0)).toBe(treeIndex);
@@ -69,13 +66,13 @@ describe('QuadGroup', () => {
     group.getColor(targetColor, 0);
     expectColorEqual(targetColor, color);
 
-    group.getVertex1(targetVector, 0);
+    group.data.getVector3('vertex1', targetVector, 0);
     expectVector3Equal(targetVector, vertex1);
 
-    group.getVertex2(targetVector, 0);
+    group.data.getVector3('vertex2', targetVector, 0);
     expectVector3Equal(targetVector, vertex2);
 
-    group.getVertex3(targetVector, 0);
+    group.data.getVector3('vertex3', targetVector, 0);
     expectVector3Equal(targetVector, vertex3);
   });
 });

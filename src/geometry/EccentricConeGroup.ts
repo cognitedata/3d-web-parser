@@ -1,9 +1,10 @@
 // Copyright 2019 Cognite AS
 
 import * as THREE from 'three';
-import BaseCylinderGroup from './BaseCylinderGroup';
+import PrimitiveGroup from './PrimitiveGroup';
 import { computeCircleBoundingBox } from './CircleGroup';
 import { FilterOptions } from '../parsers/parseUtils';
+import GeometryGroupData from './GeometryGroupData';
 
 // reusable variables
 const globalNormalMatrix = new THREE.Matrix3();
@@ -13,60 +14,14 @@ const globalNormal = new THREE.Vector3();
 const globalCenterA = new THREE.Vector3();
 const globalCenterB = new THREE.Vector3();
 
-export default class EccentricConeGroup extends BaseCylinderGroup {
-    public radiusA: Float32Array;
-    public radiusB: Float32Array;
-    public normal: Float32Array;
+export default class EccentricConeGroup extends PrimitiveGroup {
+  public data: GeometryGroupData;
 
-    constructor(capacity: number) {
+  constructor(capacity: number) {
     super(capacity);
     this.type = 'EccentricCone';
-    this.radiusA = new Float32Array(capacity);
-    this.radiusB = new Float32Array(capacity);
-    this.normal = new Float32Array(3 * capacity);
     this.hasCustomTransformAttributes = true;
-
-    this.attributes.push({
-      name: 'a_radiusA',
-      array: this.radiusA,
-      itemSize: 1,
-    });
-
-    this.attributes.push({
-      name: 'a_radiusB',
-      array: this.radiusB,
-      itemSize: 1,
-    });
-
-    this.attributes.push({
-      name: 'a_normal',
-      array: this.normal,
-      itemSize: 3,
-    });
-  }
-
-  setRadiusA(value: number, index: number) {
-    this.radiusA[index] = value;
-  }
-
-  getRadiusA(index: number): number {
-    return this.radiusA[index];
-  }
-
-  setRadiusB(value: number, index: number) {
-    this.radiusB[index] = value;
-  }
-
-  getRadiusB(index: number): number {
-    return this.radiusB[index];
-  }
-
-  setNormal(source: THREE.Vector3, index: number) {
-    this.setVector(source, this.normal, index);
-  }
-
-  getNormal(target: THREE.Vector3, index: number) {
-    return this.getVector(this.normal, target, index);
+    this.data = new GeometryGroupData('EccentricCone', capacity);
   }
 
   add(
@@ -80,14 +35,19 @@ export default class EccentricConeGroup extends BaseCylinderGroup {
     normal: THREE.Vector3,
     filterOptions?: FilterOptions,
   ) {
-    this.setNodeId(nodeId, this.count);
-    this.setTreeIndex(treeIndex, this.count);
-    this.setColor(color, this.count);
-    this.setCenterA(centerA, this.count);
-    this.setCenterB(centerB, this.count);
-    this.setRadiusA(radiusA, this.count);
-    this.setRadiusB(radiusB, this.count);
-    this.setNormal(normal, this.count);
+    this.setNodeId(nodeId, this.data.count);
+    this.setTreeIndex(treeIndex, this.data.count);
+    this.setColor(color, this.data.count);
+    this.data.add({
+      nodeId: nodeId,
+      treeIndex: treeIndex,
+      color: color,
+      centerA: centerA,
+      centerB: centerB,
+      radiusA: radiusA,
+      radiusB: radiusB,
+      normal: normal,
+    });
 
     this.count += 1;
 
@@ -105,16 +65,16 @@ export default class EccentricConeGroup extends BaseCylinderGroup {
     const scaling = matrix.getMaxScaleOnAxis();
 
     box.makeEmpty();
-    globalNormal.copy(this.getNormal(globalNormal, index)).applyMatrix3(globalNormalMatrix).normalize();
+    globalNormal.copy(this.data.getVector3('normal', globalNormal, index)).applyMatrix3(globalNormalMatrix).normalize();
 
     // A
-    globalCenter.copy(this.getCenterA(globalCenterA, index)).applyMatrix4(matrix);
-    let radius = scaling * this.getRadiusA(index);
+    globalCenter.copy(this.data.getVector3('centerA', globalCenterA, index)).applyMatrix4(matrix);
+    let radius = scaling * this.data.getNumber('radiusA', index);
     box.union(computeCircleBoundingBox(globalCenter, globalNormal, radius, globalReusableBox));
 
     // B
-    globalCenter.copy(this.getCenterB(globalCenterB, index)).applyMatrix4(matrix);
-    radius = scaling * this.getRadiusB(index);
+    globalCenter.copy(this.data.getVector3('centerB', globalCenterB, index)).applyMatrix4(matrix);
+    radius = scaling * this.data.getNumber('radiusB', index);
     box.union(computeCircleBoundingBox(globalCenter, globalNormal, radius, globalReusableBox));
 
     return box;
