@@ -54,7 +54,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 
 function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
   if (
-    primitiveGroupMap.GeneralCylinder.group.count + minimumRequiredCapacity
+    primitiveGroupMap.GeneralCylinder.group.data.count + minimumRequiredCapacity
     > primitiveGroupMap.GeneralCylinder.group.capacity) {
       const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.GeneralCylinder.capacity);
       primitiveGroupMap.GeneralCylinder.group = new GeneralCylinderGroup(capacity);

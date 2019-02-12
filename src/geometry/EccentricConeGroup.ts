@@ -46,8 +46,6 @@ export default class EccentricConeGroup extends PrimitiveGroup {
       normal: normal,
     });
 
-    this.count += 1;
-
     if (filterOptions) {
       this.filterLastObject(filterOptions);
     }

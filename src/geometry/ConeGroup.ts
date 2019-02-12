@@ -56,8 +56,6 @@ export default class ConeGroup extends PrimitiveGroup {
       localXAxis: localXAxis,
     });
 
-    this.count += 1;
-
     if (filterOptions) {
       this.filterLastObject(filterOptions);
     }

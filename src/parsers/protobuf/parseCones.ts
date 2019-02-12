@@ -50,7 +50,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 }
 
 function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
-  if (primitiveGroupMap.Cone.group.count + minimumRequiredCapacity > primitiveGroupMap.Cone.group.capacity) {
+  if (primitiveGroupMap.Cone.group.data.count + minimumRequiredCapacity > primitiveGroupMap.Cone.group.capacity) {
       const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Cone.capacity);
       primitiveGroupMap.Cone.group = new ConeGroup(capacity);
       return true;

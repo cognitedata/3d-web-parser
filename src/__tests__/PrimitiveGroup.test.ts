@@ -15,7 +15,7 @@ class NonAbstractPrimitiveGroup extends PrimitiveGroup {
 describe('PrimitiveGroup', () => {
   test('constructor', () => {
     const group = new NonAbstractPrimitiveGroup(2);
-    expect(group.count).toBe(0);
+    expect(group.data.count).toBe(0);
     expect(group.capacity).toBe(2);
     expect(group.nodeId.length).toBe(2);
     expect(group.treeIndex.length).toBe(2);

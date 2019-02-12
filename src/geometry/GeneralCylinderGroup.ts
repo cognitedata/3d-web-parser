@@ -112,7 +112,12 @@ export default class GeneralCylinderGroup extends PrimitiveGroup {
       zAngleA: zAngleA,
       zAngleB: zAngleB,
       angle: angle,
+      planeA: planeA,
+      planeB: planeB,
       arcAngle: arcAngle,
+      capNormalA: capNormalA,
+      capNormalB: capNormalB,
+      localXAxis: localXAxis,
     });
 
     if (filterOptions) {

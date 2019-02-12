@@ -48,8 +48,8 @@ export default class TorusSegmentGroup extends PrimitiveGroup {
     this.data.add({
       center: center,
       normal: normal,
-      radiusA: radius,
-      radiusB: tubeRadius,
+      radius: radius,
+      tubeRadius: tubeRadius,
       angle: angle,
       arcAngle: arcAngle,
     });
@@ -65,7 +65,7 @@ export default class TorusSegmentGroup extends PrimitiveGroup {
     scale.set(1, 1, 1);
 
     return outputMatrix.compose(
-      this.data.getVector3('centerA', vector2, index),
+      this.data.getVector3('center', vector2, index),
       secondRotation.multiply(firstRotation), // A.multiply(B) === A*B
       scale,
     );
@@ -80,7 +80,7 @@ export default class TorusSegmentGroup extends PrimitiveGroup {
     const radialSegmentAngle = twoPI / 24;
     const angle = this.data.getNumber('angle',  index);
     const arcAngle = this.data.getNumber('arcAngle',  index);
-    const radius = this.data.getNumber('radiusA', index);
+    const radius = this.data.getNumber('radius', index);
 
     const iterations = Math.ceil(arcAngle / radialSegmentAngle) + 1;
     for (let i = 0; i < iterations; ++i) {
@@ -90,7 +90,7 @@ export default class TorusSegmentGroup extends PrimitiveGroup {
       tubeCenter
         .set(x * radius, y * radius, 0)
         .applyQuaternion(secondRotation)
-        .add(this.data.getVector3('centerA', vector2, index))
+        .add(this.data.getVector3('center', vector2, index))
         .applyMatrix4(matrix);
       tubeNormal
         .set(y, -x, 0)
@@ -100,7 +100,7 @@ export default class TorusSegmentGroup extends PrimitiveGroup {
         computeCircleBoundingBox(
           tubeCenter,
           tubeNormal,
-          this.data.getNumber('radiusB', index),
+          this.data.getNumber('tubeRadius', index),
           reusableBox,
         ),
       );

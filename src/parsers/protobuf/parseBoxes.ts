@@ -30,7 +30,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 }
 
 function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
-  if (primitiveGroupMap.Box.group.count + minimumRequiredCapacity > primitiveGroupMap.Box.group.capacity) {
+  if (primitiveGroupMap.Box.group.data.count + minimumRequiredCapacity > primitiveGroupMap.Box.group.capacity) {
       const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Box.capacity);
       primitiveGroupMap.Box.group = new BoxGroup(capacity);
       return true;

@@ -30,7 +30,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 
 function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
   if (
-    primitiveGroupMap.SphericalSegment.group.count + minimumRequiredCapacity
+    primitiveGroupMap.SphericalSegment.group.data.count + minimumRequiredCapacity
     > primitiveGroupMap.SphericalSegment.group.capacity) {
       const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.SphericalSegment.capacity);
       primitiveGroupMap.SphericalSegment.group = new SphericalSegmentGroup(capacity);

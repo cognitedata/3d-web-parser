@@ -116,15 +116,15 @@ export default class EllipsoidSegmentGroup extends PrimitiveGroup {
 
     globalNormalMatrix.setFromMatrix4(matrix);
 
-    globalTransformedCenter.copy(this.data.getVector3('centerA', globalCenter, index)).applyMatrix4(matrix);
+    globalTransformedCenter.copy(this.data.getVector3('center', globalCenter, index)).applyMatrix4(matrix);
     globalTransformedNormal
       .copy(this.data.getVector3('normal', globalNormal, index))
       .applyMatrix3(globalNormalMatrix)
       .normalize();
 
-    const height = this.data.getNumber('heightA', index);
-    const hRadius = this.data.getNumber('radiusA', index);
-    const vRadius = this.data.getNumber('radiusB', index);
+    const height = this.data.getNumber('height', index);
+    const hRadius = this.data.getNumber('hRadius', index);
+    const vRadius = this.data.getNumber('vRadius', index);
 
     const segments = 16;
     const step = hRadius / segments;

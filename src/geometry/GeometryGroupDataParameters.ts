@@ -1,4 +1,5 @@
-export type primitiveName = 'Box' | 'Circle' | 'Cone' | 'EccentricCone' | 'EllipsoidSegment' | 'GeneralCylinder' |
+export type primitiveName = 'Primitive' | 'Box' | 'Circle' | 'Cone' | 'EccentricCone' | 'EllipsoidSegment' |
+'GeneralCylinder' |
 'GeneralRing' | 'Nut' | 'Quad' | 'SphericalSegment' | 'TorusSegment' | 'Trapezium';
 export type propertyName = 'nodeId' | 'treeIndex' | 'color' | 'center' | 'centerA' | 'centerB' | 'radius' | 'radiusA' |
   'radiusB' |
@@ -8,6 +9,7 @@ export type propertyName = 'nodeId' | 'treeIndex' | 'color' | 'center' | 'center
   'vertex3' | 'vertex4' | 'planeA' | 'planeB' | 'capNormalA' | 'capNormalB' | 'localXAxis' | 'tubeRadius';
 
 export const primitiveProperties: { [name in primitiveName]: propertyName[]} = {
+  Primitive: [],
   Box: ['center', 'normal', 'angle', 'delta'],
   Circle: ['center', 'normal', 'radiusA'],
   Cone: ['centerA', 'centerB', 'radiusA', 'radiusB', 'angle', 'arcAngle', 'localXAxis'],
@@ -20,7 +22,24 @@ export const primitiveProperties: { [name in primitiveName]: propertyName[]} = {
   Nut: ['centerA', 'centerB', 'radiusA', 'rotationAngle'],
   Quad: ['vertex1', 'vertex2', 'vertex3'],
   SphericalSegment: ['center', 'normal', 'hRadius', 'height'],
-  TorusSegment: ['center', 'normal', 'radiusA', 'radiusB', 'angle', 'arcAngle'],
+  TorusSegment: ['center', 'normal', 'radius', 'tubeRadius', 'angle', 'arcAngle'],
+  Trapezium: ['vertex1', 'vertex2', 'vertex3', 'vertex4'],
+};
+
+export const primitiveAttributeProperties: { [name in primitiveName]: propertyName[]} = {
+  Primitive: [],
+  Box: [],
+  Circle: [],
+  Cone: ['centerA', 'centerB', 'radiusA', 'radiusB', 'localXAxis', 'angle', 'arcAngle'],
+  EccentricCone: ['centerA', 'centerB', 'radiusA', 'radiusB', 'normal'],
+  EllipsoidSegment: ['center', 'normal', 'hRadius', 'vRadius', 'height'],
+  GeneralCylinder: ['centerA', 'centerB', 'planeA', 'planeB', 'centerA', 'centerB',
+    'localXAxis', 'radiusA', 'angle', 'arcAngle'],
+  GeneralRing: ['thickness', 'angle', 'arcAngle'],
+  Nut: ['centerA', 'centerB'],
+  Quad: [],
+  SphericalSegment: ['center', 'normal', 'hRadius', 'height'],
+  TorusSegment: ['arcAngle', 'radius', 'tubeRadius'],
   Trapezium: ['vertex1', 'vertex2', 'vertex3', 'vertex4'],
 };
 

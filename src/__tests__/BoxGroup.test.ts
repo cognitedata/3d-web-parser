@@ -71,7 +71,7 @@ describe('BoxGroup', () => {
     group.getColor(targetColor, 0);
     expectColorEqual(targetColor, color);
 
-    group.data.getVector3('centerA', targetVector, 0);
+    group.data.getVector3('center', targetVector, 0);
     expectVector3Equal(targetVector, center);
 
     group.data.getVector3('normal', targetVector, 0);

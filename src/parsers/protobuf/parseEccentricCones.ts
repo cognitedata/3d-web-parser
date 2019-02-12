@@ -34,7 +34,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 
 function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
   if (
-    primitiveGroupMap.EccentricCone.group.count + minimumRequiredCapacity
+    primitiveGroupMap.EccentricCone.group.data.count + minimumRequiredCapacity
     > primitiveGroupMap.EccentricCone.group.capacity) {
       const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.EccentricCone.capacity);
       primitiveGroupMap.EccentricCone.group = new EccentricConeGroup(capacity);

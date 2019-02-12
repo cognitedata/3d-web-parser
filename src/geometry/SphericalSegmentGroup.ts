@@ -81,10 +81,10 @@ export default class SphericalSegmentGroup extends PrimitiveGroup {
       .applyMatrix3(normalMatrix)
       .normalize();
     const scaling = matrix.getMaxScaleOnAxis();
-    const radius = scaling * this.data.getNumber('radiusA', index);
-    const height = scaling * this.data.getNumber('heightA', index);
+    const radius = scaling * this.data.getNumber('hRadius', index);
+    const height = scaling * this.data.getNumber('height', index);
 
-    sphereCenter.copy(this.data.getVector3('centerA', globalCenter, index)).applyMatrix4(matrix);
+    sphereCenter.copy(this.data.getVector3('center', globalCenter, index)).applyMatrix4(matrix);
     transformedCenter
       .copy(sphereCenter)
       .add(direction.copy(transformedNormal).multiplyScalar(radius - height));

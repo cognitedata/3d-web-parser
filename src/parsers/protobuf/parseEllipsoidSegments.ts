@@ -30,7 +30,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 
 function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
   if (
-    primitiveGroupMap.EllipsoidSegment.group.count + minimumRequiredCapacity
+    primitiveGroupMap.EllipsoidSegment.group.data.count + minimumRequiredCapacity
     > primitiveGroupMap.EllipsoidSegment.group.capacity) {
       const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.EllipsoidSegment.capacity);
       primitiveGroupMap.EllipsoidSegment.group = new EllipsoidSegmentGroup(capacity);

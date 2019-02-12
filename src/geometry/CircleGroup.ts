@@ -70,7 +70,7 @@ export default class CircleGroup extends PrimitiveGroup {
     const twoRadius = 2 * this.data.getNumber('radiusA', index);
     globalScale.set(twoRadius, twoRadius, 1);
     return outputMatrix.compose(
-      this.data.getVector3('centerA', globalCenter, index),
+      this.data.getVector3('center', globalCenter, index),
       globalQuaternion, // Rotation
       globalScale, // Scale
     );
@@ -78,7 +78,7 @@ export default class CircleGroup extends PrimitiveGroup {
 
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
     globalNormalMatrix.setFromMatrix4(matrix);
-    globalTransformedCenter.copy(this.data.getVector3('centerA', globalCenter, index)).applyMatrix4(matrix);
+    globalTransformedCenter.copy(this.data.getVector3('center', globalCenter, index)).applyMatrix4(matrix);
     globalTransformedNormal.copy(this.data.getVector3('normal', globalNormal, index)).applyMatrix3(globalNormalMatrix);
     const scaling = matrix.getMaxScaleOnAxis();
     const radius = scaling * this.data.getNumber('radiusA', index);

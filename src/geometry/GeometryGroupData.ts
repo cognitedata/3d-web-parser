@@ -1,5 +1,6 @@
 import { float64Properties, float32Properties, vector3Properties, matrix4Properties,
-  primitiveName, primitiveProperties, propertyName, colorProperties, vector4Properties }
+  primitiveName, primitiveProperties, propertyName, colorProperties, vector4Properties,
+  primitiveAttributeProperties }
   from './GeometryGroupDataParameters';
 import * as THREE from 'three';
 
@@ -43,15 +44,17 @@ export default class GeometryGroupData {
       } else {
         throw Error('Property ' + property + ' does not have an associated memory structure');
       }
+    });
 
-      if (['center', 'normal', 'hRadius', 'vRadius', 'height', 'planeA', 'planeB', 'centerA', 'centerB', 'localXAxis',
-        'radiusA', 'radiusB', 'angle', 'arcAngle', 'thickness', 'tubeRadius', 'vertex1', 'vertex2', 'vertex3',
-        'vertex4'].indexOf(property) !== -1) {
-        attributesPointer.push({
-          name: 'a_' + property,
-          array: this.arrays[property],
-          itemSize: getAttributeItemSize(property),
-        });
+    primitiveAttributeProperties[this.type].forEach(property => {
+      attributesPointer.push({
+        name: 'a_' + property,
+        array: this.arrays[property],
+        itemSize: getAttributeItemSize(property),
+      });
+
+      if (this.arrays[property] === undefined) {
+        throw Error('Primitive attributes issue. Property: ' + property + ', type: ' + this.type);
       }
     });
   }

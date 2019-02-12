@@ -15,9 +15,9 @@ describe('SphericalSegmentGroup', () => {
     const group = new SphericalSegmentGroup(2);
 
     const center = new THREE.Vector3(1.1, 2.1, 3.1);
-    group.data.setVector3('centerA',  center, 0);
+    group.data.setVector3('center',  center, 0);
 
-    expectVector3Equal(group.data.getVector3('centerA', new THREE.Vector3(), 0), center);
+    expectVector3Equal(group.data.getVector3('center', new THREE.Vector3(), 0), center);
   });
 
   test('(set/get)Normal', () => {
@@ -34,8 +34,8 @@ describe('SphericalSegmentGroup', () => {
 
     const radius = 1.0;
 
-    group.data.setNumber('radiusA', radius, 0);
-    expect(group.data.getNumber('radiusA', 0)).toBeCloseTo(radius);
+    group.data.setNumber('hRadius', radius, 0);
+    expect(group.data.getNumber('hRadius', 0)).toBeCloseTo(radius);
   });
 
   test('(set/get)Height', () => {
@@ -43,8 +43,8 @@ describe('SphericalSegmentGroup', () => {
 
     const height = 1.0;
 
-    group.data.setNumber('heightA', height, 0);
-    expect(group.data.getNumber('heightA', 0)).toBeCloseTo(height);
+    group.data.setNumber('height', height, 0);
+    expect(group.data.getNumber('height', 0)).toBeCloseTo(height);
   });
 
   test('add', () => {
@@ -68,9 +68,9 @@ describe('SphericalSegmentGroup', () => {
     expectColorEqual(group.getColor(new THREE.Color(), 0), color);
 
     expectVector3Equal(group.data.getVector3('normal', new THREE.Vector3(), 0), normal);
-    expectVector3Equal(group.data.getVector3('centerA', new THREE.Vector3(), 0), center);
+    expectVector3Equal(group.data.getVector3('center', new THREE.Vector3(), 0), center);
 
-    expect(group.data.getNumber('radiusA', 0)).toBeCloseTo(radius);
-    expect(group.data.getNumber('heightA', 0)).toBeCloseTo(height);
+    expect(group.data.getNumber('hRadius', 0)).toBeCloseTo(radius);
+    expect(group.data.getNumber('height', 0)).toBeCloseTo(height);
   });
 });
