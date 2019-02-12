@@ -23,7 +23,14 @@ import { addClosedEllipsoidSegment, addOpenEllipsoidSegment, addEllipsoid } from
 import { addClosedTorusSegment, addOpenTorusSegment, addTorus } from './unpackGeometry/Torus';
 import { addClosedSphericalSegment, addOpenSphericalSegment } from './unpackGeometry/SphericalSegment';
 
-const filePrimitives = ['Box', 'Circle', 'ClosedCone', 'ClosedCylinder', 'ClosedEccentricCone',
+type primitiveNames = 'Box' | 'Circle' | 'ClosedCone' | 'ClosedCylinder' | 'ClosedEccentricCone' |
+'ClosedEllipsoidSegment' | 'ClosedExtrudedRingSegment' | 'ClosedGeneralCylinder' | 'ClosedSphericalSegment' |
+'ClosedTorusSegment' | 'Ellipsoid' | 'ExtrudedRing' | 'Nut' | 'OpenCone' | 'OpenCylinder' | 'OpenEccentricCone' |
+'OpenEllipsoidSegment' | 'OpenExtrudedRingSegment' | 'OpenGeneralCylinder' | 'OpenSphericalSegment' |
+'OpenTorusSegment' | 'Ring' | 'Sphere' | 'Torus';
+type geometryNames = primitiveNames | 'TriangleMesh' | 'InstancedMesh';
+
+const filePrimitives: primitiveNames[] = ['Box', 'Circle', 'ClosedCone', 'ClosedCylinder', 'ClosedEccentricCone',
 'ClosedEllipsoidSegment', 'ClosedExtrudedRingSegment', 'ClosedGeneralCylinder', 'ClosedSphericalSegment',
 'ClosedTorusSegment', 'Ellipsoid', 'ExtrudedRing', 'Nut', 'OpenCone', 'OpenCylinder', 'OpenEccentricCone',
 'OpenEllipsoidSegment', 'OpenExtrudedRingSegment', 'OpenGeneralCylinder', 'OpenSphericalSegment',
@@ -31,7 +38,7 @@ const filePrimitives = ['Box', 'Circle', 'ClosedCone', 'ClosedCylinder', 'Closed
 
 const fileMeshes = ['TriangleMesh', 'InstancedMesh'];
 
-const IdToFileGeometryName: {[id: number]: string} = {
+const IdToFileGeometryName: {[id: number]: geometryNames} = {
   1: 'Box',
   2: 'Circle',
   3: 'ClosedCone',
@@ -63,14 +70,18 @@ const IdToFileGeometryName: {[id: number]: string} = {
 const BYTES_PER_NODE_ID = 7;
 const DEFAULT_COLOR = new THREE.Color(0, 0, 100);
 
-const filePropertyArrayNames = ['color', 'centerX', 'centerY', 'centerZ', 'normal', 'delta', 'height',
+type filePropertyArrayNames = 'color' | 'centerX' | 'centerY' | 'centerZ' | 'normal' | 'delta' | 'height' |
+'radius' | 'angle' | 'translationX' | 'translationY' | 'translationZ' | 'scaleX' | 'scaleY' | 'scaleZ' | 'fileId';
+const filePropertyArrays = ['color', 'centerX', 'centerY', 'centerZ', 'normal', 'delta', 'height',
 'radius', 'angle', 'translationX', 'translationY', 'translationZ', 'scaleX', 'scaleY', 'scaleZ', 'fileId'];
 
-const fileProperties = ['treeIndex', 'color', 'center', 'normal', 'delta', 'height', 'radiusA', 'radiusB',
-'rotationAngle', 'capNormal', 'thickness', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB', 'fileId'];
+type filePropertyNames = 'treeIndex' | 'color' | 'center' | 'normal' | 'delta' | 'height' | 'radiusA' | 'radiusB' |
+'rotationAngle' | 'capNormal' | 'thickness' | 'arcAngle' | 'slopeA' | 'slopeB' | 'zAngleA' | 'zAngleB' | 'fileId';
+const fileProperties: filePropertyNames[] = ['treeIndex', 'color', 'center', 'normal', 'delta', 'height', 'radiusA',
+'radiusB', 'rotationAngle', 'capNormal', 'thickness', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB', 'fileId'];
 
 // If adding new parameters, also update PropertyLoader.
-const fileGeometryProperties: {[name: string]: string[]} = {
+const fileGeometryProperties: {[name in geometryNames]: filePropertyNames[]} = {
   Box: ['treeIndex', 'color', 'center', 'normal', 'delta', 'rotationAngle'],
   Circle: ['treeIndex', 'color', 'center', 'normal', 'radiusA'],
   ClosedCone: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB'],
@@ -104,7 +115,7 @@ const fileGeometryProperties: {[name: string]: string[]} = {
   'scale'],
 };
 
-const renderedPrimitiveToAddFunction: {[name: string]: Function} = {
+const renderedPrimitiveToAddFunction: {[name in primitiveNames]: Function} = {
   'Box': addBox,
   'Circle': addCircle,
   'ClosedCone': addClosedCone,
@@ -131,8 +142,10 @@ const renderedPrimitiveToAddFunction: {[name: string]: Function} = {
   'Torus': addTorus,
 };
 
-const renderedPrimitives = ['Box', 'Circle', 'Cone', 'EccentricCone', 'EllipsoidSegment', 'GeneralCylinder',
-  'GeneralRing', 'Nut', 'Quad', 'SphericalSegment', 'TorusSegment', 'Trapezium'];
+type renderedPrimitiveNames = 'Box' | 'Circle' | 'Cone' | 'EccentricCone' | 'EllipsoidSegment' | 'GeneralCylinder' |
+  'GeneralRing' | 'Nut' | 'Quad' | 'SphericalSegment' | 'TorusSegment' | 'Trapezium';
+const renderedPrimitives: renderedPrimitiveNames[] = ['Box', 'Circle', 'Cone', 'EccentricCone', 'EllipsoidSegment',
+'GeneralCylinder', 'GeneralRing', 'Nut', 'Quad', 'SphericalSegment', 'TorusSegment', 'Trapezium'];
 
 const renderedPrimitivesPerFilePrimitive: {[name: string]: string[]} = {
   Box: ['Box'],

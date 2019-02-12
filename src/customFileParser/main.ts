@@ -5,6 +5,8 @@ import { SectorMetadata, GeometryIndexHandler, UncompressedValues, RenderedPrimi
   from './sharedFileParserTypes';
 import CustomFileReader from './CustomFileReader';
 import { renderedPrimitives, renderedPrimitiveToGroup } from './parserParameters';
+import SceneStats from './../SceneStats';
+import { getParentPath } from './../PathExtractor';
 
 function createSector(
   sectorMetadata: SectorMetadata,
@@ -40,7 +42,7 @@ function createSector(
   return sector;
 }
 
-function parseManySectors(fileBuffer: ArrayBuffer): Sector {
+function parseManySectors(fileBuffer: ArrayBuffer) {
   const fileReader = new CustomFileReader(fileBuffer);
   const sectors: {[name: string]: any} = {};
 
@@ -69,8 +71,15 @@ function parseManySectors(fileBuffer: ArrayBuffer): Sector {
       sectors[sectorMetadata.sectorId] = newSectorObject;
     } else { throw Error('Parent sector not found'); }
   }
+  const sceneStats: SceneStats = {
+    numInstancedMeshes: 0,
+    numMergedMeshes: 0,
+  };
 
-  return rootSector;
+  console.log("ROOT SECTOR");
+  console.log(rootSector);
+  console.log(sectors);
+  return { rootSector, sectors, sceneStats };
 }
 
 function parseSingleSector(fileBuffer: ArrayBuffer): Sector {
