@@ -3,79 +3,100 @@ import { int64Properties, int32Properties, vector3Properties, matrix4Properties,
   from './GeometryGroupDataParameters';
 import * as THREE from 'three';
 
+function getAttributeItemSize(property: propertyName): number {
+  if (int64Properties.indexOf(property) !== -1) {
+    return 1;
+  } else if (int32Properties.indexOf(property) !== -1) {
+    return 1;
+  } else if (vector3Properties.indexOf(property) !== -1) {
+    return 3;
+  } else if (vector4Properties.indexOf(property) !== -1) {
+    return 4;
+  } else if (colorProperties.indexOf(property) !== -1) {
+    return 3;
+  } else {
+    throw Error('Unknown attribute size for property ' + property);
+  }
+}
+
 export default class GeometryGroupData {
   type: primitiveName;
   count: number;
   capacity: number;
-  data: {[name: string]: Float64Array | Float32Array };
+  public arrays: {[name: string]: Float64Array | Float32Array };
 
-  constructor(type: primitiveName, capacity: number) {
+  constructor(type: primitiveName, capacity: number, attributesPointer: any) {
     this.type = type;
     this.count = 0;
     this.capacity = capacity;
 
-    this.data = {};
+    this.arrays = {};
     primitiveProperties[this.type].forEach(property => {
       if (int64Properties.indexOf(property) !== -1) {
-        this.data[property] = new Float64Array(this.capacity);
+        this.arrays[property] = new Float64Array(this.capacity);
       } else if (int32Properties.indexOf(property) !== -1) {
-        this.data[property] = new Float32Array(this.capacity);
+        this.arrays[property] = new Float32Array(this.capacity);
       } else if (vector3Properties.indexOf(property) !== -1) {
-        this.data[property] = new Float32Array(this.capacity * 3);
+        this.arrays[property] = new Float32Array(this.capacity * 3);
       } else if (vector4Properties.indexOf(property) !== -1) {
-        this.data[property] = new Float32Array(this.capacity * 4);
-      } else if (matrix4Properties.indexOf(property) !== -1) {
-        this.data[property] = new Float32Array(this.capacity * 16);
+        this.arrays[property] = new Float32Array(this.capacity * 4);
       } else if (colorProperties.indexOf(property) !== -1) {
-        this.data[property] = new Float32Array(this.capacity * 3);
+        this.arrays[property] = new Float32Array(this.capacity * 3);
       } else {
         throw Error('Property ' + property + ' does not have an associated memory structure');
       }
+
+      attributesPointer.push({
+        name: 'a_' + property,
+        array: this.arrays[property],
+        itemSize: getAttributeItemSize(property),
+      });
+
     });
   }
 
   setNumber(property: propertyName, value: number, index: number) {
-    this.data[property][index] = value;
+    this.arrays[property][index] = value;
   }
 
   setVector3(property: propertyName, value: THREE.Vector3, index: number) {
-    this.data[property][3 * index] = value.x;
-    this.data[property][3 * index + 1] = value.y;
-    this.data[property][3 * index + 2] = value.z;
+    this.arrays[property][3 * index] = value.x;
+    this.arrays[property][3 * index + 1] = value.y;
+    this.arrays[property][3 * index + 2] = value.z;
   }
 
   setVector4(property: propertyName, value: THREE.Vector4, index: number) {
-    this.data[property][4 * index] = value.x;
-    this.data[property][4 * index + 1] = value.y;
-    this.data[property][4 * index + 2] = value.z;
-    this.data[property][4 * index + 3] = value.w;
+    this.arrays[property][4 * index] = value.x;
+    this.arrays[property][4 * index + 1] = value.y;
+    this.arrays[property][4 * index + 2] = value.z;
+    this.arrays[property][4 * index + 3] = value.w;
   }
 
   setMatrix4(property: propertyName, value: THREE.Matrix4, index: number) {
   }
 
   setColor(source: THREE.Color, index: number) {
-    this.data.color[3 * index + 0] = source.r;
-    this.data.color[3 * index + 1] = source.g;
-    this.data.color[3 * index + 2] = source.b;
+    this.arrays.color[3 * index + 0] = source.r;
+    this.arrays.color[3 * index + 1] = source.g;
+    this.arrays.color[3 * index + 2] = source.b;
   }
 
   getNumber(property: propertyName, index: number): number {
-    return this.data[property][index];
+    return this.arrays[property][index];
   }
 
   getVector3(property: propertyName, target: THREE.Vector3, index: number): THREE.Vector3 {
-    target.x = this.data[property][3 * index];
-    target.y = this.data[property][3 * index + 1];
-    target.z = this.data[property][3 * index + 2];
+    target.x = this.arrays[property][3 * index];
+    target.y = this.arrays[property][3 * index + 1];
+    target.z = this.arrays[property][3 * index + 2];
     return target;
   }
 
   getVector4(property: propertyName, target: THREE.Vector4, index: number): THREE.Vector4 {
-    target.x = this.data[property][4 * index];
-    target.y = this.data[property][4 * index + 1];
-    target.z = this.data[property][4 * index + 2];
-    target.w = this.data[property][4 * index + 3];
+    target.x = this.arrays[property][4 * index];
+    target.y = this.arrays[property][4 * index + 1];
+    target.z = this.arrays[property][4 * index + 2];
+    target.w = this.arrays[property][4 * index + 3];
     return target;
   }
 
@@ -84,9 +105,9 @@ export default class GeometryGroupData {
 
   getColor(target: THREE.Color, index: number): THREE.Color {
     target.setRGB(
-      this.data.color[3 * index + 0],
-      this.data.color[3 * index + 1],
-      this.data.color[3 * index + 2],
+      this.arrays.color[3 * index + 0],
+      this.arrays.color[3 * index + 1],
+      this.arrays.color[3 * index + 2],
     );
     return target;
   }

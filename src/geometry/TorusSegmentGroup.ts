@@ -26,7 +26,7 @@ export default class TorusSegmentGroup extends PrimitiveGroup {
   constructor(capacity: number) {
     super(capacity);
     this.type = 'TorusSegment';
-    this.data = new GeometryGroupData('TorusSegment', capacity);
+    this.data = new GeometryGroupData('TorusSegment', capacity, this.attributes);
   }
 
   // @ts-ignore
@@ -46,9 +46,6 @@ export default class TorusSegmentGroup extends PrimitiveGroup {
     this.setTreeIndex(treeIndex, this.data.count);
     this.setColor(color, this.data.count);
     this.data.add({
-      nodeId: nodeId,
-      treeIndex: treeIndex,
-      color: color,
       centerA: center,
       normal: normal,
       radiusA: radius,

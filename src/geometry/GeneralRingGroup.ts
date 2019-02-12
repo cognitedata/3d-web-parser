@@ -25,7 +25,7 @@ export default class GeneralRingGroup extends PrimitiveGroup {
     super(capacity);
     this.type = 'GeneralRing';
     this.hasCustomTransformAttributes = false;
-    this.data = new GeometryGroupData('GeneralRing', capacity);
+    this.data = new GeometryGroupData('GeneralRing', capacity, this.attributes);
   }
 
   add(
@@ -46,9 +46,6 @@ export default class GeneralRingGroup extends PrimitiveGroup {
     this.setTreeIndex(treeIndex, this.data.count);
     this.setColor(color, this.data.count);
     this.data.add({
-      nodeId: nodeId,
-      treeIndex: treeIndex,
-      color: color,
       centerA: center,
       normal: normal,
       localXAxis: localXAxis,

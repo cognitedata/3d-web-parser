@@ -16,7 +16,7 @@ export default class TrapeziumGroup extends PrimitiveGroup {
     super(capacity);
     this.type = 'Trapezium';
     this.hasCustomTransformAttributes = true;
-    this.data = new GeometryGroupData('Trapezium', capacity);
+    this.data = new GeometryGroupData('Trapezium', capacity, this.attributes);
   }
 
   add(
@@ -33,9 +33,6 @@ export default class TrapeziumGroup extends PrimitiveGroup {
     this.setTreeIndex(treeIndex, this.data.count);
     this.setColor(color, this.data.count);
     this.data.add({
-      nodeId: nodeId,
-      treeIndex: treeIndex,
-      color: color,
       vertex1: vertex1,
       vertex2: vertex2,
       vertex3: vertex3,
