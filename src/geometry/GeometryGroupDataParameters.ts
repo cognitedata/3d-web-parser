@@ -54,8 +54,8 @@ vertex3?: any;
 vertex4?: any;
 }
 
-export const int64Properties: propertyName[] = ['nodeId'];
-export const int32Properties: propertyName[] =
+export const float64Properties: propertyName[] = ['nodeId'];
+export const float32Properties: propertyName[] =
   ['nodeId', 'treeIndex', 'radiusA', 'radiusB', 'angle', 'arcAngle', 'heightA', 'heightB', 'slopeA',
    'slopeB', 'zAngleA', 'zAngleB', 'thickness', 'triangleOffset', 'triangleCount', 'rotationAngle',
    'radius', 'tubeRadius', 'height', 'vRadius', 'hRadius'];
