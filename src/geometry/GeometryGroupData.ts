@@ -1,20 +1,10 @@
-<<<<<<< HEAD
 import { float64Properties, float32Properties, vector3Properties, matrix4Properties,
-=======
-import { int64Properties, int32Properties, vector3Properties, matrix4Properties,
->>>>>>> 87ac923af21341c57a0e269d6159bf7aee98c46a
   primitiveName, primitiveProperties, propertyName, colorProperties, vector4Properties }
   from './GeometryGroupDataParameters';
 import * as THREE from 'three';
 
 function getAttributeItemSize(property: propertyName): number {
-<<<<<<< HEAD
   if (float32Properties.indexOf(property) !== -1) {
-=======
-  if (int64Properties.indexOf(property) !== -1) {
-    return 1;
-  } else if (int32Properties.indexOf(property) !== -1) {
->>>>>>> 87ac923af21341c57a0e269d6159bf7aee98c46a
     return 1;
   } else if (vector3Properties.indexOf(property) !== -1) {
     return 3;
@@ -40,15 +30,9 @@ export default class GeometryGroupData {
 
     this.arrays = {};
     primitiveProperties[this.type].forEach(property => {
-<<<<<<< HEAD
       if (float64Properties.indexOf(property) !== -1) {
         this.arrays[property] = new Float64Array(this.capacity);
       } else if (float32Properties.indexOf(property) !== -1) {
-=======
-      if (int64Properties.indexOf(property) !== -1) {
-        this.arrays[property] = new Float64Array(this.capacity);
-      } else if (int32Properties.indexOf(property) !== -1) {
->>>>>>> 87ac923af21341c57a0e269d6159bf7aee98c46a
         this.arrays[property] = new Float32Array(this.capacity);
       } else if (vector3Properties.indexOf(property) !== -1) {
         this.arrays[property] = new Float32Array(this.capacity * 3);
@@ -60,7 +44,6 @@ export default class GeometryGroupData {
         throw Error('Property ' + property + ' does not have an associated memory structure');
       }
 
-<<<<<<< HEAD
       if (['center', 'normal', 'hRadius', 'vRadius', 'height', 'planeA', 'planeB', 'centerA', 'centerB', 'localXAxis',
         'radiusA', 'radiusB', 'angle', 'arcAngle', 'thickness', 'tubeRadius', 'vertex1', 'vertex2', 'vertex3',
         'vertex4'].indexOf(property) !== -1) {
@@ -75,14 +58,6 @@ export default class GeometryGroupData {
           itemSize: getAttributeItemSize(property),
         });
       }
-=======
-      attributesPointer.push({
-        name: 'a_' + property,
-        array: this.arrays[property],
-        itemSize: getAttributeItemSize(property),
-      });
-
->>>>>>> 87ac923af21341c57a0e269d6159bf7aee98c46a
     });
   }
 
@@ -146,11 +121,7 @@ export default class GeometryGroupData {
   add(properties: any) {
     Object.keys(properties).forEach(property => {
       const name = property as propertyName;
-<<<<<<< HEAD
       if (float64Properties.indexOf(name) !== -1 || float32Properties.indexOf(name) !== -1)  {
-=======
-      if (int64Properties.indexOf(name) !== -1 || int32Properties.indexOf(name) !== -1)  {
->>>>>>> 87ac923af21341c57a0e269d6159bf7aee98c46a
         this.setNumber(name, properties[property], this.count);
       } else if (vector3Properties.indexOf(name) !== -1) {
         this.setVector3(name, properties[property], this.count);
