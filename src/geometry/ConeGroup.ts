@@ -22,7 +22,7 @@ export default class ConeGroup extends PrimitiveGroup {
     super(capacity);
     this.type = 'Cone';
     this.hasCustomTransformAttributes = true;
-    this.data = new GeometryGroupData('Cone', capacity);
+    this.data = new GeometryGroupData('Cone', capacity, this.attributes);
   }
 
   add(
@@ -41,9 +41,6 @@ export default class ConeGroup extends PrimitiveGroup {
     this.setTreeIndex(treeIndex, this.data.count);
     this.setColor(color, this.data.count);
     this.data.add({
-      nodeId: nodeId,
-      treeIndex: treeIndex,
-      color: color,
       centerA: centerA,
       centerB: centerB,
       radiusA: radiusA,

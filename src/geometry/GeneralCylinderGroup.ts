@@ -51,7 +51,7 @@ export default class GeneralCylinderGroup extends PrimitiveGroup {
     super(capacity);
     this.type = 'GeneralCylinder';
     this.hasCustomTransformAttributes = true;
-    this.data = new GeometryGroupData('GeneralCylinder', capacity);
+    this.data = new GeometryGroupData('GeneralCylinder', capacity, this.attributes);
   }
 
   // TODO(anders.hafreager) TS is angry since add already exists with
@@ -102,9 +102,6 @@ export default class GeneralCylinderGroup extends PrimitiveGroup {
     this.setTreeIndex(treeIndex, this.data.count);
     this.setColor(color, this.data.count);
     this.data.add({
-      nodeId: nodeId,
-      treeIndex: treeIndex,
-      color: color,
       centerA: centerA,
       centerB: centerB,
       radiusA: radius,

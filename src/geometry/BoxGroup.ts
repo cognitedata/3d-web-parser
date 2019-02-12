@@ -21,7 +21,7 @@ export default class BoxGroup extends PrimitiveGroup {
     super(capacity);
     this.type = 'Box';
     this.hasCustomTransformAttributes = false;
-    this.data = new GeometryGroupData('Box', capacity);
+    this.data = new GeometryGroupData('Box', capacity, this.attributes);
   }
 
   add(
@@ -38,10 +38,7 @@ export default class BoxGroup extends PrimitiveGroup {
     this.setTreeIndex(treeIndex, this.data.count);
     this.setColor(color, this.data.count);
     this.data.add({
-      nodeId: nodeId,
-      treeIndex: treeIndex,
-      color: color,
-      centerA: center,
+      center: center,
       normal: normal,
       angle: angle,
       delta: delta,

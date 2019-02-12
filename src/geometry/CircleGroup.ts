@@ -39,7 +39,7 @@ export default class CircleGroup extends PrimitiveGroup {
   constructor(capacity: number) {
     super(capacity);
     this.type = 'Circle';
-    this.data = new GeometryGroupData('Circle', capacity);
+    this.data = new GeometryGroupData('Circle', capacity, this.attributes);
   }
 
   add(
@@ -55,10 +55,7 @@ export default class CircleGroup extends PrimitiveGroup {
     this.setTreeIndex(treeIndex, this.data.count);
     this.setColor(color, this.data.count);
     this.data.add({
-      nodeId: nodeId,
-      treeIndex: treeIndex,
-      color: color,
-      centerA: center,
+      center: center,
       normal: normal,
       radiusA: radius,
     });

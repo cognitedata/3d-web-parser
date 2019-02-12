@@ -76,7 +76,7 @@ export default class EllipsoidSegmentGroup extends PrimitiveGroup {
     super(capacity);
     this.type = 'EllipsoidSegment';
     this.hasCustomTransformAttributes = true;
-    this.data = new GeometryGroupData('EllipsoidSegment', capacity);
+    this.data = new GeometryGroupData('EllipsoidSegment', capacity, this.attributes);
   }
 
   // @ts-ignore
@@ -95,14 +95,11 @@ export default class EllipsoidSegmentGroup extends PrimitiveGroup {
     this.setTreeIndex(treeIndex, this.data.count);
     this.setColor(color, this.data.count);
     this.data.add({
-      nodeId: nodeId,
-      treeIndex: treeIndex,
-      color: color,
-      centerA: center,
+      center: center,
       normal: normal,
-      radiusA: horizontalRadius,
-      radiusB: verticalRadius,
-      heightA: height,
+      hRadius: horizontalRadius,
+      vRadius: verticalRadius,
+      height: height,
     });
 
     if (filterOptions) {

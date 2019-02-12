@@ -35,7 +35,12 @@ export default class SphericalSegmentGroup extends PrimitiveGroup {
     super(capacity);
     this.type = 'SphericalSegment';
     this.hasCustomTransformAttributes = true;
-    this.data = new GeometryGroupData('SphericalSegment', capacity);
+    this.data = new GeometryGroupData('SphericalSegment', capacity, this.attributes);
+    this.attributes.push({
+      name: 'a_vRadius',
+      array: this.data.arrays.hRadius,
+      itemSize: 3,
+    });
   }
 
   // @ts-ignore
@@ -53,13 +58,10 @@ export default class SphericalSegmentGroup extends PrimitiveGroup {
     this.setTreeIndex(treeIndex, this.data.count);
     this.setColor(color, this.data.count);
     this.data.add({
-      nodeId: nodeId,
-      treeIndex: treeIndex,
-      color: color,
-      centerA: center,
+      center: center,
       normal: normal,
-      radiusA: radius,
-      heightA: height,
+      hRadius: radius,
+      height: height,
     });
 
     if (filterOptions) {

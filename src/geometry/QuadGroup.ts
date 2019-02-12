@@ -25,7 +25,7 @@ export default class QuadGroup extends PrimitiveGroup {
   constructor(capacity: number) {
     super(capacity);
     this.type = 'Quad';
-    this.data = new GeometryGroupData('Quad', capacity);
+    this.data = new GeometryGroupData('Quad', capacity, this.attributes);
   }
 
   add(
@@ -41,9 +41,6 @@ export default class QuadGroup extends PrimitiveGroup {
     this.setTreeIndex(treeIndex, this.data.count);
     this.setColor(color, this.data.count);
     this.data.add({
-      nodeId: nodeId,
-      treeIndex: treeIndex,
-      color: color,
       vertex1: vertex1,
       vertex2: vertex2,
       vertex3: vertex3,

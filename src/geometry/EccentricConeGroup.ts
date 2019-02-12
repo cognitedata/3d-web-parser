@@ -21,7 +21,7 @@ export default class EccentricConeGroup extends PrimitiveGroup {
     super(capacity);
     this.type = 'EccentricCone';
     this.hasCustomTransformAttributes = true;
-    this.data = new GeometryGroupData('EccentricCone', capacity);
+    this.data = new GeometryGroupData('EccentricCone', capacity, this.attributes);
   }
 
   add(
@@ -39,9 +39,6 @@ export default class EccentricConeGroup extends PrimitiveGroup {
     this.setTreeIndex(treeIndex, this.data.count);
     this.setColor(color, this.data.count);
     this.data.add({
-      nodeId: nodeId,
-      treeIndex: treeIndex,
-      color: color,
       centerA: centerA,
       centerB: centerB,
       radiusA: radiusA,

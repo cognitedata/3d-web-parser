@@ -25,7 +25,7 @@ export default class NutGroup extends PrimitiveGroup {
   constructor(capacity: number) {
     super(capacity);
     this.type = 'Nut';
-    this.data = new GeometryGroupData('Nut', capacity);
+    this.data = new GeometryGroupData('Nut', capacity, this.attributes);
   }
 
   add(
@@ -42,9 +42,6 @@ export default class NutGroup extends PrimitiveGroup {
     this.setTreeIndex(treeIndex, this.data.count);
     this.setColor(color, this.data.count);
     this.data.add({
-      nodeId: nodeId,
-      treeIndex: treeIndex,
-      color: color,
       centerA: centerA,
       centerB: centerB,
       radiusA: radius,
