@@ -7,10 +7,6 @@ import { expectColorEqual, expectVector3Equal } from '../TestUtils';
 describe('ConeGroup', () => {
   test('constructor', () => {
     const group = new ConeGroup(2);
-    expect(group.radiusA.length).toBe(2);
-    expect(group.radiusB.length).toBe(2);
-    expect(group.angle.length).toBe(2);
-    expect(group.arcAngle.length).toBe(2);
     expect(group.hasCustomTransformAttributes).toBeTruthy();
     expect(group.type).toBe('Cone');
   });
@@ -19,16 +15,16 @@ describe('ConeGroup', () => {
     const group = new ConeGroup(2);
 
     const radius = 1.0;
-    group.setRadiusA(radius, 0);
-    expect(group.getRadiusA(0)).toBeCloseTo(radius);
+    group.data.setNumber('radiusA', radius, 0);
+    expect(group.data.getNumber('radiusA', 0)).toBeCloseTo(radius);
   });
 
   test('(set/get)RadiusB', () => {
     const group = new ConeGroup(2);
 
     const radius = 1.0;
-    group.setRadiusB(radius, 0);
-    expect(group.getRadiusB(0)).toBeCloseTo(radius);
+    group.data.setNumber('radiusB', radius, 0);
+    expect(group.data.getNumber('radiusB', 0)).toBeCloseTo(radius);
   });
 
   test('add', () => {
@@ -48,7 +44,7 @@ describe('ConeGroup', () => {
     const targetVector = new THREE.Vector3();
     const targetColor = new THREE.Color();
 
-    expect(group.count).toBe(1);
+    expect(group.data.count).toBe(1);
 
     expect(group.getNodeId(0)).toBe(nodeId);
     expect(group.getTreeIndex(0)).toBe(treeIndex);
@@ -56,15 +52,15 @@ describe('ConeGroup', () => {
     group.getColor(targetColor, 0);
     expectColorEqual(targetColor, color);
 
-    group.getCenterA(targetVector, 0);
+    group.data.getVector3('centerA', targetVector, 0);
     expectVector3Equal(targetVector, centerA);
 
-    group.getCenterB(targetVector, 0);
+    group.data.getVector3('centerB', targetVector, 0);
     expectVector3Equal(targetVector, centerB);
 
-    expect(group.getRadiusA(0)).toBeCloseTo(radiusA);
-    expect(group.getRadiusB(0)).toBeCloseTo(radiusB);
-    expect(group.getAngle(0)).toBeCloseTo(angle);
-    expect(group.getArcAngle(0)).toBeCloseTo(arcAngle);
+    expect(group.data.getNumber('radiusA', 0)).toBeCloseTo(radiusA);
+    expect(group.data.getNumber('radiusB', 0)).toBeCloseTo(radiusB);
+    expect(group.data.getNumber('angle', 0)).toBeCloseTo(angle);
+    expect(group.data.getNumber('arcAngle', 0)).toBeCloseTo(arcAngle);
   });
 });

@@ -7,8 +7,6 @@ import { expectColorEqual, expectVector3Equal } from '../TestUtils';
 describe('NutGroup', () => {
   test('constructor', () => {
     const group = new NutGroup(2);
-    expect(group.radius.length).toBe(2);
-    expect(group.rotationAngle.length).toBe(2);
     expect(group.hasCustomTransformAttributes).toBeFalsy();
     expect(group.type).toBe('Nut');
   });
@@ -17,16 +15,16 @@ describe('NutGroup', () => {
     const group = new NutGroup(2);
 
     const radius = 1.0;
-    group.setRadius(radius, 0);
-    expect(group.getRadius(0)).toBeCloseTo(radius);
+    group.data.setNumber('radiusA', radius, 0);
+    expect(group.data.getNumber('radiusA', 0)).toBeCloseTo(radius);
   });
 
   test('(set/get)RotationAngle', () => {
     const group = new NutGroup(2);
 
     const rotationAngle = 1.0;
-    group.setRotationAngle(rotationAngle, 0);
-    expect(group.getRotationAngle(0)).toBeCloseTo(rotationAngle);
+    group.data.setNumber('rotationAngle', rotationAngle, 0);
+    expect(group.data.getNumber('rotationAngle', 0)).toBeCloseTo(rotationAngle);
   });
 
   test('add', () => {
@@ -44,7 +42,7 @@ describe('NutGroup', () => {
     const targetVector = new THREE.Vector3();
     const targetColor = new THREE.Color();
 
-    expect(group.count).toBe(1);
+    expect(group.data.count).toBe(1);
 
     expect(group.getNodeId(0)).toBe(nodeId);
     expect(group.getTreeIndex(0)).toBe(treeIndex);
@@ -52,13 +50,13 @@ describe('NutGroup', () => {
     group.getColor(targetColor, 0);
     expectColorEqual(targetColor, color);
 
-    group.getCenterA(targetVector, 0);
+    group.data.getVector3('centerA', targetVector, 0);
     expectVector3Equal(targetVector, centerA);
 
-    group.getCenterB(targetVector, 0);
+    group.data.getVector3('centerB', targetVector, 0);
     expectVector3Equal(targetVector, centerB);
 
-    expect(group.getRadius(0)).toBeCloseTo(radius);
-    expect(group.getRotationAngle(0)).toBeCloseTo(rotationAngle);
+    expect(group.data.getNumber('radiusA', 0)).toBeCloseTo(radius);
+    expect(group.data.getNumber('rotationAngle', 0)).toBeCloseTo(rotationAngle);
   });
 });
