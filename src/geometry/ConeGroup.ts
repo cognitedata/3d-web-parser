@@ -1,10 +1,11 @@
 // Copyright 2019 Cognite AS
 
 import * as THREE from 'three';
-import BaseCylinderGroup from './BaseCylinderGroup';
+import PrimitiveGroup from './PrimitiveGroup';
 import { computeCircleBoundingBox } from './CircleGroup';
 import { xAxis, zAxis } from '../constants';
 import { FilterOptions } from '../parsers/parseUtils';
+import GeometryGroupData from './GeometryGroupData';
 
 // reusable variables
 const vector1 = new THREE.Vector3();
@@ -13,94 +14,16 @@ const center = new THREE.Vector3();
 const normal = new THREE.Vector3();
 const normalMatrix = new THREE.Matrix3();
 const reusableBox = new THREE.Box3();
+const localXAxis = new THREE.Vector3();
 const rotation = new THREE.Quaternion();
 
-export default class ConeGroup extends BaseCylinderGroup {
-    public radiusA: Float32Array;
-    public radiusB: Float32Array;
-    public angle: Float32Array;
-    public arcAngle: Float32Array;
-    public localXAxis: Float32Array;
-
-    constructor(capacity: number) {
-      super(capacity);
-      this.type = 'Cone';
-      this.radiusA = new Float32Array(capacity);
-      this.radiusB = new Float32Array(capacity);
-      this.angle = new Float32Array(capacity);
-      this.arcAngle = new Float32Array(capacity);
-      this.localXAxis = new Float32Array(3 * capacity);
-      this.hasCustomTransformAttributes = true;
-
-      this.attributes.push({
-        name: 'a_radiusA',
-        array: this.radiusA,
-        itemSize: 1,
-      });
-
-      this.attributes.push({
-        name: 'a_radiusB',
-        array: this.radiusB,
-        itemSize: 1,
-      });
-
-      this.attributes.push({
-        name: 'a_localXAxis',
-        array: this.localXAxis,
-        itemSize: 3,
-      });
-
-      this.attributes.push({
-        name: 'a_angle',
-        array: this.angle,
-        itemSize: 1,
-      });
-
-      this.attributes.push({
-        name: 'a_arcAngle',
-        array: this.arcAngle,
-        itemSize: 1,
-      });
-    }
-
-  setRadiusA(value: number, index: number) {
-    this.radiusA[index] = value;
-  }
-
-  getRadiusA(index: number): number {
-    return this.radiusA[index];
-  }
-
-  setRadiusB(value: number, index: number) {
-    this.radiusB[index] = value;
-  }
-
-  getRadiusB(index: number): number {
-    return this.radiusB[index];
-  }
-
-  setAngle(value: number, index: number) {
-    this.angle[index] = value;
-  }
-
-  getAngle(index: number): number {
-    return this.angle[index];
-  }
-
-  setArcAngle(value: number, index: number) {
-    this.arcAngle[index] = value;
-  }
-
-  getArcAngle(index: number): number {
-    return this.arcAngle[index];
-  }
-
-  setLocalXAxis(value: THREE.Vector3, index: number) {
-    this.setVector(value, this.localXAxis, index);
-  }
-
-  getLocalXAxis(target: THREE.Vector3, index: number): THREE.Vector3 {
-    return this.getVector(this.localXAxis, target, index);
+export default class ConeGroup extends PrimitiveGroup {
+  public data: GeometryGroupData;
+  constructor(capacity: number) {
+    super(capacity);
+    this.type = 'Cone';
+    this.hasCustomTransformAttributes = true;
+    this.data = new GeometryGroupData('Cone', capacity, this.attributes);
   }
 
   add(
@@ -115,21 +38,23 @@ export default class ConeGroup extends BaseCylinderGroup {
     arcAngle: number,
     filterOptions?: FilterOptions,
   ) {
-    this.setNodeId(nodeId, this.count);
-    this.setTreeIndex(treeIndex, this.count);
-    this.setColor(color, this.count);
-    this.setCenterA(centerA, this.count);
-    this.setCenterB(centerB, this.count);
-    this.setRadiusA(radiusA, this.count);
-    this.setRadiusB(radiusB, this.count);
-    this.setAngle(angle, this.count);
-    this.setArcAngle(arcAngle, this.count);
+    this.setNodeId(nodeId, this.data.count);
+    this.setTreeIndex(treeIndex, this.data.count);
+    this.setColor(color, this.data.count);
 
     normal.subVectors(centerA, centerB).normalize();
     rotation.setFromUnitVectors(zAxis, normal);
-    this.setLocalXAxis(vector1.copy(xAxis).applyQuaternion(rotation), this.count);
+    localXAxis.copy(xAxis).applyQuaternion(rotation);
 
-    this.count += 1;
+    this.data.add({
+      centerA,
+      centerB,
+      radiusA,
+      radiusB,
+      angle,
+      arcAngle,
+      localXAxis,
+    });
 
     if (filterOptions) {
       this.filterLastObject(filterOptions);
@@ -145,20 +70,20 @@ export default class ConeGroup extends BaseCylinderGroup {
     const scaling = matrix.getMaxScaleOnAxis();
 
     normal
-      .subVectors(this.getCenterA(vector1, index), this.getCenterB(vector2, index))
+      .subVectors(this.data.getVector3('centerA', vector1, index), this.data.getVector3('centerB', vector2, index))
       .applyMatrix3(normalMatrix)
       .normalize();
 
     box.makeEmpty();
 
     // A
-    center.copy(this.getCenterA(vector1, index)).applyMatrix4(matrix);
-    let radius = scaling * this.getRadiusA(index);
+    center.copy(this.data.getVector3('centerA', vector1, index)).applyMatrix4(matrix);
+    let radius = scaling * this.data.getNumber('radiusA', index);
     box.union(computeCircleBoundingBox(center, normal, radius, reusableBox));
 
     // B
-    center.copy(this.getCenterB(vector2, index)).applyMatrix4(matrix);
-    radius = scaling * this.getRadiusB(index);
+    center.copy(this.data.getVector3('centerB', vector2, index)).applyMatrix4(matrix);
+    radius = scaling * this.data.getNumber('radiusB', index);
     box.union(computeCircleBoundingBox(center, normal, radius, reusableBox));
 
     return box;

@@ -4,6 +4,8 @@ import * as THREE from 'three';
 import PrimitiveGroup from './PrimitiveGroup';
 import { computeCircleBoundingBox } from './CircleGroup';
 import { FilterOptions } from '../parsers/parseUtils';
+import GeometryGroupData from './GeometryGroupData';
+import { colorProperties } from './GeometryGroupDataParameters';
 
 // constants
 type triplet = [number, number, number];
@@ -27,81 +29,18 @@ const globalCenter = new THREE.Vector3();
 const globalNormal = new THREE.Vector3();
 
 export default class SphericalSegmentGroup extends PrimitiveGroup {
-  public center: Float32Array;
-  public radius: Float32Array;
-  public normal: Float32Array;
-  public height: Float32Array;
+  public data: GeometryGroupData;
 
   constructor(capacity: number) {
     super(capacity);
     this.type = 'SphericalSegment';
-    this.center = new Float32Array(3 * capacity);
-    this.radius = new Float32Array(capacity);
-    this.normal = new Float32Array(3 * capacity);
-    this.height = new Float32Array(capacity);
     this.hasCustomTransformAttributes = true;
-
-    this.attributes.push({
-      name: 'a_center',
-      array: this.center,
-      itemSize: 3,
-    });
-
-    this.attributes.push({
-      name: 'a_normal',
-      array: this.normal,
-      itemSize: 3,
-    });
-
-    this.attributes.push({
-      name: 'a_hRadius',
-      array: this.radius,
-      itemSize: 1,
-    });
-
+    this.data = new GeometryGroupData('SphericalSegment', capacity, this.attributes);
     this.attributes.push({
       name: 'a_vRadius',
-      array: this.radius,
+      array: this.data.arrays.hRadius,
       itemSize: 1,
     });
-
-    this.attributes.push({
-      name: 'a_height',
-      array: this.height,
-      itemSize: 1,
-    });
-  }
-
-  setCenter(source: THREE.Vector3, index: number) {
-    this.setVector(source, this.center, index);
-  }
-
-  getCenter(target: THREE.Vector3, index: number) {
-    return this.getVector(this.center, target, index);
-  }
-
-  setRadius(value: number, index: number) {
-    this.radius[index] = value;
-  }
-
-  getRadius(index: number): number {
-    return this.radius[index];
-  }
-
-  setNormal(source: THREE.Vector3, index: number) {
-    this.setVector(source, this.normal, index);
-  }
-
-  getNormal(target: THREE.Vector3, index: number) {
-    return this.getVector(this.normal, target, index);
-  }
-
-  setHeight(value: number, index: number) {
-    this.height[index] = value;
-  }
-
-  getHeight(index: number): number {
-    return this.height[index];
   }
 
   // @ts-ignore
@@ -115,14 +54,15 @@ export default class SphericalSegmentGroup extends PrimitiveGroup {
     height: number,
     filterOptions?: FilterOptions,
   ) {
-    this.setNodeId(nodeId, this.count);
-    this.setTreeIndex(treeIndex, this.count);
-    this.setColor(color, this.count);
-    this.setCenter(center, this.count);
-    this.setRadius(radius, this.count);
-    this.setNormal(normal, this.count);
-    this.setHeight(height, this.count);
-    this.count += 1;
+    this.setNodeId(nodeId, this.data.count);
+    this.setTreeIndex(treeIndex, this.data.count);
+    this.setColor(color, this.data.count);
+    this.data.add({
+      center,
+      normal,
+      hRadius: radius,
+      height,
+    });
 
     if (filterOptions) {
       this.filterLastObject(filterOptions);
@@ -137,14 +77,14 @@ export default class SphericalSegmentGroup extends PrimitiveGroup {
     box.makeEmpty();
     normalMatrix.setFromMatrix4(matrix);
     transformedNormal
-      .copy(this.getNormal(globalNormal, index))
+      .copy(this.data.getVector3('normal', globalNormal, index))
       .applyMatrix3(normalMatrix)
       .normalize();
     const scaling = matrix.getMaxScaleOnAxis();
-    const radius = scaling * this.getRadius(index);
-    const height = scaling * this.getHeight(index);
+    const radius = scaling * this.data.getNumber('hRadius', index);
+    const height = scaling * this.data.getNumber('height', index);
 
-    sphereCenter.copy(this.getCenter(globalCenter, index)).applyMatrix4(matrix);
+    sphereCenter.copy(this.data.getVector3('center', globalCenter, index)).applyMatrix4(matrix);
     transformedCenter
       .copy(sphereCenter)
       .add(direction.copy(transformedNormal).multiplyScalar(radius - height));

@@ -86,7 +86,7 @@ export default class Sector {
     // nodeId and treeIndex
     for (const child of this.traverseSectors()) {
       for (const geometryGroup of child.primitiveGroups) {
-        for (let mappingIndex = 0; mappingIndex < geometryGroup.count; mappingIndex++) {
+        for (let mappingIndex = 0; mappingIndex < geometryGroup.data.count; mappingIndex++) {
           const treeIndex = geometryGroup.getTreeIndex(mappingIndex);
           const nodeId = geometryGroup.getNodeId(mappingIndex);
           if (color != null) {

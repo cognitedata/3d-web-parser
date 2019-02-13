@@ -273,7 +273,7 @@ function parseGeneralCylinder(primitiveInfo: any,
 
 function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
   if (
-    primitiveGroupMap.GeneralRing.group.count + minimumRequiredCapacity
+    primitiveGroupMap.GeneralRing.group.data.count + minimumRequiredCapacity
     > primitiveGroupMap.GeneralRing.group.capacity) {
       const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.GeneralRing.capacity);
       primitiveGroupMap.GeneralRing.group = new GeneralRingGroup(capacity);

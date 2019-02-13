@@ -29,7 +29,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 
 function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
   if (
-    primitiveGroupMap.TorusSegment.group.count + minimumRequiredCapacity
+    primitiveGroupMap.TorusSegment.group.data.count + minimumRequiredCapacity
     > primitiveGroupMap.TorusSegment.group.capacity) {
       const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.TorusSegment.capacity);
       primitiveGroupMap.TorusSegment.group = new TorusSegmentGroup(capacity);

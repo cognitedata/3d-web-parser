@@ -103,10 +103,10 @@ describe('customFileIntegrationTest', () => {
 
       sector!.primitiveGroups.forEach(primitiveGroup => {
         expect(primitiveGroup.type).toBeDefined();
-        expect(primitiveGroup.count).toBeDefined();
+        expect(primitiveGroup.data.count).toBeDefined();
         expect(primitiveGroup.capacity).toBeDefined();
         expect(primitiveGroup.nodeId).toBeDefined();
-        expect(primitiveGroup.count).toBe(primitiveGroup.capacity);
+        expect(primitiveGroup.data.count).toBe(primitiveGroup.capacity);
       });
     }
   });

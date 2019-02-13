@@ -7,13 +7,6 @@ import { expectColorEqual, expectVector3Equal } from '../TestUtils';
 describe('TorusSegmentGroup', () => {
   test('constructor', () => {
     const group = new TorusSegmentGroup(2);
-    expect(group.center.length).toBe(6);
-    expect(group.normal.length).toBe(6);
-
-    expect(group.radius.length).toBe(2);
-    expect(group.tubeRadius.length).toBe(2);
-    expect(group.angle.length).toBe(2);
-    expect(group.arcAngle.length).toBe(2);
     expect(group.hasCustomTransformAttributes).toBeFalsy();
     expect(group.type).toBe('TorusSegment');
   });
@@ -23,8 +16,8 @@ describe('TorusSegmentGroup', () => {
 
     const radius = 1.0;
 
-    group.setRadius(radius, 0);
-    expect(group.getRadius(0)).toBeCloseTo(radius);
+    group.data.setNumber('radius', radius, 0);
+    expect(group.data.getNumber('radius', 0)).toBeCloseTo(radius);
   });
 
   test('(set/get)TubeRadius', () => {
@@ -32,8 +25,8 @@ describe('TorusSegmentGroup', () => {
 
     const tubeRadius = 1.0;
 
-    group.setTubeRadius(tubeRadius, 0);
-    expect(group.getTubeRadius(0)).toBeCloseTo(tubeRadius);
+    group.data.setNumber('tubeRadius', tubeRadius, 0);
+    expect(group.data.getNumber('tubeRadius', 0)).toBeCloseTo(tubeRadius);
   });
 
   test('(set/get)Angle', () => {
@@ -41,8 +34,8 @@ describe('TorusSegmentGroup', () => {
 
     const angle = 1.0;
 
-    group.setAngle(angle, 0);
-    expect(group.getAngle(0)).toBeCloseTo(angle);
+    group.data.setNumber('angle',  angle, 0);
+    expect(group.data.getNumber('angle',  0)).toBeCloseTo(angle);
   });
 
   test('(set/get)ArcAngle', () => {
@@ -50,8 +43,8 @@ describe('TorusSegmentGroup', () => {
 
     const arcAngle = 1.0;
 
-    group.setArcAngle(arcAngle, 0);
-    expect(group.getArcAngle(0)).toBeCloseTo(arcAngle);
+    group.data.setNumber('arcAngle',  arcAngle, 0);
+    expect(group.data.getNumber('arcAngle',  0)).toBeCloseTo(arcAngle);
   });
 
   test('add', () => {
@@ -69,17 +62,17 @@ describe('TorusSegmentGroup', () => {
 
     group.add(nodeId, treeIndex, color, center, normal, radius, tubeRadius, angle, arcAngle);
 
-    expect(group.count).toBe(1);
+    expect(group.data.count).toBe(1);
 
     expect(group.getNodeId(0)).toBe(nodeId);
     expect(group.getTreeIndex(0)).toBe(treeIndex);
 
     expectColorEqual(group.getColor(new THREE.Color(), 0), color);
-    expectVector3Equal(group.getCenter(new THREE.Vector3(), 0), center);
+    expectVector3Equal(group.data.getVector3('center', new THREE.Vector3(), 0), center);
 
-    expect(group.getRadius(0)).toBeCloseTo(radius);
-    expect(group.getTubeRadius(0)).toBeCloseTo(tubeRadius);
-    expect(group.getAngle(0)).toBeCloseTo(angle);
-    expect(group.getArcAngle(0)).toBeCloseTo(arcAngle);
+    expect(group.data.getNumber('radius', 0)).toBeCloseTo(radius);
+    expect(group.data.getNumber('tubeRadius', 0)).toBeCloseTo(tubeRadius);
+    expect(group.data.getNumber('angle',  0)).toBeCloseTo(angle);
+    expect(group.data.getNumber('arcAngle',  0)).toBeCloseTo(arcAngle);
   });
 });

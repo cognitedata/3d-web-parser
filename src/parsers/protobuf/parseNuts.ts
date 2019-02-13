@@ -28,7 +28,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 }
 
 function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
-  if (primitiveGroupMap.Nut.group.count + minimumRequiredCapacity > primitiveGroupMap.Nut.group.capacity) {
+  if (primitiveGroupMap.Nut.group.data.count + minimumRequiredCapacity > primitiveGroupMap.Nut.group.capacity) {
       const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Nut.capacity);
       primitiveGroupMap.Nut.group = new NutGroup(capacity);
       return true;

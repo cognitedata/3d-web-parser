@@ -21,7 +21,6 @@ function createCircleGroup(): CircleGroup {
 describe('CircleGroup', () => {
   test('constructor', () => {
     const group = new CircleGroup(2);
-    expect(group.radius.length).toBe(2);
     expect(group.hasCustomTransformAttributes).toBeFalsy();
     expect(group.type).toBe('Circle');
   });
@@ -31,8 +30,8 @@ describe('CircleGroup', () => {
 
     const radius = 1.0;
 
-    group.setRadius(radius, 0);
-    expect(group.getRadius(0)).toBeCloseTo(radius);
+    group.data.setNumber('radiusA', radius, 0);
+    expect(group.data.getNumber('radiusA', 0)).toBeCloseTo(radius);
   });
 
   test('add', () => {
@@ -50,7 +49,7 @@ describe('CircleGroup', () => {
     const targetVector = new THREE.Vector3();
     const targetColor = new THREE.Color();
 
-    expect(group.count).toBe(1);
+    expect(group.data.count).toBe(1);
 
     expect(group.getNodeId(0)).toBe(nodeId);
     expect(group.getTreeIndex(0)).toBe(treeIndex);
@@ -58,13 +57,13 @@ describe('CircleGroup', () => {
     group.getColor(targetColor, 0);
     expectColorEqual(targetColor, color);
 
-    group.getCenter(targetVector, 0);
+    group.data.getVector3('center', targetVector, 0);
     expectVector3Equal(targetVector, center);
 
-    group.getNormal(targetVector, 0);
+    group.data.getVector3('normal', targetVector, 0 );
     expectVector3Equal(targetVector, normal);
 
-    expect(group.getRadius(0)).toBeCloseTo(radius);
+    expect(group.data.getNumber('radiusA', 0)).toBeCloseTo(radius);
   });
 
   test('computeModelMatrix', () => {

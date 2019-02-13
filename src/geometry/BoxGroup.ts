@@ -1,9 +1,10 @@
 // Copyright 2019 Cognite AS
 
 import * as THREE from 'three';
-import PlaneGroup from './PlaneGroup';
+import PrimitiveGroup from './PrimitiveGroup';
 import { zAxis } from '../constants';
 import { FilterOptions } from '../parsers/parseUtils';
+import GeometryGroupData from './GeometryGroupData';
 
 // reusable variables
 const firstRotation = new THREE.Quaternion();
@@ -14,31 +15,13 @@ const globalDelta = new THREE.Vector3();
 const globalCenter = new THREE.Vector3();
 const globalPoint = new THREE.Vector3();
 
-export default class BoxGroup extends PlaneGroup {
-  public angle: Float32Array;
-  public delta: Float32Array;
+export default class BoxGroup extends PrimitiveGroup {
+  public data: GeometryGroupData;
   constructor(capacity: number) {
     super(capacity);
     this.type = 'Box';
     this.hasCustomTransformAttributes = false;
-    this.angle = new Float32Array(capacity);
-    this.delta = new Float32Array(3 * capacity);
-  }
-
-  setAngle(value: number, index: number) {
-    this.angle[index] = value;
-  }
-
-  getAngle(index: number): number {
-    return this.angle[index];
-  }
-
-  setDelta(value: THREE.Vector3, index: number) {
-    this.setVector(value, this.delta, index);
-  }
-
-  getDelta(target: THREE.Vector3, index: number): THREE.Vector3 {
-    return this.getVector(this.delta, target, index);
+    this.data = new GeometryGroupData('Box', capacity, this.attributes);
   }
 
   add(
@@ -51,14 +34,15 @@ export default class BoxGroup extends PlaneGroup {
     delta: THREE.Vector3,
     filterOptions?: FilterOptions,
   ) {
-    this.setNodeId(nodeId, this.count);
-    this.setTreeIndex(treeIndex, this.count);
-    this.setColor(color, this.count);
-    this.setCenter(center, this.count);
-    this.setNormal(normal, this.count);
-    this.setAngle(angle, this.count);
-    this.setDelta(delta, this.count);
-    this.count += 1;
+    this.setNodeId(nodeId, this.data.count);
+    this.setTreeIndex(treeIndex, this.data.count);
+    this.setColor(color, this.data.count);
+    this.data.add({
+      center,
+      normal,
+      angle,
+      delta,
+    });
 
     if (filterOptions) {
       this.filterLastObject(filterOptions);
@@ -66,11 +50,11 @@ export default class BoxGroup extends PlaneGroup {
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
-    firstRotation.setFromAxisAngle(zAxis, this.getAngle(index));
-    secondRotation.setFromUnitVectors(zAxis, this.getNormal(globalNormal, index));
-    const scale = this.getDelta(globalDelta, index);
+    firstRotation.setFromAxisAngle(zAxis, this.data.getNumber('angle', index));
+    secondRotation.setFromUnitVectors(zAxis, this.data.getVector3('normal', globalNormal, index));
+    const scale = this.data.getVector3('delta', globalDelta, index);
     return outputMatrix.compose(
-      this.getCenter(globalCenter, index),
+      this.data.getVector3('center', globalCenter, index),
       secondRotation.multiply(firstRotation), // A.multiply(B) === A*B
       scale,
     );

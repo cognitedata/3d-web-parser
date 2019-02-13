@@ -20,8 +20,6 @@ function createBoxGroup(): BoxGroup {
 describe('BoxGroup', () => {
   test('constructor', () => {
     const group = new BoxGroup(2);
-    expect(group.angle.length).toBe(2);
-    expect(group.delta.length).toBe(6);
     expect(group.hasCustomTransformAttributes).toBeFalsy();
     expect(group.type).toBe('Box');
   });
@@ -32,12 +30,12 @@ describe('BoxGroup', () => {
     const angle1 = 1.0;
     const angle2 = 10.0;
 
-    group.setAngle(angle1, 0);
-    expect(group.getAngle(0)).toBeCloseTo(angle1);
+    group.data.setNumber('angle', angle1, 0);
+    expect(group.data.getNumber('angle', 0)).toBeCloseTo(angle1);
 
-    group.setAngle(angle2, 1);
-    expect(group.getAngle(0)).toBeCloseTo(angle1);
-    expect(group.getAngle(1)).toBeCloseTo(angle2);
+    group.data.setNumber('angle', angle2, 1);
+    expect(group.data.getNumber('angle', 0)).toBeCloseTo(angle1);
+    expect(group.data.getNumber('angle', 1)).toBeCloseTo(angle2);
   });
 
   test('(set/get)Delta', () => {
@@ -46,8 +44,8 @@ describe('BoxGroup', () => {
     const delta = new THREE.Vector3(1, 2, 3);
     const target = new THREE.Vector3();
 
-    group.setDelta(delta, 0);
-    expect(group.getDelta(target, 0)).toEqual(delta);
+    group.data.setVector3('delta', delta, 0);
+    expect(group.data.getVector3('delta', target, 0)).toEqual(delta);
   });
 
   test('add', () => {
@@ -65,7 +63,7 @@ describe('BoxGroup', () => {
     const targetVector = new THREE.Vector3();
     const targetColor = new THREE.Color();
 
-    expect(group.count).toBe(1);
+    expect(group.data.count).toBe(1);
 
     expect(group.getNodeId(0)).toBe(nodeId);
     expect(group.getTreeIndex(0)).toBe(treeIndex);
@@ -73,15 +71,15 @@ describe('BoxGroup', () => {
     group.getColor(targetColor, 0);
     expectColorEqual(targetColor, color);
 
-    group.getCenter(targetVector, 0);
+    group.data.getVector3('center', targetVector, 0);
     expectVector3Equal(targetVector, center);
 
-    group.getNormal(targetVector, 0);
+    group.data.getVector3('normal', targetVector, 0);
     expectVector3Equal(targetVector, normal);
 
-    expect(group.getAngle(0)).toBeCloseTo(angle);
+    expect(group.data.getNumber('angle', 0)).toBeCloseTo(angle);
 
-    group.getDelta(targetVector, 0);
+    group.data.getVector3('delta', targetVector, 0);
     expectVector3Equal(targetVector, delta);
   });
 

@@ -208,7 +208,8 @@ function parseGeneralCylinder(primitiveInfo: any,
 }
 
 function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
-  if (primitiveGroupMap.Trapezium.group.count + minimumRequiredCapacity > primitiveGroupMap.Trapezium.group.capacity) {
+  if (primitiveGroupMap.Trapezium.group.data.count + minimumRequiredCapacity >
+    primitiveGroupMap.Trapezium.group.capacity) {
       const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Trapezium.capacity);
       primitiveGroupMap.Trapezium.group = new TrapeziumGroup(capacity);
       return true;

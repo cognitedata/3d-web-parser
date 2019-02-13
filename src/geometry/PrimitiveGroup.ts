@@ -17,6 +17,7 @@ import TorusSegmentGroup from './TorusSegmentGroup';
 import TrapeziumGroup from './TrapeziumGroup';
 import { FilterOptions } from '../parsers/parseUtils';
 import { identityMatrix4 } from '../constants';
+import GeometryGroupData from './GeometryGroupData';
 
 const matrix = new THREE.Matrix4();
 const globalBox = new THREE.Box3();
@@ -50,13 +51,13 @@ interface TreeIndexMap {
 }
 
 export default abstract class PrimitiveGroup extends GeometryGroup {
-  public count: number;
   public capacity: number;
   public nodeId: Float64Array;
   public treeIndex: Float32Array;
   public color: Float32Array;
   public maxTreeIndex: number;
   public treeIndexMap: TreeIndexMap;
+  public data: GeometryGroupData;
 
   // The transformX arrays contain contain transformation matrix
   public transform0: Float32Array;
@@ -67,7 +68,6 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
   public attributes: Attribute[];
   constructor(capacity: number) {
     super();
-    this.count = 0;
     this.capacity = capacity;
     this.treeIndexMap = {};
 
@@ -83,13 +83,14 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
       { name: 'treeIndex', array: this.treeIndex, itemSize: 1 },
     ];
     this.hasCustomTransformAttributes = false;
+    this.data = new GeometryGroupData('Primitive', capacity, this.attributes);
   }
 
   abstract computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4;
   abstract computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3;
 
   filterLastObject(filterOptions: FilterOptions) {
-    const index = this.count - 1;
+    const index = this.data.count - 1;
     this.computeBoundingBox(identityMatrix4, globalBox, index);
     const boundingBoxFilterResult = filterOptions.boundingBoxFilter
                                     && !filterOptions.boundingBoxFilter.intersectsBox(globalBox);
@@ -97,7 +98,7 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     const nodeIdFilterResult = filterOptions.nodeIdFilter && filterOptions.nodeIdFilter.indexOf(nodeId) === -1;
     if (boundingBoxFilterResult || nodeIdFilterResult) {
       // Reduce count, i.e. remove last element
-      this.count -= 1;
+      this.data.count -= 1;
     }
   }
 
@@ -208,14 +209,14 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     // the 3x4 matrix to the shader.
     // This array has length 4 (four columns in the matrix)
     // and will contain block of 3 numbers (one block per object)
-    this.transform0 = new Float32Array(3 * this.count);
-    this.transform1 = new Float32Array(3 * this.count);
-    this.transform2 = new Float32Array(3 * this.count);
-    this.transform3 = new Float32Array(3 * this.count);
+    this.transform0 = new Float32Array(3 * this.data.count);
+    this.transform1 = new Float32Array(3 * this.data.count);
+    this.transform2 = new Float32Array(3 * this.data.count);
+    this.transform3 = new Float32Array(3 * this.data.count);
 
     let rowIndex = 0;
 
-    for (let i = 0; i < this.count; i++) {
+    for (let i = 0; i < this.data.count; i++) {
       this.computeModelMatrix(matrix, i);
       for (let row = 0; row < 3; row++) {
         let idx = row;

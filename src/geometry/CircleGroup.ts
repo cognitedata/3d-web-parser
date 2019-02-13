@@ -1,9 +1,10 @@
 // Copyright 2019 Cognite AS
 
 import * as THREE from 'three';
-import PlaneGroup from './PlaneGroup';
+import PrimitiveGroup from './PrimitiveGroup';
 import { zAxis } from '../constants';
 import { FilterOptions } from '../parsers/parseUtils';
+import GeometryGroupData from './GeometryGroupData';
 
 // reusable variables
 const globalDot = new THREE.Vector3();
@@ -33,20 +34,12 @@ export function computeCircleBoundingBox(
   return box.setFromCenterAndSize(center, size);
 }
 
-export default class CircleGroup extends PlaneGroup {
-  public radius: Float32Array;
+export default class CircleGroup extends PrimitiveGroup {
+  public data: GeometryGroupData;
   constructor(capacity: number) {
     super(capacity);
     this.type = 'Circle';
-    this.radius = new Float32Array(capacity);
-  }
-
-  setRadius(value: number, index: number) {
-    this.radius[index] = value;
-  }
-
-  getRadius(index: number): number {
-    return this.radius[index];
+    this.data = new GeometryGroupData('Circle', capacity, this.attributes);
   }
 
   add(
@@ -58,13 +51,14 @@ export default class CircleGroup extends PlaneGroup {
     radius: number,
     filterOptions?: FilterOptions,
   ) {
-    this.setNodeId(nodeId, this.count);
-    this.setTreeIndex(treeIndex, this.count);
-    this.setColor(color, this.count);
-    this.setCenter(center, this.count);
-    this.setNormal(normal, this.count);
-    this.setRadius(radius, this.count);
-    this.count += 1;
+    this.setNodeId(nodeId, this.data.count);
+    this.setTreeIndex(treeIndex, this.data.count);
+    this.setColor(color, this.data.count);
+    this.data.add({
+      center,
+      normal,
+      radiusA: radius,
+    });
 
     if (filterOptions) {
       this.filterLastObject(filterOptions);
@@ -72,11 +66,11 @@ export default class CircleGroup extends PlaneGroup {
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
-    globalQuaternion.setFromUnitVectors(zAxis, this.getNormal(globalNormal, index));
-    const twoRadius = 2 * this.getRadius(index);
+    globalQuaternion.setFromUnitVectors(zAxis, this.data.getVector3('normal', globalNormal, index));
+    const twoRadius = 2 * this.data.getNumber('radiusA', index);
     globalScale.set(twoRadius, twoRadius, 1);
     return outputMatrix.compose(
-      this.getCenter(globalCenter, index),
+      this.data.getVector3('center', globalCenter, index),
       globalQuaternion, // Rotation
       globalScale, // Scale
     );
@@ -84,10 +78,10 @@ export default class CircleGroup extends PlaneGroup {
 
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
     globalNormalMatrix.setFromMatrix4(matrix);
-    globalTransformedCenter.copy(this.getCenter(globalCenter, index)).applyMatrix4(matrix);
-    globalTransformedNormal.copy(this.getNormal(globalNormal, index)).applyMatrix3(globalNormalMatrix);
+    globalTransformedCenter.copy(this.data.getVector3('center', globalCenter, index)).applyMatrix4(matrix);
+    globalTransformedNormal.copy(this.data.getVector3('normal', globalNormal, index)).applyMatrix3(globalNormalMatrix);
     const scaling = matrix.getMaxScaleOnAxis();
-    const radius = scaling * this.getRadius(index);
+    const radius = scaling * this.data.getNumber('radiusA', index);
 
     return computeCircleBoundingBox(
       globalTransformedCenter,

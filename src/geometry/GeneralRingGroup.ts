@@ -1,9 +1,12 @@
 // Copyright 2019 Cognite AS
 
 import * as THREE from 'three';
-import PlaneGroup from './PlaneGroup';
+import PrimitiveGroup from './PrimitiveGroup';
 import { computeEllipsoidBoundingBox } from './EllipsoidSegmentGroup';
 import { FilterOptions } from '../parsers/parseUtils';
+import GeometryGroupData from './GeometryGroupData';
+import { angleBetweenVector3s } from '../parsers/protobuf/protobufUtils';
+import { normalize } from 'path';
 
 // reusable variables
 const rotation = new THREE.Quaternion();
@@ -15,90 +18,14 @@ const globalNormal = new THREE.Vector3();
 const globalLocalXAxis = new THREE.Vector3();
 const globalCenter = new THREE.Vector3();
 
-export default class GeneralRingGroup extends PlaneGroup {
-  public xRadius: Float32Array;
-  public yRadius: Float32Array;
-  public localXAxis: Float32Array;
-  public thickness: Float32Array;
-  public angle: Float32Array;
-  public arcAngle: Float32Array;
+export default class GeneralRingGroup extends PrimitiveGroup {
+  public data: GeometryGroupData;
 
   constructor(capacity: number) {
     super(capacity);
     this.type = 'GeneralRing';
-    this.xRadius = new Float32Array(capacity);
-    this.yRadius = new Float32Array(capacity);
-    this.localXAxis = new Float32Array(3 * capacity);
-    this.thickness = new Float32Array(capacity);
-    this.angle = new Float32Array(capacity);
-    this.arcAngle = new Float32Array(capacity);
     this.hasCustomTransformAttributes = false;
-
-    this.attributes.push({
-      name: 'a_thickness',
-      array: this.thickness,
-      itemSize: 1,
-    });
-
-    this.attributes.push({
-      name: 'a_angle',
-      array: this.angle,
-      itemSize: 1,
-    });
-
-    this.attributes.push({
-      name: 'a_arcAngle',
-      array: this.arcAngle,
-      itemSize: 1,
-    });
-  }
-
-  setXRadius(value: number, index: number) {
-    this.xRadius[index] = value;
-  }
-
-  getXRadius(index: number): number {
-    return this.xRadius[index];
-  }
-
-  setYRadius(value: number, index: number) {
-    this.yRadius[index] = value;
-  }
-
-  getYRadius(index: number): number {
-    return this.yRadius[index];
-  }
-
-  setLocalXAxis(value: THREE.Vector3, index: number) {
-    this.setVector(value, this.localXAxis, index);
-  }
-
-  getLocalXAxis(target: THREE.Vector3, index: number): THREE.Vector3 {
-    return this.getVector(this.localXAxis, target, index);
-  }
-
-  setThickness(value: number, index: number) {
-    this.thickness[index] = value;
-  }
-
-  getThickness(index: number): number {
-    return this.thickness[index];
-  }
-
-  setAngle(value: number, index: number) {
-    this.angle[index] = value;
-  }
-
-  getAngle(index: number): number {
-    return this.angle[index];
-  }
-
-  setArcAngle(value: number, index: number) {
-    this.arcAngle[index] = value;
-  }
-
-  getArcAngle(index: number): number {
-    return this.arcAngle[index];
+    this.data = new GeometryGroupData('GeneralRing', capacity, this.attributes);
   }
 
   add(
@@ -115,18 +42,19 @@ export default class GeneralRingGroup extends PlaneGroup {
     arcAngle: number,
     filterOptions?: FilterOptions,
   ) {
-    this.setNodeId(nodeId, this.count);
-    this.setTreeIndex(treeIndex, this.count);
-    this.setColor(color, this.count);
-    this.setCenter(center, this.count);
-    this.setNormal(normal, this.count);
-    this.setXRadius(xRadius, this.count);
-    this.setYRadius(yRadius, this.count);
-    this.setLocalXAxis(localXAxis, this.count);
-    this.setThickness(thickness / yRadius, this.count);
-    this.setAngle(angle, this.count);
-    this.setArcAngle(arcAngle, this.count);
-    this.count += 1;
+    this.setNodeId(nodeId, this.data.count);
+    this.setTreeIndex(treeIndex, this.data.count);
+    this.setColor(color, this.data.count);
+    this.data.add({
+      center,
+      normal,
+      localXAxis,
+      radiusA: xRadius,
+      radiusB: yRadius,
+      thickness: thickness / yRadius,
+      angle,
+      arcAngle,
+    });
 
     if (filterOptions) {
       this.filterLastObject(filterOptions);
@@ -134,9 +62,10 @@ export default class GeneralRingGroup extends PlaneGroup {
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
-    this.getNormal(globalNormal, index);
-    this.getLocalXAxis(globalLocalXAxis, index);
-    localYAxis.crossVectors(this.getNormal(globalNormal, index), this.getLocalXAxis(globalLocalXAxis, index));
+    this.data.getVector3('normal', globalNormal, index);
+    this.data.getVector3('localXAxis', globalLocalXAxis, index);
+    localYAxis.crossVectors(this.data.getVector3('normal', globalNormal, index),
+      this.data.getVector3('localXAxis', globalLocalXAxis, index));
     rotationMatrix.set(
       globalLocalXAxis.x, localYAxis.x, globalNormal.x, 0,
       globalLocalXAxis.y, localYAxis.y, globalNormal.y, 0,
@@ -145,9 +74,9 @@ export default class GeneralRingGroup extends PlaneGroup {
     );
 
     rotation.setFromRotationMatrix(rotationMatrix);
-    scale.set(2 * this.getXRadius(index), 2 * this.getYRadius(index), 1);
+    scale.set(2 * this.data.getNumber('radiusA', index), 2 * this.data.getNumber('radiusB', index), 1);
     return outputMatrix.compose(
-      this.getCenter(globalCenter, index),
+      this.data.getVector3('center', globalCenter, index),
       rotation,
       scale,
     );
@@ -155,10 +84,10 @@ export default class GeneralRingGroup extends PlaneGroup {
 
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
     return computeEllipsoidBoundingBox(
-      this.getCenter(globalCenter, index),
-      this.getNormal(globalNormal, index),
-      this.getXRadius(index),
-      this.getYRadius(index),
+      this.data.getVector3('center', globalCenter, index),
+      this.data.getVector3('normal', globalNormal, index),
+      this.data.getNumber('radiusA', index),
+      this.data.getNumber('radiusB', index),
       0,
       matrix,
       box,

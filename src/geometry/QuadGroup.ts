@@ -3,6 +3,7 @@
 import * as THREE from 'three';
 import PrimitiveGroup from './PrimitiveGroup';
 import { FilterOptions } from '../parsers/parseUtils';
+import GeometryGroupData from './GeometryGroupData';
 
 // reusable variables
 const basis = new THREE.Matrix4();
@@ -20,40 +21,11 @@ const globalVertex4 = new THREE.Vector3();
 const point = new THREE.Vector3();
 
 export default class QuadGroup extends PrimitiveGroup {
-  public vertex1: Float32Array;
-  public vertex2: Float32Array;
-  public vertex3: Float32Array;
-
+  public data: GeometryGroupData;
   constructor(capacity: number) {
     super(capacity);
     this.type = 'Quad';
-    this.vertex1 = new Float32Array(3 * capacity);
-    this.vertex2 = new Float32Array(3 * capacity);
-    this.vertex3 = new Float32Array(3 * capacity);
-  }
-
-  setVertex1(value: THREE.Vector3, index: number) {
-    this.setVector(value, this.vertex1, index);
-  }
-
-  getVertex1(target: THREE.Vector3, index: number) {
-    return this.getVector(this.vertex1, target, index);
-  }
-
-  setVertex2(value: THREE.Vector3, index: number) {
-    this.setVector(value, this.vertex2, index);
-  }
-
-  getVertex2(target: THREE.Vector3, index: number) {
-    return this.getVector(this.vertex2, target, index);
-  }
-
-  setVertex3(value: THREE.Vector3, index: number) {
-    this.setVector(value, this.vertex3, index);
-  }
-
-  getVertex3(target: THREE.Vector3, index: number) {
-    return this.getVector(this.vertex3, target, index);
+    this.data = new GeometryGroupData('Quad', capacity, this.attributes);
   }
 
   add(
@@ -65,14 +37,14 @@ export default class QuadGroup extends PrimitiveGroup {
     vertex3: THREE.Vector3,
     filterOptions?: FilterOptions,
   ) {
-    this.setNodeId(nodeId, this.count);
-    this.setTreeIndex(treeIndex, this.count);
-    this.setColor(color, this.count);
-    this.setVertex1(vertex1, this.count);
-    this.setVertex2(vertex2, this.count);
-    this.setVertex3(vertex3, this.count);
-
-    this.count += 1;
+    this.setNodeId(nodeId, this.data.count);
+    this.setTreeIndex(treeIndex, this.data.count);
+    this.setColor(color, this.data.count);
+    this.data.add({
+      vertex1,
+      vertex2,
+      vertex3,
+    });
 
     if (filterOptions) {
       this.filterLastObject(filterOptions);
@@ -80,9 +52,9 @@ export default class QuadGroup extends PrimitiveGroup {
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
-    this.getVertex1(globalVertex1, index);
-    this.getVertex2(globalVertex2, index);
-    this.getVertex3(globalVertex3, index);
+    this.data.getVector3('vertex1', globalVertex1, index);
+    this.data.getVector3('vertex2', globalVertex2, index);
+    this.data.getVector3('vertex3', globalVertex3, index);
 
     side1.subVectors(globalVertex3, globalVertex1);
     side2.subVectors(globalVertex3, globalVertex2);
@@ -120,9 +92,9 @@ export default class QuadGroup extends PrimitiveGroup {
   }
 
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
-    this.getVertex1(globalVertex1, index);
-    this.getVertex2(globalVertex2, index);
-    this.getVertex3(globalVertex3, index);
+    this.data.getVector3('vertex1', globalVertex1, index);
+    this.data.getVector3('vertex2', globalVertex2, index);
+    this.data.getVector3('vertex3', globalVertex3, index);
 
     box.makeEmpty();
     globalVertex4.subVectors(globalVertex1, globalVertex3).add(globalVertex2);

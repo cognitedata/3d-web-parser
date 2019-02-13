@@ -1,26 +1,33 @@
 // Copyright 2019 Cognite AS
 
 import * as THREE from 'three';
-import BaseCylinderGroup from './BaseCylinderGroup';
+import PrimitiveGroup from './PrimitiveGroup';
 import { xAxis, yAxis, zAxis } from '../constants';
 import { FilterOptions } from '../parsers/parseUtils';
+import GeometryGroupData from './GeometryGroupData';
 import { computeEllipsoidBoundingBox } from './GeometryUtils';
+import { colorProperties } from './GeometryGroupDataParameters';
+import { angleBetweenVector3s } from '../parsers/protobuf/protobufUtils';
 
 const globalBox = new THREE.Box3();
-const globalNormal = new THREE.Vector3();
-const globalVector = new THREE.Vector3();
-const globalVector2 = new THREE.Vector3();
-let globalPlane = new THREE.Vector4();
+const normal = new THREE.Vector3();
+const tempCenterA = new THREE.Vector3();
+const tempCenterB = new THREE.Vector3();
+const planeA = new THREE.Vector4();
+const planeB = new THREE.Vector4();
+const capNormalA = new THREE.Vector3();
+const capNormalB = new THREE.Vector3();
+const localXAxis = new THREE.Vector3();
 const globalRotation = new THREE.Quaternion();
 const globalSlicingPlaneNormal = new THREE.Vector3();
 
-export default class GeneralCylinderGroup extends BaseCylinderGroup {
+export default class GeneralCylinderGroup extends PrimitiveGroup {
 
   static slicingPlane(target: THREE.Vector4,
                       slope: number,
                       zAngle: number,
                       height: number,
-                      invertNormal: boolean): THREE.Vector4 {
+                      invertNormal: boolean) {
     globalSlicingPlaneNormal
       .copy(zAxis)
       .applyAxisAngle(yAxis, slope)
@@ -30,206 +37,21 @@ export default class GeneralCylinderGroup extends BaseCylinderGroup {
       globalSlicingPlaneNormal.negate();
     }
 
-    return target.set(
+    target.set(
       globalSlicingPlaneNormal.x,
       globalSlicingPlaneNormal.y,
       globalSlicingPlaneNormal.z,
       height,
     );
   }
-    public angle: Float32Array;
-    public arcAngle: Float32Array;
-    public radius: Float32Array;
-    public heightA: Float32Array;
-    public heightB: Float32Array;
-    public slopeA: Float32Array;
-    public slopeB: Float32Array;
-    public zAngleA: Float32Array;
-    public zAngleB: Float32Array;
-    public planeA: Float32Array;
-    public planeB: Float32Array;
-    public capNormalA: Float32Array;
-    public capNormalB: Float32Array;
-    public localXAxis: Float32Array;
+
+  public data: GeometryGroupData;
 
   constructor(capacity: number) {
     super(capacity);
     this.type = 'GeneralCylinder';
-    this.angle = new Float32Array(capacity);
-    this.arcAngle = new Float32Array(capacity);
-    this.radius = new Float32Array(capacity);
-    this.heightA = new Float32Array(capacity);
-    this.heightB = new Float32Array(capacity);
-    this.slopeA = new Float32Array(capacity);
-    this.slopeB = new Float32Array(capacity);
-    this.zAngleA = new Float32Array(capacity);
-    this.zAngleB = new Float32Array(capacity);
-    this.planeA = new Float32Array(4 * capacity);
-    this.planeB = new Float32Array(4 * capacity);
-    this.capNormalA = new Float32Array(3 * capacity);
-    this.capNormalB = new Float32Array(3 * capacity);
-    this.localXAxis = new Float32Array(3 * capacity);
     this.hasCustomTransformAttributes = true;
-
-    this.attributes.push({
-      name: 'a_planeA',
-      array: this.planeA,
-      itemSize: 4,
-    });
-
-    this.attributes.push({
-      name: 'a_planeB',
-      array: this.planeB,
-      itemSize: 4,
-    });
-
-    this.attributes.push({
-      name: 'a_centerA',
-      array: this.centerA,
-      itemSize: 3,
-    });
-
-    this.attributes.push({
-      name: 'a_centerB',
-      array: this.centerB,
-      itemSize: 3,
-    });
-
-    this.attributes.push({
-      name: 'a_localXAxis',
-      array: this.localXAxis,
-      itemSize: 3,
-    });
-
-    this.attributes.push({
-      name: 'a_radiusA',
-      array: this.radius,
-      itemSize: 1,
-    });
-
-    this.attributes.push({
-      name: 'a_angle',
-      array: this.angle,
-      itemSize: 1,
-    });
-
-    this.attributes.push({
-      name: 'a_arcAngle',
-      array: this.arcAngle,
-      itemSize: 1,
-    });
-  }
-
-  setAngle(value: number, index: number) {
-    this.angle[index] = value;
-  }
-
-  getAngle(index: number): number {
-    return this.angle[index];
-  }
-
-  setArcAngle(value: number, index: number) {
-    this.arcAngle[index] = value;
-  }
-
-  getArcAngle(index: number): number {
-    return this.arcAngle[index];
-  }
-
-  setRadius(value: number, index: number) {
-    this.radius[index] = value;
-  }
-
-  getRadius(index: number): number {
-    return this.radius[index];
-  }
-
-  setHeightA(value: number, index: number) {
-    this.heightA[index] = value;
-  }
-
-  getHeightA(index: number): number {
-    return this.heightA[index];
-  }
-
-  setHeightB(value: number, index: number) {
-    this.heightB[index] = value;
-  }
-
-  getHeightB(index: number): number {
-    return this.heightB[index];
-  }
-
-  setSlopeA(value: number, index: number) {
-    this.slopeA[index] = value;
-  }
-
-  getSlopeA(index: number): number {
-    return this.slopeA[index];
-  }
-
-  setSlopeB(value: number, index: number) {
-    this.slopeB[index] = value;
-  }
-
-  getSlopeB(index: number): number {
-    return this.slopeB[index];
-  }
-
-  setZAngleA(value: number, index: number) {
-    this.zAngleA[index] = value;
-  }
-
-  getZAngleA(index: number): number {
-    return this.zAngleA[index];
-  }
-
-  setZAngleB(value: number, index: number) {
-    this.zAngleB[index] = value;
-  }
-
-  getZAngleB(index: number): number {
-    return this.zAngleB[index];
-  }
-
-  setPlaneA(value: THREE.Vector4, index: number) {
-    this.setVector(value, this.planeA, index);
-  }
-
-  getPlaneA(target: THREE.Vector4, index: number): THREE.Vector4 {
-    return this.getVector(this.planeA, target, index);
-  }
-
-  setPlaneB(value: THREE.Vector4, index: number) {
-    this.setVector(value, this.planeB, index);
-  }
-
-  getPlaneB(target: THREE.Vector4, index: number): THREE.Vector4 {
-    return this.getVector(this.planeB, target, index);
-  }
-
-  setCapNormalA(value: THREE.Vector3, index: number) {
-    this.setVector(value, this.capNormalA, index);
-  }
-
-  getCapNormalA(target: THREE.Vector3, index: number): THREE.Vector3 {
-    return this.getVector(this.capNormalA, target, index);
-  }
-
-  setCapNormalB(value: THREE.Vector3, index: number) {
-    this.setVector(value, this.capNormalB, index);
-  }
-
-  getCapNormalB(target: THREE.Vector3, index: number): THREE.Vector3 {
-    return this.getVector(this.capNormalB, target, index);
-  }
-
-  setLocalXAxis(value: THREE.Vector3, index: number) {
-    this.setVector(value, this.localXAxis, index);
-  }
-
-  getLocalXAxis(target: THREE.Vector3, index: number): THREE.Vector3 {
-    return this.getVector(this.localXAxis, target, index);
+    this.data = new GeometryGroupData('GeneralCylinder', capacity, this.attributes);
   }
 
   // TODO(anders.hafreager) TS is angry since add already exists with
@@ -252,58 +74,51 @@ export default class GeneralCylinderGroup extends BaseCylinderGroup {
     arcAngle: number = Math.PI * 2.0,
     filterOptions?: FilterOptions,
   ) {
-    this.setNodeId(nodeId, this.count);
-    this.setTreeIndex(treeIndex, this.count);
-    this.setColor(color, this.count);
-    this.setCenterA(centerA, this.count);
-    this.setCenterB(centerB, this.count);
-    this.setRadius(radius, this.count);
-    this.setHeightA(heightA, this.count);
-    this.setHeightB(heightB, this.count);
-    this.setSlopeA(slopeA, this.count);
-    this.setSlopeB(slopeB, this.count);
-    this.setZAngleA(zAngleA, this.count);
-    this.setZAngleB(zAngleB, this.count);
-    this.setAngle(angle, this.count);
-    this.setArcAngle(arcAngle, this.count);
 
-    globalNormal.subVectors(centerA, centerB).normalize();
-    globalRotation.setFromUnitVectors(zAxis, globalNormal);
+    normal.subVectors(centerA, centerB).normalize();
+    globalRotation.setFromUnitVectors(zAxis, normal);
 
     // Calculate global plane (also used to calculate normal A and B)
-    globalPlane = GeneralCylinderGroup.slicingPlane(
-      globalPlane,
-      this.getSlopeA(this.count),
-      this.getZAngleA(this.count),
-      this.getHeightA(this.count),
+    GeneralCylinderGroup.slicingPlane(
+      planeA,
+      slopeA,
+      zAngleA,
+      heightA,
       false);
-    this.setPlaneA(globalPlane, this.count);
 
-    globalNormal.set(globalPlane.x, globalPlane.y, globalPlane.z).applyQuaternion(globalRotation);
-    this.setCapNormalA(globalNormal, this.count);
+    capNormalA.set(planeA.x, planeA.y, planeA.z).applyQuaternion(globalRotation);
 
-    globalPlane = GeneralCylinderGroup.slicingPlane(
-      globalPlane,
-      this.getSlopeB(this.count),
-      this.getZAngleB(this.count),
-      this.getHeightB(this.count),
+    GeneralCylinderGroup.slicingPlane(
+      planeB,
+      slopeB,
+      zAngleB,
+      heightB,
       true);
 
-    this.setPlaneB(
-      GeneralCylinderGroup.slicingPlane(
-        globalPlane,
-        this.getSlopeB(this.count),
-        this.getZAngleB(this.count),
-        this.getHeightB(this.count),
-        true),
-      this.count);
+    capNormalB.set(planeB.x, planeB.y, planeB.z).applyQuaternion(globalRotation);
 
-    globalNormal.set(globalPlane.x, globalPlane.y, globalPlane.z).applyQuaternion(globalRotation);
-    this.setCapNormalB(globalNormal, this.count);
-
-    this.setLocalXAxis(globalVector.copy(xAxis).applyQuaternion(globalRotation), this.count);
-
-    this.count += 1;
+    localXAxis.copy(xAxis).applyQuaternion(globalRotation);
+    this.setNodeId(nodeId, this.data.count);
+    this.setTreeIndex(treeIndex, this.data.count);
+    this.setColor(color, this.data.count);
+    this.data.add({
+      centerA,
+      centerB,
+      radiusA: radius,
+      heightA,
+      heightB,
+      slopeA,
+      slopeB,
+      zAngleA,
+      zAngleB,
+      angle,
+      planeA,
+      planeB,
+      arcAngle,
+      capNormalA,
+      capNormalB,
+      localXAxis,
+    });
 
     if (filterOptions) {
       this.filterLastObject(filterOptions);
@@ -319,10 +134,10 @@ export default class GeneralCylinderGroup extends BaseCylinderGroup {
 
     globalBox.makeEmpty();
     computeEllipsoidBoundingBox(
-      this.getCenterA(globalVector, index),
-      this.getCapNormalA(globalVector2, index),
-      this.getRadius(index) / Math.abs(Math.cos(this.getSlopeA(index))),
-      this.getRadius(index),
+      this.data.getVector3('centerA', tempCenterA, index),
+      this.data.getVector3('capNormalA', capNormalA, index),
+      this.data.getNumber('radiusA', index) / Math.abs(Math.cos(this.data.getNumber('slopeA', index))),
+      this.data.getNumber('radiusA', index),
       0,
       matrix,
       globalBox,
@@ -331,10 +146,10 @@ export default class GeneralCylinderGroup extends BaseCylinderGroup {
     box.union(globalBox);
     globalBox.makeEmpty();
     computeEllipsoidBoundingBox(
-      this.getCenterB(globalVector, index),
-      this.getCapNormalB(globalVector2, index),
-      this.getRadius(index) / Math.abs(Math.cos(this.getSlopeB(index))),
-      this.getRadius(index),
+      this.data.getVector3('centerB', tempCenterB, index),
+      this.data.getVector3('capNormalB', capNormalB, index),
+      this.data.getNumber('radiusA', index) / Math.abs(Math.cos(this.data.getNumber('slopeB', index))),
+      this.data.getNumber('radiusA', index),
       0,
       matrix,
       globalBox,

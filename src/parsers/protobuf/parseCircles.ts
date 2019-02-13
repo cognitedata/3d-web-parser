@@ -99,7 +99,7 @@ function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup, fil
     .normalize();
 
     group.add(nodeId, treeIndex, color, centerA, normal, radiusA, filterOptions);
-    group.add(nodeId, treeIndex, color, centerB, normal, radiusA, filterOptions);
+    group.add(nodeId, treeIndex, color, centerB, normal, radiusB, filterOptions);
   // @ts-ignore
   } else if (geometry.type === 'eccentricCone') {
     const { radiusA, radiusB } = primitiveInfo;
@@ -117,7 +117,7 @@ function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup, fil
 }
 
 function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
-  if (primitiveGroupMap.Circle.group.count + minimumRequiredCapacity > primitiveGroupMap.Circle.group.capacity) {
+  if (primitiveGroupMap.Circle.group.data.count + minimumRequiredCapacity > primitiveGroupMap.Circle.group.capacity) {
       const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Circle.capacity);
       primitiveGroupMap.Circle.group = new CircleGroup(capacity);
       return true;

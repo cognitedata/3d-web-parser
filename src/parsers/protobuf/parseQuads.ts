@@ -47,7 +47,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 }
 
 function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
-  if (primitiveGroupMap.Quad.group.count + minimumRequiredCapacity > primitiveGroupMap.Quad.group.capacity) {
+  if (primitiveGroupMap.Quad.group.data.count + minimumRequiredCapacity > primitiveGroupMap.Quad.group.capacity) {
       const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Quad.capacity);
       primitiveGroupMap.Quad.group = new QuadGroup(capacity);
       return true;
