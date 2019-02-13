@@ -99,7 +99,7 @@ function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup, fil
     .normalize();
 
     group.add(nodeId, treeIndex, color, centerA, normal, radiusA, filterOptions);
-    group.add(nodeId, treeIndex, color, centerB, normal, radiusA, filterOptions);
+    group.add(nodeId, treeIndex, color, centerB, normal, radiusB, filterOptions);
   // @ts-ignore
   } else if (geometry.type === 'eccentricCone') {
     const { radiusA, radiusB } = primitiveInfo;
