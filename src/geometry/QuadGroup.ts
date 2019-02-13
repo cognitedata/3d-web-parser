@@ -41,9 +41,9 @@ export default class QuadGroup extends PrimitiveGroup {
     this.setTreeIndex(treeIndex, this.data.count);
     this.setColor(color, this.data.count);
     this.data.add({
-      vertex1: vertex1,
-      vertex2: vertex2,
-      vertex3: vertex3,
+      vertex1,
+      vertex2,
+      vertex3,
     });
 
     if (filterOptions) {

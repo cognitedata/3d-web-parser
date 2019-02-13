@@ -46,14 +46,14 @@ export default class GeneralRingGroup extends PrimitiveGroup {
     this.setTreeIndex(treeIndex, this.data.count);
     this.setColor(color, this.data.count);
     this.data.add({
-      center: center,
-      normal: normal,
-      localXAxis: localXAxis,
+      center,
+      normal,
+      localXAxis,
       radiusA: xRadius,
       radiusB: yRadius,
       thickness: thickness / yRadius,
-      angle: angle,
-      arcAngle: arcAngle,
+      angle,
+      arcAngle,
     });
 
     if (filterOptions) {

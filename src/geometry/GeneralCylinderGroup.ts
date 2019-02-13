@@ -102,22 +102,22 @@ export default class GeneralCylinderGroup extends PrimitiveGroup {
     this.setTreeIndex(treeIndex, this.data.count);
     this.setColor(color, this.data.count);
     this.data.add({
-      centerA: centerA,
-      centerB: centerB,
+      centerA,
+      centerB,
       radiusA: radius,
-      heightA: heightA,
-      heightB: heightB,
-      slopeA: slopeA,
-      slopeB: slopeB,
-      zAngleA: zAngleA,
-      zAngleB: zAngleB,
-      angle: angle,
-      planeA: planeA,
-      planeB: planeB,
-      arcAngle: arcAngle,
-      capNormalA: capNormalA,
-      capNormalB: capNormalB,
-      localXAxis: localXAxis,
+      heightA,
+      heightB,
+      slopeA,
+      slopeB,
+      zAngleA,
+      zAngleB,
+      angle,
+      planeA,
+      planeB,
+      arcAngle,
+      capNormalA,
+      capNormalB,
+      localXAxis,
     });
 
     if (filterOptions) {

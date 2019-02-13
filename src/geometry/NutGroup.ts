@@ -42,10 +42,10 @@ export default class NutGroup extends PrimitiveGroup {
     this.setTreeIndex(treeIndex, this.data.count);
     this.setColor(color, this.data.count);
     this.data.add({
-      centerA: centerA,
-      centerB: centerB,
+      centerA,
+      centerB,
       radiusA: radius,
-      rotationAngle: rotationAngle,
+      rotationAngle,
     });
     if (filterOptions) {
       this.filterLastObject(filterOptions);

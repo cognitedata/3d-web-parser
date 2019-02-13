@@ -33,10 +33,10 @@ export default class TrapeziumGroup extends PrimitiveGroup {
     this.setTreeIndex(treeIndex, this.data.count);
     this.setColor(color, this.data.count);
     this.data.add({
-      vertex1: vertex1,
-      vertex2: vertex2,
-      vertex3: vertex3,
-      vertex4: vertex4,
+      vertex1,
+      vertex2,
+      vertex3,
+      vertex4,
     });
 
     if (filterOptions) {

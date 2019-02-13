@@ -55,8 +55,8 @@ export default class CircleGroup extends PrimitiveGroup {
     this.setTreeIndex(treeIndex, this.data.count);
     this.setColor(color, this.data.count);
     this.data.add({
-      center: center,
-      normal: normal,
+      center,
+      normal,
       radiusA: radius,
     });
 

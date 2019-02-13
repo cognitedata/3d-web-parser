@@ -58,10 +58,10 @@ export default class SphericalSegmentGroup extends PrimitiveGroup {
     this.setTreeIndex(treeIndex, this.data.count);
     this.setColor(color, this.data.count);
     this.data.add({
-      center: center,
-      normal: normal,
+      center,
+      normal,
       hRadius: radius,
-      height: height,
+      height,
     });
 
     if (filterOptions) {
