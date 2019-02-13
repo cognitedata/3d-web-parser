@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import CustomFileReader from '../../customFileParser/CustomFileReader';
 import { parseManySectors } from '../../customFileParser/main';
-import { filePrimitives, filePropertyArrayNames, fileMeshes  } from '../../customFileParser/parserParameters';
+import { filePrimitives, fileMeshes, filePropertyArrays, geometryNames }
+  from '../../customFileParser/parserParameters';
 
 // @ts-ignore
 const fs = require('fs');
@@ -32,7 +33,7 @@ describe('customFileIntegrationTest', () => {
     expect(sectorMetadata.optimizerVersion).toBeDefined();
     expect(sectorMetadata.sectorId).toBeDefined();
     expect(sectorMetadata.parentSectorId).toBeDefined();
-    expect(sectorMetadata.arrayCount).toBe(filePropertyArrayNames.length);
+    expect(sectorMetadata.arrayCount).toBe(filePropertyArrays.length);
     expect(sectorMetadata.sectorBBoxMin).toBeDefined();
     expect(sectorMetadata.sectorBBoxMax).toBeDefined();
     expect(sectorMetadata.sectorBBoxMax.x).toBeGreaterThan(sectorMetadata.sectorBBoxMin.x);
@@ -44,13 +45,13 @@ describe('customFileIntegrationTest', () => {
     const fileBuffer = fileToArrayBuffer(rootSectorFilePath);
     const fileReader = new CustomFileReader(fileBuffer);
     const sectorMetadata = fileReader.readSectorMetadata(fileBuffer.byteLength);
-    expect(sectorMetadata.arrayCount).toBe(filePropertyArrayNames.length);
+    expect(sectorMetadata.arrayCount).toBe(filePropertyArrays.length);
 
     const uncompressedValues = fileReader.readUncompressedValues();
 
-    expect(Object.keys(uncompressedValues).length).toBe(filePropertyArrayNames.length);
+    expect(Object.keys(uncompressedValues).length).toBe(filePropertyArrays.length);
     Object.keys(uncompressedValues).forEach(parameterName => {
-      expect(filePropertyArrayNames.indexOf(parameterName)).not.toBe(-1);
+      expect(filePropertyArrays.indexOf(parameterName)).not.toBe(-1);
       if (uncompressedValues[parameterName].length > 0) {
         if (parameterName === 'color') {
           expect(uncompressedValues[parameterName][0] instanceof THREE.Color);
@@ -73,9 +74,10 @@ describe('customFileIntegrationTest', () => {
     if (sectorMetadata.arrayCount !== 0) {
       fileReader.readUncompressedValues();
     }
-    const primitiveIndexHandlers = fileReader.readSectorGeometryIndexHandlers(fileBuffer.byteLength).primitives;
+    const geometryIndexHandlers = fileReader.readSectorGeometryIndexHandlers(fileBuffer.byteLength).primitives;
 
     // Check that the sector has geometries. If it doesn't, run this test on a different file.
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     expect(geometryIndexHandlers.length).toBeGreaterThan(0);
@@ -102,28 +104,34 @@ describe('customFileIntegrationTest', () => {
 >>>>>>> Triangle meshes done, pending tests
 =======
 >>>>>>> Triangle meshes done, pending tests
+=======
+    expect(geometryIndexHandlers.length).toBeGreaterThan(0);
+
+    geometryIndexHandlers.forEach(geometryIndexHandler => {
+      expect((filePrimitives.concat(fileMeshes)).indexOf(
+        geometryIndexHandler.name as geometryNames)).not.toBe(-1);
+      expect(geometryIndexHandler.nodeIds).toBeDefined();
+      expect(geometryIndexHandler.indexes).toBeDefined();
+      expect(geometryIndexHandler.count).toBeGreaterThan(0);
+      expect(geometryIndexHandler.byteCount).toBeGreaterThan(0);
+      expect(geometryIndexHandler.attributeCount).toBeDefined();
+>>>>>>> temp
     });
   });
 
   test('read multi-sector file', async() => {
     const fileBuffer = fileToArrayBuffer(multiSectorFilePath);
-    const rootSector = parseManySectors(fileBuffer);
+    const { rootSector, sectors, sceneStats } = parseManySectors(fileBuffer);
 
-    const sectors = [rootSector];
-    while (sectors.length > 0) {
-      const sector = sectors.pop();
-      expect(sector).toBeDefined();
-
-      sector!.children.forEach(child => {
-        sectors.push(child);
-      });
-
+    Object.keys(sectors).forEach(sectorPath => {
+      const sector = sectors[sectorPath];
+      // @ts-ignore
       sector!.primitiveGroups.forEach(primitiveGroup => {
         expect(primitiveGroup.type).toBeDefined();
         expect(primitiveGroup.data.count).toBeDefined();
         expect(primitiveGroup.capacity).toBeDefined();
         expect(primitiveGroup.data.count).toBe(primitiveGroup.capacity);
       });
-    }
+    });
   });
 });

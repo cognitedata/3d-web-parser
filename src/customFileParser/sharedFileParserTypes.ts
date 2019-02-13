@@ -1,5 +1,5 @@
 import FibonacciDecoder from './FibonacciDecoder';
-import { BYTES_PER_NODE_ID, geometryNames, primitiveNames } from './parserParameters';
+import { BYTES_PER_NODE_ID, geometryNames } from './parserParameters';
 import * as THREE from 'three';
 
 interface SectorMetadata {
@@ -27,7 +27,7 @@ interface RenderedPrimitiveGroups {
 }
 
 interface UncompressedValues {
-  [name: filePropertyArrayNames]: any[];
+  [name: string]: any[];
 }
 
 class NodeIdReader {

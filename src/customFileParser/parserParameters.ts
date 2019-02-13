@@ -28,7 +28,8 @@ export type primitiveNames = 'Box' | 'Circle' | 'ClosedCone' | 'ClosedCylinder' 
 'ClosedTorusSegment' | 'Ellipsoid' | 'ExtrudedRing' | 'Nut' | 'OpenCone' | 'OpenCylinder' | 'OpenEccentricCone' |
 'OpenEllipsoidSegment' | 'OpenExtrudedRingSegment' | 'OpenGeneralCylinder' | 'OpenSphericalSegment' |
 'OpenTorusSegment' | 'Ring' | 'Sphere' | 'Torus';
-export type geometryNames = primitiveNames | 'TriangleMesh' | 'InstancedMesh';
+export type meshNames = 'TriangleMesh' | 'InstancedMesh';
+export type geometryNames = primitiveNames | meshNames;
 
 export const filePrimitives: primitiveNames[] = ['Box', 'Circle', 'ClosedCone', 'ClosedCylinder', 'ClosedEccentricCone',
 'ClosedEllipsoidSegment', 'ClosedExtrudedRingSegment', 'ClosedGeneralCylinder', 'ClosedSphericalSegment',
