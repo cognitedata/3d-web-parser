@@ -95,11 +95,11 @@ export default class EllipsoidSegmentGroup extends PrimitiveGroup {
     this.setTreeIndex(treeIndex, this.data.count);
     this.setColor(color, this.data.count);
     this.data.add({
-      center: center,
-      normal: normal,
+      center,
+      normal,
       hRadius: horizontalRadius,
       vRadius: verticalRadius,
-      height: height,
+      height,
     });
 
     if (filterOptions) {

@@ -39,11 +39,11 @@ export default class EccentricConeGroup extends PrimitiveGroup {
     this.setTreeIndex(treeIndex, this.data.count);
     this.setColor(color, this.data.count);
     this.data.add({
-      centerA: centerA,
-      centerB: centerB,
-      radiusA: radiusA,
-      radiusB: radiusB,
-      normal: normal,
+      centerA,
+      centerB,
+      radiusA,
+      radiusB,
+      normal,
     });
 
     if (filterOptions) {

@@ -38,10 +38,10 @@ export default class BoxGroup extends PrimitiveGroup {
     this.setTreeIndex(treeIndex, this.data.count);
     this.setColor(color, this.data.count);
     this.data.add({
-      center: center,
-      normal: normal,
-      angle: angle,
-      delta: delta,
+      center,
+      normal,
+      angle,
+      delta,
     });
 
     if (filterOptions) {

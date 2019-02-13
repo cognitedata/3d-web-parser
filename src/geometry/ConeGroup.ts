@@ -47,13 +47,13 @@ export default class ConeGroup extends PrimitiveGroup {
     localXAxis.copy(xAxis).applyQuaternion(rotation);
 
     this.data.add({
-      centerA: centerA,
-      centerB: centerB,
-      radiusA: radiusA,
-      radiusB: radiusB,
-      angle: angle,
-      arcAngle: arcAngle,
-      localXAxis: localXAxis,
+      centerA,
+      centerB,
+      radiusA,
+      radiusB,
+      angle,
+      arcAngle,
+      localXAxis,
     });
 
     if (filterOptions) {
