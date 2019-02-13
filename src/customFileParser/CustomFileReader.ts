@@ -3,7 +3,7 @@ import loadUncompressedValues from './loadUncompressedValues';
 import loadGeometryIndexHandlers from './loadGeometryIndexHandlers';
 import FibonacciDecoder from './FibonacciDecoder';
 import { NodeIdReader, GeometryIndexHandler } from './sharedFileParserTypes';
-import { filePrimitives, fileMeshes, BYTES_PER_NODE_ID } from './parserParameters';
+import { filePrimitives, fileMeshes, BYTES_PER_NODE_ID, primitiveNames } from './parserParameters';
 
 export default class CustomFileReader {
   public location: number;
@@ -110,7 +110,8 @@ export default class CustomFileReader {
 
   readSectorGeometryIndexHandlers(sectorEndLocation: number): {[name: string]: GeometryIndexHandler[]} {
     const allHandlers = loadGeometryIndexHandlers(this, sectorEndLocation);
-    const primitiveHandlers = allHandlers.filter(handler => { return (filePrimitives.indexOf(handler.name) !== -1); });
+    const primitiveHandlers = allHandlers.filter(handler => {
+      return (filePrimitives.indexOf(handler.name as primitiveNames) !== -1); });
     const meshHandlers = allHandlers.filter(handler => { return (fileMeshes.indexOf(handler.name) !== -1); });
     return { primitives: primitiveHandlers, meshes: meshHandlers };
   }

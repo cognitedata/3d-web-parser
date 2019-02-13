@@ -1,5 +1,6 @@
 import { GeometryIndexHandler } from './sharedFileParserTypes';
-import { renderedPrimitives, renderedPrimitivesPerFilePrimitive, filePrimitives } from './parserParameters';
+import { renderedPrimitives, renderedPrimitivesPerFilePrimitive, filePrimitives, primitiveNames }
+  from './parserParameters';
 
 export default function countRenderedPrimitives(geometryIndexHandlers: GeometryIndexHandler[]) {
   const counts: {[name: string]: number} = {};
@@ -8,7 +9,7 @@ export default function countRenderedPrimitives(geometryIndexHandlers: GeometryI
   });
 
   geometryIndexHandlers.forEach(geometryIndexHandler => {
-    if (filePrimitives.indexOf(geometryIndexHandler.name) !== -1) {
+    if (filePrimitives.indexOf(geometryIndexHandler.name as primitiveNames) !== -1) {
       renderedPrimitivesPerFilePrimitive[geometryIndexHandler.name].forEach(renderedPrimitive => {
         counts[renderedPrimitive] += geometryIndexHandler.count;
       });

@@ -76,9 +76,6 @@ function parseManySectors(fileBuffer: ArrayBuffer) {
     numMergedMeshes: 0,
   };
 
-  console.log("ROOT SECTOR");
-  console.log(rootSector);
-  console.log(sectors);
   return { rootSector, sectors, sceneStats };
 }
 
