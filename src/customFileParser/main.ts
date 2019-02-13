@@ -6,7 +6,6 @@ import { SectorMetadata, GeometryIndexHandler, UncompressedValues, RenderedPrimi
 import CustomFileReader from './CustomFileReader';
 import { renderedPrimitives, renderedPrimitiveToGroup } from './parserParameters';
 import SceneStats from './../SceneStats';
-import { getParentPath } from './../PathExtractor';
 
 function createSector(
   sectorMetadata: SectorMetadata,

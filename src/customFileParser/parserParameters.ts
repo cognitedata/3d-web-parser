@@ -23,6 +23,7 @@ import { addClosedEllipsoidSegment, addOpenEllipsoidSegment, addEllipsoid } from
 import { addClosedTorusSegment, addOpenTorusSegment, addTorus } from './unpackGeometry/Torus';
 import { addClosedSphericalSegment, addOpenSphericalSegment } from './unpackGeometry/SphericalSegment';
 
+<<<<<<< HEAD
 export type primitiveNames = 'Box' | 'Circle' | 'ClosedCone' | 'ClosedCylinder' | 'ClosedEccentricCone' |
 'ClosedEllipsoidSegment' | 'ClosedExtrudedRingSegment' | 'ClosedGeneralCylinder' | 'ClosedSphericalSegment' |
 'ClosedTorusSegment' | 'Ellipsoid' | 'ExtrudedRing' | 'Nut' | 'OpenCone' | 'OpenCylinder' | 'OpenEccentricCone' |
@@ -31,12 +32,19 @@ export type primitiveNames = 'Box' | 'Circle' | 'ClosedCone' | 'ClosedCylinder' 
 export type geometryNames = primitiveNames | 'TriangleMesh' | 'InstancedMesh';
 
 export const filePrimitives: primitiveNames[] = ['Box', 'Circle', 'ClosedCone', 'ClosedCylinder', 'ClosedEccentricCone',
+=======
+const filePrimitives = ['Box', 'Circle', 'ClosedCone', 'ClosedCylinder', 'ClosedEccentricCone',
+>>>>>>> 4b4fd2f7f7f1fa4671d4ff9bd700192a6884c107
 'ClosedEllipsoidSegment', 'ClosedExtrudedRingSegment', 'ClosedGeneralCylinder', 'ClosedSphericalSegment',
 'ClosedTorusSegment', 'Ellipsoid', 'ExtrudedRing', 'Nut', 'OpenCone', 'OpenCylinder', 'OpenEccentricCone',
 'OpenEllipsoidSegment', 'OpenExtrudedRingSegment', 'OpenGeneralCylinder', 'OpenSphericalSegment',
 'OpenTorusSegment', 'Ring', 'Sphere', 'Torus'];
 
+<<<<<<< HEAD
 export const fileMeshes = ['TriangleMesh', 'InstancedMesh'];
+=======
+const fileMeshes = ['TriangleMesh', 'InstancedMesh'];
+>>>>>>> 4b4fd2f7f7f1fa4671d4ff9bd700192a6884c107
 
 export const IdToFileGeometryName: {[id: number]: geometryNames} = {
   1: 'Box',
@@ -117,7 +125,11 @@ export const fileGeometryProperties: {[name in geometryNames]: filePropertyNames
   'scale'],
 };
 
+<<<<<<< HEAD
 export const renderedPrimitiveToAddFunction: {[name in primitiveNames]: Function} = {
+=======
+const renderedPrimitiveToAddFunction: {[name: string]: Function} = {
+>>>>>>> 4b4fd2f7f7f1fa4671d4ff9bd700192a6884c107
   'Box': addBox,
   'Circle': addCircle,
   'ClosedCone': addClosedCone,
@@ -144,12 +156,19 @@ export const renderedPrimitiveToAddFunction: {[name in primitiveNames]: Function
   'Torus': addTorus,
 };
 
+<<<<<<< HEAD
 type renderedPrimitiveNames = 'Box' | 'Circle' | 'Cone' | 'EccentricCone' | 'EllipsoidSegment' | 'GeneralCylinder' |
   'GeneralRing' | 'Nut' | 'Quad' | 'SphericalSegment' | 'TorusSegment' | 'Trapezium';
 export const renderedPrimitives: renderedPrimitiveNames[] = ['Box', 'Circle', 'Cone', 'EccentricCone',
 'EllipsoidSegment', 'GeneralCylinder', 'GeneralRing', 'Nut', 'Quad', 'SphericalSegment', 'TorusSegment', 'Trapezium'];
 
 export const renderedPrimitivesPerFilePrimitive: {[name: string]: string[]} = {
+=======
+const renderedPrimitives = ['Box', 'Circle', 'Cone', 'EccentricCone', 'EllipsoidSegment', 'GeneralCylinder',
+  'GeneralRing', 'Nut', 'Quad', 'SphericalSegment', 'TorusSegment', 'Trapezium'];
+
+const renderedPrimitivesPerFilePrimitive: {[name: string]: string[]} = {
+>>>>>>> 4b4fd2f7f7f1fa4671d4ff9bd700192a6884c107
   Box: ['Box'],
   Circle: ['Circle'],
   ClosedCone: ['Circle', 'Circle', 'Cone'],
@@ -176,7 +195,11 @@ export const renderedPrimitivesPerFilePrimitive: {[name: string]: string[]} = {
   Torus: ['TorusSegment'],
 };
 
+<<<<<<< HEAD
 export const renderedPrimitiveToGroup: {[name: string]: any } = {
+=======
+const renderedPrimitiveToGroup: {[name: string]: any } = {
+>>>>>>> 4b4fd2f7f7f1fa4671d4ff9bd700192a6884c107
   Box: BoxGroup,
   Circle: CircleGroup,
   Cone: ConeGroup,
@@ -190,3 +213,11 @@ export const renderedPrimitiveToGroup: {[name: string]: any } = {
   TorusSegment: TorusSegmentGroup,
   Trapezium: TrapeziumGroup,
 };
+<<<<<<< HEAD
+=======
+
+export { filePropertyArrayNames, filePrimitives, fileMeshes,
+  IdToFileGeometryName, fileProperties, fileGeometryProperties,
+  renderedPrimitives, renderedPrimitivesPerFilePrimitive, renderedPrimitiveToGroup,
+  renderedPrimitiveToAddFunction, BYTES_PER_NODE_ID, DEFAULT_COLOR };
+>>>>>>> 4b4fd2f7f7f1fa4671d4ff9bd700192a6884c107
