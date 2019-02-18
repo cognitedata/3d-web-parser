@@ -1,11 +1,18 @@
 import * as THREE from 'three';
 import { InstancedMeshGroup, InstancedMesh, InstancedMeshCollection } from '../../geometry/InstancedMeshGroup';
-import { GeometryIndexHandler } from './../sharedFileParserTypes';
+import { CompressedGeometryData } from './../sharedFileParserTypes';
 import PropertyLoader from './../PropertyLoader';
+import { xAxis, yAxis, zAxis } from './../../constants';
+import SceneStats from './../../SceneStats';
 
 const matrix = new THREE.Matrix4();
+const rotation = new THREE.Matrix4();
 
-export default function unpackInstancedMesh(geometryInfo: GeometryIndexHandler, uncompressedValues: any) {
+export default function unpackInstancedMesh(
+  group: InstancedMeshGroup,
+  geometryInfo: CompressedGeometryData,
+  uncompressedValues: any,
+  sceneStats: SceneStats) {
   const data = new PropertyLoader(uncompressedValues);
 
   const triangleProperties = [];
@@ -44,8 +51,12 @@ export default function unpackInstancedMesh(geometryInfo: GeometryIndexHandler, 
 
   for (let i = 0; i < geometryInfo.count; i++) {
     data.loadData(geometryInfo);
+    matrix.identity().setPosition(data.translation);
+    matrix.multiply(rotation.makeRotationAxis(zAxis, data.rotation3.z));
+    matrix.multiply(rotation.makeRotationAxis(yAxis, data.rotation3.y));
+    matrix.multiply(rotation.makeRotationAxis(xAxis, data.rotation3.x));
 
-    matrix.makeRotationAxis(data.rotation3, 0).scale(data.scale).setPosition(data.translation);
+    matrix.scale(data.scale);
     instancedMeshCollections[data.fileId][data.triangleOffset].addMapping(
       data.nodeId, data.treeIndex, data.color, matrix);
   }
@@ -58,10 +69,9 @@ export default function unpackInstancedMesh(geometryInfo: GeometryIndexHandler, 
         instancedMeshCollections[fileId][triangleOffset]);
     });
   });
-
-  const group = new InstancedMeshGroup();
   Object.keys(instancedMeshes).forEach(fileId => {
     group.addMesh(instancedMeshes[fileId]);
+    sceneStats.numInstancedMeshes += 1;
   });
 
   return group;

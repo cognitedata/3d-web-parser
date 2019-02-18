@@ -1,16 +1,15 @@
-import { RenderedPrimitiveGroups } from '../sharedFileParserTypes';
 import PropertyLoader from '../PropertyLoader';
 import { zAxis } from '../../constants';
 import * as THREE from 'three';
 
 const centerA = new THREE.Vector3();
 
-function addOpenEllipsoidSegment(groups: RenderedPrimitiveGroups, data: PropertyLoader) {
+function addOpenEllipsoidSegment(groups: any, data: PropertyLoader) {
   groups.EllipsoidSegment.add(data.nodeId, data.treeIndex, data.color, data.center, data.normal, data.radiusA,
     data.radiusB, data.radiusB * 2);
 }
 
-function addClosedEllipsoidSegment(groups: RenderedPrimitiveGroups, data: PropertyLoader) {
+function addClosedEllipsoidSegment(groups: any, data: PropertyLoader) {
   addOpenEllipsoidSegment(groups, data);
   const length = data.radiusB - data.height;
   const circleRadius =
@@ -19,7 +18,7 @@ function addClosedEllipsoidSegment(groups: RenderedPrimitiveGroups, data: Proper
   groups.Circle.add(data.nodeId, data.treeIndex, data.color, centerA, data.normal, circleRadius);
 }
 
-function addEllipsoid(groups: RenderedPrimitiveGroups, data: PropertyLoader) {
+function addEllipsoid(groups: any, data: PropertyLoader) {
   data.height = 2 * data.radiusB;
   addOpenEllipsoidSegment(groups, data);
 }

@@ -1,6 +1,7 @@
 // After making changes to this file, run parserParametersTest to make sure everything is still valid
 import * as THREE from 'three';
 
+import PrimitiveGroup from '../geometry/PrimitiveGroup';
 import BoxGroup from '../geometry/BoxGroup';
 import CircleGroup from '../geometry/CircleGroup';
 import ConeGroup from '../geometry/ConeGroup';
@@ -18,7 +19,8 @@ import { addBox, addCircle, addNut, addRing, addSphere } from './unpackGeometry/
 import { addClosedCone, addClosedEccentricCone, addOpenCone, addOpenEccentricCone } from './unpackGeometry/Cone';
 import { addExtrudedRing, addClosedExtrudedRingSegment, addOpenExtrudedRingSegment }
   from './unpackGeometry/ExtrudedRing';
-import { addClosedCylinder, addGeneralCylinder, addOpenCylinder } from './unpackGeometry/Cylinder';
+import { addClosedCylinder, addClosedGeneralCylinder, addOpenGeneralCylinder, addOpenCylinder }
+  from './unpackGeometry/Cylinder';
 import { addClosedEllipsoidSegment, addOpenEllipsoidSegment, addEllipsoid } from './unpackGeometry/Ellipsoid';
 import { addClosedTorusSegment, addOpenTorusSegment, addTorus } from './unpackGeometry/Torus';
 import { addClosedSphericalSegment, addOpenSphericalSegment } from './unpackGeometry/SphericalSegment';
@@ -112,7 +114,7 @@ export const fileGeometryProperties: {[name in geometryNames]: filePropertyNames
   Ring: ['treeIndex', 'color', 'center', 'normal', 'radiusA', 'radiusB'],
   Sphere: ['treeIndex', 'color', 'center', 'radiusA'],
   Torus: ['treeIndex', 'color', 'center', 'normal', 'radiusA', 'radiusB'],
-  TriangleMesh: ['treeIndex', 'fileId', 'triangleOffset', 'color'],
+  TriangleMesh: ['treeIndex', 'fileId', 'triangleCount', 'color'],
   InstancedMesh: ['treeIndex', 'fileId', 'triangleOffset', 'triangleCount', 'color', 'translation', 'rotation3',
   'scale'],
 };
@@ -125,7 +127,7 @@ export const renderedPrimitiveToAddFunction: {[name in primitiveNames]: Function
   'ClosedEccentricCone': addClosedEccentricCone,
   'ClosedEllipsoidSegment': addClosedEllipsoidSegment,
   'ClosedExtrudedRingSegment': addClosedExtrudedRingSegment,
-  'ClosedGeneralCylinder': addGeneralCylinder,
+  'ClosedGeneralCylinder': addClosedGeneralCylinder,
   'ClosedSphericalSegment': addClosedSphericalSegment,
   'ClosedTorusSegment': addClosedTorusSegment,
   'Ellipsoid': addEllipsoid,
@@ -136,7 +138,7 @@ export const renderedPrimitiveToAddFunction: {[name in primitiveNames]: Function
   'OpenEccentricCone': addOpenEccentricCone,
   'OpenEllipsoidSegment': addOpenEllipsoidSegment,
   'OpenExtrudedRingSegment': addOpenExtrudedRingSegment,
-  'OpenGeneralCylinder': addGeneralCylinder,
+  'OpenGeneralCylinder': addOpenGeneralCylinder,
   'OpenSphericalSegment': addOpenSphericalSegment,
   'OpenTorusSegment': addOpenTorusSegment,
   'Ring': addRing,
@@ -149,31 +151,34 @@ type renderedPrimitiveNames = 'Box' | 'Circle' | 'Cone' | 'EccentricCone' | 'Ell
 export const renderedPrimitives: renderedPrimitiveNames[] = ['Box', 'Circle', 'Cone', 'EccentricCone',
 'EllipsoidSegment', 'GeneralCylinder', 'GeneralRing', 'Nut', 'Quad', 'SphericalSegment', 'TorusSegment', 'Trapezium'];
 
-export const renderedPrimitivesPerFilePrimitive: {[name: string]: string[]} = {
-  Box: ['Box'],
-  Circle: ['Circle'],
-  ClosedCone: ['Circle', 'Circle', 'Cone'],
-  ClosedCylinder: ['Circle', 'Circle', 'Cone'],
-  ClosedEccentricCone: ['Circle', 'Circle', 'EccentricCone'],
-  ClosedEllipsoidSegment: ['EllipsoidSegment', 'Circle'],
-  ClosedExtrudedRingSegment: ['Cone', 'Cone', 'GeneralRing', 'GeneralRing', 'Quad', 'Quad'],
-  ClosedGeneralCylinder: [/* TODO */],
-  ClosedSphericalSegment: ['Circle', 'SphericalSegment'],
-  ClosedTorusSegment: ['TorusSegment'],
-  Ellipsoid: ['EllipsoidSegment'],
-  ExtrudedRing: ['Cone', 'Cone', 'GeneralRing', 'GeneralRing'],
-  Nut: ['Nut'],
-  OpenCone: ['Cone'],
-  OpenCylinder: ['Cone'],
-  OpenEccentricCone: ['EccentricCone'],
-  OpenEllipsoidSegment: ['EllipsoidSegment'],
-  OpenExtrudedRingSegment: ['Cone', 'Cone', 'GeneralRing', 'GeneralRing'],
-  OpenGeneralCylinder: [/* TODO */],
-  OpenSphericalSegment: ['SphericalSegment'],
-  OpenTorusSegment: ['TorusSegment'],
-  Ring: ['GeneralRing'],
-  Sphere: ['SphericalSegment'],
-  Torus: ['TorusSegment'],
+export const renderedPrimitivesPerFilePrimitive: {[name: string]: {name: renderedPrimitiveNames, count: number}[]} = {
+  Box: [{ name: 'Box', count: 1 }],
+  Circle: [{ name: 'Circle', count: 1 }],
+  ClosedCone: [{ name: 'Circle', count: 2 }, { name: 'Cone', count: 1 }],
+  ClosedCylinder: [{ name: 'Circle', count: 2 }, { name: 'Cone', count: 1 }],
+  ClosedEccentricCone: [{ name: 'Circle', count: 2 }, { name: 'EccentricCone', count: 1 }],
+  ClosedEllipsoidSegment: [{ name: 'EllipsoidSegment', count: 1 }, { name: 'Circle', count: 1 }],
+  ClosedExtrudedRingSegment: [{ name: 'Cone', count : 2 }, { name: 'GeneralRing', count : 2 },
+    { name: 'Quad', count : 2 }],
+  ClosedGeneralCylinder: [{ name: 'GeneralCylinder', count : 2 }, { name: 'Cone', count : 2 },
+  { name: 'GeneralRing', count : 2 }, { name: 'Circle', count : 2 }],
+  ClosedSphericalSegment: [{ name: 'Circle', count: 1 }, { name: 'SphericalSegment', count: 1 }],
+  ClosedTorusSegment: [{ name: 'TorusSegment', count: 1 }],
+  Ellipsoid: [{ name: 'EllipsoidSegment', count: 1 }],
+  ExtrudedRing: [{ name: 'Cone', count : 2 }, { name: 'GeneralRing', count: 2 }],
+  Nut: [{ name: 'Nut', count: 1 }],
+  OpenCone: [{ name: 'Cone', count: 1 }],
+  OpenCylinder: [{ name: 'Cone', count: 1 }],
+  OpenEccentricCone: [{ name: 'EccentricCone', count: 1 }],
+  OpenEllipsoidSegment: [{ name: 'EllipsoidSegment', count: 1 }],
+  OpenExtrudedRingSegment: [{ name: 'Cone', count : 2 }, { name: 'GeneralRing', count: 1 }],
+  OpenGeneralCylinder:  [{ name: 'GeneralCylinder', count : 2 }, { name: 'Cone', count : 2 },
+  { name: 'GeneralRing', count : 2 }, { name: 'Circle', count : 2 }],
+  OpenSphericalSegment: [{ name: 'SphericalSegment', count: 1 }],
+  OpenTorusSegment: [{ name: 'TorusSegment', count: 1 }],
+  Ring: [{ name: 'GeneralRing', count: 1 }],
+  Sphere: [{ name: 'SphericalSegment', count: 1 }],
+  Torus: [{ name: 'TorusSegment', count: 1 }],
 };
 
 export const renderedPrimitiveToGroup: {[name: string]: any } = {
