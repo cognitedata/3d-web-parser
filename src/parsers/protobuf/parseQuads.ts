@@ -104,10 +104,8 @@ export default function parse(args: ParseData): boolean {
       if (isSecondQuad) {
         // swap the order of vertex1 and vertex2 to flip the normal
         added = group.add(nodeId, treeIndex, vertex2, vertex1, vertex3, filterOptions) || added;
-        console.log('Creating trapezium with treeIndex ', treeIndex);
       } else {
         added = group.add(nodeId, treeIndex, vertex1, vertex2, vertex3, filterOptions) || added;
-        console.log('Creating trapezium with treeIndex ', treeIndex);
       }
     });
 
