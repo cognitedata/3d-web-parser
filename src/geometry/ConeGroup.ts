@@ -29,7 +29,6 @@ export default class ConeGroup extends PrimitiveGroup {
   add(
     nodeId: number,
     treeIndex: number,
-    color: THREE.Color,
     centerA: THREE.Vector3,
     centerB: THREE.Vector3,
     radiusA: number,
@@ -37,11 +36,9 @@ export default class ConeGroup extends PrimitiveGroup {
     angle: number,
     arcAngle: number,
     filterOptions?: FilterOptions,
-  ) {
-    this.setNodeId(nodeId, this.data.count);
+  ): boolean {
     this.setTreeIndex(treeIndex, this.data.count);
-    this.setColor(color, this.data.count);
-
+    console.log('Added cone with treeIndex ', treeIndex);
     normal.subVectors(centerA, centerB).normalize();
     rotation.setFromUnitVectors(zAxis, normal);
     localXAxis.copy(xAxis).applyQuaternion(rotation);
@@ -56,9 +53,7 @@ export default class ConeGroup extends PrimitiveGroup {
       localXAxis,
     });
 
-    if (filterOptions) {
-      this.filterLastObject(filterOptions);
-    }
+    return this.filterLastObject(nodeId, filterOptions);
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {

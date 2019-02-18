@@ -8,7 +8,7 @@ import { MatchingGeometries,
   getPrimitiveType,
   isPrimitive,
   normalizeRadians } from './protobufUtils';
-import { ParsePrimitiveData } from '../parseUtils';
+import { ParseData } from '../parseUtils';
 import { zAxis } from '../../constants';
 
 // reusable variables
@@ -63,13 +63,14 @@ function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumReq
   return false;
 }
 
-export default function parse(args: ParsePrimitiveData): boolean {
-  const { geometries, primitiveGroupMap, filterOptions } = args;
+export default function parse(args: ParseData): boolean {
+  const { geometries, primitiveGroupMap, filterOptions, treeIndexNodeIdMap, colorMap } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
   const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
   const group = primitiveGroupMap.GeneralCylinder.group;
 
   matchingGeometries.geometries.forEach(geometry => {
+    let added = false;
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
 
     const nodeId = parsePrimitiveNodeId(geometry);
@@ -114,17 +115,22 @@ export default function parse(args: ParsePrimitiveData): boolean {
       .multiplyScalar(-distFromBToExtB)
       .add(centerB);
 
-    group.add(nodeId, treeIndex, color, extA, extB,
+    added = group.add(nodeId, treeIndex, extA, extB,
               radiusA, heightA,
               heightB, slopeA, slopeB, zAngleA, zAngleB,
               angle, arcAngle, filterOptions);
     if (thickness > 0) {
       if (thickness !== radiusA) {
-        group.add(nodeId, treeIndex, color, extA, extB,
+        added = group.add(nodeId, treeIndex, extA, extB,
                   radiusA - thickness, heightA,
                   heightB, slopeA, slopeB, zAngleA, zAngleB,
-                  angle, arcAngle, filterOptions);
+                  angle, arcAngle, filterOptions) || added;
       }
+    }
+
+    if (added) {
+      treeIndexNodeIdMap[treeIndex] = nodeId;
+      colorMap[treeIndex] = color.clone();
     }
   });
   return didCreateNewGroup;

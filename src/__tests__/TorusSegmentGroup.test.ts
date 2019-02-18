@@ -2,7 +2,7 @@
 
 import * as THREE from 'three';
 import TorusSegmentGroup from '../geometry/TorusSegmentGroup';
-import { expectColorEqual, expectVector3Equal } from '../TestUtils';
+import { expectVector3Equal } from '../TestUtils';
 
 describe('TorusSegmentGroup', () => {
   test('constructor', () => {
@@ -52,7 +52,6 @@ describe('TorusSegmentGroup', () => {
 
     const nodeId = 1;
     const treeIndex = 1;
-    const color = new THREE.Color(0.5, 0.5, 0.5);
     const center = new THREE.Vector3(10.1, 20.5, 30.5);
     const normal = new THREE.Vector3(0.1, 0.2, 0.3);
     const radius = 1.2;
@@ -60,14 +59,12 @@ describe('TorusSegmentGroup', () => {
     const angle = 1.4;
     const arcAngle = 1.5;
 
-    group.add(nodeId, treeIndex, color, center, normal, radius, tubeRadius, angle, arcAngle);
+    group.add(nodeId, treeIndex, center, normal, radius, tubeRadius, angle, arcAngle);
 
     expect(group.data.count).toBe(1);
 
-    expect(group.getNodeId(0)).toBe(nodeId);
     expect(group.getTreeIndex(0)).toBe(treeIndex);
 
-    expectColorEqual(group.getColor(new THREE.Color(), 0), color);
     expectVector3Equal(group.data.getVector3('center', new THREE.Vector3(), 0), center);
 
     expect(group.data.getNumber('radius', 0)).toBeCloseTo(radius);

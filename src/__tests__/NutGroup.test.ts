@@ -2,7 +2,7 @@
 
 import * as THREE from 'three';
 import NutGroup from '../geometry/NutGroup';
-import { expectColorEqual, expectVector3Equal } from '../TestUtils';
+import { expectVector3Equal } from '../TestUtils';
 
 describe('NutGroup', () => {
   test('constructor', () => {
@@ -32,23 +32,17 @@ describe('NutGroup', () => {
 
     const nodeId = 1;
     const treeIndex = 1;
-    const color = new THREE.Color(0.5, 0.5, 0.5);
     const centerA = new THREE.Vector3(1, 2, 3);
     const centerB = new THREE.Vector3(4, 5, 6);
     const radius = 100.0;
     const rotationAngle = 1.2345;
 
-    group.add(nodeId, treeIndex, color, centerA, centerB, radius, rotationAngle);
+    group.add(nodeId, treeIndex, centerA, centerB, radius, rotationAngle);
     const targetVector = new THREE.Vector3();
-    const targetColor = new THREE.Color();
 
     expect(group.data.count).toBe(1);
 
-    expect(group.getNodeId(0)).toBe(nodeId);
     expect(group.getTreeIndex(0)).toBe(treeIndex);
-
-    group.getColor(targetColor, 0);
-    expectColorEqual(targetColor, color);
 
     group.data.getVector3('centerA', targetVector, 0);
     expectVector3Equal(targetVector, centerA);

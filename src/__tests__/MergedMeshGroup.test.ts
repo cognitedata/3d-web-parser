@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { MergedMeshMappings } from '../geometry/MergedMeshGroup';
-import { expectColorEqual } from '../TestUtils';
 
 describe('MeshGroup', () => {
   test('MergedMeshMappings', () => {
@@ -11,8 +10,6 @@ describe('MeshGroup', () => {
     expect(nodeMappings.triangleCounts.length).toBe(capacity);
     expect(nodeMappings.count).toBe(0);
     expect(nodeMappings.capacity).toBe(capacity);
-    expect(nodeMappings.color.length).toBe(3 * capacity);
-    expect(nodeMappings.nodeId.length).toBe(capacity);
     expect(nodeMappings.treeIndex.length).toBe(capacity);
     expect(nodeMappings.transform0.length).toBe(capacity);
     expect(nodeMappings.transform1.length).toBe(capacity);
@@ -26,18 +23,12 @@ describe('MeshGroup', () => {
       const triangleCount = 1234;
       const nodeId = 123;
       const treeIndex = 456;
-      const color = new THREE.Color(0xff0000);
-      nodeMappings.add(triangleOffset, triangleCount, nodeId, treeIndex, color);
+      nodeMappings.add(triangleOffset, triangleCount, nodeId, treeIndex);
       expect(nodeMappings.count).toBe(index + 1);
       expect(nodeMappings.capacity).toBe(capacity);
 
-      const targetColor = new THREE.Color();
-      expect(nodeMappings.getColor(targetColor, index)).toBe(targetColor);
-      expectColorEqual(targetColor, color);
-
       expect(nodeMappings.getTriangleOffset(index)).toBe(triangleOffset);
       expect(nodeMappings.getTriangleCount(index)).toBe(triangleCount);
-      expect(nodeMappings.getNodeId(index)).toBe(nodeId);
       expect(nodeMappings.getTreeIndex(index)).toBe(treeIndex);
       expect(nodeMappings.hasTransform(index)).toBe(false);
 
@@ -50,7 +41,6 @@ describe('MeshGroup', () => {
       const triangleCount = 4322;
       const nodeId = 11;
       const treeIndex = 10;
-      const color = new THREE.Color(0x00ff00);
       const transformMatrix = new THREE.Matrix4();
       transformMatrix.set(
         11, 12, 13, 14,
@@ -59,16 +49,11 @@ describe('MeshGroup', () => {
         0,  0,  0,  1,
       );
 
-      nodeMappings.add(triangleOffset, triangleCount, nodeId, treeIndex, color, transformMatrix);
+      nodeMappings.add(triangleOffset, triangleCount, nodeId, treeIndex, transformMatrix);
       expect(nodeMappings.count).toBe(index + 1);
       expect(nodeMappings.capacity).toBe(capacity);
 
-      const targetColor = new THREE.Color();
-      expect(nodeMappings.getColor(targetColor, index)).toBe(targetColor);
-      expectColorEqual(targetColor, color);
-
       expect(nodeMappings.getTriangleCount(index)).toBe(triangleCount);
-      expect(nodeMappings.getNodeId(index)).toBe(nodeId);
       expect(nodeMappings.getTreeIndex(index)).toBe(treeIndex);
 
       const targetMatrix = new THREE.Matrix4();

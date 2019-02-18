@@ -2,7 +2,7 @@
 
 import * as THREE from 'three';
 import GeneralRingGroup from '../geometry/GeneralRingGroup';
-import { expectColorEqual, expectVector3Equal } from '../TestUtils';
+import { expectVector3Equal } from '../TestUtils';
 
 describe('GeneralRingGroup', () => {
   test('constructor', () => {
@@ -63,7 +63,6 @@ describe('GeneralRingGroup', () => {
 
     const nodeId = 1;
     const treeIndex = 1;
-    const color = new THREE.Color(0.5, 0.5, 0.5);
     const center = new THREE.Vector3(1, 2, 3);
     const normal = new THREE.Vector3(4, 5, 6);
     const xRadius = 1.0;
@@ -73,17 +72,13 @@ describe('GeneralRingGroup', () => {
     const angle = 4.0;
     const arcAngle = 5.0;
 
-    group.add(nodeId, treeIndex, color, center, normal, localXAxis, xRadius, yRadius, thickness, angle, arcAngle);
+    group.add(nodeId, treeIndex, center, normal, localXAxis, xRadius, yRadius, thickness, angle, arcAngle);
     const targetVector = new THREE.Vector3();
     const targetColor = new THREE.Color();
 
     expect(group.data.count).toBe(1);
 
-    expect(group.getNodeId(0)).toBe(nodeId);
     expect(group.getTreeIndex(0)).toBe(treeIndex);
-
-    group.getColor(targetColor, 0);
-    expectColorEqual(targetColor, color);
 
     group.data.getVector3('center', targetVector, 0);
     expectVector3Equal(targetVector, center);

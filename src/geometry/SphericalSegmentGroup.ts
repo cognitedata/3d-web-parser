@@ -47,16 +47,13 @@ export default class SphericalSegmentGroup extends PrimitiveGroup {
   add(
     nodeId: number,
     treeIndex: number,
-    color: THREE.Color,
     center: THREE.Vector3,
     normal: THREE.Vector3,
     radius: number,
     height: number,
     filterOptions?: FilterOptions,
-  ) {
-    this.setNodeId(nodeId, this.data.count);
+  ): boolean {
     this.setTreeIndex(treeIndex, this.data.count);
-    this.setColor(color, this.data.count);
     this.data.add({
       center,
       normal,
@@ -64,9 +61,7 @@ export default class SphericalSegmentGroup extends PrimitiveGroup {
       height,
     });
 
-    if (filterOptions) {
-      this.filterLastObject(filterOptions);
-    }
+    return this.filterLastObject(nodeId, filterOptions);
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {

@@ -3,6 +3,7 @@ import { MergedMesh, MergedMeshMappings } from '../geometry/MergedMeshGroup';
 import * as THREE from 'three';
 import { InstancedMeshCollection } from '../geometry/InstancedMeshGroup';
 import SceneStats from '../SceneStats';
+import { TreeIndexNodeIdMap } from '../parsers/parseUtils';
 
 const globalMatrix = new THREE.Matrix4();
 const globalColor = new THREE.Color();
@@ -18,7 +19,11 @@ function countMappingsToMerge(collections: InstancedMeshCollection[], triangleCo
   return numMappings;
 }
 
-export default function mergedInstancedMeshes(sector: Sector, triangleCountLimit: number, sceneStats: SceneStats) {
+export default function mergedInstancedMeshes(
+  sector: Sector,
+  triangleCountLimit: number,
+  sceneStats: SceneStats,
+  treeIndexNodeIdMap: TreeIndexNodeIdMap) {
   sector.instancedMeshGroup.meshes.forEach(instancedMesh => {
     const mergedMesh = new MergedMesh(
       countMappingsToMerge(instancedMesh.collections, triangleCountLimit),
@@ -31,9 +36,8 @@ export default function mergedInstancedMeshes(sector: Sector, triangleCountLimit
       const triangleCount = (collection.mappings.count - 1) * collection.triangleCount;
       if (triangleCount < triangleCountLimit) {
         for (let i = 0; i < collection.mappings.count; i++) {
-          const nodeId = collection.mappings.getNodeId(i);
           const treeIndex = collection.mappings.getTreeIndex(i);
-          collection.mappings.getColor(globalColor, i);
+          const nodeId = treeIndexNodeIdMap[treeIndex];
           collection.mappings.getTransformMatrix(globalMatrix, i);
 
           mergedMesh.mappings.add(
@@ -41,7 +45,6 @@ export default function mergedInstancedMeshes(sector: Sector, triangleCountLimit
             collection.triangleCount,
             nodeId,
             treeIndex,
-            globalColor,
             globalMatrix,
           );
         }

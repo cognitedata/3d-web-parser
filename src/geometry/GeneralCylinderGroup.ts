@@ -60,7 +60,6 @@ export default class GeneralCylinderGroup extends PrimitiveGroup {
   add(
     nodeId: number,
     treeIndex: number,
-    color: THREE.Color,
     centerA: THREE.Vector3,
     centerB: THREE.Vector3,
     radius: number,
@@ -73,7 +72,7 @@ export default class GeneralCylinderGroup extends PrimitiveGroup {
     angle: number = 0,
     arcAngle: number = Math.PI * 2.0,
     filterOptions?: FilterOptions,
-  ) {
+  ): boolean {
 
     normal.subVectors(centerA, centerB).normalize();
     globalRotation.setFromUnitVectors(zAxis, normal);
@@ -98,9 +97,7 @@ export default class GeneralCylinderGroup extends PrimitiveGroup {
     capNormalB.set(planeB.x, planeB.y, planeB.z).applyQuaternion(globalRotation);
 
     localXAxis.copy(xAxis).applyQuaternion(globalRotation);
-    this.setNodeId(nodeId, this.data.count);
     this.setTreeIndex(treeIndex, this.data.count);
-    this.setColor(color, this.data.count);
     this.data.add({
       centerA,
       centerB,
@@ -120,9 +117,7 @@ export default class GeneralCylinderGroup extends PrimitiveGroup {
       localXAxis,
     });
 
-    if (filterOptions) {
-      this.filterLastObject(filterOptions);
-    }
+    return this.filterLastObject(nodeId, filterOptions);
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {

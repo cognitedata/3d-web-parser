@@ -10,35 +10,34 @@ import { InstancedMesh, InstancedMeshGroup } from './geometry/InstancedMeshGroup
 import { MergedMesh } from './geometry/MergedMeshGroup';
 import PrimitiveGroup from './geometry/PrimitiveGroup';
 import GeometryGroup from './geometry/GeometryGroup';
-import { FilterOptions, ParsePrimitiveData } from './parsers/parseUtils';
-
-import parseBoxes from './parsers/protobuf/parseBoxes';
-import parseCircles from './parsers/protobuf/parseCircles';
-import parseCones from './parsers/protobuf/parseCones';
-import parseEccentricCones from './parsers/protobuf/parseEccentricCones';
-import parseEllipsoidSegments from './parsers/protobuf/parseEllipsoidSegments';
-import parseGeneralCylinders from './parsers/protobuf/parseGeneralCylinders';
-import parseGeneralRings from './parsers/protobuf/parseGeneralRings';
-import parseNuts from './parsers/protobuf/parseNuts';
-import parseQuads from './parsers/protobuf/parseQuads';
-import parseSphericalSegments from './parsers/protobuf/parseSphericalSegments';
-import parseTorusSegments from './parsers/protobuf/parseTorusSegments';
-import parseTrapeziums from './parsers/protobuf/parseTrapeziums';
-import parseMergedMeshes from './parsers/protobuf/parseMergedMeshes';
-import parseInstancedMeshes from './parsers/protobuf/parseInstancedMeshes';
+import { FilterOptions, InstancedMeshMap, ParseData } from './parsers/parseUtils';
+import { parseBoxes,
+         parseCircles,
+         parseCones,
+         parseEccentricCones,
+         parseEllipsoidSegments,
+         parseGeneralCylinders,
+         parseGeneralRings,
+         parseNuts,
+         parseQuads,
+         parseSphericalSegments,
+         parseTorusSegments,
+         parseTrapeziums,
+         parseMergedMeshes,
+         parseInstancedMeshes } from './parsers/protobuf/parsers';
 
 import { BoxGroup,
-  CircleGroup,
-  ConeGroup,
-  EccentricConeGroup,
-  EllipsoidSegmentGroup,
-  GeneralCylinderGroup,
-  GeneralRingGroup,
-  NutGroup,
-  QuadGroup,
-  SphericalSegmentGroup,
-  TorusSegmentGroup,
-  TrapeziumGroup } from './geometry/GeometryGroups';
+         CircleGroup,
+         ConeGroup,
+         EccentricConeGroup,
+         EllipsoidSegmentGroup,
+         GeneralCylinderGroup,
+         GeneralRingGroup,
+         NutGroup,
+         QuadGroup,
+         SphericalSegmentGroup,
+         TorusSegmentGroup,
+         TrapeziumGroup } from './geometry/GeometryGroups';
 
 import SceneStats from './SceneStats';
 
@@ -61,30 +60,20 @@ const primitiveParsers = [
   { type: 'Trapezium', parser: parseTrapeziums },
 ];
 
-interface InstancedMeshMap { [key: number]: InstancedMesh; }
-
-function parseGeometries(geometries: GeometryGroup[],
-                         instancedMeshMap: InstancedMeshMap,
-                         primitiveGroupMap: PrimitiveGroupMap,
-                         sceneStats: SceneStats,
-                         filterOptions?: FilterOptions) {
+function parseGeometries(data: ParseData) {
   const primitiveGroups: PrimitiveGroup[] = [];
   primitiveParsers.forEach(({ type, parser }) => {
-    const didCreateNewGroup = parser({
-      geometries,
-      primitiveGroupMap,
-      sceneStats,
-      filterOptions,
-    });
+    const didCreateNewGroup = parser(data);
+
     if (didCreateNewGroup) {
       // TODO(anders.hafreager) Learn TypeScript and fix this
       // @ts-ignore
-      primitiveGroups.push(primitiveGroupMap[type].group);
+      primitiveGroups.push(data.primitiveGroupMap[type].group);
     }
   });
 
-  const mergedMeshGroup = parseMergedMeshes(geometries, sceneStats);
-  const instancedMeshGroup = parseInstancedMeshes(geometries, instancedMeshMap, sceneStats);
+  const mergedMeshGroup = parseMergedMeshes(data);
+  const instancedMeshGroup = parseInstancedMeshes(data);
 
   return { primitiveGroups, mergedMeshGroup, instancedMeshGroup };
 }
@@ -118,10 +107,12 @@ export default async function parseProtobuf(
     SphericalSegment: { capacity: 5000, group: new SphericalSegmentGroup(0) },
     TorusSegment: { capacity: 5000, group: new TorusSegmentGroup(0) },
     Trapezium: { capacity: 5000, group: new TrapeziumGroup(0) },
-
   };
 
   const mergedMeshMap: InstancedMeshMap = {};
+  const treeIndexNodeIdMap: number[] = [];
+  const colorMap = {};
+
   let t0 = performance.now();
   let previousPath = '';
   const handleWebNode = (webNode: any) => {
@@ -148,13 +139,15 @@ export default async function parseProtobuf(
       primitiveGroups,
       mergedMeshGroup,
       instancedMeshGroup,
-    } = parseGeometries(
-      webNode.geometries,
-      instancedMeshMap,
+    } = parseGeometries({
       primitiveGroupMap,
+      geometries: webNode.geometries,
+      instancedMeshMap,
       sceneStats,
+      treeIndexNodeIdMap,
+      colorMap,
       filterOptions,
-    );
+    });
 
     sector.primitiveGroups = primitiveGroups;
     sector.mergedMeshGroup = mergedMeshGroup;
@@ -192,13 +185,20 @@ export default async function parseProtobuf(
   t0 = performance.now();
   const rootSector = sectors['0/'];
   for (const sector of rootSector.traverseSectors()) {
-    mergeInstancedMeshes(sector, 2500, sceneStats);
+    mergeInstancedMeshes(sector, 2500, sceneStats, treeIndexNodeIdMap);
     sector.mergedMeshGroup.createTreeIndexMap();
     sector.instancedMeshGroup.createTreeIndexMap();
   }
+
   if (printParsingTime) {
     // tslint:disable-next-line
     console.log('Optimizing instanced meshes took ', performance.now() - t0, ' ms.');
   }
-  return { rootSector, sectors, sceneStats };
+
+  const nodeIdTreeIndexMap: {[s: number]: number} = {};
+  for (let treeIndex = 0; treeIndex < treeIndexNodeIdMap.length; treeIndex++) {
+    const nodeId = treeIndexNodeIdMap[treeIndex];
+    nodeIdTreeIndexMap[nodeId] = treeIndex;
+  }
+  return { rootSector, sectors, sceneStats, maps: { colorMap, treeIndexNodeIdMap, nodeIdTreeIndexMap } };
 }

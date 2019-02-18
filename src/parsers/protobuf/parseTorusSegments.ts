@@ -6,8 +6,8 @@ import { MatchingGeometries,
          parsePrimitiveNodeId,
          parsePrimitiveTreeIndex,
          getPrimitiveType} from './protobufUtils';
-import { ParsePrimitiveData } from '../parseUtils';
-const color = new THREE.Color();
+import { ParseData } from '../parseUtils';
+const globalColor = new THREE.Color();
 const center = new THREE.Vector3();
 const normal = new THREE.Vector3();
 
@@ -38,8 +38,8 @@ function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumReq
   return false;
 }
 
-export default function parse(args: ParsePrimitiveData): boolean {
-  const { geometries, primitiveGroupMap, filterOptions } = args;
+export default function parse(args: ParseData): boolean {
+  const { geometries, primitiveGroupMap, filterOptions, treeIndexNodeIdMap, colorMap } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
   const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
   const group = primitiveGroupMap.TorusSegment.group;
@@ -49,7 +49,7 @@ export default function parse(args: ParsePrimitiveData): boolean {
 
     const nodeId = parsePrimitiveNodeId(geometry);
     const treeIndex = parsePrimitiveTreeIndex(geometry);
-    color.setHex(parsePrimitiveColor(geometry));
+    globalColor.setHex(parsePrimitiveColor(geometry));
 
     let { x = 0, y = 0, z = 0 } = primitiveInfo.center;
     center.set(x, y, z);
@@ -64,7 +64,20 @@ export default function parse(args: ParsePrimitiveData): boolean {
       arcAngle = 2 * Math.PI,
     } = primitiveInfo;
 
-    group.add(nodeId, treeIndex, color, center, normal, radius, tubeRadius, angle, arcAngle, filterOptions);
+    const added = group.add(
+      nodeId,
+      treeIndex,
+      center,
+      normal,
+      radius,
+      tubeRadius,
+      angle,
+      arcAngle,
+      filterOptions);
+    if (added) {
+      treeIndexNodeIdMap[treeIndex] = nodeId;
+      colorMap[treeIndex] = globalColor.clone();
+    }
   });
   return didCreateNewGroup;
 }

@@ -2,7 +2,7 @@
 
 import * as THREE from 'three';
 import GeneralCylinderGroup from '../geometry/GeneralCylinderGroup';
-import { expectColorEqual, expectVector3Equal } from '../TestUtils';
+import { expectVector3Equal } from '../TestUtils';
 
 describe('GeneralCylinderGroup', () => {
   test('constructor', () => {
@@ -81,7 +81,6 @@ describe('GeneralCylinderGroup', () => {
 
     const nodeId = 1;
     const treeIndex = 1;
-    const color = new THREE.Color(0.5, 0.5, 0.5);
     const centerA = new THREE.Vector3(1, 2, 3);
     const centerB = new THREE.Vector3(4, 5, 6);
     const radius = 1.1;
@@ -97,7 +96,6 @@ describe('GeneralCylinderGroup', () => {
     group.add(
       nodeId,
       treeIndex,
-      color,
       centerA,
       centerB,
       radius,
@@ -114,11 +112,7 @@ describe('GeneralCylinderGroup', () => {
 
     expect(group.data.count).toBe(1);
 
-    expect(group.getNodeId(0)).toBe(nodeId);
     expect(group.getTreeIndex(0)).toBe(treeIndex);
-
-    group.getColor(targetColor, 0);
-    expectColorEqual(targetColor, color);
 
     group.data.getVector3('centerA', targetVector, 0);
     expectVector3Equal(targetVector, centerA);

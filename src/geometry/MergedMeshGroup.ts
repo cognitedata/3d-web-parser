@@ -11,8 +11,6 @@ export class MergedMeshMappings {
   public capacity: number;
   public triangleOffsets: Uint32Array;
   public triangleCounts: Uint32Array;
-  public color: Float32Array;
-  public nodeId: Float64Array;
   public treeIndex: Float32Array;
   public maxTreeIndex: number;
   // The transformX arrays contain contain transformation matrix
@@ -26,8 +24,6 @@ export class MergedMeshMappings {
     this.capacity = capacity;
     this.triangleOffsets = new Uint32Array(this.capacity);
     this.triangleCounts = new Uint32Array(this.capacity);
-    this.color = new Float32Array(3 * this.capacity);
-    this.nodeId = new Float64Array(this.capacity);
     this.treeIndex = new Float32Array(this.capacity);
     this.maxTreeIndex = -1;
     this.transform0 = []; this.transform0.length = capacity;
@@ -41,7 +37,6 @@ export class MergedMeshMappings {
     triangleCount: number,
     nodeId: number,
     treeIndex: number,
-    color: THREE.Color,
     transformMatrix?: THREE.Matrix4,
   ) {
     if (this.count + 1 > this.capacity) {
@@ -49,27 +44,11 @@ export class MergedMeshMappings {
     }
     this.setTriangleOffset(triangleOffset, this.count);
     this.setTriangleCount(triangleCount, this.count);
-    this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
-    this.setColor(color, this.count);
     if (transformMatrix !== undefined) {
       this.setTransform(transformMatrix, this.count);
     }
     this.count += 1;
-  }
-
-  public getColor(target: THREE.Color, index: number): THREE.Color {
-    let nextIndex = 3 * index;
-    target.setRGB(
-      this.color[nextIndex++],
-      this.color[nextIndex++],
-      this.color[nextIndex++],
-    );
-    return target;
-  }
-
-  public getNodeId(index: number): number {
-    return this.nodeId[index];
   }
 
   public getTreeIndex(index: number): number {
@@ -114,11 +93,6 @@ export class MergedMeshMappings {
         this.triangleOffsets[newIndex] = this.triangleOffsets[i];
         this.triangleCounts[newIndex] = this.triangleCounts[i];
 
-        this.color[3 * newIndex + 0] = this.color[3 * i + 0];
-        this.color[3 * newIndex + 1] = this.color[3 * i + 1];
-        this.color[3 * newIndex + 2] = this.color[3 * i + 2];
-
-        this.nodeId[newIndex] = this.nodeId[i];
         this.treeIndex[newIndex] = this.treeIndex[i];
         this.transform0[newIndex] = this.transform0[i];
         this.transform1[newIndex] = this.transform1[i];
@@ -131,23 +105,12 @@ export class MergedMeshMappings {
     this.count = newIndex;
   }
 
-  public setColor(source: THREE.Color, index: number) {
-    let nextIndex = 3 * index;
-    this.color[nextIndex++] = source.r;
-    this.color[nextIndex++] = source.g;
-    this.color[nextIndex++] = source.b;
-  }
-
   public setTriangleCount(value: number, index: number) {
     this.triangleCounts[index] = value;
   }
 
   public setTriangleOffset(value: number, index: number) {
     this.triangleOffsets[index] = value;
-  }
-
-  public setNodeId(value: number, index: number) {
-    this.nodeId[index] = value;
   }
 
   public setTreeIndex(value: number, index: number) {

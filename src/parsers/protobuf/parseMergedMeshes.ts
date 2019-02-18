@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { MergedMeshGroup, MergedMesh } from '../../geometry/MergedMeshGroup';
 import { MatchingGeometries } from './protobufUtils';
 import SceneStats from '../../SceneStats';
+import { ParseData } from '../parseUtils';
 const globalColor = new THREE.Color();
 
 function findMatchingGeometries(geometries: any[]): MatchingGeometries {
@@ -20,8 +21,8 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-export default function parse(geometries: any[], sceneStats: SceneStats): MergedMeshGroup {
-  const matchingGeometries = findMatchingGeometries(geometries);
+export default function parse(data: ParseData): MergedMeshGroup {
+  const matchingGeometries = findMatchingGeometries(data.geometries);
   const group = new MergedMeshGroup();
 
   matchingGeometries.geometries.forEach(geometry => {
@@ -36,11 +37,14 @@ export default function parse(geometries: any[], sceneStats: SceneStats): Merged
       const { color, treeIndex } = node.properties[0];
       const { triangleCount } = node;
       globalColor.setHex(color.rgb);
-      mergedMesh.mappings.add(triangleOffset, triangleCount, nodeId, treeIndex, globalColor);
+      mergedMesh.mappings.add(triangleOffset, triangleCount, nodeId, treeIndex);
       triangleOffset += triangleCount;
+
+      data.treeIndexNodeIdMap[treeIndex] = nodeId;
+      data.colorMap[treeIndex] = globalColor.clone();
     });
 
-    sceneStats.numMergedMeshes += 1;
+    data.sceneStats.numMergedMeshes += 1;
     group.addMesh(mergedMesh);
   });
 

@@ -2,18 +2,17 @@
 
 import * as THREE from 'three';
 import BoxGroup from '../geometry/BoxGroup';
-import { expectVector3Equal, expectColorEqual } from '../TestUtils';
+import { expectVector3Equal } from '../TestUtils';
 
 function createBoxGroup(): BoxGroup {
   const group = new BoxGroup(1);
   const nodeId = 1;
   const treeIndex = 1;
-  const color = new THREE.Color(0.5, 0.5, 0.5);
   const center = new THREE.Vector3(1, 2, 3);
   const normal = new THREE.Vector3(4, 5, 6);
   const angle = 1.0;
   const delta = new THREE.Vector3(1, 1, 1);
-  group.add(nodeId, treeIndex, color, center, normal, angle, delta);
+  group.add(nodeId, treeIndex, center, normal, angle, delta);
   return group;
 }
 
@@ -53,23 +52,17 @@ describe('BoxGroup', () => {
 
     const nodeId = 1;
     const treeIndex = 1;
-    const color = new THREE.Color(0.5, 0.5, 0.5);
     const center = new THREE.Vector3(1, 2, 3);
     const normal = new THREE.Vector3(4, 5, 6);
     const angle = 10.0;
     const delta = new THREE.Vector3(10, 10, 10);
 
-    group.add(nodeId, treeIndex, color, center, normal, angle, delta);
+    group.add(nodeId, treeIndex, center, normal, angle, delta);
     const targetVector = new THREE.Vector3();
-    const targetColor = new THREE.Color();
 
     expect(group.data.count).toBe(1);
 
-    expect(group.getNodeId(0)).toBe(nodeId);
     expect(group.getTreeIndex(0)).toBe(treeIndex);
-
-    group.getColor(targetColor, 0);
-    expectColorEqual(targetColor, color);
 
     group.data.getVector3('center', targetVector, 0);
     expectVector3Equal(targetVector, center);
