@@ -3,24 +3,21 @@ import Sector from './../Sector';
 import { CompressedGeometryData, UncompressedValues }
   from './sharedFileParserTypes';
 import CustomFileReader from './CustomFileReader';
-import { renderedPrimitives, renderedPrimitiveToGroup } from './parserParameters';
 import SceneStats from './../SceneStats';
-<<<<<<< HEAD
-import { getParentPath } from './../PathExtractor';
-=======
 import { MergedMeshGroup } from '../geometry/MergedMeshGroup';
-import { InstancedMeshGroup } from '../geometry/InstancedMeshGroup';
->>>>>>> All geometries rendering, except for caps on ClosedTorusSegment and ClosedGeneralCylinder, which werenot implemented in the previous codebase. Also added more efficient geometryGroup logic
+import { InstancedMesh, InstancedMeshGroup } from '../geometry/InstancedMeshGroup';
 
 function unpackData(
   sector: Sector,
   uncompressedValues: UncompressedValues,
   compressedGeometryData: {[name: string]: CompressedGeometryData[]},
-  sceneStats: SceneStats): Sector {
+  sceneStats: SceneStats,
+  treeIndexNodeIdMap: any,
+  colorMap: any): Sector {
 
   // Unpack primitives
   compressedGeometryData.primitives.forEach(primitiveCompressedData => {
-    unpackFilePrimitive(sector, primitiveCompressedData, uncompressedValues);
+    unpackFilePrimitive(sector, primitiveCompressedData, uncompressedValues, treeIndexNodeIdMap, colorMap);
   });
 
   sector.mergedMeshGroup = new MergedMeshGroup();
@@ -28,9 +25,9 @@ function unpackData(
   // Unpack meshes
   compressedGeometryData.meshes.forEach(meshCompressedData => {
     if (meshCompressedData.type === 'InstancedMesh') {
-      unpackInstancedMesh(sector.instancedMeshGroup, meshCompressedData, uncompressedValues, sceneStats);
+      // unpackInstancedMesh(sector.instancedMeshGroup, meshCompressedData, uncompressedValues, sceneStats);
     } else if (meshCompressedData.type === 'TriangleMesh') {
-      unpackTriangleMesh(sector.mergedMeshGroup, meshCompressedData, uncompressedValues, sceneStats);
+      // unpackTriangleMesh(sector.mergedMeshGroup, meshCompressedData, uncompressedValues, sceneStats);
     }
   });
   sector.instancedMeshGroup.createTreeIndexMap();
@@ -46,6 +43,9 @@ export default function parseCustomFile(fileBuffer: ArrayBuffer) {
     numInstancedMeshes: 0,
     numMergedMeshes: 0,
   };
+  const mergedMeshMap: any = {};
+  const treeIndexNodeIdMap: number[] = [];
+  const colorMap = {};
 
   let rootSector = undefined;
   let uncompressedValues = undefined;
@@ -67,10 +67,16 @@ export default function parseCustomFile(fileBuffer: ArrayBuffer) {
       } else { throw Error('Parent sector not found'); }
     }
     const compressedGeometryData = fileReader.readCompressedGeometryData(sectorStartLocation + sectorByteLength);
-    unpackData(sector, uncompressedValues, compressedGeometryData, sceneStats);
+    unpackData(sector, uncompressedValues, compressedGeometryData, sceneStats,
+      treeIndexNodeIdMap, colorMap);
   }
 
   const sectors = idToSectorMap;
+  const nodeIdTreeIndexMap: {[s: number]: number} = {};
+  for (let treeIndex = 0; treeIndex < treeIndexNodeIdMap.length; treeIndex++) {
+    const nodeId = treeIndexNodeIdMap[treeIndex];
+    nodeIdTreeIndexMap[nodeId] = treeIndex;
+  }
 
-  return { rootSector, sectors, sceneStats };
+  return { rootSector, sectors, sceneStats, maps: { colorMap, treeIndexNodeIdMap, nodeIdTreeIndexMap } };
 }

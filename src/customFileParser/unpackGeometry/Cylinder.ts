@@ -19,24 +19,19 @@ const globalLineStart = new THREE.Vector3();
 const globalLineEnd = new THREE.Vector3();
 const globalVector = new THREE.Vector3();
 
-const vertex = new THREE.Vector3();
-const vertex1 = new THREE.Vector3();
-const vertex2 = new THREE.Vector3();
-const vertex3 = new THREE.Vector3();
-
 export function addClosedCylinder(groups: any, data: PropertyLoader) {
   centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
   centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
-  groups.Cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB,
+  groups.Cone.add(data.nodeId, data.treeIndex, centerA, centerB,
     data.radiusA, data.radiusA, data.rotationAngle);
-  groups.Circle.add(data.nodeId, data.treeIndex, data.color, centerA, data.normal, data.radiusA);
-  groups.Circle.add(data.nodeId, data.treeIndex, data.color, centerB, data.normal, data.radiusA);
+  groups.Circle.add(data.nodeId, data.treeIndex, centerA, data.normal, data.radiusA);
+  groups.Circle.add(data.nodeId, data.treeIndex, centerB, data.normal, data.radiusA);
 }
 
 export function addOpenCylinder(groups: any, data: PropertyLoader) {
   centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
   centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
-  groups.Cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB,
+  groups.Cone.add(data.nodeId, data.treeIndex, centerA, centerB,
   data.radiusA, data.radiusA, data.rotationAngle);
 }
 
@@ -84,10 +79,10 @@ function drawGeneralCylinders(groups: any, data: PropertyLoader, drawQuads: bool
   extA.copy(data.normal).multiplyScalar(distFromAToExtA).add(centerA);
   extB.copy(data.normal).multiplyScalar(-distFromBToExtB).add(centerB);
 
-  groups.GeneralCylinder.add(data.nodeId, data.treeIndex, data.color, extA, extB, data.radiusA, heightA,
+  groups.GeneralCylinder.add(data.nodeId, data.treeIndex, extA, extB, data.radiusA, heightA,
     heightB, data.slopeA, data.slopeB, data.zAngleA, data.zAngleB, data.rotationAngle, data.arcAngle);
   if ((data. thickness > 0) && (data. thickness !== data.radiusA)) {
-    groups.GeneralCylinder.add(data.nodeId, data.treeIndex, data.color, extA, extB, data.radiusA - data.thickness,
+    groups.GeneralCylinder.add(data.nodeId, data.treeIndex, extA, extB, data.radiusA - data.thickness,
       heightA, heightB, data.slopeA, data.slopeB, data.zAngleA, data.zAngleB, data.rotationAngle, data.arcAngle);
   }
 
@@ -119,7 +114,7 @@ function drawGeneralCylinders(groups: any, data: PropertyLoader, drawQuads: bool
     const capAngle = angleBetweenVector3s(capAngleAxis, capXAxis, slicingPlaneNormal);
 
     if (data.thickness > 0) {
-      groups.GeneralRing.add(data.nodeId, data.treeIndex, data.color, center, slicingPlaneNormal,
+      groups.GeneralRing.add(data.nodeId, data.treeIndex, center, slicingPlaneNormal,
         capXAxis, radius / Math.abs(Math.cos(slope)),
         radius, data.thickness, capAngle, data.arcAngle);
     }
@@ -133,15 +128,15 @@ function drawGeneralCylinders(groups: any, data: PropertyLoader, drawQuads: bool
 function drawHollowedCone(groups: any, data: PropertyLoader, drawQuads: boolean) {
   centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
   centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
-  groups.Cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB, data.radiusA, data.radiusB,
+  groups.Cone.add(data.nodeId, data.treeIndex, centerA, centerB, data.radiusA, data.radiusB,
     data.rotationAngle, data.arcAngle);
-  groups.Cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB, data.radiusA - data.thickness,
+  groups.Cone.add(data.nodeId, data.treeIndex, centerA, centerB, data.radiusA - data.thickness,
     data.radiusB - data.thickness, data.rotationAngle, data.arcAngle);
   localXAxis.copy(xAxis).applyQuaternion(axisRotation.setFromUnitVectors(zAxis, data.normal));
-  groups.GeneralRing.add(data.nodeId, data.treeIndex, data.color, centerA, data.normal,
+  groups.GeneralRing.add(data.nodeId, data.treeIndex, centerA, data.normal,
     localXAxis, data.radiusA, data.radiusA, data.thickness,
     data.rotationAngle, data.arcAngle);
-  groups.GeneralRing.add(data.nodeId, data.treeIndex, data.color, centerB, data.normal,
+  groups.GeneralRing.add(data.nodeId, data.treeIndex, centerB, data.normal,
     localXAxis, data.radiusB, data.radiusB, data.thickness,
     data.rotationAngle, data.arcAngle);
 

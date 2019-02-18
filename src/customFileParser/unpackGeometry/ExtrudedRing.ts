@@ -18,15 +18,15 @@ function addOpenExtrudedRingSegment(groups: any, data: PropertyLoader) {
   centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
   localXAxis.copy(xAxis).applyQuaternion(axisRotation.setFromUnitVectors(zAxis, data.normal));
 
-  groups.GeneralRing.add(data.nodeId, data.treeIndex, data.color, centerA, data.normal,
+  groups.GeneralRing.add(data.nodeId, data.treeIndex, centerA, data.normal,
     localXAxis, data.radiusB, data.radiusB, data.radiusB - data.radiusA,
     data.rotationAngle, data.arcAngle);
-  groups.GeneralRing.add(data.nodeId, data.treeIndex, data.color, centerB, data.normal,
+  groups.GeneralRing.add(data.nodeId, data.treeIndex, centerB, data.normal,
     localXAxis, data.radiusB, data.radiusB, data.radiusB - data.radiusA,
     data.rotationAngle, data.arcAngle);
-  groups.Cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB, data.radiusA,
+  groups.Cone.add(data.nodeId, data.treeIndex, centerA, centerB, data.radiusA,
     data.radiusA, data.rotationAngle, data.arcAngle);
-  groups.Cone.add(data.nodeId, data.treeIndex, data.color, centerA, centerB, data.radiusB,
+  groups.Cone.add(data.nodeId, data.treeIndex, centerA, centerB, data.radiusB,
     data.radiusB, data.rotationAngle, data.arcAngle);
 }
 
@@ -42,7 +42,7 @@ function addClosedExtrudedRingSegment(groups: any, data: PropertyLoader) {
   vertex2.copy(vertex).multiplyScalar(data.radiusA).add(centerB);
   vertex3.copy(vertex).multiplyScalar(data.radiusB).add(centerB);
 
-  groups.Quad.add(data.nodeId, data.treeIndex, data.color, vertex2, vertex1, vertex3);
+  groups.Quad.add(data.nodeId, data.treeIndex, vertex2, vertex1, vertex3);
 
   // quad 2
   quadNorm.copy(centerA).sub(centerB).normalize();
@@ -54,7 +54,7 @@ function addClosedExtrudedRingSegment(groups: any, data: PropertyLoader) {
   vertex3.copy(vertex).multiplyScalar(data.radiusB).add(centerB);
 
   // Note that vertexes 2 and 1 are flipped
-  groups.Quad.add(data.nodeId, data.treeIndex, data.color, vertex1, vertex2, vertex3);
+  groups.Quad.add(data.nodeId, data.treeIndex, vertex1, vertex2, vertex3);
 }
 
 function addExtrudedRing(groups: any, data: PropertyLoader) {

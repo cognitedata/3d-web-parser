@@ -33,13 +33,13 @@ export type primitiveNames = 'Box' | 'Circle' | 'ClosedCone' | 'ClosedCylinder' 
 export type meshNames = 'TriangleMesh' | 'InstancedMesh';
 export type geometryNames = primitiveNames | meshNames;
 
-export const filePrimitives: primitiveNames[] = ['Box', 'Circle', 'ClosedCone', 'ClosedCylinder', 'ClosedEccentricCone',
+export const filePrimitives: geometryNames[] = ['Box', 'Circle', 'ClosedCone', 'ClosedCylinder', 'ClosedEccentricCone',
 'ClosedEllipsoidSegment', 'ClosedExtrudedRingSegment', 'ClosedGeneralCylinder', 'ClosedSphericalSegment',
 'ClosedTorusSegment', 'Ellipsoid', 'ExtrudedRing', 'Nut', 'OpenCone', 'OpenCylinder', 'OpenEccentricCone',
 'OpenEllipsoidSegment', 'OpenExtrudedRingSegment', 'OpenGeneralCylinder', 'OpenSphericalSegment',
 'OpenTorusSegment', 'Ring', 'Sphere', 'Torus'];
 
-export const fileMeshes = ['TriangleMesh', 'InstancedMesh'];
+export const fileMeshes: geometryNames[] = ['TriangleMesh', 'InstancedMesh'];
 
 export const IdToFileGeometryName: {[id: number]: geometryNames} = {
   1: 'Box',

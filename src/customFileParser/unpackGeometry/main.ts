@@ -45,7 +45,9 @@ function findOrCreateDestinationGroup(
 export function unpackFilePrimitive(
   currentSector: Sector,
   primitiveCompressedData: CompressedGeometryData,
-  uncompressedValues: any) {
+  uncompressedValues: any,
+  treeIndexNodeIdMap: any,
+  colorMap: any) {
 
   const destinationPrimitiveGroups: any = {};
   renderedPrimitivesPerFilePrimitive[primitiveCompressedData.type].forEach(renderedPrimitiveInfo => {
@@ -56,6 +58,8 @@ export function unpackFilePrimitive(
   const data = new PropertyLoader(uncompressedValues);
   for (let j = 0; j < primitiveCompressedData.count; j++) {
     data.loadData(primitiveCompressedData);
+    treeIndexNodeIdMap[data.treeIndex] = data.nodeId;
+    colorMap[data.treeIndex] = data.nodeId;
     // @ts-ignore
     renderedPrimitiveToAddFunction[primitiveCompressedData.type].call(this, destinationPrimitiveGroups, data);
   }
