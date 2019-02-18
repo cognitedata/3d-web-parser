@@ -38,7 +38,6 @@ export default class ConeGroup extends PrimitiveGroup {
     filterOptions?: FilterOptions,
   ): boolean {
     this.setTreeIndex(treeIndex, this.data.count);
-    console.log('Added cone with treeIndex ', treeIndex);
     normal.subVectors(centerA, centerB).normalize();
     rotation.setFromUnitVectors(zAxis, normal);
     localXAxis.copy(xAxis).applyQuaternion(rotation);
