@@ -38,6 +38,7 @@ export interface PrimitiveGroupMap {
   SphericalSegment: {capacity: number, group: SphericalSegmentGroup};
   TorusSegment: {capacity: number, group: TorusSegmentGroup};
   Trapezium: {capacity: number, group: TrapeziumGroup};
+  [s: string]: any; // TODO(anders.hafreager) any isn't any good.
 }
 
 export interface Attribute {
@@ -52,10 +53,7 @@ interface TreeIndexMap {
 
 export default abstract class PrimitiveGroup extends GeometryGroup {
   public capacity: number;
-  public nodeId: Float64Array;
   public treeIndex: Float32Array;
-  public color: Float32Array;
-  public maxTreeIndex: number;
   public treeIndexMap: TreeIndexMap;
   public data: GeometryGroupData;
 
@@ -71,10 +69,7 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     this.capacity = capacity;
     this.treeIndexMap = {};
 
-    this.maxTreeIndex = -1;
-    this.nodeId = new Float64Array(this.capacity);
     this.treeIndex = new Float32Array(this.capacity);
-    this.color = new Float32Array(3 * this.capacity);
     this.transform0 = new Float32Array(0);
     this.transform1 = new Float32Array(0);
     this.transform2 = new Float32Array(0);
@@ -89,17 +84,21 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
   abstract computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4;
   abstract computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3;
 
-  filterLastObject(filterOptions: FilterOptions) {
+  filterLastObject(nodeId: number, filterOptions?: FilterOptions) {
+    if (!filterOptions) {
+      return true; // Did add this geometry
+    }
     const index = this.data.count - 1;
     this.computeBoundingBox(identityMatrix4, globalBox, index);
     const boundingBoxFilterResult = filterOptions.boundingBoxFilter
                                     && !filterOptions.boundingBoxFilter.intersectsBox(globalBox);
-    const nodeId = this.getNodeId(index);
     const nodeIdFilterResult = filterOptions.nodeIdFilter && filterOptions.nodeIdFilter.indexOf(nodeId) === -1;
     if (boundingBoxFilterResult || nodeIdFilterResult) {
-      // Reduce count, i.e. remove last element
+      // Reduce count, i.e. remove last geometry
       this.data.count -= 1;
+      return false; // Did not add this geometry
     }
+    return true; // Did add this geometry
   }
 
   setVector<T extends TypedArray, U extends THREEVector>(
@@ -163,27 +162,7 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     return target;
   }
 
-  setColor(source: THREE.Color, index: number) {
-    this.color[3 * index + 0] = source.r;
-    this.color[3 * index + 1] = source.g;
-    this.color[3 * index + 2] = source.b;
-  }
-
-  getColor(target: THREE.Color, index: number): THREE.Color {
-    target.setRGB(
-      this.color[3 * index + 0],
-      this.color[3 * index + 1],
-      this.color[3 * index + 2],
-    );
-    return target;
-  }
-
-  setNodeId(value: number, index: number) {
-    this.nodeId[index] = value;
-  }
-
   setTreeIndex(value: number, index: number) {
-    this.maxTreeIndex = Math.max(this.maxTreeIndex, value);
     if (this.treeIndexMap[value] == null) {
       this.treeIndexMap[value] = [index];
     } else {
@@ -191,10 +170,6 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     }
 
     this.treeIndex[index] = value;
-  }
-
-  getNodeId(index: number): number {
-    return this.nodeId[index];
   }
 
   getTreeIndex(index: number): number {

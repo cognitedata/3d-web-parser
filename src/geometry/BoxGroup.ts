@@ -27,16 +27,13 @@ export default class BoxGroup extends PrimitiveGroup {
   add(
     nodeId: number,
     treeIndex: number,
-    color: THREE.Color,
     center: THREE.Vector3,
     normal: THREE.Vector3,
     angle: number,
     delta: THREE.Vector3,
     filterOptions?: FilterOptions,
-  ) {
-    this.setNodeId(nodeId, this.data.count);
+  ): boolean {
     this.setTreeIndex(treeIndex, this.data.count);
-    this.setColor(color, this.data.count);
     this.data.add({
       center,
       normal,
@@ -44,9 +41,7 @@ export default class BoxGroup extends PrimitiveGroup {
       delta,
     });
 
-    if (filterOptions) {
-      this.filterLastObject(filterOptions);
-    }
+    return this.filterLastObject(nodeId, filterOptions);
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {

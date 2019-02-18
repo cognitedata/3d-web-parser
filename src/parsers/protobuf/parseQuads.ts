@@ -7,10 +7,10 @@ import { MatchingGeometries,
          parsePrimitiveTreeIndex,
          getPrimitiveType,
          isPrimitive} from './protobufUtils';
-import { ParsePrimitiveData } from '../parseUtils';
+import { ParseData } from '../parseUtils';
 import { zAxis } from '../../constants';
 
-const color = new THREE.Color();
+const globalColor = new THREE.Color();
 const vertex = new THREE.Vector3();
 const vertex1 = new THREE.Vector3();
 const vertex2 = new THREE.Vector3();
@@ -39,7 +39,6 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
         && isClosed) {
           matchingGeometries.geometries.push(geometry);
           matchingGeometries.count += 2;
-          const treeIndex = parsePrimitiveTreeIndex(geometry);
       }
   });
 
@@ -55,18 +54,19 @@ function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumReq
   return false;
 }
 
-export default function parse(args: ParsePrimitiveData): boolean {
-  const { geometries, primitiveGroupMap, filterOptions } = args;
+export default function parse(args: ParseData): boolean {
+  const { geometries, primitiveGroupMap, filterOptions, treeIndexNodeIdMap, colorMap } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
   const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
   const group = primitiveGroupMap.Quad.group;
 
   matchingGeometries.geometries.forEach(geometry => {
+    let added = false;
     // Only extruded rings will produce quads
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
     const nodeId = parsePrimitiveNodeId(geometry);
     const treeIndex = parsePrimitiveTreeIndex(geometry);
-    color.setHex(parsePrimitiveColor(geometry));
+    globalColor.setHex(parsePrimitiveColor(geometry));
     const {
       angle = 0,
       innerRadius,
@@ -103,11 +103,16 @@ export default function parse(args: ParsePrimitiveData): boolean {
 
       if (isSecondQuad) {
         // swap the order of vertex1 and vertex2 to flip the normal
-        group.add(nodeId, treeIndex, color, vertex2, vertex1, vertex3, filterOptions);
+        added = group.add(nodeId, treeIndex, vertex2, vertex1, vertex3, filterOptions) || added;
       } else {
-        group.add(nodeId, treeIndex, color, vertex1, vertex2, vertex3, filterOptions);
+        added = group.add(nodeId, treeIndex, vertex1, vertex2, vertex3, filterOptions) || added;
       }
     });
+
+    if (added) {
+      treeIndexNodeIdMap[treeIndex] = nodeId;
+      colorMap[treeIndex] = globalColor.clone();
+    }
   });
   return didCreateNewGroup;
 }

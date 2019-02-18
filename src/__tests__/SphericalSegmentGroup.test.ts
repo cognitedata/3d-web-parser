@@ -2,7 +2,7 @@
 
 import * as THREE from 'three';
 import SphericalSegmentGroup from '../geometry/SphericalSegmentGroup';
-import { expectColorEqual, expectVector3Equal } from '../TestUtils';
+import { expectVector3Equal } from '../TestUtils';
 
 describe('SphericalSegmentGroup', () => {
   test('constructor', () => {
@@ -52,20 +52,16 @@ describe('SphericalSegmentGroup', () => {
 
     const nodeId = 1;
     const treeIndex = 2;
-    const color = new THREE.Color(0.5, 0.5, 0.5);
     const center = new THREE.Vector3(10.1, 20.5, 30.5);
     const normal = new THREE.Vector3(0.1, 0.2, 0.3);
     const radius = 1.5;
     const height = 1.1;
 
-    group.add(nodeId, treeIndex, color, center, normal, radius, height);
+    group.add(nodeId, treeIndex, center, normal, radius, height);
 
     expect(group.data.count).toBe(1);
 
-    expect(group.getNodeId(0)).toBe(nodeId);
     expect(group.getTreeIndex(0)).toBe(treeIndex);
-
-    expectColorEqual(group.getColor(new THREE.Color(), 0), color);
 
     expectVector3Equal(group.data.getVector3('normal', new THREE.Vector3(), 0), normal);
     expectVector3Equal(group.data.getVector3('center', new THREE.Vector3(), 0), center);

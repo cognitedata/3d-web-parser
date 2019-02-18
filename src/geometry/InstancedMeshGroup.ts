@@ -9,10 +9,7 @@ interface IndexMap { [s: number]: boolean; }
 export class InstancedMeshMappings {
   public count: number;
   public capacity: number;
-  public color: Float32Array;
-  public nodeId: Float64Array;
   public treeIndex: Float32Array;
-  public maxTreeIndex: number;
   // The transformX arrays contain contain transformation matrix
   public transform0: Float32Array;
   public transform1: Float32Array;
@@ -23,10 +20,7 @@ export class InstancedMeshMappings {
     this.count = 0;
     this.capacity = capacity;
 
-    this.color = new Float32Array(3 * this.capacity);
-    this.nodeId = new Float64Array(this.capacity);
     this.treeIndex = new Float32Array(this.capacity);
-    this.maxTreeIndex = -1;
 
     this.transform0 = new Float32Array(3 * this.capacity);
     this.transform1 = new Float32Array(3 * this.capacity);
@@ -38,11 +32,6 @@ export class InstancedMeshMappings {
     let newIndex = 0;
     for (let i = 0; i < this.count; i++) {
       if (!indicesToRemove[i]) {
-        this.color[3 * newIndex + 0] = this.color[3 * i + 0];
-        this.color[3 * newIndex + 1] = this.color[3 * i + 1];
-        this.color[3 * newIndex + 2] = this.color[3 * i + 2];
-
-        this.nodeId[newIndex] = this.nodeId[i];
         this.treeIndex[newIndex] = this.treeIndex[i];
         this.transform0[3 * newIndex + 0] = this.transform0[3 * i + 0];
         this.transform0[3 * newIndex + 1] = this.transform0[3 * i + 1];
@@ -70,30 +59,13 @@ export class InstancedMeshMappings {
   public add(
     nodeId: number,
     treeIndex: number,
-    color: THREE.Color,
     transformMatrix?: THREE.Matrix4,
   ) {
-    this.setNodeId(nodeId, this.count);
     this.setTreeIndex(treeIndex, this.count);
-    this.setColor(color, this.count);
     if (transformMatrix !== undefined) {
       this.setTransform(transformMatrix, this.count);
     }
     this.count += 1;
-  }
-
-  public getColor(target: THREE.Color, index: number): THREE.Color {
-    let nextIndex = 3 * index;
-    target.setRGB(
-      this.color[nextIndex++],
-      this.color[nextIndex++],
-      this.color[nextIndex++],
-    );
-    return target;
-  }
-
-  public getNodeId(index: number): number {
-    return this.nodeId[index];
   }
 
   public getTreeIndex(index: number): number {
@@ -126,14 +98,6 @@ export class InstancedMeshMappings {
     }
 
     let tmp: TypedArray;
-    tmp = this.color;
-    this.color = new Float32Array(3 * capacity);
-    this.color.set(tmp.subarray(0, 3 * this.count), 0);
-
-    tmp = this.nodeId;
-    this.nodeId = new Float64Array(capacity);
-    this.nodeId.set(tmp.subarray(0, this.count), 0);
-
     tmp = this.treeIndex;
     this.treeIndex = new Float32Array(capacity);
     this.treeIndex.set(tmp.subarray(0, this.count), 0);
@@ -162,9 +126,7 @@ export class InstancedMeshMappings {
     const newCapacity = this.count + otherMappings.count;
     this.resize(newCapacity);
 
-    this.nodeId.set(otherMappings.nodeId.subarray(0, otherMappings.count), this.count);
     this.treeIndex.set(otherMappings.treeIndex.subarray(0, otherMappings.count), this.count);
-    this.color.set(otherMappings.color.subarray(0, 3 * otherMappings.count), 3 * this.count);
     this.transform0.set(otherMappings.transform0.subarray(0, 3 * otherMappings.count), 3 * this.count);
     this.transform1.set(otherMappings.transform1.subarray(0, 3 * otherMappings.count), 3 * this.count);
     this.transform2.set(otherMappings.transform2.subarray(0, 3 * otherMappings.count), 3 * this.count);
@@ -172,19 +134,7 @@ export class InstancedMeshMappings {
     this.count = newCapacity;
   }
 
-  private setColor(source: THREE.Color, index: number) {
-    let nextIndex = 3 * index;
-    this.color[nextIndex++] = source.r;
-    this.color[nextIndex++] = source.g;
-    this.color[nextIndex++] = source.b;
-  }
-
-  private setNodeId(value: number, index: number) {
-    this.nodeId[index] = value;
-  }
-
   private setTreeIndex(value: number, index: number) {
-    this.maxTreeIndex = Math.max(this.maxTreeIndex, value);
     this.treeIndex[index] = value;
   }
 
@@ -214,9 +164,8 @@ export class InstancedMeshCollection {
 
   addMapping(nodeId: number,
              treeIndex: number,
-             color: THREE.Color,
              transformMatrix?: THREE.Matrix4) {
-    this.mappings.add(nodeId, treeIndex, color, transformMatrix);
+    this.mappings.add(nodeId, treeIndex, transformMatrix);
   }
 }
 

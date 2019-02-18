@@ -2,7 +2,7 @@
 
 import * as THREE from 'three';
 import TrapeziumGroup from '../geometry/TrapeziumGroup';
-import { expectColorEqual, expectVector3Equal } from '../TestUtils';
+import { expectVector3Equal } from '../TestUtils';
 
 describe('TrapeziumGroup', () => {
   test('constructor', () => {
@@ -60,23 +60,17 @@ describe('TrapeziumGroup', () => {
 
     const nodeId = 1;
     const treeIndex = 1;
-    const color = new THREE.Color(0.5, 0.5, 0.5);
     const vertex1 = new THREE.Vector3(10.1, 20.5, 30.5);
     const vertex2 = new THREE.Vector3(10.112, 21.5, 40.5);
     const vertex3 = new THREE.Vector3(5.1, 221.5, 33.5);
     const vertex4 = new THREE.Vector3(3.1, 22.5, 330.5);
 
-    group.add(nodeId, treeIndex, color, vertex1, vertex2, vertex3, vertex4);
+    group.add(nodeId, treeIndex, vertex1, vertex2, vertex3, vertex4);
     const targetVector = new THREE.Vector3();
-    const targetColor = new THREE.Color();
 
     expect(group.data.count).toBe(1);
 
-    expect(group.getNodeId(0)).toBe(nodeId);
     expect(group.getTreeIndex(0)).toBe(treeIndex);
-
-    group.getColor(targetColor, 0);
-    expectColorEqual(targetColor, color);
 
     group.data.getVector3('vertex1', targetVector, 0);
     expectVector3Equal(targetVector, vertex1);

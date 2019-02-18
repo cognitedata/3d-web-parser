@@ -1,5 +1,8 @@
+import * as THREE from 'three';
+
 import GeometryGroup from '../geometry/GeometryGroup';
 import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
+import { InstancedMesh } from '../geometry/InstancedMeshGroup';
 import SceneStats from '../SceneStats';
 
 export interface FilterOptions {
@@ -7,9 +10,24 @@ export interface FilterOptions {
   nodeIdFilter?: number[];
 }
 
-export interface ParsePrimitiveData {
+export interface TreeIndexNodeIdMap {
+  [s: number]: number;
+}
+
+export interface ColorMap {
+  [s: number]: THREE.Color;
+}
+
+export interface InstancedMeshMap {
+  [key: number]: InstancedMesh;
+}
+
+export interface ParseData {
   primitiveGroupMap: PrimitiveGroupMap;
   geometries: GeometryGroup[];
+  instancedMeshMap: InstancedMeshMap;
   sceneStats: SceneStats;
+  treeIndexNodeIdMap: TreeIndexNodeIdMap;
+  colorMap: ColorMap;
   filterOptions?: FilterOptions;
 }

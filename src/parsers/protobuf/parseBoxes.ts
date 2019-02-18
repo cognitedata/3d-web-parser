@@ -6,7 +6,7 @@ import { MatchingGeometries,
          parsePrimitiveNodeId,
          parsePrimitiveTreeIndex,
          getPrimitiveType } from './protobufUtils';
-import { ParsePrimitiveData } from '../parseUtils';
+import { ParseData } from '../parseUtils';
 
 const color = new THREE.Color();
 const center = new THREE.Vector3();
@@ -38,8 +38,8 @@ function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumReq
   return false;
 }
 
-export default function parse(args: ParsePrimitiveData): boolean {
-  const { geometries, primitiveGroupMap, filterOptions } = args;
+export default function parse(args: ParseData): boolean {
+  const { geometries, primitiveGroupMap, filterOptions, treeIndexNodeIdMap, colorMap } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
   const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
   const group = primitiveGroupMap.Box.group;
@@ -61,7 +61,11 @@ export default function parse(args: ParsePrimitiveData): boolean {
     delta.set(x, y, z);
 
     const { angle = 0 } = geometry.primitiveInfo.box;
-    group.add(nodeId, treeIndex, color, center, normal, angle, delta, filterOptions);
+    const added = group.add(nodeId, treeIndex, center, normal, angle, delta, filterOptions);
+    if (added) {
+      treeIndexNodeIdMap[treeIndex] = nodeId;
+      colorMap[treeIndex] = color.clone();
+    }
   });
   return didCreateNewGroup;
 }

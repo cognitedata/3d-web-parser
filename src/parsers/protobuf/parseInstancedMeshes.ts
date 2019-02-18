@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { InstancedMeshGroup, InstancedMesh, InstancedMeshCollection } from '../../geometry/InstancedMeshGroup';
 import { MatchingGeometries, parseInstancedMeshTransformMatrix } from './protobufUtils';
 import SceneStats from '../../SceneStats';
+import { ParseData } from '../parseUtils';
 import { Scene } from 'three';
 const globalColor = new THREE.Color();
 const globalMatrix = new THREE.Matrix4();
@@ -22,7 +23,9 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-function createCollection(node: any) {
+function createCollection(
+  node: any,
+  data: ParseData) {
   const { triangleCount, triangleOffset } = node;
   const collection = new InstancedMeshCollection(
     triangleOffset,
@@ -35,15 +38,16 @@ function createCollection(node: any) {
     const { color, treeIndex, transformMatrix } = property;
     globalColor.setHex(color.rgb);
     parseInstancedMeshTransformMatrix(globalMatrix, transformMatrix);
-    collection.addMapping(nodeId, treeIndex, globalColor, globalMatrix);
+    collection.addMapping(nodeId, treeIndex, globalMatrix);
+
+    data.treeIndexNodeIdMap[treeIndex] = nodeId;
+    data.colorMap[treeIndex] = globalColor.clone();
   });
   return collection;
 }
 
-export default function parse(geometries: any[],
-                              instancedMeshMap: { [key: number]: InstancedMesh },
-                              sceneStats: SceneStats): InstancedMeshGroup {
-  const matchingGeometries = findMatchingGeometries(geometries);
+export default function parse(data: ParseData): InstancedMeshGroup {
+  const matchingGeometries = findMatchingGeometries(data.geometries);
   const group = new InstancedMeshGroup();
 
   matchingGeometries.geometries.forEach(geometry => {
@@ -52,20 +56,20 @@ export default function parse(geometries: any[],
     const nodes: any[] = geometry.nodes;
 
     let didCreateNewInstancedMesh = false;
-    if (instancedMeshMap[fileId] == null) {
-      instancedMeshMap[fileId] = new InstancedMesh(fileId);
+    if (data.instancedMeshMap[fileId] == null) {
+      data.instancedMeshMap[fileId] = new InstancedMesh(fileId);
       didCreateNewInstancedMesh = true;
     }
-    const instancedMesh = instancedMeshMap[fileId];
+    const instancedMesh = data.instancedMeshMap[fileId];
 
     nodes.forEach(node => {
-      instancedMesh.addCollection(createCollection(node));
+      instancedMesh.addCollection(createCollection(node, data));
     });
 
     // Only add it to the group if we created a new one. If we didn't,
     // the instanced mesh is on another sector.
     if (didCreateNewInstancedMesh) {
-      sceneStats.numInstancedMeshes += 1;
+      data.sceneStats.numInstancedMeshes += 1;
       group.addMesh(instancedMesh);
     }
 

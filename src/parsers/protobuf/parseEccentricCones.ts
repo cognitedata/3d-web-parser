@@ -8,7 +8,7 @@ import { MatchingGeometries,
          getPrimitiveType } from './protobufUtils';
 
 import { zAxis } from '../../constants';
-import { ParsePrimitiveData } from '../parseUtils';
+import { ParseData } from '../parseUtils';
 
 const color = new THREE.Color();
 const centerA = new THREE.Vector3();
@@ -43,8 +43,8 @@ function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumReq
   return false;
 }
 
-export default function parse(args: ParsePrimitiveData): boolean {
-  const { geometries, primitiveGroupMap, filterOptions } = args;
+export default function parse(args: ParseData): boolean {
+  const { geometries, primitiveGroupMap, filterOptions, treeIndexNodeIdMap, colorMap } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
   const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
   const group = primitiveGroupMap.EccentricCone.group;
@@ -71,7 +71,21 @@ export default function parse(args: ParsePrimitiveData): boolean {
       normal.negate();
     }
 
-    group.add(nodeId, treeIndex, color, centerA, centerB, radiusA, radiusB, normal, filterOptions);
+    const added = group.add(
+      nodeId,
+      treeIndex,
+      centerA,
+      centerB,
+      radiusA,
+      radiusB,
+      normal,
+      filterOptions,
+    );
+
+    if (added) {
+      treeIndexNodeIdMap[treeIndex] = nodeId;
+      colorMap[treeIndex] = color.clone();
+    }
   });
   return didCreateNewGroup;
 }

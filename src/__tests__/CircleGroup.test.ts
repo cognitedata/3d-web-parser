@@ -2,19 +2,18 @@
 
 import * as THREE from 'three';
 import CircleGroup from '../geometry/CircleGroup';
-import { expectColorEqual, expectVector3Equal } from '../TestUtils';
+import { expectVector3Equal } from '../TestUtils';
 
 function createCircleGroup(): CircleGroup {
   const group = new CircleGroup(2);
 
   const nodeId = 1;
   const treeIndex = 1;
-  const color = new THREE.Color(0.5, 0.5, 0.5);
   const center = new THREE.Vector3(1, 2, 3);
   const normal = new THREE.Vector3(4, 5, 6);
   const radius = 10.0;
 
-  group.add(nodeId, treeIndex, color, center, normal, radius);
+  group.add(nodeId, treeIndex, center, normal, radius);
   return group;
 }
 
@@ -39,23 +38,17 @@ describe('CircleGroup', () => {
 
     const nodeId = 1;
     const treeIndex = 1;
-    const color = new THREE.Color(0.5, 0.5, 0.5);
     const center = new THREE.Vector3(1, 2, 3);
     const normal = new THREE.Vector3(4, 5, 6);
     const radius = 10.0;
 
-    group.add(nodeId, treeIndex, color, center, normal, radius);
+    group.add(nodeId, treeIndex, center, normal, radius);
 
     const targetVector = new THREE.Vector3();
-    const targetColor = new THREE.Color();
 
     expect(group.data.count).toBe(1);
 
-    expect(group.getNodeId(0)).toBe(nodeId);
     expect(group.getTreeIndex(0)).toBe(treeIndex);
-
-    group.getColor(targetColor, 0);
-    expectColorEqual(targetColor, color);
 
     group.data.getVector3('center', targetVector, 0);
     expectVector3Equal(targetVector, center);

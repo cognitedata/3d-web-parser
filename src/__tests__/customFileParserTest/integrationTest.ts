@@ -80,7 +80,6 @@ describe('customFileIntegrationTest', () => {
 
     geometryIndexHandlers.forEach(geometryIndexHandler => {
       expect(fileGeometries.indexOf(geometryIndexHandler.name)).not.toBe(-1);
-      expect(geometryIndexHandler.nodeIds).toBeDefined();
       expect(geometryIndexHandler.indexes).toBeDefined();
       expect(geometryIndexHandler.geometryCount).toBeGreaterThan(0);
       expect(geometryIndexHandler.byteCount).toBeGreaterThan(0);
@@ -105,7 +104,6 @@ describe('customFileIntegrationTest', () => {
         expect(primitiveGroup.type).toBeDefined();
         expect(primitiveGroup.data.count).toBeDefined();
         expect(primitiveGroup.capacity).toBeDefined();
-        expect(primitiveGroup.nodeId).toBeDefined();
         expect(primitiveGroup.data.count).toBe(primitiveGroup.capacity);
       });
     }

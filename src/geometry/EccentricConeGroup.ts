@@ -27,17 +27,14 @@ export default class EccentricConeGroup extends PrimitiveGroup {
   add(
     nodeId: number,
     treeIndex: number,
-    color: THREE.Color,
     centerA: THREE.Vector3,
     centerB: THREE.Vector3,
     radiusA: number,
     radiusB: number,
     normal: THREE.Vector3,
     filterOptions?: FilterOptions,
-  ) {
-    this.setNodeId(nodeId, this.data.count);
+  ): boolean {
     this.setTreeIndex(treeIndex, this.data.count);
-    this.setColor(color, this.data.count);
     this.data.add({
       centerA,
       centerB,
@@ -46,9 +43,7 @@ export default class EccentricConeGroup extends PrimitiveGroup {
       normal,
     });
 
-    if (filterOptions) {
-      this.filterLastObject(filterOptions);
-    }
+    return this.filterLastObject(nodeId, filterOptions);
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {

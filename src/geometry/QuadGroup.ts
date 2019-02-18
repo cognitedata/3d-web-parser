@@ -31,24 +31,19 @@ export default class QuadGroup extends PrimitiveGroup {
   add(
     nodeId: number,
     treeIndex: number,
-    color: THREE.Color,
     vertex1: THREE.Vector3,
     vertex2: THREE.Vector3,
     vertex3: THREE.Vector3,
     filterOptions?: FilterOptions,
-  ) {
-    this.setNodeId(nodeId, this.data.count);
+  ): boolean {
     this.setTreeIndex(treeIndex, this.data.count);
-    this.setColor(color, this.data.count);
     this.data.add({
       vertex1,
       vertex2,
       vertex3,
     });
 
-    if (filterOptions) {
-      this.filterLastObject(filterOptions);
-    }
+    return this.filterLastObject(nodeId, filterOptions);
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
