@@ -1,92 +1,76 @@
-import { unpackPrimitive, unpackInstancedMesh, unpackTriangleMesh } from './unpackGeometry/main';
+import { unpackFilePrimitive, unpackInstancedMesh, unpackTriangleMesh } from './unpackGeometry/main';
 import Sector from './../Sector';
-import countRenderedPrimitives from './countRenderedPrimitives';
-import { SectorMetadata, GeometryIndexHandler, UncompressedValues, RenderedPrimitiveGroups }
+import { CompressedGeometryData, UncompressedValues }
   from './sharedFileParserTypes';
 import CustomFileReader from './CustomFileReader';
 import { renderedPrimitives, renderedPrimitiveToGroup } from './parserParameters';
 import SceneStats from './../SceneStats';
+<<<<<<< HEAD
 import { getParentPath } from './../PathExtractor';
+=======
+import { MergedMeshGroup } from '../geometry/MergedMeshGroup';
+import { InstancedMeshGroup } from '../geometry/InstancedMeshGroup';
+>>>>>>> All geometries rendering, except for caps on ClosedTorusSegment and ClosedGeneralCylinder, which werenot implemented in the previous codebase. Also added more efficient geometryGroup logic
 
-function createSector(
-  sectorMetadata: SectorMetadata,
+function unpackData(
+  sector: Sector,
   uncompressedValues: UncompressedValues,
-  primitiveIndexHandlers: GeometryIndexHandler[],
-  meshIndexHandlers: GeometryIndexHandler[]): Sector {
-
-  const sector = new Sector(sectorMetadata.sectorBBoxMin, sectorMetadata.sectorBBoxMax);
+  compressedGeometryData: {[name: string]: CompressedGeometryData[]},
+  sceneStats: SceneStats): Sector {
 
   // Unpack primitives
-  const counts = countRenderedPrimitives(primitiveIndexHandlers);
-  const renderedPrimitiveGroups: RenderedPrimitiveGroups = {};
-  renderedPrimitives.forEach(renderedPrimitive => {
-    const count = counts[renderedPrimitive];
-    renderedPrimitiveGroups[renderedPrimitive] = new renderedPrimitiveToGroup[renderedPrimitive](count);
-  });
-  primitiveIndexHandlers.forEach(primitiveIndexHandler => {
-    unpackPrimitive(renderedPrimitiveGroups, primitiveIndexHandler, uncompressedValues);
-  });
-  Object.keys(renderedPrimitiveGroups).forEach(renderedPrimitiveName => {
-    sector.primitiveGroups.push(renderedPrimitiveGroups[renderedPrimitiveName]);
+  compressedGeometryData.primitives.forEach(primitiveCompressedData => {
+    unpackFilePrimitive(sector, primitiveCompressedData, uncompressedValues);
   });
 
+  sector.mergedMeshGroup = new MergedMeshGroup();
+  sector.instancedMeshGroup = new InstancedMeshGroup();
   // Unpack meshes
-  meshIndexHandlers.forEach(meshIndexHandler => {
-    if (meshIndexHandler.name === 'InstancedMesh') {
-      sector.instancedMeshGroup = unpackInstancedMesh(meshIndexHandler, uncompressedValues);
-    } else if (meshIndexHandler.name === 'TriangleMesh') {
-      sector.mergedMeshGroup = unpackTriangleMesh(meshIndexHandler, uncompressedValues);
+  compressedGeometryData.meshes.forEach(meshCompressedData => {
+    if (meshCompressedData.type === 'InstancedMesh') {
+      unpackInstancedMesh(sector.instancedMeshGroup, meshCompressedData, uncompressedValues, sceneStats);
+    } else if (meshCompressedData.type === 'TriangleMesh') {
+      unpackTriangleMesh(sector.mergedMeshGroup, meshCompressedData, uncompressedValues, sceneStats);
     }
   });
+  sector.instancedMeshGroup.createTreeIndexMap();
+  sector.mergedMeshGroup.createTreeIndexMap();
 
   return sector;
 }
 
-function parseManySectors(fileBuffer: ArrayBuffer) {
+export default function parseCustomFile(fileBuffer: ArrayBuffer) {
   const fileReader = new CustomFileReader(fileBuffer);
-  const sectors: {[name: string]: any} = {};
-
-  let sectorStartLocation = 0;
-  let sectorByteLength = fileReader.readUint32();
-  let sectorMetadata = fileReader.readSectorMetadata(sectorByteLength);
-  const uncompressedValues = fileReader.readUncompressedValues();
-  let geometries = fileReader.readSectorGeometryIndexHandlers(sectorStartLocation + sectorByteLength);
-  let primitiveIndexHandlers = geometries.primitives;
-  let meshIndexHandlers = geometries.meshes;
-  const rootSector = createSector(sectorMetadata, uncompressedValues, primitiveIndexHandlers, meshIndexHandlers);
-  sectors[sectorMetadata.sectorId] = rootSector;
-
-  while (fileReader.location < fileBuffer.byteLength) {
-    sectorStartLocation = fileReader.location;
-    sectorByteLength = fileReader.readUint32();
-    sectorMetadata = fileReader.readSectorMetadata(sectorByteLength);
-    geometries = fileReader.readSectorGeometryIndexHandlers(sectorStartLocation + sectorByteLength);
-    primitiveIndexHandlers = geometries.primitives;
-    meshIndexHandlers = geometries.meshes;
-    const newSectorObject = createSector(sectorMetadata, uncompressedValues, primitiveIndexHandlers, meshIndexHandlers);
-    const parentSector = sectors[sectorMetadata.parentSectorId];
-    if (parentSector !== undefined) {
-      parentSector.addChild(newSectorObject);
-      parentSector.object3d.add(newSectorObject.object3d);
-      sectors[sectorMetadata.sectorId] = newSectorObject;
-    } else { throw Error('Parent sector not found'); }
-  }
+  const idToSectorMap: {[name: string]: Sector} = {};
   const sceneStats: SceneStats = {
     numInstancedMeshes: 0,
     numMergedMeshes: 0,
   };
 
+  let rootSector = undefined;
+  let uncompressedValues = undefined;
+  while (fileReader.location < fileBuffer.byteLength) {
+    const sectorStartLocation = fileReader.location;
+    const sectorByteLength = fileReader.readUint32();
+    const sectorMetadata = fileReader.readSectorMetadata(sectorByteLength);
+    const sector = new Sector(sectorMetadata.sectorBBoxMin, sectorMetadata.sectorBBoxMax);
+    idToSectorMap[sectorMetadata.sectorId] = sector;
+
+    if (rootSector === undefined || uncompressedValues === undefined) {
+      rootSector = sector;
+      uncompressedValues = fileReader.readUncompressedValues();
+    } else {
+      const parentSector = idToSectorMap[sectorMetadata.parentSectorId];
+      if (parentSector !== undefined) {
+        parentSector.addChild(sector);
+        parentSector.object3d.add(sector.object3d);
+      } else { throw Error('Parent sector not found'); }
+    }
+    const compressedGeometryData = fileReader.readCompressedGeometryData(sectorStartLocation + sectorByteLength);
+    unpackData(sector, uncompressedValues, compressedGeometryData, sceneStats);
+  }
+
+  const sectors = idToSectorMap;
+
   return { rootSector, sectors, sceneStats };
 }
-
-function parseSingleSector(fileBuffer: ArrayBuffer): Sector {
-  const fileReader = new CustomFileReader(fileBuffer);
-  const sectorMetadata = fileReader.readSectorMetadata(fileBuffer.byteLength);
-  const uncompressedValues = fileReader.readUncompressedValues();
-  const geometries = fileReader.readSectorGeometryIndexHandlers(fileBuffer.byteLength);
-  const primitiveIndexHandlers = geometries.primitives;
-  const meshIndexHandlers = geometries.meshes;
-  return createSector(sectorMetadata, uncompressedValues, primitiveIndexHandlers, meshIndexHandlers);
-}
-
-export { parseManySectors, parseSingleSector };

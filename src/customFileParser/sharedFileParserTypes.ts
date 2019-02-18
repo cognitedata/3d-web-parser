@@ -13,17 +13,13 @@ interface SectorMetadata {
   sectorBBoxMax: THREE.Vector3;
 }
 
-interface GeometryIndexHandler {
-  name: geometryNames;
+interface CompressedGeometryData {
+  type: geometryNames;
   nodeIds: NodeIdReader;
   indexes: FibonacciDecoder;
   count: number;
   byteCount: number;
   attributeCount: number;
-}
-
-interface RenderedPrimitiveGroups {
-  [name: string]: any;
 }
 
 interface UncompressedValues {
@@ -51,5 +47,5 @@ class NodeIdReader {
   }
 }
 
-export { GeometryIndexHandler, SectorMetadata, NodeIdReader, RenderedPrimitiveGroups,
+export { CompressedGeometryData, SectorMetadata, NodeIdReader,
   UncompressedValues, BYTES_PER_NODE_ID };

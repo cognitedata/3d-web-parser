@@ -1,9 +1,10 @@
-import { GeometryIndexHandler } from './../sharedFileParserTypes';
+import { CompressedGeometryData } from './../sharedFileParserTypes';
 import { fileGeometryProperties } from './../parserParameters';
 import PropertyLoader from './../PropertyLoader';
 import { MergedMeshGroup, MergedMesh } from './../../geometry/MergedMeshGroup';
+import SceneStats from './../../SceneStats';
 
-function countMeshesPerFileIdIndex(geometryInfo: GeometryIndexHandler, uncompressedValues: any) {
+function countMeshesPerFileIdIndex(geometryInfo: CompressedGeometryData, uncompressedValues: any) {
   const data = new PropertyLoader(uncompressedValues);
   const meshCounts: any = {};
   for (let i = 0; i < geometryInfo.count; i++) {
@@ -18,7 +19,11 @@ function countMeshesPerFileIdIndex(geometryInfo: GeometryIndexHandler, uncompres
   return meshCounts;
 }
 
-export default function unpackTriangleMesh(geometryInfo: GeometryIndexHandler, uncompressedValues: any) {
+export default function unpackTriangleMesh(
+  group: MergedMeshGroup,
+  geometryInfo: CompressedGeometryData,
+  uncompressedValues: any,
+  sceneStats: SceneStats) {
   const meshCounts = countMeshesPerFileIdIndex(geometryInfo, uncompressedValues);
 
   const mergedMeshes: any = {};
@@ -40,9 +45,9 @@ export default function unpackTriangleMesh(geometryInfo: GeometryIndexHandler, u
     triangleOffsets[data.fileId] += data.triangleCount;
   }
 
-  const group = new MergedMeshGroup();
   Object.keys(mergedMeshes).forEach(fileId => {
     group.addMesh(mergedMeshes[fileId]);
+    sceneStats.numMergedMeshes += 1;
   });
 
   return group;

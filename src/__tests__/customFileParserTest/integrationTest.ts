@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import CustomFileReader from '../../customFileParser/CustomFileReader';
-import { parseManySectors } from '../../customFileParser/main';
+import parseCustomFile from '../../customFileParser/main';
 import { filePrimitives, fileMeshes, filePropertyArrays, geometryNames }
   from '../../customFileParser/parserParameters';
 
@@ -74,8 +74,9 @@ describe('customFileIntegrationTest', () => {
     if (sectorMetadata.arrayCount !== 0) {
       fileReader.readUncompressedValues();
     }
-    const geometryIndexHandlers = fileReader.readSectorGeometryIndexHandlers(fileBuffer.byteLength).primitives;
+    const compressedGeometryDatas = fileReader.readCompressedGeometryData(fileBuffer.byteLength).primitives;
 
+<<<<<<< HEAD
     // Check that the sector has geometries. If it doesn't, run this test on a different file.
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -106,9 +107,14 @@ describe('customFileIntegrationTest', () => {
 >>>>>>> Triangle meshes done, pending tests
 =======
     expect(geometryIndexHandlers.length).toBeGreaterThan(0);
+=======
+    // Check that the sector has geometries. If it doesn't, run t  his test on a different file.
+    expect(compressedGeometryDatas.length).toBeGreaterThan(0);
+>>>>>>> All geometries rendering, except for caps on ClosedTorusSegment and ClosedGeneralCylinder, which werenot implemented in the previous codebase. Also added more efficient geometryGroup logic
 
-    geometryIndexHandlers.forEach(geometryIndexHandler => {
+    compressedGeometryDatas.forEach(compressedGeometryData => {
       expect((filePrimitives.concat(fileMeshes)).indexOf(
+<<<<<<< HEAD
         geometryIndexHandler.name as geometryNames)).not.toBe(-1);
       expect(geometryIndexHandler.nodeIds).toBeDefined();
       expect(geometryIndexHandler.indexes).toBeDefined();
@@ -116,12 +122,20 @@ describe('customFileIntegrationTest', () => {
       expect(geometryIndexHandler.byteCount).toBeGreaterThan(0);
       expect(geometryIndexHandler.attributeCount).toBeDefined();
 >>>>>>> temp
+=======
+        compressedGeometryData.type as geometryNames)).not.toBe(-1);
+      expect(compressedGeometryData.nodeIds).toBeDefined();
+      expect(compressedGeometryData.indexes).toBeDefined();
+      expect(compressedGeometryData.count).toBeGreaterThan(0);
+      expect(compressedGeometryData.byteCount).toBeGreaterThan(0);
+      expect(compressedGeometryData.attributeCount).toBeDefined();
+>>>>>>> All geometries rendering, except for caps on ClosedTorusSegment and ClosedGeneralCylinder, which werenot implemented in the previous codebase. Also added more efficient geometryGroup logic
     });
   });
 
   test('read multi-sector file', async() => {
     const fileBuffer = fileToArrayBuffer(multiSectorFilePath);
-    const { rootSector, sectors, sceneStats } = parseManySectors(fileBuffer);
+    const { rootSector, sectors, sceneStats } = parseCustomFile(fileBuffer);
 
     Object.keys(sectors).forEach(sectorPath => {
       const sector = sectors[sectorPath];
@@ -130,7 +144,11 @@ describe('customFileIntegrationTest', () => {
         expect(primitiveGroup.type).toBeDefined();
         expect(primitiveGroup.data.count).toBeDefined();
         expect(primitiveGroup.capacity).toBeDefined();
+<<<<<<< HEAD
         expect(primitiveGroup.data.count).toBe(primitiveGroup.capacity);
+=======
+        expect(primitiveGroup.nodeId).toBeDefined();
+>>>>>>> All geometries rendering, except for caps on ClosedTorusSegment and ClosedGeneralCylinder, which werenot implemented in the previous codebase. Also added more efficient geometryGroup logic
       });
     });
   });

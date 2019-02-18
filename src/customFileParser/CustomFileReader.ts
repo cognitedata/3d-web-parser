@@ -1,8 +1,8 @@
 import loadSectorMetadata from './loadSectorMetadata';
 import loadUncompressedValues from './loadUncompressedValues';
-import loadGeometryIndexHandlers from './loadGeometryIndexHandlers';
+import loadCompressedGeometryData from './loadCompressedGeometryData';
 import FibonacciDecoder from './FibonacciDecoder';
-import { NodeIdReader, GeometryIndexHandler } from './sharedFileParserTypes';
+import { NodeIdReader, CompressedGeometryData } from './sharedFileParserTypes';
 import { filePrimitives, fileMeshes, BYTES_PER_NODE_ID, primitiveNames } from './parserParameters';
 
 export default class CustomFileReader {
@@ -47,9 +47,9 @@ export default class CustomFileReader {
   }
 
   readUint64() {
-    let value = this.dataView.getUint32(this.location, this.flip);
-    value = value * Math.pow(2, 8);
-    value += this.dataView.getUint32(this.location + 4, this.flip);
+    let value = this.dataView.getUint32(this.location + 4, this.flip);
+    value = value * Math.pow(2, 32);
+    value += this.dataView.getUint32(this.location, this.flip);
     this.location += 8;
     return value;
   }
@@ -108,11 +108,11 @@ export default class CustomFileReader {
     return loadUncompressedValues(this);
   }
 
-  readSectorGeometryIndexHandlers(sectorEndLocation: number): {[name: string]: GeometryIndexHandler[]} {
-    const allHandlers = loadGeometryIndexHandlers(this, sectorEndLocation);
+  readCompressedGeometryData(sectorEndLocation: number): {[name: string]: CompressedGeometryData[]} {
+    const allHandlers = loadCompressedGeometryData(this, sectorEndLocation);
     const primitiveHandlers = allHandlers.filter(handler => {
-      return (filePrimitives.indexOf(handler.name as primitiveNames) !== -1); });
-    const meshHandlers = allHandlers.filter(handler => { return (fileMeshes.indexOf(handler.name) !== -1); });
+      return (filePrimitives.indexOf(handler.type as primitiveNames) !== -1); });
+    const meshHandlers = allHandlers.filter(handler => { return (fileMeshes.indexOf(handler.type) !== -1); });
     return { primitives: primitiveHandlers, meshes: meshHandlers };
   }
 

@@ -79,12 +79,6 @@ export default class GeometryGroupData {
   setMatrix4(property: propertyName, value: THREE.Matrix4, index: number) {
   }
 
-  setColor(source: THREE.Color, index: number) {
-    this.arrays.color[3 * index + 0] = source.r;
-    this.arrays.color[3 * index + 1] = source.g;
-    this.arrays.color[3 * index + 2] = source.b;
-  }
-
   getNumber(property: propertyName, index: number): number {
     return this.arrays[property][index];
   }
@@ -107,15 +101,6 @@ export default class GeometryGroupData {
   getMatrix4(property: propertyName, index: number, target: THREE.Matrix4) {
   }
 
-  getColor(target: THREE.Color, index: number): THREE.Color {
-    target.setRGB(
-      this.arrays.color[3 * index + 0],
-      this.arrays.color[3 * index + 1],
-      this.arrays.color[3 * index + 2],
-    );
-    return target;
-  }
-
   add(properties: any) {
     Object.keys(properties).forEach(property => {
       const name = property as propertyName;
@@ -127,8 +112,6 @@ export default class GeometryGroupData {
         this.setVector4(name, properties[property], this.count);
       } else if (matrix4Properties.indexOf(name) !== -1) {
         this.setMatrix4(name, properties[property], this.count);
-      } else if (colorProperties.indexOf(name) !== -1) {
-        this.setColor(properties[property], this.count);
       } else {
         throw Error('Property ' + name + ' does not have an associated memory structure');
       }
