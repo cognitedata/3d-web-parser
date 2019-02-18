@@ -114,26 +114,12 @@ export default async function parseProtobuf(
   const colorMap = {};
 
   let t0 = performance.now();
-  let previousPath = '';
   const handleWebNode = (webNode: any) => {
     const { boundingBox, path } = webNode;
     const boundingBoxMin = new Vector3(boundingBox.min.x, boundingBox.min.y, boundingBox.min.z);
     const boundingBoxMax = new Vector3(boundingBox.max.x, boundingBox.max.y, boundingBox.max.z);
     const sector = new Sector(boundingBoxMin, boundingBoxMax);
     sectors[path] = sector;
-
-    if (false && !path.startsWith(previousPath)) {
-      console.log('Creating new group since previous path is not a parent of current');
-      // The previous sector was not an ancestor, we need to create new primitive groups.
-      Object.keys(primitiveGroupMap).forEach(key => {
-        const constructor = primitiveGroupMap[key].group.constructor;
-
-        // Create new group with capacity 0 so new one will be created with proper capacity later
-        // @ts-ignore
-        primitiveGroupMap[key].group = new constructor(0);
-      });
-    }
-    previousPath = path;
 
     const {
       primitiveGroups,

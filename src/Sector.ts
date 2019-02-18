@@ -57,30 +57,6 @@ export default class Sector {
     }
   }
 
-  findMaxTreeIndex() {
-    let maxTreeIndex = -1;
-    for (const child of this.traverseSectors()) {
-      for (const geometryGroup of child.primitiveGroups) {
-        maxTreeIndex = Math.max(geometryGroup.maxTreeIndex, maxTreeIndex);
-      }
-
-      for (let meshIndex = 0; meshIndex < child.mergedMeshGroup.meshes.length; meshIndex++) {
-        const mappings = child.mergedMeshGroup.meshes[meshIndex].mappings;
-        maxTreeIndex = Math.max(mappings.maxTreeIndex, maxTreeIndex);
-      }
-
-      for (let meshIndex = 0; meshIndex < child.instancedMeshGroup.meshes.length; meshIndex++) {
-        const instancedMesh = child.instancedMeshGroup.meshes[meshIndex];
-        for (let collectionIndex = 0; collectionIndex < instancedMesh.collections.length; collectionIndex++) {
-          const mappings = instancedMesh.collections[collectionIndex].mappings;
-          maxTreeIndex = Math.max(mappings.maxTreeIndex, maxTreeIndex);
-        }
-      }
-    }
-
-    return maxTreeIndex;
-  }
-
   memoryUsage(recursive = true, usage: any): number {
     if (usage == null) {
       usage = {

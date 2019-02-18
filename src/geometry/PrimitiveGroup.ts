@@ -54,7 +54,6 @@ interface TreeIndexMap {
 export default abstract class PrimitiveGroup extends GeometryGroup {
   public capacity: number;
   public treeIndex: Float32Array;
-  public maxTreeIndex: number;
   public treeIndexMap: TreeIndexMap;
   public data: GeometryGroupData;
 
@@ -70,7 +69,6 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     this.capacity = capacity;
     this.treeIndexMap = {};
 
-    this.maxTreeIndex = -1;
     this.treeIndex = new Float32Array(this.capacity);
     this.transform0 = new Float32Array(0);
     this.transform1 = new Float32Array(0);
@@ -165,7 +163,6 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
   }
 
   setTreeIndex(value: number, index: number) {
-    this.maxTreeIndex = Math.max(this.maxTreeIndex, value);
     if (this.treeIndexMap[value] == null) {
       this.treeIndexMap[value] = [index];
     } else {
