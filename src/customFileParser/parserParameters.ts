@@ -38,7 +38,6 @@ export const filePrimitives: geometryNames[] = ['Box', 'Circle', 'ClosedCone', '
 'ClosedTorusSegment', 'Ellipsoid', 'ExtrudedRing', 'Nut', 'OpenCone', 'OpenCylinder', 'OpenEccentricCone',
 'OpenEllipsoidSegment', 'OpenExtrudedRingSegment', 'OpenGeneralCylinder', 'OpenSphericalSegment',
 'OpenTorusSegment', 'Ring', 'Sphere', 'Torus'];
-
 export const fileMeshes: geometryNames[] = ['TriangleMesh', 'InstancedMesh'];
 
 export const IdToFileGeometryName: {[id: number]: geometryNames} = {

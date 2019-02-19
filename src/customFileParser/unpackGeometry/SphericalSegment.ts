@@ -4,8 +4,7 @@ import * as THREE from 'three';
 const centerA = new THREE.Vector3();
 
 function addOpenSphericalSegment(groups: any, data: PropertyLoader) {
-  groups.SphericalSegment.add(data.nodeId, data.treeIndex, data.center, data.normal,
-    data.radiusA, data.height);
+  groups.SphericalSegment.add(data.nodeId, data.treeIndex, data.center, data.normal, data.radiusA, data.height);
 }
 
 function addClosedSphericalSegment(groups: any, data: PropertyLoader) {

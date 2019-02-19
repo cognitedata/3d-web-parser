@@ -12,10 +12,14 @@ export default function unpackInstancedMesh(
   group: InstancedMeshGroup,
   geometryInfo: CompressedGeometryData,
   uncompressedValues: any,
+<<<<<<< HEAD
   sceneStats: SceneStats,
   treeIndexNodeIdMap: any,
   colorMap: any) {
 
+=======
+  sceneStats: SceneStats) {
+>>>>>>> e160f545c56e2180472eb73add30f9bdd5f7ad47
   const data = new PropertyLoader(uncompressedValues);
 
   const triangleProperties = [];
@@ -54,8 +58,11 @@ export default function unpackInstancedMesh(
 
   for (let i = 0; i < geometryInfo.count; i++) {
     data.loadData(geometryInfo);
+<<<<<<< HEAD
     treeIndexNodeIdMap[data.treeIndex] = data.nodeId;
     colorMap[data.treeIndex] = data.color;
+=======
+>>>>>>> e160f545c56e2180472eb73add30f9bdd5f7ad47
     matrix.identity().setPosition(data.translation);
     matrix.multiply(rotation.makeRotationAxis(zAxis, data.rotation3.z));
     matrix.multiply(rotation.makeRotationAxis(yAxis, data.rotation3.y));
@@ -63,7 +70,11 @@ export default function unpackInstancedMesh(
 
     matrix.scale(data.scale);
     instancedMeshCollections[data.fileId][data.triangleOffset].addMapping(
+<<<<<<< HEAD
       data.nodeId, data.treeIndex, matrix);
+=======
+      data.nodeId, data.treeIndex, data.color, matrix);
+>>>>>>> e160f545c56e2180472eb73add30f9bdd5f7ad47
   }
 
   const instancedMeshes: any = {};
