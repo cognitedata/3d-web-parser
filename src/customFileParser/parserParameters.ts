@@ -33,12 +33,12 @@ type primitiveNameType = 'Box' | 'Circle' | 'ClosedCone' | 'ClosedCylinder' | 'C
 type meshNameType = 'TriangleMesh' | 'InstancedMesh';
 export type geometryNameType = primitiveNameType | meshNameType;
 
-export const filePrimitives: geometryNameType[] = ['Box', 'Circle', 'ClosedCone', 'ClosedCylinder',
+export const filePrimitiveNames: geometryNameType[] = ['Box', 'Circle', 'ClosedCone', 'ClosedCylinder',
 'ClosedEccentricCone', 'ClosedEllipsoidSegment', 'ClosedExtrudedRingSegment', 'ClosedGeneralCylinder',
 'ClosedSphericalSegment', 'ClosedTorusSegment', 'Ellipsoid', 'ExtrudedRing', 'Nut', 'OpenCone',
 'OpenCylinder', 'OpenEccentricCone', 'OpenEllipsoidSegment', 'OpenExtrudedRingSegment',
 'OpenGeneralCylinder', 'OpenSphericalSegment', 'OpenTorusSegment', 'Ring', 'Sphere', 'Torus'];
-export const fileMeshes: geometryNameType[] = ['TriangleMesh', 'InstancedMesh'];
+export const fileMeshNames: geometryNameType[] = ['TriangleMesh', 'InstancedMesh'];
 
 export const IdToFileGeometryName: {[id: number]: geometryNameType} = {
   1: 'Box',
@@ -120,7 +120,7 @@ export const fileGeometryProperties: {[name in geometryNameType]: filePropertyNa
   'scale'],
 };
 
-export const renderedPrimitiveToAddFunction: {[name in primitiveNames]: Function} = {
+export const renderedPrimitiveToAddFunction: {[name in primitiveNameType]: Function} = {
   'Box': addBox,
   'Circle': addCircle,
   'ClosedCone': addClosedCone,

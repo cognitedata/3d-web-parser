@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import CustomFileReader from '../../customFileParser/CustomFileReader';
 import parseCustomFile from '../../customFileParser/main';
-import { filePrimitives, filePropertyArrayNames, fileMeshes, filePropertyArrayNameType  } from '../../customFileParser/parserParameters';
+import { filePrimitiveNames, filePropertyArrayNames, fileMeshNames, filePropertyArrayNameType  } from '../../customFileParser/parserParameters';
 
 // @ts-ignore
 const fs = require('fs');
@@ -77,7 +77,7 @@ describe('customFileIntegrationTest', () => {
     expect(compressedPrimitiveData.length).toBeGreaterThan(0);
 
     compressedPrimitiveData.forEach(compressedPrimitive => {
-      expect((filePrimitives).indexOf(compressedPrimitive.type)).not.toBe(-1);
+      expect((filePrimitiveNames).indexOf(compressedPrimitive.type)).not.toBe(-1);
       expect(compressedPrimitive.nodeIds).toBeDefined();
       expect(compressedPrimitive.indexes).toBeDefined();
       expect(compressedPrimitive.count).toBeGreaterThan(0);
