@@ -1,5 +1,5 @@
 import FibonacciDecoder from './FibonacciDecoder';
-import { BYTES_PER_NODE_ID, geometryNames } from './parserParameters';
+import { BYTES_PER_NODE_ID, geometryNameType } from './parserParameters';
 import * as THREE from 'three';
 
 interface SectorMetadata {
@@ -14,7 +14,7 @@ interface SectorMetadata {
 }
 
 interface CompressedGeometryData {
-  type: geometryNames;
+  type: geometryNameType;
   nodeIds: NodeIdReader;
   indexes: FibonacciDecoder;
   count: number;

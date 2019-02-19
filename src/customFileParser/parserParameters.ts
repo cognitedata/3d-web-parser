@@ -25,22 +25,22 @@ import { addClosedEllipsoidSegment, addOpenEllipsoidSegment, addEllipsoid } from
 import { addClosedTorusSegment, addOpenTorusSegment, addTorus } from './unpackGeometry/Torus';
 import { addClosedSphericalSegment, addOpenSphericalSegment } from './unpackGeometry/SphericalSegment';
 
-export type primitiveNames = 'Box' | 'Circle' | 'ClosedCone' | 'ClosedCylinder' | 'ClosedEccentricCone' |
+type primitiveNameType = 'Box' | 'Circle' | 'ClosedCone' | 'ClosedCylinder' | 'ClosedEccentricCone' |
 'ClosedEllipsoidSegment' | 'ClosedExtrudedRingSegment' | 'ClosedGeneralCylinder' | 'ClosedSphericalSegment' |
 'ClosedTorusSegment' | 'Ellipsoid' | 'ExtrudedRing' | 'Nut' | 'OpenCone' | 'OpenCylinder' | 'OpenEccentricCone' |
 'OpenEllipsoidSegment' | 'OpenExtrudedRingSegment' | 'OpenGeneralCylinder' | 'OpenSphericalSegment' |
 'OpenTorusSegment' | 'Ring' | 'Sphere' | 'Torus';
-export type meshNames = 'TriangleMesh' | 'InstancedMesh';
-export type geometryNames = primitiveNames | meshNames;
+type meshNameType = 'TriangleMesh' | 'InstancedMesh';
+export type geometryNameType = primitiveNameType | meshNameType;
 
-export const filePrimitives: geometryNames[] = ['Box', 'Circle', 'ClosedCone', 'ClosedCylinder', 'ClosedEccentricCone',
-'ClosedEllipsoidSegment', 'ClosedExtrudedRingSegment', 'ClosedGeneralCylinder', 'ClosedSphericalSegment',
-'ClosedTorusSegment', 'Ellipsoid', 'ExtrudedRing', 'Nut', 'OpenCone', 'OpenCylinder', 'OpenEccentricCone',
-'OpenEllipsoidSegment', 'OpenExtrudedRingSegment', 'OpenGeneralCylinder', 'OpenSphericalSegment',
-'OpenTorusSegment', 'Ring', 'Sphere', 'Torus'];
-export const fileMeshes: geometryNames[] = ['TriangleMesh', 'InstancedMesh'];
+export const filePrimitives: geometryNameType[] = ['Box', 'Circle', 'ClosedCone', 'ClosedCylinder',
+'ClosedEccentricCone', 'ClosedEllipsoidSegment', 'ClosedExtrudedRingSegment', 'ClosedGeneralCylinder',
+'ClosedSphericalSegment', 'ClosedTorusSegment', 'Ellipsoid', 'ExtrudedRing', 'Nut', 'OpenCone',
+'OpenCylinder', 'OpenEccentricCone', 'OpenEllipsoidSegment', 'OpenExtrudedRingSegment',
+'OpenGeneralCylinder', 'OpenSphericalSegment', 'OpenTorusSegment', 'Ring', 'Sphere', 'Torus'];
+export const fileMeshes: geometryNameType[] = ['TriangleMesh', 'InstancedMesh'];
 
-export const IdToFileGeometryName: {[id: number]: geometryNames} = {
+export const IdToFileGeometryName: {[id: number]: geometryNameType} = {
   1: 'Box',
   2: 'Circle',
   3: 'ClosedCone',
@@ -72,20 +72,21 @@ export const IdToFileGeometryName: {[id: number]: geometryNames} = {
 export const BYTES_PER_NODE_ID = 7;
 export const DEFAULT_COLOR = new THREE.Color(0, 0, 100);
 
-export type filePropertyArrayNames = 'color' | 'centerX' | 'centerY' | 'centerZ' | 'normal' | 'delta' | 'height' |
-'radius' | 'angle' | 'translationX' | 'translationY' | 'translationZ' | 'scaleX' | 'scaleY' | 'scaleZ' | 'fileId';
-export const filePropertyArrays = ['color', 'centerX', 'centerY', 'centerZ', 'normal', 'delta', 'height',
-'radius', 'angle', 'translationX', 'translationY', 'translationZ', 'scaleX', 'scaleY', 'scaleZ', 'fileId'];
+export type filePropertyArrayNameType = 'color' | 'centerX' | 'centerY' | 'centerZ' | 'normal' | 'delta' | 'height' |
+  'radius' | 'angle' | 'translationX' | 'translationY' | 'translationZ' | 'scaleX' | 'scaleY' | 'scaleZ' | 'fileId';
+export const filePropertyArrayNames: filePropertyArrayNameType[] = ['color', 'centerX', 'centerY', 'centerZ', 'normal',
+  'delta', 'height', 'radius', 'angle', 'translationX', 'translationY', 'translationZ', 'scaleX', 'scaleY', 'scaleZ',
+  'fileId'];
 
 export type filePropertyNames = 'treeIndex' | 'color' | 'center' | 'normal' | 'delta' | 'height' | 'radiusA' |
-'radiusB' | 'rotationAngle' | 'capNormal' | 'thickness' | 'arcAngle' | 'slopeA' | 'slopeB' | 'zAngleA' | 'zAngleB' |
-'fileId' | 'triangleOffset' | 'translation' | 'rotation3' | 'scale' | 'triangleCount';
+  'radiusB' | 'rotationAngle' | 'capNormal' | 'thickness' | 'arcAngle' | 'slopeA' | 'slopeB' | 'zAngleA' | 'zAngleB' |
+  'fileId' | 'triangleOffset' | 'translation' | 'rotation3' | 'scale' | 'triangleCount';
 export const fileProperties: filePropertyNames[] = ['treeIndex', 'color', 'center', 'normal', 'delta', 'height',
-'radiusA', 'radiusB', 'rotationAngle', 'capNormal', 'thickness', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB',
-'fileId'];
+  'radiusA', 'radiusB', 'rotationAngle', 'capNormal', 'thickness', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB',
+  'fileId'];
 
-// If adding new parameters, also update PropertyLoader.
-export const fileGeometryProperties: {[name in geometryNames]: filePropertyNames[]} = {
+// If adding new parameters, also update PropergeometryNameType
+export const fileGeometryProperties: {[name in geometryNameType]: filePropertyNames[]} = {
   Box: ['treeIndex', 'color', 'center', 'normal', 'delta', 'rotationAngle'],
   Circle: ['treeIndex', 'color', 'center', 'normal', 'radiusA'],
   ClosedCone: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB'],
@@ -146,12 +147,13 @@ export const renderedPrimitiveToAddFunction: {[name in primitiveNames]: Function
   'Torus': addTorus,
 };
 
-type renderedPrimitiveNames = 'Box' | 'Circle' | 'Cone' | 'EccentricCone' | 'EllipsoidSegment' | 'GeneralCylinder' |
+type renderedPrimitiveNameType = 'Box' | 'Circle' | 'Cone' | 'EccentricCone' | 'EllipsoidSegment' | 'GeneralCylinder' |
   'GeneralRing' | 'Nut' | 'Quad' | 'SphericalSegment' | 'TorusSegment' | 'Trapezium';
-export const renderedPrimitives: renderedPrimitiveNames[] = ['Box', 'Circle', 'Cone', 'EccentricCone',
+export const renderedPrimitiveNames: renderedPrimitiveNameType[] = ['Box', 'Circle', 'Cone', 'EccentricCone',
 'EllipsoidSegment', 'GeneralCylinder', 'GeneralRing', 'Nut', 'Quad', 'SphericalSegment', 'TorusSegment', 'Trapezium'];
 
-export const renderedPrimitivesPerFilePrimitive: {[name: string]: {name: renderedPrimitiveNames, count: number}[]} = {
+export const renderedPrimitivesPerFilePrimitive:
+  {[name: string]: {name: renderedPrimitiveNameType, count: number}[]} = {
   Box: [{ name: 'Box', count: 1 }],
   Circle: [{ name: 'Circle', count: 1 }],
   ClosedCone: [{ name: 'Circle', count: 2 }, { name: 'Cone', count: 1 }],

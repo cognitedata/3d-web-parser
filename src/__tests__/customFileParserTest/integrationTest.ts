@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import CustomFileReader from '../../customFileParser/CustomFileReader';
 import parseCustomFile from '../../customFileParser/main';
-import { filePrimitives, filePropertyArrays, fileMeshes  } from '../../customFileParser/parserParameters';
+import { filePrimitives, filePropertyArrayNames, fileMeshes, filePropertyArrayNameType  } from '../../customFileParser/parserParameters';
 
 // @ts-ignore
 const fs = require('fs');
@@ -32,7 +32,7 @@ describe('customFileIntegrationTest', () => {
     expect(sectorMetadata.optimizerVersion).toBeDefined();
     expect(sectorMetadata.sectorId).toBeDefined();
     expect(sectorMetadata.parentSectorId).toBeDefined();
-    expect(sectorMetadata.arrayCount).toBe(filePropertyArrays.length);
+    expect(sectorMetadata.arrayCount).toBe(filePropertyArrayNames.length);
     expect(sectorMetadata.sectorBBoxMin).toBeDefined();
     expect(sectorMetadata.sectorBBoxMax).toBeDefined();
     expect(sectorMetadata.sectorBBoxMax.x).toBeGreaterThan(sectorMetadata.sectorBBoxMin.x);
@@ -44,17 +44,15 @@ describe('customFileIntegrationTest', () => {
     const fileBuffer = fileToArrayBuffer(rootSectorFilePath);
     const fileReader = new CustomFileReader(fileBuffer);
     const sectorMetadata = fileReader.readSectorMetadata(fileBuffer.byteLength);
-    expect(sectorMetadata.arrayCount).toBe(filePropertyArrays.length);
+    expect(sectorMetadata.arrayCount).toBe(filePropertyArrayNames.length);
 
     const uncompressedValues = fileReader.readUncompressedValues();
 
-    expect(Object.keys(uncompressedValues).length).toBe(filePropertyArrays.length);
+    expect(Object.keys(uncompressedValues).length).toBe(filePropertyArrayNames.length);
     Object.keys(uncompressedValues).forEach(parameterName => {
-      expect(filePropertyArrays.indexOf(parameterName)).not.toBe(-1);
+      expect(filePropertyArrayNames.indexOf(parameterName as filePropertyArrayNameType)).not.toBe(-1);
       if (uncompressedValues[parameterName].length > 0) {
-        if (parameterName === 'color') {
-          expect(uncompressedValues[parameterName][0] instanceof THREE.Color);
-        } else if (parameterName === 'normal') {
+        if (parameterName === 'normal') {
           expect(uncompressedValues[parameterName][0] instanceof THREE.Vector3);
         } else {
           expect(uncompressedValues[parameterName][0] instanceof Number);
@@ -73,18 +71,18 @@ describe('customFileIntegrationTest', () => {
     if (sectorMetadata.arrayCount !== 0) {
       fileReader.readUncompressedValues();
     }
-    const compressedGeometryData = fileReader.readCompressedGeometryData(fileBuffer.byteLength).primitives;
+    const compressedPrimitiveData = fileReader.readCompressedGeometryData(fileBuffer.byteLength).primitives;
 
     // Check that the sector has geometries. If it doesn't, run this test on a different file.
-    expect(compressedGeometryData.length).toBeGreaterThan(0);
+    expect(compressedPrimitiveData.length).toBeGreaterThan(0);
 
-    compressedGeometryData.forEach(compressedGeometry => {
-      expect((filePrimitives).indexOf(compressedGeometry.type)).not.toBe(-1);
-      expect(compressedGeometry.nodeIds).toBeDefined();
-      expect(compressedGeometry.indexes).toBeDefined();
-      expect(compressedGeometry.count).toBeGreaterThan(0);
-      expect(compressedGeometry.byteCount).toBeGreaterThan(0);
-      expect(compressedGeometry.attributeCount).toBeDefined();
+    compressedPrimitiveData.forEach(compressedPrimitive => {
+      expect((filePrimitives).indexOf(compressedPrimitive.type)).not.toBe(-1);
+      expect(compressedPrimitive.nodeIds).toBeDefined();
+      expect(compressedPrimitive.indexes).toBeDefined();
+      expect(compressedPrimitive.count).toBeGreaterThan(0);
+      expect(compressedPrimitive.byteCount).toBeGreaterThan(0);
+      expect(compressedPrimitive.attributeCount).toBeDefined();
     });
   });
 

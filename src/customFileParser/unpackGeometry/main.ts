@@ -24,11 +24,9 @@ function findOrCreateDestinationGroup(
     searchSector.primitiveGroups.forEach(primitiveGroup => {
       if (primitiveGroup.type === renderedPrimitiveInfo.name) {
         if (primitiveGroup.capacity >= primitiveGroup.data.count + renderedPrimitiveInfo.count) {
-          // Found destination primitive group
           destinationGroup = primitiveGroup;
-        } else {
-          destinationGroup = createGroup(originalSector, renderedPrimitiveInfo.name);
         }
+        return;
       }
     });
 

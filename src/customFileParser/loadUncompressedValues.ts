@@ -1,11 +1,11 @@
 import CustomFileReader from './CustomFileReader';
-import { filePropertyArrays } from './parserParameters';
+import { filePropertyArrayNames } from './parserParameters';
 import * as THREE from 'three';
 
 // Debugging note: This function should never be called on a sector with arrayCount == 0.
 export default function loadUncompressedValues(fileReader: CustomFileReader) {
   const uncompressedValues: {[name: string]: any[]} = {};
-  filePropertyArrays.forEach(property => {
+  filePropertyArrayNames.forEach(property => {
     uncompressedValues[property] = [];
     const clusterCount = fileReader.readUint32();
     const bytesForOneValue = fileReader.readUint8();

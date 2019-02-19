@@ -109,10 +109,11 @@ export default class CustomFileReader {
   }
 
   readCompressedGeometryData(sectorEndLocation: number): {[name: string]: CompressedGeometryData[]} {
-    const allHandlers = loadCompressedGeometryData(this, sectorEndLocation);
-    const primitiveHandlers = allHandlers.filter(handler => {
-      return (filePrimitives.indexOf(handler.type as primitiveNames) !== -1); });
-    const meshHandlers = allHandlers.filter(handler => { return (fileMeshes.indexOf(handler.type) !== -1); });
+    const geometryDataArray = loadCompressedGeometryData(this, sectorEndLocation);
+    const primitiveHandlers = geometryDataArray.filter(geometryData => {
+      return (filePrimitives.indexOf(geometryData.type as primitiveNames) !== -1); });
+    const meshHandlers = geometryDataArray.filter(geometryData => {
+      return (fileMeshes.indexOf(geometryData.type) !== -1); });
     return { primitives: primitiveHandlers, meshes: meshHandlers };
   }
 
