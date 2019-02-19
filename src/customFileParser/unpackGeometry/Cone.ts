@@ -15,7 +15,7 @@ function addOpenEccentricCone(groups: any, data: PropertyLoader) {
   centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
   centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
   groups.EccentricCone.add(data.nodeId, data.treeIndex, centerA, centerB,
-    data.radiusA, data.radiusA, data.normal);
+    data.radiusA, data.radiusB, data.normal);
 }
 
 function addClosedCone(groups: any, data: PropertyLoader) {
@@ -27,7 +27,7 @@ function addClosedCone(groups: any, data: PropertyLoader) {
 function addClosedEccentricCone(groups: any, data: PropertyLoader) {
   addOpenEccentricCone(groups, data);
   groups.Circle.add(data.nodeId, data.treeIndex, centerA, data.normal, data.radiusA);
-  groups.Circle.add(data.nodeId, data.treeIndex, centerB, data.normal, data.radiusA);
+  groups.Circle.add(data.nodeId, data.treeIndex, centerB, data.normal, data.radiusB);
 }
 
 export { addClosedCone, addClosedEccentricCone, addOpenCone, addOpenEccentricCone };

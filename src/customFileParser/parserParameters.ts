@@ -162,7 +162,7 @@ export const renderedPrimitivesPerFilePrimitive: {[name: string]: {name: rendere
   ClosedExtrudedRingSegment: [{ name: 'Cone', count : 2 }, { name: 'GeneralRing', count : 2 },
     { name: 'Quad', count : 2 }],
   ClosedGeneralCylinder: [{ name: 'GeneralCylinder', count : 2 }, { name: 'Cone', count : 2 },
-  { name: 'GeneralRing', count : 2 }, { name: 'Circle', count : 2 }],
+  { name: 'GeneralRing', count : 2 }, { name: 'Circle', count : 2 }, { name: 'Trapezium', count: 2 }],
   ClosedSphericalSegment: [{ name: 'Circle', count: 1 }, { name: 'SphericalSegment', count: 1 }],
   ClosedTorusSegment: [{ name: 'TorusSegment', count: 1 }],
   Ellipsoid: [{ name: 'EllipsoidSegment', count: 1 }],

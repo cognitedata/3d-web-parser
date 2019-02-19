@@ -23,7 +23,9 @@ export default function unpackTriangleMesh(
   group: MergedMeshGroup,
   geometryInfo: CompressedGeometryData,
   uncompressedValues: any,
-  sceneStats: SceneStats) {
+  sceneStats: SceneStats,
+  treeIndexNodeIdMap: any,
+  colorMap: any) {
   const meshCounts = countMeshesPerFileIdIndex(geometryInfo, uncompressedValues);
 
   const mergedMeshes: any = {};
@@ -37,11 +39,13 @@ export default function unpackTriangleMesh(
   const data = new PropertyLoader(uncompressedValues);
   for (let i = 0; i < geometryInfo.count; i++) {
     data.loadData(geometryInfo);
+    treeIndexNodeIdMap[data.treeIndex] = data.nodeId;
+    colorMap[data.treeIndex] = data.color;
     if (Object.keys(triangleOffsets).indexOf(data.fileId.toString()) === -1) {
       triangleOffsets[data.fileId] = 0;
     }
     mergedMeshes[data.fileId].mappings.add(
-      triangleOffsets[data.fileId], data.triangleCount, data.nodeId, data.treeIndex, data.color);
+      triangleOffsets[data.fileId], data.triangleCount, data.nodeId, data.treeIndex);
     triangleOffsets[data.fileId] += data.triangleCount;
   }
 

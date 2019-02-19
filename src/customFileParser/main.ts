@@ -25,9 +25,11 @@ function unpackData(
   // Unpack meshes
   compressedGeometryData.meshes.forEach(meshCompressedData => {
     if (meshCompressedData.type === 'InstancedMesh') {
-      // unpackInstancedMesh(sector.instancedMeshGroup, meshCompressedData, uncompressedValues, sceneStats);
+      unpackInstancedMesh(sector.instancedMeshGroup, meshCompressedData, uncompressedValues,
+        sceneStats, treeIndexNodeIdMap, colorMap);
     } else if (meshCompressedData.type === 'TriangleMesh') {
-      // unpackTriangleMesh(sector.mergedMeshGroup, meshCompressedData, uncompressedValues, sceneStats);
+      unpackTriangleMesh(sector.mergedMeshGroup, meshCompressedData, uncompressedValues,
+        sceneStats, treeIndexNodeIdMap, colorMap);
     }
   });
   sector.instancedMeshGroup.createTreeIndexMap();

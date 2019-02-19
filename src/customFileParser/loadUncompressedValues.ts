@@ -15,9 +15,9 @@ export default function loadUncompressedValues(fileReader: CustomFileReader) {
         if (bytesForOneValue !== 4) { throw Error('Reading incorrect number of bytes for color'); }
         const colorValues = fileReader.readUint8Array(clusterCount * 4);
         for (let j = 0; j < clusterCount; j++) {
-          const r = colorValues[j * 4];
-          const g = colorValues[j * 4 + 1];
-          const b = colorValues[j * 4 + 2];
+          const r = colorValues[j * 4] / 255;
+          const g = colorValues[j * 4 + 1] / 255;
+          const b = colorValues[j * 4 + 2] / 255;
           // ignoring a, it's not used by PrimitiveGroup.
           uncompressedValues.color.push(new THREE.Color(r, g, b));
         }
