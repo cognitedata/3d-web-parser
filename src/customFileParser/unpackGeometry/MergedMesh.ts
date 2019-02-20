@@ -1,8 +1,8 @@
-import { CompressedGeometryData } from './../sharedFileParserTypes';
-import { fileGeometryProperties } from './../parserParameters';
-import PropertyLoader from './../PropertyLoader';
-import { MergedMeshGroup, MergedMesh } from './../../geometry/MergedMeshGroup';
-import SceneStats from './../../SceneStats';
+import { CompressedGeometryData } from '../sharedFileParserTypes';
+import { fileGeometryProperties } from '../parserParameters';
+import PropertyLoader from '../PropertyLoader';
+import { MergedMeshGroup, MergedMesh } from '../../geometry/MergedMeshGroup';
+import SceneStats from '../../SceneStats';
 
 function countMeshesPerFileIdIndex(geometryInfo: CompressedGeometryData, uncompressedValues: any) {
   const data = new PropertyLoader(uncompressedValues);
@@ -19,7 +19,7 @@ function countMeshesPerFileIdIndex(geometryInfo: CompressedGeometryData, uncompr
   return meshCounts;
 }
 
-export default function unpackTriangleMesh(
+export default function unpackMergedMesh(
   group: MergedMeshGroup,
   geometryInfo: CompressedGeometryData,
   uncompressedValues: any,

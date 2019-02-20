@@ -1,35 +1,38 @@
-import { unpackFilePrimitive, unpackInstancedMesh, unpackTriangleMesh } from './unpackGeometry/main';
+import { unpackFilePrimitive, unpackInstancedMesh, unpackMergedMesh } from './unpackGeometry/main';
 import Sector from './../Sector';
 import { CompressedGeometryData, UncompressedValues }
   from './sharedFileParserTypes';
 import CustomFileReader from './CustomFileReader';
 import SceneStats from './../SceneStats';
 import { MergedMeshGroup } from '../geometry/MergedMeshGroup';
-import { InstancedMesh, InstancedMeshGroup } from '../geometry/InstancedMeshGroup';
+import { InstancedMeshGroup } from '../geometry/InstancedMeshGroup';
+import mergeInstancedMeshes from './../optimizations/mergeInstancedMeshes';
 
 function unpackData(
   sector: Sector,
   uncompressedValues: UncompressedValues,
-  compressedGeometryData: {[name: string]: CompressedGeometryData[]},
+  sectorPathToGeometryData: {[path: string]: {[name: string]: CompressedGeometryData[]}},
   sceneStats: SceneStats,
-  treeIndexNodeIdMap: any,
-  colorMap: any): Sector {
+  treeIndexNodeIdMap: number[],
+  colorMap: THREE.Color[]): Sector {
 
+  const compressedGeometryData = sectorPathToGeometryData[sector.path];
   // Unpack primitives
   compressedGeometryData.primitives.forEach(primitiveCompressedData => {
     unpackFilePrimitive(sector, primitiveCompressedData, uncompressedValues, treeIndexNodeIdMap, colorMap);
   });
 
+  // Unpack meshes
   sector.mergedMeshGroup = new MergedMeshGroup();
   sector.instancedMeshGroup = new InstancedMeshGroup();
-  // Unpack meshes
   compressedGeometryData.meshes.forEach(meshCompressedData => {
     if (meshCompressedData.type === 'InstancedMesh') {
       unpackInstancedMesh(sector.instancedMeshGroup, meshCompressedData, uncompressedValues,
         sceneStats, treeIndexNodeIdMap, colorMap);
-    } else if (meshCompressedData.type === 'TriangleMesh') {
-      unpackTriangleMesh(sector.mergedMeshGroup, meshCompressedData, uncompressedValues,
-        sceneStats, treeIndexNodeIdMap, colorMap);
+    } else if (meshCompressedData.type === 'MergedMesh') {
+      unpackMergedMesh(sector.mergedMeshGroup, meshCompressedData, uncompressedValues,
+       sceneStats, treeIndexNodeIdMap, colorMap);
+      mergeInstancedMeshes(sector, 2500, sceneStats, treeIndexNodeIdMap);
     }
   });
   sector.instancedMeshGroup.createTreeIndexMap();
@@ -47,10 +50,11 @@ export default function parseCustomFile(fileBuffer: ArrayBuffer) {
   };
   const mergedMeshMap: any = {};
   const treeIndexNodeIdMap: number[] = [];
-  const colorMap = {};
+  const colorMap: THREE.Color[] = [];
 
   let rootSector = undefined;
   let uncompressedValues = undefined;
+  const sectorPathToGeometryData: any = {};
   while (fileReader.location < fileBuffer.byteLength) {
     const sectorStartLocation = fileReader.location;
     const sectorByteLength = fileReader.readUint32();
@@ -69,7 +73,11 @@ export default function parseCustomFile(fileBuffer: ArrayBuffer) {
       } else { throw Error('Parent sector not found'); }
     }
     const compressedGeometryData = fileReader.readCompressedGeometryData(sectorStartLocation + sectorByteLength);
-    unpackData(sector, uncompressedValues, compressedGeometryData, sceneStats,
+    sectorPathToGeometryData[sector.path] = compressedGeometryData;
+  }
+
+  for (const sector of rootSector!.traverseSectors()) {
+    unpackData(sector, uncompressedValues!, sectorPathToGeometryData, sceneStats,
       treeIndexNodeIdMap, colorMap);
   }
 

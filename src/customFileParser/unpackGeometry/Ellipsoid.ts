@@ -4,12 +4,12 @@ import * as THREE from 'three';
 
 const centerA = new THREE.Vector3();
 
-function addOpenEllipsoidSegment(groups: any, data: PropertyLoader) {
+function addOpenEllipsoidSegment(groups: {[name: string]: any}, data: PropertyLoader) {
   groups.EllipsoidSegment.add(data.nodeId, data.treeIndex, data.center, data.normal, data.radiusA,
     data.radiusB, data.radiusB * 2);
 }
 
-function addClosedEllipsoidSegment(groups: any, data: PropertyLoader) {
+function addClosedEllipsoidSegment(groups: {[name: string]: any}, data: PropertyLoader) {
   addOpenEllipsoidSegment(groups, data);
   const length = data.radiusB - data.height;
   const circleRadius =
@@ -18,7 +18,7 @@ function addClosedEllipsoidSegment(groups: any, data: PropertyLoader) {
   groups.Circle.add(data.nodeId, data.treeIndex, centerA, data.normal, circleRadius);
 }
 
-function addEllipsoid(groups: any, data: PropertyLoader) {
+function addEllipsoid(groups: {[name: string]: any}, data: PropertyLoader) {
   data.height = 2 * data.radiusB;
   addOpenEllipsoidSegment(groups, data);
 }

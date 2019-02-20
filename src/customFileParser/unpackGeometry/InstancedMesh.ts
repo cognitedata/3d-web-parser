@@ -1,49 +1,54 @@
 import * as THREE from 'three';
 import { InstancedMeshGroup, InstancedMesh, InstancedMeshCollection } from '../../geometry/InstancedMeshGroup';
-import { CompressedGeometryData } from './../sharedFileParserTypes';
+import { CompressedGeometryData, UncompressedValues } from './../sharedFileParserTypes';
 import PropertyLoader from './../PropertyLoader';
 import { xAxis, yAxis, zAxis } from './../../constants';
 import SceneStats from './../../SceneStats';
 
 const matrix = new THREE.Matrix4();
 const rotation = new THREE.Matrix4();
-
+let size = 0;
 export default function unpackInstancedMesh(
   group: InstancedMeshGroup,
   geometryInfo: CompressedGeometryData,
-  uncompressedValues: any,
+  uncompressedValues: UncompressedValues,
   sceneStats: SceneStats,
-  treeIndexNodeIdMap: any,
-  colorMap: any) {
+  treeIndexNodeIdMap: number[],
+  colorMap: THREE.Color[]) {
 
   const data = new PropertyLoader(uncompressedValues);
 
-  const triangleProperties = [];
+  const uncompressedMetadata = [];
   for (let i = 0; i < geometryInfo.count; i++) {
     data.loadData(geometryInfo);
-    triangleProperties.push({ fileId: data.fileId, triangleOffset: data.triangleOffset,
+    uncompressedMetadata.push({ fileId: data.fileId, triangleOffset: data.triangleOffset,
       triangleCount: data.triangleCount });
   }
   geometryInfo.indexes.rewind();
   geometryInfo.nodeIds.rewind();
 
-  const allFileIds: any = {};
-  triangleProperties.forEach(triangle => {
-    if (allFileIds[triangle.fileId] === undefined) {
-      allFileIds[triangle.fileId] = [];
+  const meshesByFileId: any = {};
+  uncompressedMetadata.forEach(mergedMesh => {
+    if (meshesByFileId[mergedMesh.fileId] === undefined) {
+      meshesByFileId[mergedMesh.fileId] = [];
     }
-    if (allFileIds[triangle.fileId][triangle.triangleOffset] === undefined) {
-      allFileIds[triangle.fileId][triangle.triangleOffset] = { count: 0, triangleCount: data.triangleCount };
+    if (meshesByFileId[mergedMesh.fileId][mergedMesh.triangleOffset] === undefined) {
+      meshesByFileId[mergedMesh.fileId][mergedMesh.triangleOffset] = {
+        count: 0, triangleCount: mergedMesh.triangleCount };
+      size += 1;
     }
 
-    allFileIds[triangle.fileId][triangle.triangleOffset].count += 1;
+    meshesByFileId[mergedMesh.fileId][mergedMesh.triangleOffset].count += 1;
+    if (meshesByFileId[mergedMesh.fileId][mergedMesh.triangleOffset].triangleCount !== mergedMesh.triangleCount) {
+      throw Error("Triangle counts don't match");
+    }
   });
 
   const instancedMeshCollections: any = {};
-  Object.keys(allFileIds).forEach(fileId => {
+  Object.keys(meshesByFileId).forEach(fileId => {
     instancedMeshCollections[fileId] = {};
-    Object.keys(allFileIds[fileId]).forEach(triangleOffset => {
-      const info = allFileIds[fileId][triangleOffset];
+    Object.keys(meshesByFileId[fileId]).forEach(triangleOffset => {
+      const info = meshesByFileId[fileId][triangleOffset];
       instancedMeshCollections[fileId][triangleOffset] = new InstancedMeshCollection(
         parseInt(triangleOffset, 10),
         info.triangleCount,
@@ -67,17 +72,16 @@ export default function unpackInstancedMesh(
   }
 
   const instancedMeshes: any = {};
-  Object.keys(allFileIds).forEach(fileId => {
+  Object.keys(meshesByFileId).forEach(fileId => {
     instancedMeshes[fileId] = new InstancedMesh(parseInt(fileId, 10));
-    Object.keys(allFileIds[fileId]).forEach(triangleOffset => {
+    group.addMesh(instancedMeshes[fileId]);
+    sceneStats.numInstancedMeshes += 1;
+
+    Object.keys(meshesByFileId[fileId]).forEach(triangleOffset => {
       instancedMeshes[fileId].addCollection(
         instancedMeshCollections[fileId][triangleOffset]);
     });
   });
-  Object.keys(instancedMeshes).forEach(fileId => {
-    group.addMesh(instancedMeshes[fileId]);
-    sceneStats.numInstancedMeshes += 1;
-  });
-
-  return group;
+  
+  console.log(size);
 }

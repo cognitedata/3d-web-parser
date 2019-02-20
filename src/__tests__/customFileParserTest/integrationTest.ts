@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import CustomFileReader from '../../customFileParser/CustomFileReader';
 import parseCustomFile from '../../customFileParser/main';
-import { filePrimitiveNames, filePropertyArrayNames, fileMeshNames, filePropertyArrayNameType  } from '../../customFileParser/parserParameters';
+import { filePrimitiveNames, filePropertyArrayNames, filePropertyArrayNameType }
+  from '../../customFileParser/parserParameters';
 
 // @ts-ignore
 const fs = require('fs');

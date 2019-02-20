@@ -1,7 +1,6 @@
 // After making changes to this file, run parserParametersTest to make sure everything is still valid
 import * as THREE from 'three';
 
-import PrimitiveGroup from '../geometry/PrimitiveGroup';
 import BoxGroup from '../geometry/BoxGroup';
 import CircleGroup from '../geometry/CircleGroup';
 import ConeGroup from '../geometry/ConeGroup';
@@ -30,7 +29,7 @@ type primitiveNameType = 'Box' | 'Circle' | 'ClosedCone' | 'ClosedCylinder' | 'C
 'ClosedTorusSegment' | 'Ellipsoid' | 'ExtrudedRing' | 'Nut' | 'OpenCone' | 'OpenCylinder' | 'OpenEccentricCone' |
 'OpenEllipsoidSegment' | 'OpenExtrudedRingSegment' | 'OpenGeneralCylinder' | 'OpenSphericalSegment' |
 'OpenTorusSegment' | 'Ring' | 'Sphere' | 'Torus';
-type meshNameType = 'TriangleMesh' | 'InstancedMesh';
+type meshNameType = 'MergedMesh' | 'InstancedMesh';
 export type geometryNameType = primitiveNameType | meshNameType;
 
 export const filePrimitiveNames: geometryNameType[] = ['Box', 'Circle', 'ClosedCone', 'ClosedCylinder',
@@ -38,7 +37,7 @@ export const filePrimitiveNames: geometryNameType[] = ['Box', 'Circle', 'ClosedC
 'ClosedSphericalSegment', 'ClosedTorusSegment', 'Ellipsoid', 'ExtrudedRing', 'Nut', 'OpenCone',
 'OpenCylinder', 'OpenEccentricCone', 'OpenEllipsoidSegment', 'OpenExtrudedRingSegment',
 'OpenGeneralCylinder', 'OpenSphericalSegment', 'OpenTorusSegment', 'Ring', 'Sphere', 'Torus'];
-export const fileMeshNames: geometryNameType[] = ['TriangleMesh', 'InstancedMesh'];
+export const fileMeshNames: geometryNameType[] = ['MergedMesh', 'InstancedMesh'];
 
 export const IdToFileGeometryName: {[id: number]: geometryNameType} = {
   1: 'Box',
@@ -65,7 +64,7 @@ export const IdToFileGeometryName: {[id: number]: geometryNameType} = {
   22: 'Ring',
   23: 'Sphere',
   24: 'Torus',
-  100: 'TriangleMesh',
+  100: 'MergedMesh',
   101: 'InstancedMesh',
 };
 
@@ -107,7 +106,7 @@ export const fileGeometryProperties: {[name in geometryNameType]: filePropertyNa
   OpenEccentricCone: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB', 'capNormal'],
   OpenEllipsoidSegment: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB'],
   OpenExtrudedRingSegment: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB',
-  'rotationAngle', 'arcAngle'],
+    'rotationAngle', 'arcAngle'],
   OpenGeneralCylinder: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB', 'thickness',
   'rotationAngle', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB'],
   OpenSphericalSegment: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA'],
@@ -115,7 +114,7 @@ export const fileGeometryProperties: {[name in geometryNameType]: filePropertyNa
   Ring: ['treeIndex', 'color', 'center', 'normal', 'radiusA', 'radiusB'],
   Sphere: ['treeIndex', 'color', 'center', 'radiusA'],
   Torus: ['treeIndex', 'color', 'center', 'normal', 'radiusA', 'radiusB'],
-  TriangleMesh: ['treeIndex', 'fileId', 'triangleCount', 'color'],
+  MergedMesh: ['treeIndex', 'fileId', 'triangleCount', 'color'],
   InstancedMesh: ['treeIndex', 'fileId', 'triangleOffset', 'triangleCount', 'color', 'translation', 'rotation3',
   'scale'],
 };
@@ -147,10 +146,10 @@ export const renderedPrimitiveToAddFunction: {[name in primitiveNameType]: Funct
   'Torus': addTorus,
 };
 
-type renderedPrimitiveNameType = 'Box' | 'Circle' | 'Cone' | 'EccentricCone' | 'EllipsoidSegment' | 'GeneralCylinder' |
-  'GeneralRing' | 'Nut' | 'Quad' | 'SphericalSegment' | 'TorusSegment' | 'Trapezium';
+export type renderedPrimitiveNameType = 'Box' | 'Circle' | 'Cone' | 'EccentricCone' | 'EllipsoidSegment' |
+  'GeneralCylinder' | 'GeneralRing' | 'Nut' | 'Quad' | 'SphericalSegment' | 'TorusSegment' | 'Trapezium';
 export const renderedPrimitiveNames: renderedPrimitiveNameType[] = ['Box', 'Circle', 'Cone', 'EccentricCone',
-'EllipsoidSegment', 'GeneralCylinder', 'GeneralRing', 'Nut', 'Quad', 'SphericalSegment', 'TorusSegment', 'Trapezium'];
+  'EllipsoidSegment', 'GeneralCylinder', 'GeneralRing', 'Nut', 'Quad', 'SphericalSegment', 'TorusSegment', 'Trapezium'];
 
 export const renderedPrimitivesPerFilePrimitive:
   {[name: string]: {name: renderedPrimitiveNameType, count: number}[]} = {
@@ -173,7 +172,7 @@ export const renderedPrimitivesPerFilePrimitive:
   OpenCylinder: [{ name: 'Cone', count: 1 }],
   OpenEccentricCone: [{ name: 'EccentricCone', count: 1 }],
   OpenEllipsoidSegment: [{ name: 'EllipsoidSegment', count: 1 }],
-  OpenExtrudedRingSegment: [{ name: 'Cone', count : 2 }, { name: 'GeneralRing', count: 1 }],
+  OpenExtrudedRingSegment: [{ name: 'Cone', count : 2 }, { name: 'GeneralRing', count: 2 }],
   OpenGeneralCylinder:  [{ name: 'GeneralCylinder', count : 2 }, { name: 'Cone', count : 2 },
   { name: 'GeneralRing', count : 2 }, { name: 'Circle', count : 2 }],
   OpenSphericalSegment: [{ name: 'SphericalSegment', count: 1 }],

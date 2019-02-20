@@ -2,6 +2,7 @@ import PropertyLoader from '../PropertyLoader';
 import * as THREE from 'three';
 import { xAxis, yAxis, zAxis } from './../../constants';
 import { addOpenCone, addClosedCone } from './Cone';
+import { truncate } from 'fs';
 
 const centerA = new THREE.Vector3();
 const centerB = new THREE.Vector3();
@@ -23,7 +24,7 @@ const globalCapZAxis = new THREE.Vector3();
 const globalCapXAxis = new THREE.Vector3();
 const globalVertices = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
 
-export function addClosedCylinder(groups: any, data: PropertyLoader) {
+export function addClosedCylinder(groups: {[name: string]: any}, data: PropertyLoader) {
   centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
   centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
   groups.Cone.add(data.nodeId, data.treeIndex, centerA, centerB,
@@ -32,14 +33,14 @@ export function addClosedCylinder(groups: any, data: PropertyLoader) {
   groups.Circle.add(data.nodeId, data.treeIndex, centerB, data.normal, data.radiusA);
 }
 
-export function addOpenCylinder(groups: any, data: PropertyLoader) {
+export function addOpenCylinder(groups: {[name: string]: any}, data: PropertyLoader) {
   centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
   centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
   groups.Cone.add(data.nodeId, data.treeIndex, centerA, centerB,
   data.radiusA, data.radiusA, data.rotationAngle);
 }
 
-export function addOpenGeneralCylinder(groups: any, data: PropertyLoader) {
+export function addOpenGeneralCylinder(groups: {[name: string]: any}, data: PropertyLoader) {
   if (data.radiusA !== data.radiusB) {
     drawHollowedCone(groups, data, false);
   } else {
@@ -47,7 +48,7 @@ export function addOpenGeneralCylinder(groups: any, data: PropertyLoader) {
   }
 }
 
-export function addClosedGeneralCylinder(groups: any, data: PropertyLoader) {
+export function addClosedGeneralCylinder(groups: {[name: string]: any}, data: PropertyLoader) {
   if (data.radiusA !== data.radiusB) {
     drawHollowedCone(groups, data, true);
   } else {
@@ -72,7 +73,7 @@ function normalizeRadians (angle: number, lowerBound = -Math.PI, upperBound = Ma
   return angle;
 }
 
-function drawGeneralCylinders(groups: any, data: PropertyLoader, drawQuads: boolean) {
+function drawGeneralCylinders(groups: {[name: string]: any}, data: PropertyLoader, drawQuads: boolean) {
   centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
   centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
 
@@ -164,7 +165,7 @@ function drawGeneralCylinders(groups: any, data: PropertyLoader, drawQuads: bool
   }
 }
 
-function drawHollowedCone(groups: any, data: PropertyLoader, drawQuads: boolean) {
+function drawHollowedCone(groups: {[name: string]: any}, data: PropertyLoader, drawQuads: boolean) {
   centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
   centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
   groups.Cone.add(data.nodeId, data.treeIndex, centerA, centerB, data.radiusA, data.radiusB,
