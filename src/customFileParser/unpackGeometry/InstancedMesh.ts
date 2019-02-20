@@ -4,84 +4,86 @@ import { CompressedGeometryData, UncompressedValues } from './../sharedFileParse
 import PropertyLoader from './../PropertyLoader';
 import { xAxis, yAxis, zAxis } from './../../constants';
 import SceneStats from './../../SceneStats';
+import Sector from './../../Sector';
 
 const matrix = new THREE.Matrix4();
 const rotation = new THREE.Matrix4();
-let size = 0;
-export default function unpackInstancedMesh(
-  group: InstancedMeshGroup,
-  geometryInfo: CompressedGeometryData,
+
+export default function unpackInstancedMeshes(
+  rootSector: Sector,
   uncompressedValues: UncompressedValues,
+  sectorPathToInstancedMeshData: {[path: string]: CompressedGeometryData},
   sceneStats: SceneStats,
   treeIndexNodeIdMap: number[],
   colorMap: THREE.Color[]) {
 
   const data = new PropertyLoader(uncompressedValues);
+  const meshCounts: any = {};
+  const fileIdToSector: {[fileId: string]: Sector} = {};
 
-  const uncompressedMetadata = [];
-  for (let i = 0; i < geometryInfo.count; i++) {
-    data.loadData(geometryInfo);
-    uncompressedMetadata.push({ fileId: data.fileId, triangleOffset: data.triangleOffset,
-      triangleCount: data.triangleCount });
+  // Count meshes per file Id and triangle offset
+  for (const sector of rootSector.traverseSectors()) {
+    const geometryInfo = sectorPathToInstancedMeshData[sector.path];
+    if (geometryInfo !== undefined) {
+      for (let i = 0; i < geometryInfo.count; i++) {
+        data.loadData(geometryInfo);
+        fileIdToSector[data.fileId] = fileIdToSector[data.fileId] ? fileIdToSector[data.fileId] : sector;
+        while (sector.path.indexOf(fileIdToSector[data.fileId]!.path) === -1) {
+          fileIdToSector[data.fileId] = fileIdToSector[data.fileId]!.parent!;
+        }
+        meshCounts[data.fileId] = meshCounts[data.fileId] ? meshCounts[data.fileId] : {};
+        meshCounts[data.fileId][data.triangleOffset] = meshCounts[data.fileId][data.triangleOffset] ?
+          meshCounts[data.fileId][data.triangleOffset] : { count: 0, triangleCount: data.triangleCount };
+        meshCounts[data.fileId][data.triangleOffset].count++;
+      }
+      geometryInfo.indexes.rewind();
+      geometryInfo.nodeIds.rewind();
+    }
   }
-  geometryInfo.indexes.rewind();
-  geometryInfo.nodeIds.rewind();
 
-  const meshesByFileId: any = {};
-  uncompressedMetadata.forEach(mergedMesh => {
-    if (meshesByFileId[mergedMesh.fileId] === undefined) {
-      meshesByFileId[mergedMesh.fileId] = [];
-    }
-    if (meshesByFileId[mergedMesh.fileId][mergedMesh.triangleOffset] === undefined) {
-      meshesByFileId[mergedMesh.fileId][mergedMesh.triangleOffset] = {
-        count: 0, triangleCount: mergedMesh.triangleCount };
-      size += 1;
-    }
-
-    meshesByFileId[mergedMesh.fileId][mergedMesh.triangleOffset].count += 1;
-    if (meshesByFileId[mergedMesh.fileId][mergedMesh.triangleOffset].triangleCount !== mergedMesh.triangleCount) {
-      throw Error("Triangle counts don't match");
-    }
-  });
-
-  const instancedMeshCollections: any = {};
-  Object.keys(meshesByFileId).forEach(fileId => {
-    instancedMeshCollections[fileId] = {};
-    Object.keys(meshesByFileId[fileId]).forEach(triangleOffset => {
-      const info = meshesByFileId[fileId][triangleOffset];
-      instancedMeshCollections[fileId][triangleOffset] = new InstancedMeshCollection(
-        parseInt(triangleOffset, 10),
-        info.triangleCount,
-        info.count,
-      );
+  // Create mesh collections for each file Id and triangle offset
+  const collections: any = {};
+  Object.keys(meshCounts).forEach(fileId => {
+    collections[fileId] = collections[fileId] ? collections[fileId] : {};
+    Object.keys(meshCounts[fileId]).forEach(triangleOffset => {
+      const { count, triangleCount } = meshCounts[fileId][triangleOffset];
+      collections[fileId][triangleOffset] = new InstancedMeshCollection(
+        parseInt(triangleOffset, 10), triangleCount, count);
     });
   });
 
-  for (let i = 0; i < geometryInfo.count; i++) {
-    data.loadData(geometryInfo);
-    treeIndexNodeIdMap[data.treeIndex] = data.nodeId;
-    colorMap[data.treeIndex] = data.color;
-    matrix.identity().setPosition(data.translation);
-    matrix.multiply(rotation.makeRotationAxis(zAxis, data.rotation3.z));
-    matrix.multiply(rotation.makeRotationAxis(yAxis, data.rotation3.y));
-    matrix.multiply(rotation.makeRotationAxis(xAxis, data.rotation3.x));
+  // Fill mesh collections with matrix data
+  for (const sector of rootSector.traverseSectors()) {
+    const geometryInfo = sectorPathToInstancedMeshData[sector.path];
+    if (geometryInfo !== undefined) {
+      for (let i = 0; i < geometryInfo.count; i++) {
+        data.loadData(geometryInfo);
+        treeIndexNodeIdMap[data.treeIndex] = data.nodeId;
+        colorMap[data.treeIndex] = data.color;
+        matrix.identity().setPosition(data.translation);
+        matrix.multiply(rotation.makeRotationAxis(zAxis, data.rotation3.z));
+        matrix.multiply(rotation.makeRotationAxis(yAxis, data.rotation3.y));
+        matrix.multiply(rotation.makeRotationAxis(xAxis, data.rotation3.x));
+        matrix.scale(data.scale);
 
-    matrix.scale(data.scale);
-    instancedMeshCollections[data.fileId][data.triangleOffset].addMapping(
-      data.nodeId, data.treeIndex, matrix);
+        collections[data.fileId][data.triangleOffset].addMapping(
+          data.nodeId, data.treeIndex, matrix);
+      }
+    }
   }
 
-  const instancedMeshes: any = {};
-  Object.keys(meshesByFileId).forEach(fileId => {
-    instancedMeshes[fileId] = new InstancedMesh(parseInt(fileId, 10));
-    group.addMesh(instancedMeshes[fileId]);
+  // Add collections to sector group
+  Object.keys(collections).forEach(fileId => {
+    const instancedMesh = new InstancedMesh(parseInt(fileId, 10));
+    Object.keys(collections[fileId]).forEach(triangleOffset => {
+      instancedMesh.addCollection(collections[fileId][triangleOffset]);
+    });
+    fileIdToSector[fileId].instancedMeshGroup.addMesh(instancedMesh);
     sceneStats.numInstancedMeshes += 1;
-
-    Object.keys(meshesByFileId[fileId]).forEach(triangleOffset => {
-      instancedMeshes[fileId].addCollection(
-        instancedMeshCollections[fileId][triangleOffset]);
-    });
   });
-  
-  console.log(size);
+
+  // create tree index map for each sector
+  for (const sector of rootSector.traverseSectors()) {
+    sector.instancedMeshGroup.createTreeIndexMap();
+  }
 }

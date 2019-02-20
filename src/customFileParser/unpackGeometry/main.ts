@@ -1,12 +1,12 @@
-import { CompressedGeometryData } from './../sharedFileParserTypes';
+import { CompressedGeometryData, UncompressedValues } from './../sharedFileParserTypes';
 import PropertyLoader from './../PropertyLoader';
 import { renderedPrimitiveToAddFunction, renderedPrimitivesPerFilePrimitive, renderedPrimitiveToGroup }
   from '../parserParameters';
-import unpackInstancedMesh from './InstancedMesh';
-import unpackMergedMesh from './MergedMesh';
+import unpackInstancedMeshes from './InstancedMesh';
+import unpackMergedMeshes from './MergedMesh';
 import { Sector } from '../..';
 
-export { unpackInstancedMesh, unpackMergedMesh };
+export { unpackInstancedMeshes, unpackMergedMeshes };
 
 function createGroup(sector: Sector, primitiveName: string, capacity: number) {
   const createdGroup = new renderedPrimitiveToGroup[primitiveName](capacity);
@@ -73,7 +73,7 @@ function updateDestinationGroups(
   });
 }
 
-export function unpackFilePrimitive(
+function unpackFilePrimitive(
   currentSector: Sector,
   primitiveCompressedData: CompressedGeometryData,
   uncompressedValues: any,
@@ -92,5 +92,20 @@ export function unpackFilePrimitive(
     colorMap[data.treeIndex] = data.color;
     // @ts-ignore
     renderedPrimitiveToAddFunction[primitiveCompressedData.type].call(this, destinationPrimitiveGroups, data);
+  }
+}
+
+export function unpackPrimitives(
+  rootSector: Sector,
+  uncompressedValues: UncompressedValues,
+  sectorPathToPrimitiveData: {[path: string]: CompressedGeometryData[]},
+  treeIndexNodeIdMap: number[],
+  colorMap: THREE.Color[]) {
+
+  for (const sector of rootSector!.traverseSectors()) {
+    const compressedPrimitiveData = sectorPathToPrimitiveData[sector.path];
+    compressedPrimitiveData.forEach(primitiveCompressedData => {
+      unpackFilePrimitive(sector, primitiveCompressedData, uncompressedValues, treeIndexNodeIdMap, colorMap);
+    });
   }
 }

@@ -108,13 +108,28 @@ export default class CustomFileReader {
     return loadUncompressedValues(this);
   }
 
-  readCompressedGeometryData(sectorEndLocation: number): {[name: string]: CompressedGeometryData[]} {
+  readCompressedGeometryData(sectorEndLocation: number): {
+    [name: string]: CompressedGeometryData[] | CompressedGeometryData | undefined} {
     const geometryDataArray = loadCompressedGeometryData(this, sectorEndLocation);
+    const primitives: CompressedGeometryData[] = [];
+    let instancedMesh = undefined;
+    let mergedMesh = undefined;
+    geometryDataArray.forEach(geometryData => {
+      if (filePrimitiveNames.indexOf(geometryData.type) !== -1) {
+        primitives.push(geometryData);
+      } else if (geometryData.type === 'InstancedMesh' as geometryNameType) {
+        instancedMesh = geometryData;
+      } else if (geometryData.type === 'MergedMesh' as geometryNameType) {
+        mergedMesh = geometryData;
+      } else {
+        throw Error('Unrecognized geometry data type ' + geometryData.type);
+      }
+    });
     const primitiveHandlers = geometryDataArray.filter(geometryData => {
       return (filePrimitiveNames.indexOf(geometryData.type as geometryNameType) !== -1); });
     const meshHandlers = geometryDataArray.filter(geometryData => {
       return (fileMeshNames.indexOf(geometryData.type) !== -1); });
-    return { primitives: primitiveHandlers, meshes: meshHandlers };
+    return { primitives: primitiveHandlers, instancedMesh, mergedMesh };
   }
 
   getNodeIdReader(geometryCount: number): NodeIdReader {
