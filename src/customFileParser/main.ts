@@ -2,6 +2,7 @@ import { unpackInstancedMeshes, unpackMergedMeshes, unpackPrimitives } from './u
 import Sector from './../Sector';
 import CustomFileReader from './CustomFileReader';
 import SceneStats from './../SceneStats';
+import mergeInstancedMeshes from './../optimizations/mergeInstancedMeshes';
 
 export default function parseCustomFile(fileBuffer: ArrayBuffer) {
   const fileReader = new CustomFileReader(fileBuffer);
@@ -45,10 +46,15 @@ export default function parseCustomFile(fileBuffer: ArrayBuffer) {
 
   unpackPrimitives(rootSector!, uncompressedValues!, sectorPathToPrimitiveData,
     treeIndexNodeIdMap, colorMap);
-  unpackInstancedMeshes(rootSector!, uncompressedValues!, sectorPathToInstancedMeshData, sceneStats,
-    treeIndexNodeIdMap, colorMap);
   unpackMergedMeshes(rootSector!, uncompressedValues!, sectorPathToMergedMeshData, sceneStats,
     treeIndexNodeIdMap, colorMap);
+  unpackInstancedMeshes(rootSector!, uncompressedValues!, sectorPathToInstancedMeshData, sceneStats,
+    treeIndexNodeIdMap, colorMap);
+  for (const sector of rootSector!.traverseSectors()) {
+    mergeInstancedMeshes(sector, 2500, sceneStats, treeIndexNodeIdMap);
+    sector.mergedMeshGroup.createTreeIndexMap();
+    sector.instancedMeshGroup.createTreeIndexMap();
+  }
 
   const sectors = idToSectorMap;
   const nodeIdTreeIndexMap: {[s: number]: number} = {};
