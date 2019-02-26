@@ -63,19 +63,21 @@ const primitiveParsers = [
 function parseGeometries(data: ParseData) {
   const primitiveGroups: PrimitiveGroup[] = [];
   primitiveParsers.forEach(({ type, parser }) => {
-    const didCreateNewGroup = parser(data);
-
-    if (didCreateNewGroup) {
-      // TODO(anders.hafreager) Learn TypeScript and fix this
-      // @ts-ignore
-      primitiveGroups.push(data.primitiveGroupMap[type].group);
+    // @ts-ignore
+    if (true) { //(type == "Nut" || (window.changeType.length === type.length && (window.changeType.slice(1) === type.slice(1)))) {
+      const didCreateNewGroup = parser(data);
+      if (didCreateNewGroup) {
+        primitiveGroups.push(data.primitiveGroupMap[type].group);
+      }
     }
   });
 
+  /*
   const mergedMeshGroup = parseMergedMeshes(data);
   const instancedMeshGroup = parseInstancedMeshes(data);
+  */
 
-  return { primitiveGroups, mergedMeshGroup, instancedMeshGroup };
+  return { primitiveGroups };
 }
 
 export default async function parseProtobuf(
@@ -95,20 +97,33 @@ export default async function parseProtobuf(
   // Create map since we will reuse primitive groups until the count is above some threshold.
   // This reduces the number of draw calls.
   const primitiveGroupMap: PrimitiveGroupMap = {
-    Box: { capacity: 5000, group: new BoxGroup(0) },
-    Circle: { capacity: 5000, group: new CircleGroup(0) },
-    Cone: { capacity: 5000, group: new ConeGroup(0) },
-    EccentricCone: { capacity: 5000, group: new EccentricConeGroup(0) },
-    EllipsoidSegment: { capacity: 5000, group: new EllipsoidSegmentGroup(0) },
-    GeneralCylinder: { capacity: 5000, group: new GeneralCylinderGroup(0) },
-    GeneralRing: { capacity: 5000, group: new GeneralRingGroup(0) },
-    Nut: { capacity: 5000, group: new NutGroup(0) },
-    Quad: { capacity: 5000, group: new QuadGroup(0) },
-    SphericalSegment: { capacity: 5000, group: new SphericalSegmentGroup(0) },
-    TorusSegment: { capacity: 5000, group: new TorusSegmentGroup(0) },
-    Trapezium: { capacity: 5000, group: new TrapeziumGroup(0) },
+    // @ts-ignore
+    Box: { capacity: window.box, group: new BoxGroup(0) },
+    // @ts-ignore
+    Circle: { capacity: window.circle, group: new CircleGroup(0) },
+    // @ts-ignore
+    Cone: { capacity: window.cone, group: new ConeGroup(0) },
+    // @ts-ignore
+    EccentricCone: { capacity: window.eccentricCone, group: new EccentricConeGroup(0) },
+    // @ts-ignore
+    EllipsoidSegment: { capacity: window.ellipsoidSegment, group: new EllipsoidSegmentGroup(0) },
+    // @ts-ignore
+    GeneralCylinder: { capacity: window.generalCylinder, group: new GeneralCylinderGroup(0) },
+    // @ts-ignore
+    GeneralRing: { capacity: window.generalRing, group: new GeneralRingGroup(0) },
+    // @ts-ignore
+    Nut: { capacity: window.nut, group: new NutGroup(0) },
+    // @ts-ignore
+    Quad: { capacity: window.quad, group: new QuadGroup(0) },
+    // @ts-ignore
+    SphericalSegment: { capacity: window.sphericalSegment, group: new SphericalSegmentGroup(0) },
+    // @ts-ignore
+    TorusSegment: { capacity: window.torusSegment, group: new TorusSegmentGroup(0) },
+    // @ts-ignore
+    Trapezium: { capacity: window.trapezium, group: new TrapeziumGroup(0) },
   };
 
+  console.log(primitiveGroupMap);
   const mergedMeshMap: InstancedMeshMap = {};
   const treeIndexNodeIdMap: number[] = [];
   const colorMap = {};
@@ -123,8 +138,6 @@ export default async function parseProtobuf(
 
     const {
       primitiveGroups,
-      mergedMeshGroup,
-      instancedMeshGroup,
     } = parseGeometries({
       primitiveGroupMap,
       geometries: webNode.geometries,
@@ -136,8 +149,8 @@ export default async function parseProtobuf(
     });
 
     sector.primitiveGroups = primitiveGroups;
-    sector.mergedMeshGroup = mergedMeshGroup;
-    sector.instancedMeshGroup = instancedMeshGroup;
+    // sector.mergedMeshGroup = mergedMeshGroup;
+    // sector.instancedMeshGroup = instancedMeshGroup;
 
     // attach to parent
     const parentPath = getParentPath(path);
@@ -186,5 +199,12 @@ export default async function parseProtobuf(
     const nodeId = treeIndexNodeIdMap[treeIndex];
     nodeIdTreeIndexMap[nodeId] = treeIndex;
   }
+
+  for (const sector of rootSector.traverseSectors()) {
+    sector.instancedMeshGroup.meshes.forEach(mesh => {
+      console.log(mesh.fileId, sector.path);
+    });
+  }
+
   return { rootSector, sectors, sceneStats, maps: { colorMap, treeIndexNodeIdMap, nodeIdTreeIndexMap } };
 }
