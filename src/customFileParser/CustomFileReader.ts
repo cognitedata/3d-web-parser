@@ -109,7 +109,9 @@ export default class CustomFileReader {
   }
 
   readCompressedGeometryData(sectorEndLocation: number): {
-    [name: string]: CompressedGeometryData[] | CompressedGeometryData | undefined} {
+    primitives: CompressedGeometryData[],
+    instancedMesh: CompressedGeometryData | undefined,
+    mergedMesh: CompressedGeometryData | undefined} {
     const geometryDataArray = loadCompressedGeometryData(this, sectorEndLocation);
     const primitives: CompressedGeometryData[] = [];
     let instancedMesh = undefined;
