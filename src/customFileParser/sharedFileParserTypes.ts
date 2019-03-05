@@ -23,7 +23,7 @@ interface CompressedGeometryData {
 }
 
 interface UncompressedValues {
-  [propertyName: string]: any[] | undefined;
+  [propertyName: string]: THREE.Color[] | THREE.Vector3[] | number[] | undefined;
   color?: THREE.Color[];
   normal?: THREE.Vector3[];
   centerX?: number[];
