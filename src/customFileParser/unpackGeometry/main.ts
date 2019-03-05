@@ -4,11 +4,13 @@ import { renderedPrimitiveToAddFunction, renderedPrimitivesPerFilePrimitive, ren
   from '../parserParameters';
 import unpackInstancedMeshes from './InstancedMesh';
 import unpackMergedMeshes from './MergedMesh';
+import { PrimitiveGroup } from '../../geometry/GeometryGroups';
 import { Sector } from '../..';
 
 export { unpackInstancedMeshes, unpackMergedMeshes };
 
 function createGroup(sector: Sector, primitiveName: string, capacity: number) {
+  // @ts-ignore
   const createdGroup = new renderedPrimitiveToGroup[primitiveName](capacity);
   sector.primitiveGroups.push(createdGroup);
   return createdGroup;
@@ -17,10 +19,10 @@ function createGroup(sector: Sector, primitiveName: string, capacity: number) {
 function findOrCreateDestinationGroup(
   originalSector: Sector,
   renderedPrimitiveInfo: {name: string, count: number},
-  numOfGeometries: number) {
+  numberOfGeometries: number) {
 
   let searchSector: Sector | undefined = originalSector;
-  let destinationGroup: any = undefined;
+  let destinationGroup: PrimitiveGroup | undefined = undefined;
 
   while ((searchSector !== undefined) && (destinationGroup === undefined)) {
 
@@ -39,7 +41,7 @@ function findOrCreateDestinationGroup(
     return destinationGroup;
   } else {
     if (originalSector.children.length === 0) {
-      const capacity = renderedPrimitiveInfo.count * numOfGeometries;
+      const capacity = renderedPrimitiveInfo.count * numberOfGeometries;
       return createGroup(originalSector, renderedPrimitiveInfo.name, capacity);
     } else {
       return createGroup(originalSector, renderedPrimitiveInfo.name, 1000);
@@ -48,9 +50,9 @@ function findOrCreateDestinationGroup(
 }
 
 function loadDestinationGroups(
-  destinationPrimitiveGroups: any,
+  destinationPrimitiveGroups: {[name: string]: PrimitiveGroup},
   currentSector: Sector,
-  primitiveCompressedData: any,
+  primitiveCompressedData: CompressedGeometryData,
 ) {
   renderedPrimitivesPerFilePrimitive[primitiveCompressedData.type].forEach(renderedPrimitiveInfo => {
     destinationPrimitiveGroups[renderedPrimitiveInfo.name] =
@@ -59,16 +61,16 @@ function loadDestinationGroups(
 }
 
 function updateDestinationGroups(
-  destinationPrimitiveGroups: any,
+  destinationPrimitiveGroups: {[name: string]: PrimitiveGroup},
   currentSector: Sector,
-  primitiveCompressedData: any,
-  numOfGeometries: number,
+  primitiveCompressedData: CompressedGeometryData,
+  numberOfGeometries: number,
 ) {
   renderedPrimitivesPerFilePrimitive[primitiveCompressedData.type].forEach(renderedPrimitiveInfo => {
     const destinationGroup = destinationPrimitiveGroups[renderedPrimitiveInfo.name];
     if ( destinationGroup.capacity < destinationGroup.data.count + renderedPrimitiveInfo.count) {
         destinationPrimitiveGroups[renderedPrimitiveInfo.name] =
-          findOrCreateDestinationGroup(currentSector, renderedPrimitiveInfo, numOfGeometries);
+          findOrCreateDestinationGroup(currentSector, renderedPrimitiveInfo, numberOfGeometries);
       }
   });
 }
@@ -76,11 +78,11 @@ function updateDestinationGroups(
 function unpackFilePrimitive(
   currentSector: Sector,
   primitiveCompressedData: CompressedGeometryData,
-  uncompressedValues: any,
-  treeIndexNodeIdMap: any,
-  colorMap: any) {
+  uncompressedValues: UncompressedValues,
+  treeIndexNodeIdMap: number[],
+  colorMap: THREE.Color[]) {
 
-  const destinationPrimitiveGroups: any = {};
+  const destinationPrimitiveGroups: {[name: string]: PrimitiveGroup} = {};
   loadDestinationGroups(destinationPrimitiveGroups, currentSector, primitiveCompressedData);
 
   const data = new PropertyLoader(uncompressedValues);

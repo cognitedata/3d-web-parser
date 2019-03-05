@@ -52,11 +52,11 @@ describe('customFileIntegrationTest', () => {
     expect(Object.keys(uncompressedValues).length).toBe(filePropertyArrayNames.length);
     Object.keys(uncompressedValues).forEach(parameterName => {
       expect(filePropertyArrayNames.indexOf(parameterName as filePropertyArrayNameType)).not.toBe(-1);
-      if (uncompressedValues[parameterName].length > 0) {
+      if (uncompressedValues[parameterName]!.length > 0) {
         if (parameterName === 'normal') {
-          expect(uncompressedValues[parameterName][0] instanceof THREE.Vector3);
+          expect(uncompressedValues[parameterName]![0] instanceof THREE.Vector3);
         } else {
-          expect(uncompressedValues[parameterName][0] instanceof Number);
+          expect(uncompressedValues[parameterName]![0] instanceof Number);
         }
       } else {
         // tslint:disable-next-line
@@ -80,7 +80,7 @@ describe('customFileIntegrationTest', () => {
     compressedPrimitiveData.forEach(compressedPrimitive => {
       expect((filePrimitiveNames).indexOf(compressedPrimitive.type)).not.toBe(-1);
       expect(compressedPrimitive.nodeIds).toBeDefined();
-      expect(compressedPrimitive.indexes).toBeDefined();
+      expect(compressedPrimitive.indices).toBeDefined();
       expect(compressedPrimitive.count).toBeGreaterThan(0);
       expect(compressedPrimitive.byteCount).toBeGreaterThan(0);
       expect(compressedPrimitive.attributeCount).toBeDefined();

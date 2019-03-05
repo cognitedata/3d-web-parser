@@ -110,8 +110,8 @@ export default class CustomFileReader {
 
   readCompressedGeometryData(sectorEndLocation: number): {
     primitives: CompressedGeometryData[],
-    instancedMesh: CompressedGeometryData | undefined,
-    mergedMesh: CompressedGeometryData | undefined} {
+    instancedMesh?: CompressedGeometryData,
+    mergedMesh?: CompressedGeometryData} {
     const geometryDataArray = loadCompressedGeometryData(this, sectorEndLocation);
     const primitives: CompressedGeometryData[] = [];
     let instancedMesh = undefined;
@@ -141,8 +141,8 @@ export default class CustomFileReader {
   }
 
   getFibonacciDecoder(byteCount: number, numberOfValues: number): FibonacciDecoder {
-    const indexes = new FibonacciDecoder(this.originalBuffer, numberOfValues, this.location, byteCount);
+    const indices = new FibonacciDecoder(this.originalBuffer, numberOfValues, this.location, byteCount);
     this.location += byteCount;
-    return indexes;
+    return indices;
   }
 }

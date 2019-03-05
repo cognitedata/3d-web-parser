@@ -18,7 +18,7 @@ export default function unpackInstancedMeshes(
   colorMap: THREE.Color[]) {
 
   const data = new PropertyLoader(uncompressedValues);
-  const meshCounts: any = {};
+  const meshCounts: {[fileId: string]: {[triangleOffset: string]: { count: number, triangleCount: number }}} = {};
   const fileIdToSector: {[fileId: string]: Sector} = {};
 
   // Count meshes per file Id and triangle offset
@@ -36,13 +36,13 @@ export default function unpackInstancedMeshes(
           meshCounts[data.fileId][data.triangleOffset] : { count: 0, triangleCount: data.triangleCount };
         meshCounts[data.fileId][data.triangleOffset].count++;
       }
-      geometryInfo.indexes.rewind();
+      geometryInfo.indices.rewind();
       geometryInfo.nodeIds.rewind();
     }
   }
 
   // Create mesh collections for each file Id and triangle offset
-  const collections: any = {};
+  const collections: {[fileId: string]: {[triangleOffset: string]: InstancedMeshCollection}} = {};
   Object.keys(meshCounts).forEach(fileId => {
     collections[fileId] = collections[fileId] ? collections[fileId] : {};
     Object.keys(meshCounts[fileId]).forEach(triangleOffset => {
