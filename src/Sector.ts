@@ -54,9 +54,7 @@ export default class Sector {
     while (stack.length > 0) {
       const nextSector = stack.shift();
       nextSector!.children.forEach(child => {
-        if (child !== undefined) {
-          stack.push(child);
-        }
+        stack.push(child);
       });
       yield nextSector!;
     }
