@@ -2,7 +2,7 @@ import FibonacciDecoder from '../../customFileParser/FibonacciDecoder';
 
 describe('FibonacciDecoder', () => {
   test('parse fibonacci encoding', async() => {
-    const uncompressedData = new ArrayBuffer(13);
+    const uncompressedData = new ArrayBuffer(12);
     const uncompressedView = new Uint8Array(uncompressedData);
     uncompressedView[0] = parseInt('11110011', 2);
     uncompressedView[1] = parseInt('10001000', 2);
@@ -16,7 +16,7 @@ describe('FibonacciDecoder', () => {
     uncompressedView[9] = parseInt('00000010', 2);
     uncompressedView[10] = parseInt('01011110', 2);
     uncompressedView[11] = parseInt('10110000', 2);
-    const decoder = new FibonacciDecoder(uncompressedData);
+    const decoder = new FibonacciDecoder(uncompressedData, 6, 0, uncompressedView.length);
     expect(decoder.nextValue()).toBe(0);
     expect(decoder.nextValue()).toBe(0);
     expect(decoder.nextValue()).toBe(2);

@@ -1,3 +1,4 @@
+export { default as PrimitiveGroup } from './PrimitiveGroup';
 export { default as BoxGroup } from './BoxGroup';
 export { default as CircleGroup } from './CircleGroup';
 export { default as ConeGroup } from './ConeGroup';

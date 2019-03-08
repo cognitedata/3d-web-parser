@@ -1,10 +1,9 @@
-
 import loadSectorMetadata from './loadSectorMetadata';
 import loadUncompressedValues from './loadUncompressedValues';
-import loadGeometryIndexHandlers from './loadGeometryIndexHandlers';
+import loadCompressedGeometryData from './loadCompressedGeometryData';
 import FibonacciDecoder from './FibonacciDecoder';
-import { NodeIdReader, GeometryIndexHandler } from './sharedFileParserTypes';
-import { BYTES_PER_NODE_ID } from './parserParameters';
+import { NodeIdReader, CompressedGeometryData } from './sharedFileParserTypes';
+import { filePrimitiveNames, fileMeshNames, BYTES_PER_NODE_ID, geometryNameType } from './parserParameters';
 
 export default class CustomFileReader {
   public location: number;
@@ -21,6 +20,7 @@ export default class CustomFileReader {
     this.flip = true;
   }
 
+  // Use for debugging
   dumpHex(numberOfValues: number) {
     for (let i = -numberOfValues; i < 0; i++) {
       // tslint:disable-next-line
@@ -47,9 +47,9 @@ export default class CustomFileReader {
   }
 
   readUint64() {
-    let value = this.dataView.getUint32(this.location, this.flip);
-    value = value * Math.pow(2, 8);
-    value += this.dataView.getUint32(this.location + 4, this.flip);
+    let value = this.dataView.getUint32(this.location + 4, this.flip);
+    value = value * Math.pow(2, 32);
+    value += this.dataView.getUint32(this.location, this.flip);
     this.location += 8;
     return value;
   }
@@ -108,8 +108,30 @@ export default class CustomFileReader {
     return loadUncompressedValues(this);
   }
 
-  readSectorGeometryIndexHandlers(sectorEndLocation: number): GeometryIndexHandler[] {
-    return loadGeometryIndexHandlers(this, sectorEndLocation);
+  readCompressedGeometryData(sectorEndLocation: number): {
+    primitives: CompressedGeometryData[],
+    instancedMesh?: CompressedGeometryData,
+    mergedMesh?: CompressedGeometryData} {
+    const geometryDataArray = loadCompressedGeometryData(this, sectorEndLocation);
+    const primitives: CompressedGeometryData[] = [];
+    let instancedMesh = undefined;
+    let mergedMesh = undefined;
+    geometryDataArray.forEach(geometryData => {
+      if (filePrimitiveNames.indexOf(geometryData.type) !== -1) {
+        primitives.push(geometryData);
+      } else if (geometryData.type === 'InstancedMesh' as geometryNameType) {
+        instancedMesh = geometryData;
+      } else if (geometryData.type === 'MergedMesh' as geometryNameType) {
+        mergedMesh = geometryData;
+      } else {
+        throw Error('Unrecognized geometry data type ' + geometryData.type);
+      }
+    });
+    const primitiveHandlers = geometryDataArray.filter(geometryData => {
+      return (filePrimitiveNames.indexOf(geometryData.type as geometryNameType) !== -1); });
+    const meshHandlers = geometryDataArray.filter(geometryData => {
+      return (fileMeshNames.indexOf(geometryData.type) !== -1); });
+    return { primitives: primitiveHandlers, instancedMesh, mergedMesh };
   }
 
   getNodeIdReader(geometryCount: number): NodeIdReader {
@@ -118,9 +140,9 @@ export default class CustomFileReader {
     return nodeIds;
   }
 
-  getFibonacciDecoder(byteCount: number): FibonacciDecoder {
-    const indexes = new FibonacciDecoder(this.originalBuffer, this.location, byteCount);
+  getFibonacciDecoder(byteCount: number, numberOfValues: number): FibonacciDecoder {
+    const indices = new FibonacciDecoder(this.originalBuffer, numberOfValues, this.location, byteCount);
     this.location += byteCount;
-    return indexes;
+    return indices;
   }
 }

@@ -44,6 +44,7 @@ import SceneStats from './SceneStats';
 import mergeInstancedMeshes from './optimizations/mergeInstancedMeshes';
 import { MergedMeshGroup } from './geometry/MergedMeshGroup';
 import { PrimitiveGroupMap } from './geometry/PrimitiveGroup';
+import { TreeIndexNodeIdMap, ColorMap } from './parsers/parseUtils';
 
 const primitiveParsers = [
   { type: 'Box', parser: parseBoxes },
@@ -110,8 +111,8 @@ export default async function parseProtobuf(
   };
 
   const mergedMeshMap: InstancedMeshMap = {};
-  const treeIndexNodeIdMap: number[] = [];
-  const colorMap = {};
+  const treeIndexNodeIdMap: TreeIndexNodeIdMap = [];
+  const colorMap: ColorMap = [];
 
   let t0 = performance.now();
   const handleWebNode = (webNode: any) => {

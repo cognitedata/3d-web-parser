@@ -6,3 +6,5 @@ src/geometry/*.js
 src/__tests__/customFileParserTest/customFileParserTest.js
 src/constants.js
 src/customParser.js
+.DS_Store
+.vscode

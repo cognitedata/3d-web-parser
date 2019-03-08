@@ -78,7 +78,7 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
       { name: 'treeIndex', array: this.treeIndex, itemSize: 1 },
     ];
     this.hasCustomTransformAttributes = false;
-    this.data = new GeometryGroupData('Primitive', capacity, this.attributes);
+    this.data = new GeometryGroupData('Primitive', 0, this.attributes); // Placeholder, overwritten in children classes
   }
 
   abstract computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4;
@@ -99,67 +99,6 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
       return false; // Did not add this geometry
     }
     return true; // Did add this geometry
-  }
-
-  setVector<T extends TypedArray, U extends THREEVector>(
-    source: U,
-    target: T,
-    index: number,
-  ) {
-    // @ts-ignore
-    if (source.isVector2) {
-      target[2 * index + 0] = source.x;
-      target[2 * index + 1] = source.y;
-      // @ts-ignore
-    } else if (source.isVector3) {
-      target[3 * index + 0] = source.x;
-      target[3 * index + 1] = source.y;
-      // @ts-ignore
-      target[3 * index + 2] = source.z;
-      // @ts-ignore
-    } else if (source.isVector4) {
-      target[4 * index + 0] = source.x;
-      target[4 * index + 1] = source.y;
-      // @ts-ignore
-      target[4 * index + 2] = source.z;
-      // @ts-ignore
-      target[4 * index + 3] = source.w;
-    }
-  }
-
-  getVector<T extends TypedArray, U extends THREEVector>(
-    array: T,
-    target: U,
-    index: number,
-  ): U {
-    // @ts-ignore
-    if (target.isVector2) {
-      // @ts-ignore
-      target.set(
-        array[2 * index + 0],
-        array[2 * index + 1],
-        array[2 * index + 2],
-      );
-      // @ts-ignore
-    } else if (target.isVector3) {
-      // @ts-ignore
-      target.set(
-        array[3 * index + 0],
-        array[3 * index + 1],
-        array[3 * index + 2],
-      );
-      // @ts-ignore
-    } else if (target.isVector4) {
-      // @ts-ignore
-      target.set(
-        array[4 * index + 0],
-        array[4 * index + 1],
-        array[4 * index + 2],
-        array[4 * index + 3],
-      );
-    }
-
-    return target;
   }
 
   setTreeIndex(value: number, index: number) {

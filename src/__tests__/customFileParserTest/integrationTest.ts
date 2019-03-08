@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import CustomFileReader from '../../customFileParser/CustomFileReader';
-import { parseManySectors } from '../../customFileParser/main';
-import { fileGeometries, filePropertyArrayNames } from '../../customFileParser/parserParameters';
+import parseCustomFile from '../../customFileParser/main';
+import { filePrimitiveNames, filePropertyArrayNames, filePropertyArrayNameType }
+  from '../../customFileParser/parserParameters';
 
 // @ts-ignore
 const fs = require('fs');
@@ -50,14 +51,12 @@ describe('customFileIntegrationTest', () => {
 
     expect(Object.keys(uncompressedValues).length).toBe(filePropertyArrayNames.length);
     Object.keys(uncompressedValues).forEach(parameterName => {
-      expect(filePropertyArrayNames.indexOf(parameterName)).not.toBe(-1);
-      if (uncompressedValues[parameterName].length > 0) {
-        if (parameterName === 'color') {
-          expect(uncompressedValues[parameterName][0] instanceof THREE.Color);
-        } else if (parameterName === 'normal') {
-          expect(uncompressedValues[parameterName][0] instanceof THREE.Vector3);
+      expect(filePropertyArrayNames.indexOf(parameterName as filePropertyArrayNameType)).not.toBe(-1);
+      if (uncompressedValues[parameterName]!.length > 0) {
+        if (parameterName === 'normal') {
+          expect(uncompressedValues[parameterName]![0] instanceof THREE.Vector3);
         } else {
-          expect(uncompressedValues[parameterName][0] instanceof Number);
+          expect(uncompressedValues[parameterName]![0] instanceof Number);
         }
       } else {
         // tslint:disable-next-line
@@ -73,39 +72,31 @@ describe('customFileIntegrationTest', () => {
     if (sectorMetadata.arrayCount !== 0) {
       fileReader.readUncompressedValues();
     }
-    const geometryIndexHandlers = fileReader.readSectorGeometryIndexHandlers(fileBuffer.byteLength);
+    const compressedPrimitiveData = fileReader.readCompressedGeometryData(fileBuffer.byteLength).primitives;
 
     // Check that the sector has geometries. If it doesn't, run this test on a different file.
-    expect(geometryIndexHandlers.length).toBeGreaterThan(0);
+    expect(compressedPrimitiveData!.length).toBeGreaterThan(0);
 
-    geometryIndexHandlers.forEach(geometryIndexHandler => {
-      expect(fileGeometries.indexOf(geometryIndexHandler.name)).not.toBe(-1);
-      expect(geometryIndexHandler.indexes).toBeDefined();
-      expect(geometryIndexHandler.geometryCount).toBeGreaterThan(0);
-      expect(geometryIndexHandler.byteCount).toBeGreaterThan(0);
-      expect(geometryIndexHandler.attributeCount).toBeDefined();
+    compressedPrimitiveData.forEach(compressedPrimitive => {
+      expect((filePrimitiveNames).indexOf(compressedPrimitive.type)).not.toBe(-1);
+      expect(compressedPrimitive.nodeIds).toBeDefined();
+      expect(compressedPrimitive.indices).toBeDefined();
+      expect(compressedPrimitive.count).toBeGreaterThan(0);
+      expect(compressedPrimitive.byteCount).toBeGreaterThan(0);
+      expect(compressedPrimitive.attributeCount).toBeDefined();
     });
   });
 
   test('read multi-sector file', async() => {
     const fileBuffer = fileToArrayBuffer(multiSectorFilePath);
-    const rootSector = parseManySectors(fileBuffer);
-
-    const sectors = [rootSector];
-    while (sectors.length > 0) {
-      const sector = sectors.pop();
-      expect(sector).toBeDefined();
-
-      sector!.children.forEach(child => {
-        sectors.push(child);
-      });
-
-      sector!.primitiveGroups.forEach(primitiveGroup => {
+    const { rootSector, sectors, sceneStats } = parseCustomFile(fileBuffer);
+    Object.keys(sectors).forEach(sectorId => {
+      const sector = sectors[sectorId];
+      sector.primitiveGroups.forEach(primitiveGroup => {
         expect(primitiveGroup.type).toBeDefined();
         expect(primitiveGroup.data.count).toBeDefined();
         expect(primitiveGroup.capacity).toBeDefined();
-        expect(primitiveGroup.data.count).toBe(primitiveGroup.capacity);
       });
-    }
+    });
   });
 });

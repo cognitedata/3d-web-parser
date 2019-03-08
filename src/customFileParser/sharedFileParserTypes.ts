@@ -1,5 +1,5 @@
 import FibonacciDecoder from './FibonacciDecoder';
-import { BYTES_PER_NODE_ID } from './parserParameters';
+import { BYTES_PER_NODE_ID, geometryNameType } from './parserParameters';
 import * as THREE from 'three';
 
 interface SectorMetadata {
@@ -13,21 +13,33 @@ interface SectorMetadata {
   sectorBBoxMax: THREE.Vector3;
 }
 
-interface GeometryIndexHandler {
-  name: string;
+interface CompressedGeometryData {
+  type: geometryNameType;
   nodeIds: NodeIdReader;
-  indexes: FibonacciDecoder;
-  geometryCount: number;
+  indices: FibonacciDecoder;
+  count: number;
   byteCount: number;
   attributeCount: number;
 }
 
-interface RenderedGeometryGroups {
-  [name: string]: any;
-}
-
 interface UncompressedValues {
-  [name: string]: any[];
+  [propertyName: string]: THREE.Color[] | THREE.Vector3[] | number[] | undefined;
+  color?: THREE.Color[];
+  normal?: THREE.Vector3[];
+  centerX?: number[];
+  centerY?: number[];
+  centerZ?: number[];
+  delta?: number[];
+  height?: number[];
+  radius?: number[];
+  angle?: number[];
+  translationX?: number[];
+  translationY?: number[];
+  translationZ?: number[];
+  scaleX?: number[];
+  scaleY?: number[];
+  scaleZ?: number[];
+  fileId?: number[];
 }
 
 class NodeIdReader {
@@ -41,12 +53,15 @@ class NodeIdReader {
   nextNodeId(): number {
     let readValue = 0;
     for (let i = 0; i < BYTES_PER_NODE_ID; i++) {
-      readValue += this.dataView.getUint8(this.location + i) << (8 * ((BYTES_PER_NODE_ID - 1) - i));
+      readValue += this.dataView.getUint8(this.location + i) * Math.pow(2, 8 * (BYTES_PER_NODE_ID - 1 - i));
     }
     this.location += BYTES_PER_NODE_ID;
     return readValue;
   }
+  rewind() {
+    this.location = 0;
+  }
 }
 
-export { GeometryIndexHandler, SectorMetadata, NodeIdReader, RenderedGeometryGroups,
+export { CompressedGeometryData, SectorMetadata, NodeIdReader,
   UncompressedValues, BYTES_PER_NODE_ID };
