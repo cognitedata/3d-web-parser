@@ -32,9 +32,10 @@ export default class FibonacciDecoder {
 
   nextValue() {
     if (this.numberOfValuesRead >= this.numberOfValues) { throw Error('Reading past end of FibonacciDecoder'); }
-
     this.numberOfValuesRead++;
 
+    // Read until you find two 1 bits in a row. Before then, each 1 corresponds to the (n+1)th fibinacci number.
+    // For example, 0010011 is read as 0*1 + 0*2 + 1*3 + 0*5 + 0*8 + 1*13 = 16. Subtract 1 to get the final value.
     for (let i = 0; i < FIBONACCI_MAX_LENGTH; i++) {
       const currentByte = this.data[Math.floor(this.readBitId / 8)];
       const currentBit8 = currentByte & (1 << (7 - (this.readBitId % 8)));

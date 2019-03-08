@@ -16,14 +16,30 @@ interface SectorMetadata {
 interface CompressedGeometryData {
   type: geometryNameType;
   nodeIds: NodeIdReader;
-  indexes: FibonacciDecoder;
+  indices: FibonacciDecoder;
   count: number;
   byteCount: number;
   attributeCount: number;
 }
 
 interface UncompressedValues {
-  [name: string]: any[];
+  [propertyName: string]: THREE.Color[] | THREE.Vector3[] | number[] | undefined;
+  color?: THREE.Color[];
+  normal?: THREE.Vector3[];
+  centerX?: number[];
+  centerY?: number[];
+  centerZ?: number[];
+  delta?: number[];
+  height?: number[];
+  radius?: number[];
+  angle?: number[];
+  translationX?: number[];
+  translationY?: number[];
+  translationZ?: number[];
+  scaleX?: number[];
+  scaleY?: number[];
+  scaleZ?: number[];
+  fileId?: number[];
 }
 
 class NodeIdReader {

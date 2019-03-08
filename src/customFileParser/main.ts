@@ -3,6 +3,8 @@ import Sector from './../Sector';
 import CustomFileReader from './CustomFileReader';
 import SceneStats from './../SceneStats';
 import mergeInstancedMeshes from './../optimizations/mergeInstancedMeshes';
+import { CompressedGeometryData } from './sharedFileParserTypes';
+import { TreeIndexNodeIdMap, ColorMap, NodeIdTreeIndexMap } from './../parsers/parseUtils';
 
 export default function parseCustomFile(fileBuffer: ArrayBuffer) {
   const fileReader = new CustomFileReader(fileBuffer);
@@ -11,15 +13,14 @@ export default function parseCustomFile(fileBuffer: ArrayBuffer) {
     numInstancedMeshes: 0,
     numMergedMeshes: 0,
   };
-  const mergedMeshMap: any = {};
-  const treeIndexNodeIdMap: number[] = [];
-  const colorMap: THREE.Color[] = [];
+  const treeIndexNodeIdMap: TreeIndexNodeIdMap = [];
+  const colorMap: ColorMap = [];
 
   let rootSector = undefined;
   let uncompressedValues = undefined;
-  const sectorPathToPrimitiveData: any = {};
-  const sectorPathToInstancedMeshData: any = {};
-  const sectorPathToMergedMeshData: any = {};
+  const sectorPathToPrimitiveData: {[path: string]: CompressedGeometryData[]} = {};
+  const sectorPathToInstancedMeshData: {[path: string]: CompressedGeometryData} = {};
+  const sectorPathToMergedMeshData: {[path: string]: CompressedGeometryData} = {};
 
   while (fileReader.location < fileBuffer.byteLength) {
     const sectorStartLocation = fileReader.location;
@@ -40,8 +41,12 @@ export default function parseCustomFile(fileBuffer: ArrayBuffer) {
     }
     const compressedGeometryData = fileReader.readCompressedGeometryData(sectorStartLocation + sectorByteLength);
     sectorPathToPrimitiveData[sector.path] = compressedGeometryData.primitives;
-    sectorPathToInstancedMeshData[sector.path] = compressedGeometryData.instancedMesh;
-    sectorPathToMergedMeshData[sector.path] = compressedGeometryData.mergedMesh;
+    if (compressedGeometryData.instancedMesh) {
+      sectorPathToInstancedMeshData[sector.path] = compressedGeometryData.instancedMesh;
+    }
+    if (compressedGeometryData.mergedMesh) {
+      sectorPathToMergedMeshData[sector.path] = compressedGeometryData.mergedMesh;
+    }
   }
 
   unpackPrimitives(rootSector!, uncompressedValues!, sectorPathToPrimitiveData,
@@ -57,7 +62,7 @@ export default function parseCustomFile(fileBuffer: ArrayBuffer) {
   }
 
   const sectors = idToSectorMap;
-  const nodeIdTreeIndexMap: {[s: number]: number} = {};
+  const nodeIdTreeIndexMap: NodeIdTreeIndexMap = {};
   for (let treeIndex = 0; treeIndex < treeIndexNodeIdMap.length; treeIndex++) {
     const nodeId = treeIndexNodeIdMap[treeIndex];
     nodeIdTreeIndexMap[nodeId] = treeIndex;

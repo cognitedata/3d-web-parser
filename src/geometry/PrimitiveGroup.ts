@@ -78,7 +78,7 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
       { name: 'treeIndex', array: this.treeIndex, itemSize: 1 },
     ];
     this.hasCustomTransformAttributes = false;
-    this.data = new GeometryGroupData('Primitive', 0, this.attributes);
+    this.data = new GeometryGroupData('Primitive', 0, this.attributes); // Placeholder, overwritten in children classes
   }
 
   abstract computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4;
