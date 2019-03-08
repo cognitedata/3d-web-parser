@@ -2,7 +2,9 @@ import { unpackInstancedMeshes, unpackMergedMeshes, unpackPrimitives } from './u
 import Sector from './../Sector';
 import CustomFileReader from './CustomFileReader';
 import SceneStats from './../SceneStats';
+import mergeInstancedMeshes from './../optimizations/mergeInstancedMeshes';
 import { CompressedGeometryData } from './sharedFileParserTypes';
+import { TreeIndexNodeIdMap, ColorMap, NodeIdTreeIndexMap } from './../parsers/parseUtils';
 
 function preloadMeshFiles(meshLoader: any, fileIds: number[]) {
   fileIds.forEach(fileId => {
@@ -17,9 +19,9 @@ export default async function parseCustomFile(fileBuffer: ArrayBuffer, meshLoade
     numInstancedMeshes: 0,
     numMergedMeshes: 0,
   };
-  const mergedMeshMap: any = {};
-  const treeIndexNodeIdMap: number[] = [];
-  const colorMap: THREE.Color[] = [];
+  const treeIndexNodeIdMap: TreeIndexNodeIdMap = [];
+  const colorMap: ColorMap = [];
+
   let rootSector = undefined;
   let uncompressedValues = undefined;
   const sectorPathToPrimitiveData: {[path: string]: CompressedGeometryData[]} = {};
@@ -56,13 +58,18 @@ export default async function parseCustomFile(fileBuffer: ArrayBuffer, meshLoade
 
   unpackPrimitives(rootSector!, uncompressedValues!, sectorPathToPrimitiveData,
     treeIndexNodeIdMap, colorMap);
-  unpackInstancedMeshes(rootSector!, uncompressedValues!, sectorPathToInstancedMeshData, sceneStats,
-    treeIndexNodeIdMap, colorMap);
   unpackMergedMeshes(rootSector!, uncompressedValues!, sectorPathToMergedMeshData, sceneStats,
     treeIndexNodeIdMap, colorMap);
+  unpackInstancedMeshes(rootSector!, uncompressedValues!, sectorPathToInstancedMeshData, sceneStats,
+    treeIndexNodeIdMap, colorMap);
+  for (const sector of rootSector!.traverseSectors()) {
+    mergeInstancedMeshes(sector, 2500, sceneStats, treeIndexNodeIdMap);
+    sector.mergedMeshGroup.createTreeIndexMap();
+    sector.instancedMeshGroup.createTreeIndexMap();
+  }
 
   const sectors = idToSectorMap;
-  const nodeIdTreeIndexMap: {[s: number]: number} = {};
+  const nodeIdTreeIndexMap: NodeIdTreeIndexMap = {};
   for (let treeIndex = 0; treeIndex < treeIndexNodeIdMap.length; treeIndex++) {
     const nodeId = treeIndexNodeIdMap[treeIndex];
     nodeIdTreeIndexMap[nodeId] = treeIndex;

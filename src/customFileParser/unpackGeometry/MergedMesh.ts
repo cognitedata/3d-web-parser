@@ -3,14 +3,15 @@ import PropertyLoader from '../PropertyLoader';
 import { MergedMeshGroup, MergedMesh } from '../../geometry/MergedMeshGroup';
 import SceneStats from '../../SceneStats';
 import Sector from './../../Sector';
+import { TreeIndexNodeIdMap, ColorMap } from './../../parsers/parseUtils';
 
 export default function unpackMergedMeshes(
   rootSector: Sector,
   uncompressedValues: UncompressedValues,
   sectorPathToMergedMeshData: {[path: string]: CompressedGeometryData},
   sceneStats: SceneStats,
-  treeIndexNodeIdMap: number[],
-  colorMap: THREE.Color[],
+  treeIndexNodeIdMap: TreeIndexNodeIdMap,
+  colorMap: ColorMap,
 ) {
   const data = new PropertyLoader(uncompressedValues);
 
@@ -55,6 +56,5 @@ export default function unpackMergedMeshes(
         sceneStats.numMergedMeshes += 1;
       });
     }
-    sector.mergedMeshGroup.createTreeIndexMap();
   }
 }

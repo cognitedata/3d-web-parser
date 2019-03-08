@@ -55,5 +55,4 @@ export default function mergedInstancedMeshes(
     sceneStats.numMergedMeshes += 1;
     sector.mergedMeshGroup.addMesh(mergedMesh);
   });
-
 }

@@ -5,6 +5,7 @@ import PropertyLoader from './../PropertyLoader';
 import { xAxis, yAxis, zAxis } from './../../constants';
 import SceneStats from './../../SceneStats';
 import Sector from './../../Sector';
+import { TreeIndexNodeIdMap, ColorMap } from './../../parsers/parseUtils';
 
 const matrix = new THREE.Matrix4();
 const rotation = new THREE.Matrix4();
@@ -14,8 +15,8 @@ export default function unpackInstancedMeshes(
   uncompressedValues: UncompressedValues,
   sectorPathToInstancedMeshData: {[path: string]: CompressedGeometryData},
   sceneStats: SceneStats,
-  treeIndexNodeIdMap: number[],
-  colorMap: THREE.Color[]) {
+  treeIndexNodeIdMap: TreeIndexNodeIdMap,
+  colorMap: ColorMap) {
 
   const data = new PropertyLoader(uncompressedValues);
   const meshCounts: {[fileId: string]: {[triangleOffset: string]: { count: number, triangleCount: number }}} = {};
@@ -28,9 +29,6 @@ export default function unpackInstancedMeshes(
       for (let i = 0; i < geometryInfo.count; i++) {
         data.loadData(geometryInfo);
         fileIdToSector[data.fileId] = fileIdToSector[data.fileId] ? fileIdToSector[data.fileId] : sector;
-        while (sector.path.indexOf(fileIdToSector[data.fileId]!.path) === -1) {
-          fileIdToSector[data.fileId] = fileIdToSector[data.fileId]!.parent!;
-        }
         meshCounts[data.fileId] = meshCounts[data.fileId] ? meshCounts[data.fileId] : {};
         meshCounts[data.fileId][data.triangleOffset] = meshCounts[data.fileId][data.triangleOffset] ?
           meshCounts[data.fileId][data.triangleOffset] : { count: 0, triangleCount: data.triangleCount };
@@ -81,9 +79,4 @@ export default function unpackInstancedMeshes(
     fileIdToSector[fileId].instancedMeshGroup.addMesh(instancedMesh);
     sceneStats.numInstancedMeshes += 1;
   });
-
-  // create tree index map for each sector
-  for (const sector of rootSector.traverseSectors()) {
-    sector.instancedMeshGroup.createTreeIndexMap();
-  }
 }
