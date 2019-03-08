@@ -5,6 +5,7 @@ import PropertyLoader from './../PropertyLoader';
 import { xAxis, yAxis, zAxis } from './../../constants';
 import SceneStats from './../../SceneStats';
 import Sector from './../../Sector';
+import { TreeIndexNodeIdMap, ColorMap } from './../../parsers/parseUtils';
 
 const matrix = new THREE.Matrix4();
 const rotation = new THREE.Matrix4();
@@ -14,8 +15,8 @@ export default function unpackInstancedMeshes(
   uncompressedValues: UncompressedValues,
   sectorPathToInstancedMeshData: {[path: string]: CompressedGeometryData},
   sceneStats: SceneStats,
-  treeIndexNodeIdMap: number[],
-  colorMap: THREE.Color[]) {
+  treeIndexNodeIdMap: TreeIndexNodeIdMap,
+  colorMap: ColorMap) {
 
   const data = new PropertyLoader(uncompressedValues);
   const meshCounts: {[fileId: string]: {[triangleOffset: string]: { count: number, triangleCount: number }}} = {};

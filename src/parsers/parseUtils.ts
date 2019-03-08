@@ -10,16 +10,16 @@ export interface FilterOptions {
   nodeIdFilter?: number[];
 }
 
-export interface TreeIndexNodeIdMap {
-  [s: number]: number;
-}
+export type TreeIndexNodeIdMap = number[];
 
-export interface ColorMap {
-  [s: number]: THREE.Color;
-}
+export type ColorMap = THREE.Color[];
 
 export interface InstancedMeshMap {
   [key: number]: InstancedMesh;
+}
+
+export interface NodeIdTreeIndexMap {
+  [nodeId: number]: number;
 }
 
 export interface ParseData {

@@ -6,6 +6,7 @@ import unpackInstancedMeshes from './InstancedMesh';
 import unpackMergedMeshes from './MergedMesh';
 import { PrimitiveGroup } from '../../geometry/GeometryGroups';
 import { Sector } from '../..';
+import { TreeIndexNodeIdMap, ColorMap } from './../../parsers/parseUtils';
 
 export { unpackInstancedMeshes, unpackMergedMeshes };
 
@@ -79,8 +80,8 @@ function unpackFilePrimitive(
   currentSector: Sector,
   primitiveCompressedData: CompressedGeometryData,
   uncompressedValues: UncompressedValues,
-  treeIndexNodeIdMap: number[],
-  colorMap: THREE.Color[]) {
+  treeIndexNodeIdMap: TreeIndexNodeIdMap,
+  colorMap: ColorMap) {
 
   const destinationPrimitiveGroups: {[name: string]: PrimitiveGroup} = {};
   loadDestinationGroups(destinationPrimitiveGroups, currentSector, primitiveCompressedData);
@@ -101,8 +102,8 @@ export function unpackPrimitives(
   rootSector: Sector,
   uncompressedValues: UncompressedValues,
   sectorPathToPrimitiveData: {[path: string]: CompressedGeometryData[]},
-  treeIndexNodeIdMap: number[],
-  colorMap: THREE.Color[]) {
+  treeIndexNodeIdMap: TreeIndexNodeIdMap,
+  colorMap: ColorMap) {
 
   for (const sector of rootSector!.traverseSectors()) {
     const compressedPrimitiveData = sectorPathToPrimitiveData[sector.path];

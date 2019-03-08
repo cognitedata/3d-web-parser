@@ -15,12 +15,12 @@ export default function loadGeometryIndices(file: CustomFileReader, sectorEndLoc
     const indices = file.getFibonacciDecoder(byteCount, count * attributeCount);
 
     const newGeometry: CompressedGeometryData = {
-      type: type,
-      nodeIds: nodeIds,
-      indices: indices,
-      count: count,
-      byteCount: byteCount,
-      attributeCount: attributeCount,
+      type,
+      nodeIds,
+      indices,
+      count,
+      byteCount,
+      attributeCount,
     };
 
     geometryIndices.push(newGeometry);

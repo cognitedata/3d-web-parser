@@ -42,17 +42,17 @@ export function addOpenCylinder(groups: {[name: string]: PrimitiveGroup}, data: 
 
 export function addOpenGeneralCylinder(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader) {
   if (data.radiusA !== data.radiusB) {
-    drawHollowedCone(groups, data, false);
+    addHollowedCone(groups, data, false);
   } else {
-    drawGeneralCylinders(groups, data, false);
+    addGeneralCylinders(groups, data, false);
   }
 }
 
 export function addClosedGeneralCylinder(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader) {
   if (data.radiusA !== data.radiusB) {
-    drawHollowedCone(groups, data, true);
+    addHollowedCone(groups, data, true);
   } else {
-    drawGeneralCylinders(groups, data, true);
+    addGeneralCylinders(groups, data, true);
   }
 }
 
@@ -73,7 +73,7 @@ function normalizeRadians (angle: number, lowerBound = -Math.PI, upperBound = Ma
   return angle;
 }
 
-function drawGeneralCylinders(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader, drawQuads: boolean) {
+function addGeneralCylinders(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader, drawQuads: boolean) {
   centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
   centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
 
@@ -166,7 +166,7 @@ function drawGeneralCylinders(groups: {[name: string]: PrimitiveGroup}, data: Pr
   }
 }
 
-function drawHollowedCone(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader, drawQuads: boolean) {
+function addHollowedCone(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader, drawQuads: boolean) {
   centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
   centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
   (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, centerA, centerB, data.radiusA, data.radiusB,

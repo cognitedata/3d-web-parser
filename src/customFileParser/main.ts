@@ -3,6 +3,7 @@ import Sector from './../Sector';
 import CustomFileReader from './CustomFileReader';
 import SceneStats from './../SceneStats';
 import { CompressedGeometryData } from './sharedFileParserTypes';
+import { TreeIndexNodeIdMap, ColorMap, NodeIdTreeIndexMap } from './../parsers/parseUtils';
 
 export default function parseCustomFile(fileBuffer: ArrayBuffer) {
   const fileReader = new CustomFileReader(fileBuffer);
@@ -11,8 +12,8 @@ export default function parseCustomFile(fileBuffer: ArrayBuffer) {
     numInstancedMeshes: 0,
     numMergedMeshes: 0,
   };
-  const treeIndexNodeIdMap: number[] = [];
-  const colorMap: THREE.Color[] = [];
+  const treeIndexNodeIdMap: TreeIndexNodeIdMap = [];
+  const colorMap: ColorMap = [];
 
   let rootSector = undefined;
   let uncompressedValues = undefined;
@@ -55,7 +56,7 @@ export default function parseCustomFile(fileBuffer: ArrayBuffer) {
     treeIndexNodeIdMap, colorMap);
 
   const sectors = idToSectorMap;
-  const nodeIdTreeIndexMap: {[s: number]: number} = {};
+  const nodeIdTreeIndexMap: NodeIdTreeIndexMap = {};
   for (let treeIndex = 0; treeIndex < treeIndexNodeIdMap.length; treeIndex++) {
     const nodeId = treeIndexNodeIdMap[treeIndex];
     nodeIdTreeIndexMap[nodeId] = treeIndex;
