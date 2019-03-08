@@ -49,6 +49,17 @@ export default class Sector {
     }
   }
 
+  *traverseSectorsBreadthFirst(): IterableIterator<Sector> {
+    const stack: Sector[] = [this];
+    while (stack.length > 0) {
+      const nextSector = stack.shift();
+      nextSector!.children.forEach(child => {
+        stack.push(child);
+      });
+      yield nextSector!;
+    }
+  }
+
   *traversePrimitiveGroups(): IterableIterator<PrimitiveGroup> {
     for (const child of this.traverseSectors()) {
       for (const geometryGroup of child.primitiveGroups) {

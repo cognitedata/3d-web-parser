@@ -56,6 +56,5 @@ export default function unpackMergedMeshes(
         sceneStats.numMergedMeshes += 1;
       });
     }
-    sector.mergedMeshGroup.createTreeIndexMap();
   }
 }

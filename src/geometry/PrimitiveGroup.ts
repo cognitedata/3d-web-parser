@@ -38,7 +38,7 @@ export interface PrimitiveGroupMap {
   SphericalSegment: {capacity: number, group: SphericalSegmentGroup};
   TorusSegment: {capacity: number, group: TorusSegmentGroup};
   Trapezium: {capacity: number, group: TrapeziumGroup};
-  [s: string]: any; // TODO(anders.hafreager) any isn't any good.
+  [s: string]: {capacity: number, group: PrimitiveGroup};
 }
 
 export interface Attribute {

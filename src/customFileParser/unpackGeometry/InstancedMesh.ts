@@ -29,9 +29,6 @@ export default function unpackInstancedMeshes(
       for (let i = 0; i < geometryInfo.count; i++) {
         data.loadData(geometryInfo);
         fileIdToSector[data.fileId] = fileIdToSector[data.fileId] ? fileIdToSector[data.fileId] : sector;
-        while (sector.path.indexOf(fileIdToSector[data.fileId]!.path) === -1) {
-          fileIdToSector[data.fileId] = fileIdToSector[data.fileId]!.parent!;
-        }
         meshCounts[data.fileId] = meshCounts[data.fileId] ? meshCounts[data.fileId] : {};
         meshCounts[data.fileId][data.triangleOffset] = meshCounts[data.fileId][data.triangleOffset] ?
           meshCounts[data.fileId][data.triangleOffset] : { count: 0, triangleCount: data.triangleCount };
@@ -82,9 +79,4 @@ export default function unpackInstancedMeshes(
     fileIdToSector[fileId].instancedMeshGroup.addMesh(instancedMesh);
     sceneStats.numInstancedMeshes += 1;
   });
-
-  // create tree index map for each sector
-  for (const sector of rootSector.traverseSectors()) {
-    sector.instancedMeshGroup.createTreeIndexMap();
-  }
 }
