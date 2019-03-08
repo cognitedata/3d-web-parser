@@ -65,7 +65,7 @@ function parseGeometries(data: ParseData) {
   const primitiveGroups: PrimitiveGroup[] = [];
   primitiveParsers.forEach(({ type, parser }) => {
     // @ts-ignore
-    if (true) { //(type == "Nut" || (window.changeType.length === type.length && (window.changeType.slice(1) === type.slice(1)))) {
+    if (true) { // (type == "Nut" || (window.changeType.length === type.length && (window.changeType.slice(1) === type.slice(1)))) {
       const didCreateNewGroup = parser(data);
       if (didCreateNewGroup) {
         primitiveGroups.push(data.primitiveGroupMap[type].group);
