@@ -125,7 +125,8 @@ function findOrCreateDestinationGroup(
   if (destinationGroup) {
     return destinationGroup;
   } else {
-    const capacity = Math.min(5000, primitivesPerSectorAndChildren[originalSector.path][renderedPrimitiveInfo.name]);
+    const capacity = Math.min(5000,
+      primitivesPerSectorAndChildren[originalSector.path][renderedPrimitiveInfo.name] * numberOfGeometries);
     // @ts-ignore
     const createdGroup = new renderedPrimitiveToGroup[renderedPrimitiveInfo.name](capacity);
     originalSector.primitiveGroups.push(createdGroup);
