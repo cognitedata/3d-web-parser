@@ -187,6 +187,5 @@ export default async function parseProtobuf(
     const nodeId = treeIndexNodeIdMap[treeIndex];
     nodeIdTreeIndexMap[nodeId] = treeIndex;
   }
-
   return { rootSector, sectors, sceneStats, maps: { colorMap, treeIndexNodeIdMap, nodeIdTreeIndexMap } };
 }
