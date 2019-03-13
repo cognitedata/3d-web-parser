@@ -131,7 +131,7 @@ export default class GeometryGroupData {
     return usage;
   }
 
-  asDictionary(index: number) {
+  getPropertiesAsObject(index: number) {
     const data: {[name: string]: any} = {};
     Object.keys(this.arrays).forEach(property => {
       const name = property as propertyName;
