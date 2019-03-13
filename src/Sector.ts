@@ -6,7 +6,7 @@ import PrimitiveGroup from './geometry/PrimitiveGroup';
 import { MergedMeshGroup } from './geometry/MergedMeshGroup';
 import { InstancedMeshGroup } from './geometry/InstancedMeshGroup';
 
-export default class Sector {
+export class Sector {
   public readonly min: THREE.Vector3;
   public readonly max: THREE.Vector3;
   public depth: number;
