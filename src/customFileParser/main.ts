@@ -1,5 +1,5 @@
 import { unpackInstancedMeshes, unpackMergedMeshes, unpackPrimitives } from './unpackGeometry/main';
-import Sector from './../Sector';
+import { Sector } from './../Sector';
 import CustomFileReader from './CustomFileReader';
 import SceneStats from './../SceneStats';
 import mergeInstancedMeshes from './../optimizations/mergeInstancedMeshes';

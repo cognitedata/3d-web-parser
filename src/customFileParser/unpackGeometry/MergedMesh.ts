@@ -2,7 +2,7 @@ import { CompressedGeometryData, UncompressedValues } from '../sharedFileParserT
 import PropertyLoader from '../PropertyLoader';
 import { MergedMeshGroup, MergedMesh } from '../../geometry/MergedMeshGroup';
 import SceneStats from '../../SceneStats';
-import Sector from './../../Sector';
+import { Sector } from './../../Sector';
 import { TreeIndexNodeIdMap, ColorMap } from './../../parsers/parseUtils';
 
 export default function unpackMergedMeshes(

@@ -3,7 +3,7 @@
 import ProtobufDecoder from './ProtobufDecoder';
 import * as WebSceneProto from './proto/web_scene.json';
 import * as THREE from 'three';
-import Sector from './Sector';
+import { Sector } from './Sector';
 import { Vector3, Group } from 'three';
 import { getParentPath } from './PathExtractor';
 import { InstancedMesh, InstancedMeshGroup } from './geometry/InstancedMeshGroup';

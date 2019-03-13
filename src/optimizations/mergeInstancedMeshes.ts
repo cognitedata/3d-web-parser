@@ -1,4 +1,4 @@
-import Sector from '../Sector';
+import { Sector } from '../Sector';
 import { MergedMesh, MergedMeshMappings } from '../geometry/MergedMeshGroup';
 import * as THREE from 'three';
 import { InstancedMeshCollection } from '../geometry/InstancedMeshGroup';

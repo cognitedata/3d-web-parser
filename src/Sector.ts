@@ -81,7 +81,7 @@ export class Sector {
     });
 
     if (this.mergedMeshGroup != null) {
-      this.mergedMeshGroup.memoryUsage(usage);
+    this.mergedMeshGroup.memoryUsage(usage);
     }
 
     if (this.instancedMeshGroup != null) {
@@ -167,7 +167,7 @@ export class SectorTreeHelper extends THREE.Group {
     let numSectors = 0;
     for (const sector of rootSector.traverseSectors()) {
       numSectors++;
-    };
+    }
 
     const vertexCount = numSectors * 8;
     let d = 0;
@@ -191,13 +191,14 @@ export class SectorTreeHelper extends THREE.Group {
       }
 
       return false;
-    };
+    }
 
     const geometry = new THREE.BufferGeometry();
     geometry.setIndex(new THREE.BufferAttribute(indices, 1));
     geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3));
     group.add(new THREE.LineSegments(geometry, material));
     this.add(group);
+    return true;
   }
 
   dispose() {

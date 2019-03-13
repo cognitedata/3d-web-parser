@@ -4,7 +4,7 @@ import { CompressedGeometryData, UncompressedValues } from './../sharedFileParse
 import PropertyLoader from './../PropertyLoader';
 import { xAxis, yAxis, zAxis } from './../../constants';
 import SceneStats from './../../SceneStats';
-import Sector from './../../Sector';
+import { Sector } from './../../Sector';
 import { TreeIndexNodeIdMap, ColorMap } from './../../parsers/parseUtils';
 
 const matrix = new THREE.Matrix4();

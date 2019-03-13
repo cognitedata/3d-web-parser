@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 import parse from '../Parser';
-import Sector from '../Sector';
+import { Sector } from '../Sector';
 import * as TestScene from './fixtures/test_scene.json';
 import { expectBoundingBoxEqual } from '../TestUtils';
 

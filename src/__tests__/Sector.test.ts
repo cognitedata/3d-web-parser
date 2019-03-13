@@ -1,7 +1,7 @@
 // Copyright 2019 Cognite AS
 
 import * as THREE from 'three';
-import Sector from '../Sector';
+import { Sector } from '../Sector';
 
 describe('Sectors', () => {
   test('constructor', () => {
