@@ -39,8 +39,6 @@ export default class GeometryGroupData {
         this.arrays[property] = new Float32Array(this.capacity * 3);
       } else if (vector4Properties.indexOf(property) !== -1) {
         this.arrays[property] = new Float32Array(this.capacity * 4);
-      } else if (colorProperties.indexOf(property) !== -1) {
-        this.arrays[property] = new Float32Array(this.capacity * 3);
       } else {
         throw Error('Property ' + property + ' does not have an associated memory structure');
       }
@@ -76,9 +74,6 @@ export default class GeometryGroupData {
     this.arrays[property][4 * index + 3] = value.w;
   }
 
-  setMatrix4(property: propertyName, value: THREE.Matrix4, index: number) {
-  }
-
   getNumber(property: propertyName, index: number): number {
     return this.arrays[property][index];
   }
@@ -98,9 +93,6 @@ export default class GeometryGroupData {
     return target;
   }
 
-  getMatrix4(property: propertyName, index: number, target: THREE.Matrix4) {
-  }
-
   add(properties: any) {
     Object.keys(properties).forEach(property => {
       const name = property as propertyName;
@@ -110,8 +102,6 @@ export default class GeometryGroupData {
         this.setVector3(name, properties[property], this.count);
       } else if (vector4Properties.indexOf(name) !== -1) {
         this.setVector4(name, properties[property], this.count);
-      } else if (matrix4Properties.indexOf(name) !== -1) {
-        this.setMatrix4(name, properties[property], this.count);
       } else {
         throw Error('Property ' + name + ' does not have an associated memory structure');
       }
@@ -139,5 +129,23 @@ export default class GeometryGroupData {
       }
     });
     return usage;
+  }
+
+  asDictionary(index: number) {
+    const data: {[name: string]: any} = {};
+    Object.keys(this.arrays).forEach(property => {
+      const name = property as propertyName;
+      if (float64Properties.indexOf(name) !== -1 || float32Properties.indexOf(name) !== -1)  {
+        data[property] = this.getNumber(name, index);
+      } else if (vector3Properties.indexOf(name) !== -1) {
+        data[property] = this.getVector3(name, new THREE.Vector3(), index);
+      } else if (vector4Properties.indexOf(name) !== -1) {
+        data[property] = this.getVector4(name, new THREE.Vector4(),  index);
+      } else {
+        throw Error('Property ' + name + ' does not have an associated memory structure');
+      }
+    });
+
+    return data;
   }
 }
