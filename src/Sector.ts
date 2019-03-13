@@ -81,7 +81,7 @@ export class Sector {
     });
 
     if (this.mergedMeshGroup != null) {
-    this.mergedMeshGroup.memoryUsage(usage);
+      this.mergedMeshGroup.memoryUsage(usage);
     }
 
     if (this.instancedMeshGroup != null) {
