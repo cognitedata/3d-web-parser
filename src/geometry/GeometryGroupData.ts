@@ -111,23 +111,15 @@ export default class GeometryGroupData {
   }
 
   memoryUsage(usage: any) {
-    Object.keys(this).forEach(key => {
-      // @ts-ignore
-      if (ArrayBuffer.isView(this[key])) {
-        if (usage.byProperty[key] == null) {
-          usage.byProperty[key] = 0;
-        }
-        if (usage.byGeometry[this.type] == null) {
-          usage.byGeometry[this.type] = 0;
-        }
-        // @ts-ignore
-        usage.byGeometry[this.type] += this[key].byteLength;
-        // @ts-ignore
-        usage.byProperty[key] += this[key].byteLength;
-        // @ts-ignore
-        usage.total += this[key].byteLength;
-      }
+    let totalSize = 0;
+    Object.keys(this.arrays).forEach(property => {
+      const array = this.arrays[property];
+      totalSize += array.length * array.BYTES_PER_ELEMENT;
+      usage.byProperty[property] = usage.byProperty[property] ? usage.byProperty[property] : 0;
+      usage.byProperty[property] += array.length * array.BYTES_PER_ELEMENT;
     });
+    usage.byGeometry[this.type] += totalSize;
+    usage.total += totalSize;
     return usage;
   }
 
