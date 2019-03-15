@@ -5,14 +5,17 @@ import PrimitiveGroup from './PrimitiveGroup';
 import { xAxis, yAxis, zAxis } from '../constants';
 import { FilterOptions } from '../parsers/parseUtils';
 import GeometryGroupData from './GeometryGroupData';
-import { computeEllipsoidBoundingBox } from './GeometryUtils';
+import { computeEllipsoidBoundingBox } from './EllipsoidSegmentGroup';
 import { colorProperties } from './GeometryGroupDataParameters';
 import { angleBetweenVector3s } from '../parsers/protobuf/protobufUtils';
 
 const globalBox = new THREE.Box3();
 const normal = new THREE.Vector3();
-const tempCenterA = new THREE.Vector3();
-const tempCenterB = new THREE.Vector3();
+const ringCenterA = new THREE.Vector3();
+const ringCenterB = new THREE.Vector3();
+const extA = new THREE.Vector3();
+const extB = new THREE.Vector3();
+const tempNormal = new THREE.Vector3();
 const planeA = new THREE.Vector4();
 const planeB = new THREE.Vector4();
 const capNormalA = new THREE.Vector3();
@@ -126,13 +129,21 @@ export default class GeneralCylinderGroup extends PrimitiveGroup {
 
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
     box.makeEmpty();
-    /*
     globalBox.makeEmpty();
+    this.data.getVector3('centerA', extA, index);
+    this.data.getVector3('centerB', extB, index);
+    tempNormal.copy(extB).sub(extA).normalize();
+
+    const distFromAToExtA = this.data.getNumber('radiusA', index) * Math.tan(this.data.getNumber('slopeA', index));
+    const distFromBToExtB = this.data.getNumber('radiusA', index) * Math.tan(this.data.getNumber('slopeB', index));
+    ringCenterA.copy(normal).multiplyScalar(-distFromAToExtA).add(extA);
+    ringCenterB.copy(normal).multiplyScalar(distFromBToExtB).add(extB);
+
     computeEllipsoidBoundingBox(
-      this.data.getVector3('centerA', tempCenterA, index),
+      ringCenterA,
       this.data.getVector3('capNormalA', capNormalA, index),
-      this.data.getNumber('radiusA', index) / Math.abs(Math.cos(this.data.getNumber('slopeA', index))),
       this.data.getNumber('radiusA', index),
+      this.data.getNumber('radiusA', index) / Math.abs(Math.cos(this.data.getNumber('slopeA', index))),
       0,
       matrix,
       globalBox,
@@ -141,16 +152,16 @@ export default class GeneralCylinderGroup extends PrimitiveGroup {
     box.union(globalBox);
     globalBox.makeEmpty();
     computeEllipsoidBoundingBox(
-      this.data.getVector3('centerB', tempCenterB, index),
+      ringCenterB,
       this.data.getVector3('capNormalB', capNormalB, index),
-      this.data.getNumber('radiusA', index) / Math.abs(Math.cos(this.data.getNumber('slopeB', index))),
       this.data.getNumber('radiusA', index),
+      this.data.getNumber('radiusA', index) / Math.abs(Math.cos(this.data.getNumber('slopeB', index))),
       0,
       matrix,
       globalBox,
     );
     box.union(globalBox);
-    */
+
     return box;
   }
 }
