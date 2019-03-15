@@ -110,12 +110,16 @@ export default class GeometryGroupData {
     this.count += 1;
   }
 
-  calculateMemoryUsage() {
-    let usage = 0;
-    Object.keys(this.arrays).forEach(arrayName => {
-      const array = this.arrays[arrayName];
-      usage += array.length * array.BYTES_PER_ELEMENT;
+  memoryUsage(usage: any) {
+    let totalSize = 0;
+    Object.keys(this.arrays).forEach(property => {
+      const array = this.arrays[property];
+      totalSize += array.length * array.BYTES_PER_ELEMENT;
+      usage.byProperty[property] = usage.byProperty[property]? usage.byProperty[property]: 0;
+      usage.byProperty[property] += array.length * array.BYTES_PER_ELEMENT;
     });
+    usage.byGeometry[this.type] += totalSize;
+    usage.total += totalSize;
     return usage;
   }
 

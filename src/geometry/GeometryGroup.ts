@@ -1,5 +1,6 @@
 // Copyright 2019 Cognite AS
 import * as THREE from 'three';
+import GeometryGroupData from './GeometryGroupData';
 
 export interface GeometryNode {
   groupIndex: {collectionIndex?: number, mappingIndex: number};
@@ -35,6 +36,10 @@ export abstract class GeometryGroup {
         usage.byProperty[key] += this[key].byteLength;
         // @ts-ignore
         usage.total += this[key].byteLength;
+      // @ts-ignore
+      } else if (this[key] instanceof GeometryGroupData) {
+        // @ts-ignore
+        this[key].memoryUsage(usage);
       }
     });
     return usage;
