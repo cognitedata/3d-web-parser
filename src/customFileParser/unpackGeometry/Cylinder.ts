@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { xAxis, yAxis, zAxis } from './../../constants';
 import { PrimitiveGroup, ConeGroup, GeneralCylinderGroup, TrapeziumGroup, CircleGroup, GeneralRingGroup }
   from '../../geometry/GeometryGroups';
+import { FilterOptions } from '../../parsers/parseUtils';
 
 const centerA = new THREE.Vector3();
 const centerB = new THREE.Vector3();
@@ -24,35 +25,39 @@ const globalCapZAxis = new THREE.Vector3();
 const globalCapXAxis = new THREE.Vector3();
 const globalVertices = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
 
-export function addClosedCylinder(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader) {
+export function addClosedCylinder(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader,
+                                  filterOptions?: FilterOptions) {
   centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
   centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
   (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, centerA, centerB,
-    data.radiusA, data.radiusA, 0, 2 * Math.PI);
-  (groups.Circle as CircleGroup).add(data.nodeId, data.treeIndex, centerA, data.normal, data.radiusA);
-  (groups.Circle as CircleGroup).add(data.nodeId, data.treeIndex, centerB, data.normal, data.radiusA);
+    data.radiusA, data.radiusA, 0, 2 * Math.PI, filterOptions);
+  (groups.Circle as CircleGroup).add(data.nodeId, data.treeIndex, centerA, data.normal, data.radiusA, filterOptions);
+  (groups.Circle as CircleGroup).add(data.nodeId, data.treeIndex, centerB, data.normal, data.radiusA, filterOptions);
 }
 
-export function addOpenCylinder(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader) {
+export function addOpenCylinder(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader,
+                                filterOptions?: FilterOptions) {
   centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
   centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
   (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, centerA, centerB,
-  data.radiusA, data.radiusA, 0, 2 * Math.PI);
+  data.radiusA, data.radiusA, 0, 2 * Math.PI, filterOptions);
 }
 
-export function addOpenGeneralCylinder(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader) {
+export function addOpenGeneralCylinder(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader,
+                                       filterOptions?: FilterOptions) {
   if (data.radiusA !== data.radiusB) {
-    addHollowedCone(groups, data, false);
+    addHollowedCone(groups, data, false, filterOptions);
   } else {
-    addGeneralCylinders(groups, data, false);
+    addGeneralCylinders(groups, data, false, filterOptions);
   }
 }
 
-export function addClosedGeneralCylinder(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader) {
+export function addClosedGeneralCylinder(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader,
+                                         filterOptions?: FilterOptions) {
   if (data.radiusA !== data.radiusB) {
-    addHollowedCone(groups, data, true);
+    addHollowedCone(groups, data, true, filterOptions);
   } else {
-    addGeneralCylinders(groups, data, true);
+    addGeneralCylinders(groups, data, true, filterOptions);
   }
 }
 
@@ -73,7 +78,8 @@ function normalizeRadians (angle: number, lowerBound = -Math.PI, upperBound = Ma
   return angle;
 }
 
-function addGeneralCylinders(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader, drawQuads: boolean) {
+function addGeneralCylinders(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader, drawQuads: boolean,
+                             filterOptions?: FilterOptions) {
   centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
   centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
 
@@ -85,11 +91,11 @@ function addGeneralCylinders(groups: {[name: string]: PrimitiveGroup}, data: Pro
   extB.copy(data.normal).multiplyScalar(-distFromBToExtB).add(centerB);
 
   (groups.GeneralCylinder as GeneralCylinderGroup).add(data.nodeId, data.treeIndex, extA, extB, data.radiusA, heightA,
-    heightB, data.slopeA, data.slopeB, data.zAngleA, data.zAngleB, data.rotationAngle, data.arcAngle);
+    heightB, data.slopeA, data.slopeB, data.zAngleA, data.zAngleB, data.rotationAngle, data.arcAngle, filterOptions);
   if ((data. thickness > 0) && (data. thickness !== data.radiusA)) {
     (groups.GeneralCylinder as GeneralCylinderGroup).add(data.nodeId, data.treeIndex, extA, extB,
       data.radiusA - data.thickness, heightA, heightB, data.slopeA, data.slopeB, data.zAngleA,
-      data.zAngleB, data.rotationAngle, data.arcAngle);
+      data.zAngleB, data.rotationAngle, data.arcAngle, filterOptions);
   }
 
   [true, false].forEach(isA => {
@@ -122,7 +128,7 @@ function addGeneralCylinders(groups: {[name: string]: PrimitiveGroup}, data: Pro
     if (data.thickness > 0) {
       (groups.GeneralRing as GeneralRingGroup).add(data.nodeId, data.treeIndex, center, slicingPlaneNormal,
         capXAxis, radius / Math.abs(Math.cos(slope)),
-        radius, data.thickness, capAngle, data.arcAngle);
+        radius, data.thickness, capAngle, data.arcAngle, filterOptions);
     }
   });
 
@@ -161,25 +167,27 @@ function addGeneralCylinders(groups: {[name: string]: PrimitiveGroup}, data: Pro
         globalVertices[0],
         globalVertices[1],
         globalVertices[2],
-        globalVertices[3]);
+        globalVertices[3],
+        filterOptions);
     });
   }
 }
 
-function addHollowedCone(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader, drawQuads: boolean) {
+function addHollowedCone(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader, drawQuads: boolean,
+                         filterOptions?: FilterOptions) {
   centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
   centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
   (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, centerA, centerB, data.radiusA, data.radiusB,
-    data.rotationAngle, data.arcAngle);
+    data.rotationAngle, data.arcAngle, filterOptions);
   (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, centerA, centerB, data.radiusA - data.thickness,
-    data.radiusB - data.thickness, data.rotationAngle, data.arcAngle);
+    data.radiusB - data.thickness, data.rotationAngle, data.arcAngle, filterOptions);
   localXAxis.copy(xAxis).applyQuaternion(axisRotation.setFromUnitVectors(zAxis, data.normal));
   (groups.GeneralRing as GeneralRingGroup).add(data.nodeId, data.treeIndex, centerA, data.normal,
     localXAxis, data.radiusA, data.radiusA, data.thickness,
-    data.rotationAngle, data.arcAngle);
+    data.rotationAngle, data.arcAngle, filterOptions);
   (groups.GeneralRing as GeneralRingGroup).add(data.nodeId, data.treeIndex, centerB, data.normal,
     localXAxis, data.radiusB, data.radiusB, data.thickness,
-    data.rotationAngle, data.arcAngle);
+    data.rotationAngle, data.arcAngle, filterOptions);
 
   if (drawQuads) {
     globalCapZAxis.copy(centerA).sub(centerB);
@@ -213,7 +221,8 @@ function addHollowedCone(groups: {[name: string]: PrimitiveGroup}, data: Propert
       vertices[0],
       vertices[1],
       vertices[2],
-      vertices[3]);
+      vertices[3],
+      filterOptions);
     });
   }
 }

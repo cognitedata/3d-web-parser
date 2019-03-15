@@ -4,7 +4,7 @@ import CustomFileReader from './CustomFileReader';
 import SceneStats from './../SceneStats';
 import mergeInstancedMeshes from './../optimizations/mergeInstancedMeshes';
 import { CompressedGeometryData } from './sharedFileParserTypes';
-import { TreeIndexNodeIdMap, ColorMap, NodeIdTreeIndexMap } from './../parsers/parseUtils';
+import { TreeIndexNodeIdMap, ColorMap, NodeIdTreeIndexMap, FilterOptions } from './../parsers/parseUtils';
 
 function preloadMeshFiles(meshLoader: any, fileIds: number[]) {
   fileIds.forEach(fileId => {
@@ -12,7 +12,7 @@ function preloadMeshFiles(meshLoader: any, fileIds: number[]) {
   });
 }
 
-export default async function parseCustomFile(fileBuffer: ArrayBuffer, meshLoader: any) {
+export default async function parseCustomFile(fileBuffer: ArrayBuffer, meshLoader: any, filterOptions?: FilterOptions) {
   const fileReader = new CustomFileReader(fileBuffer);
   const idToSectorMap: {[name: string]: Sector} = {};
   const sceneStats: SceneStats = {
@@ -57,7 +57,7 @@ export default async function parseCustomFile(fileBuffer: ArrayBuffer, meshLoade
   }
 
   unpackPrimitives(rootSector!, uncompressedValues!, sectorPathToPrimitiveData,
-    treeIndexNodeIdMap, colorMap);
+    treeIndexNodeIdMap, colorMap, filterOptions);
   unpackMergedMeshes(rootSector!, uncompressedValues!, sectorPathToMergedMeshData, sceneStats,
     treeIndexNodeIdMap, colorMap);
   unpackInstancedMeshes(rootSector!, uncompressedValues!, sectorPathToInstancedMeshData, sceneStats,
