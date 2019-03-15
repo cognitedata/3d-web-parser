@@ -81,7 +81,9 @@ function unpackFilePrimitive(
     treeIndexNodeIdMap[data.treeIndex] = data.nodeId;
     colorMap[data.treeIndex] = data.color;
     // @ts-ignore
-    renderedPrimitiveToAddFunction[primitiveCompressedData.type].call(this, destinationPrimitiveGroups, data, filterOptions);
+    renderedPrimitiveToAddFunction[primitiveCompressedData.type].call(
+      // @ts-ignore
+      this, destinationPrimitiveGroups, data, filterOptions);
   }
 }
 

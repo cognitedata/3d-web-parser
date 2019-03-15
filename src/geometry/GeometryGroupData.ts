@@ -115,7 +115,7 @@ export default class GeometryGroupData {
     Object.keys(this.arrays).forEach(property => {
       const array = this.arrays[property];
       totalSize += array.length * array.BYTES_PER_ELEMENT;
-      usage.byProperty[property] = usage.byProperty[property]? usage.byProperty[property]: 0;
+      usage.byProperty[property] = usage.byProperty[property] ? usage.byProperty[property] : 0;
       usage.byProperty[property] += array.length * array.BYTES_PER_ELEMENT;
     });
     usage.byGeometry[this.type] += totalSize;
