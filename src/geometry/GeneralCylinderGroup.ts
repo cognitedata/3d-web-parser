@@ -126,7 +126,7 @@ export default class GeneralCylinderGroup extends PrimitiveGroup {
 
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3 {
     box.makeEmpty();
-
+    /*
     globalBox.makeEmpty();
     computeEllipsoidBoundingBox(
       this.data.getVector3('centerA', tempCenterA, index),
@@ -150,6 +150,7 @@ export default class GeneralCylinderGroup extends PrimitiveGroup {
       globalBox,
     );
     box.union(globalBox);
+    */
     return box;
   }
 }
