@@ -15,7 +15,6 @@ const ringCenterA = new THREE.Vector3();
 const ringCenterB = new THREE.Vector3();
 const extA = new THREE.Vector3();
 const extB = new THREE.Vector3();
-const tempNormal = new THREE.Vector3();
 const planeA = new THREE.Vector4();
 const planeB = new THREE.Vector4();
 const capNormalA = new THREE.Vector3();
@@ -132,7 +131,7 @@ export default class GeneralCylinderGroup extends PrimitiveGroup {
     globalBox.makeEmpty();
     this.data.getVector3('centerA', extA, index);
     this.data.getVector3('centerB', extB, index);
-    tempNormal.copy(extB).sub(extA).normalize();
+    normal.copy(extA).sub(extB).normalize();
 
     const distFromAToExtA = this.data.getNumber('radiusA', index) * Math.tan(this.data.getNumber('slopeA', index));
     const distFromBToExtB = this.data.getNumber('radiusA', index) * Math.tan(this.data.getNumber('slopeB', index));
