@@ -1,7 +1,5 @@
 import * as THREE from 'three';
 import GeometryGroup from './GeometryGroup';
-
-import { identityMatrix4 } from '../constants';
 import { computeBoundingBox } from './GeometryUtils';
 
 interface IndexMap { [s: number]: boolean; }
@@ -192,6 +190,7 @@ export class MergedMeshGroup extends GeometryGroup {
   ): THREE.Box3 {
     box.makeEmpty();
 
+    if (!this.treeIndexMap[treeIndex]) return box;
     // Extract data about geometry
     const { meshIndex, mappingIndex } = this.treeIndexMap[treeIndex];
     const mergedMesh = this.meshes[meshIndex];
