@@ -190,7 +190,7 @@ export class MergedMeshGroup extends GeometryGroup {
   ): THREE.Box3 {
     box.makeEmpty();
 
-    if (!this.treeIndexMap[treeIndex]) { return box };
+    if (!this.treeIndexMap[treeIndex]) { return box; }
     // Extract data about geometry
     const { meshIndex, mappingIndex } = this.treeIndexMap[treeIndex];
     const mergedMesh = this.meshes[meshIndex];
