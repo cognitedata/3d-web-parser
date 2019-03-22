@@ -39,3 +39,10 @@ export interface ParseData {
   colorMap: ColorMap;
   filterOptions?: FilterOptions;
 }
+
+export interface ParseReturn {
+  rootSector: Sector;
+  sectors: {[name: string]: Sector};
+  sceneStats: SceneStats;
+  maps: DataMaps;
+}

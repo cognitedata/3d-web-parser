@@ -4,7 +4,7 @@ import CustomFileReader from './CustomFileReader';
 import SceneStats from './../SceneStats';
 import mergeInstancedMeshes from './../optimizations/mergeInstancedMeshes';
 import { PerSectorCompressedDataDictionary, UncompressedValues } from './sharedFileParserTypes';
-import { DataMaps, FilterOptions } from './../parsers/parseUtils';
+import { DataMaps, FilterOptions, ParseReturn } from './../parsers/parseUtils';
 
 function preloadMeshFiles(meshLoader: any, fileIds: number[]) {
   fileIds.forEach(fileId => {
@@ -16,7 +16,7 @@ export function parseFullCustomFile(
   fileBuffer: ArrayBuffer,
   meshLoader: any,
   filterOptions?: FilterOptions,
-  ) {
+  ): ParseReturn {
   const fileReader = new CustomFileReader(fileBuffer);
   const maps: DataMaps = {
     treeIndexNodeIdMap: [],
@@ -57,7 +57,7 @@ export function parseMultipleCustomFiles(
   sectorBuffers: ArrayBuffer[],
   meshLoader: any,
   filterOptions?: FilterOptions,
-) {
+): ParseReturn {
   const maps: DataMaps = {
     treeIndexNodeIdMap: [],
     colorMap: [],
@@ -101,7 +101,8 @@ function unpackData(
   uncompressedValues: UncompressedValues,
   compressedData: PerSectorCompressedDataDictionary,
   maps: DataMaps,
-  filterOptions?: FilterOptions) {
+  filterOptions?: FilterOptions,
+  ): ParseReturn {
   const sceneStats: SceneStats = {
     numInstancedMeshes: 0,
     numMergedMeshes: 0,
