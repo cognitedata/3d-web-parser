@@ -1,11 +1,11 @@
 import * as THREE from 'three';
-import { InstancedMeshGroup, InstancedMesh, InstancedMeshCollection } from '../../geometry/InstancedMeshGroup';
-import { CompressedGeometryData, UncompressedValues } from './../sharedFileParserTypes';
+import { InstancedMesh, InstancedMeshCollection } from '../../geometry/InstancedMeshGroup';
+import { PerSectorCompressedDataDictionary, UncompressedValues } from './../sharedFileParserTypes';
 import PropertyLoader from './../PropertyLoader';
 import { xAxis, yAxis, zAxis } from './../../constants';
 import SceneStats from './../../SceneStats';
 import Sector from './../../Sector';
-import { TreeIndexNodeIdMap, ColorMap } from './../../parsers/parseUtils';
+import { DataMaps } from './../../parsers/parseUtils';
 
 const matrix = new THREE.Matrix4();
 const rotation = new THREE.Matrix4();
@@ -13,10 +13,10 @@ const rotation = new THREE.Matrix4();
 export default function unpackInstancedMeshes(
   rootSector: Sector,
   uncompressedValues: UncompressedValues,
-  sectorPathToInstancedMeshData: {[path: string]: CompressedGeometryData},
+  compressedData: PerSectorCompressedDataDictionary,
+  maps: DataMaps,
   sceneStats: SceneStats,
-  treeIndexNodeIdMap: TreeIndexNodeIdMap,
-  colorMap: ColorMap) {
+  ) {
 
   const data = new PropertyLoader(uncompressedValues);
   const meshCounts: {[fileId: string]: {[triangleOffset: string]: { count: number, triangleCount: number }}} = {};
@@ -24,7 +24,7 @@ export default function unpackInstancedMeshes(
 
   // Count meshes per file Id and triangle offset
   for (const sector of rootSector.traverseSectors()) {
-    const geometryInfo = sectorPathToInstancedMeshData[sector.path];
+    const geometryInfo = compressedData[sector.path].instancedMesh;
     if (geometryInfo !== undefined) {
       for (let i = 0; i < geometryInfo.count; i++) {
         data.loadData(geometryInfo);
@@ -52,12 +52,12 @@ export default function unpackInstancedMeshes(
 
   // Fill mesh collections with matrix data
   for (const sector of rootSector.traverseSectors()) {
-    const geometryInfo = sectorPathToInstancedMeshData[sector.path];
+    const geometryInfo = compressedData[sector.path].instancedMesh;
     if (geometryInfo !== undefined) {
       for (let i = 0; i < geometryInfo.count; i++) {
         data.loadData(geometryInfo);
-        treeIndexNodeIdMap[data.treeIndex] = data.nodeId;
-        colorMap[data.treeIndex] = data.color;
+        maps.treeIndexNodeIdMap[data.treeIndex] = data.nodeId;
+        maps.colorMap[data.treeIndex] = data.color;
         matrix.identity().setPosition(data.translation);
         matrix.multiply(rotation.makeRotationAxis(zAxis, data.rotation3.z));
         matrix.multiply(rotation.makeRotationAxis(yAxis, data.rotation3.y));

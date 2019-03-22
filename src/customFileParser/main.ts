@@ -3,8 +3,8 @@ import Sector from './../Sector';
 import CustomFileReader from './CustomFileReader';
 import SceneStats from './../SceneStats';
 import mergeInstancedMeshes from './../optimizations/mergeInstancedMeshes';
-import { CompressedGeometryData } from './sharedFileParserTypes';
-import { TreeIndexNodeIdMap, ColorMap, NodeIdTreeIndexMap, FilterOptions } from './../parsers/parseUtils';
+import { PerSectorCompressedDataDictionary, UncompressedValues } from './sharedFileParserTypes';
+import { DataMaps, FilterOptions } from './../parsers/parseUtils';
 
 function preloadMeshFiles(meshLoader: any, fileIds: number[]) {
   fileIds.forEach(fileId => {
@@ -12,68 +12,114 @@ function preloadMeshFiles(meshLoader: any, fileIds: number[]) {
   });
 }
 
-export default async function parseCustomFile(fileBuffer: ArrayBuffer, meshLoader: any, filterOptions?: FilterOptions) {
+export function parseFullCustomFile(
+  fileBuffer: ArrayBuffer,
+  meshLoader: any,
+  filterOptions?: FilterOptions,
+  ) {
   const fileReader = new CustomFileReader(fileBuffer);
-  const idToSectorMap: {[name: string]: Sector} = {};
+  const maps: DataMaps = {
+    treeIndexNodeIdMap: [],
+    colorMap: [],
+    nodeIdTreeIndexMap: new Map(),
+    idToSectorMap: {},
+  };
+  const compressedData: PerSectorCompressedDataDictionary = {};
+
+  // Read root sector
+  const rootSectorLength = fileReader.readUint32();
+  const rootSectorMetadata = fileReader.readSectorMetadata();
+  const rootSector = new Sector(rootSectorMetadata.sectorBBoxMin, rootSectorMetadata.sectorBBoxMax);
+  maps.idToSectorMap[rootSectorMetadata.sectorId] = rootSector;
+  const uncompressedValues = fileReader.readUncompressedValues();
+  compressedData[rootSector.path] = fileReader.readCompressedGeometryData(rootSectorLength);
+
+  // Read remaining sectors
+  while (fileReader.location < fileBuffer.byteLength) {
+    const sectorStartLocation = fileReader.location;
+    const sectorByteLength = fileReader.readUint32();
+    const sectorMetadata = fileReader.readSectorMetadata();
+    const sector = new Sector(sectorMetadata.sectorBBoxMin, sectorMetadata.sectorBBoxMax);
+    maps.idToSectorMap[sectorMetadata.sectorId] = sector;
+
+    const parentSector = maps.idToSectorMap[sectorMetadata.parentSectorId];
+    if (parentSector !== undefined) {
+      parentSector.addChild(sector);
+      parentSector.object3d.add(sector.object3d);
+    } else { throw Error('Parent sector not found'); }
+    compressedData[sector.path] = fileReader.readCompressedGeometryData(sectorStartLocation + sectorByteLength);
+  }
+
+  return unpackData(rootSector, uncompressedValues, compressedData, maps, filterOptions);
+}
+
+export function parseMultipleCustomFiles(
+  sectorBuffers: ArrayBuffer[],
+  meshLoader: any,
+  filterOptions?: FilterOptions,
+) {
+  const maps: DataMaps = {
+    treeIndexNodeIdMap: [],
+    colorMap: [],
+    nodeIdTreeIndexMap: new Map(),
+    idToSectorMap: {},
+  };
+  const compressedData: PerSectorCompressedDataDictionary = {};
+  let uncompressedValues: undefined | UncompressedValues;
+  let rootSector: undefined | Sector;
+
+  sectorBuffers.forEach(sectorBuffer => {
+    const fileReader = new CustomFileReader(sectorBuffer);
+    const sectorByteLength = fileReader.readUint32();
+    const sectorMetadata = fileReader.readSectorMetadata();
+    const sector = new Sector(sectorMetadata.sectorBBoxMin, sectorMetadata.sectorBBoxMax);
+    maps.idToSectorMap[sectorMetadata.sectorId] = sector;
+
+    if (sectorMetadata.arrayCount > 0) { // Is root sector
+      rootSector = sector;
+      uncompressedValues = fileReader.readUncompressedValues();
+    } else {
+      const parentSector = maps.idToSectorMap[sectorMetadata.parentSectorId];
+      if (parentSector !== undefined) {
+        parentSector.addChild(sector);
+        parentSector.object3d.add(sector.object3d);
+      } else { throw Error('Did not find parent sector'); }
+    }
+
+    compressedData[sector.path] = fileReader.readCompressedGeometryData(sectorByteLength);
+  });
+
+  if (rootSector === undefined || uncompressedValues === undefined) {
+    throw Error('Did not find root sector');
+  }
+
+  return unpackData(rootSector, uncompressedValues, compressedData, maps, filterOptions);
+}
+
+function unpackData(
+  rootSector: Sector,
+  uncompressedValues: UncompressedValues,
+  compressedData: PerSectorCompressedDataDictionary,
+  maps: DataMaps,
+  filterOptions?: FilterOptions) {
   const sceneStats: SceneStats = {
     numInstancedMeshes: 0,
     numMergedMeshes: 0,
   };
-  const treeIndexNodeIdMap: TreeIndexNodeIdMap = [];
-  const colorMap: ColorMap = [];
-
-  let rootSector = undefined;
-  let uncompressedValues = undefined;
-  const sectorPathToPrimitiveData: {[path: string]: CompressedGeometryData[]} = {};
-  const sectorPathToInstancedMeshData: {[path: string]: CompressedGeometryData} = {};
-  const sectorPathToMergedMeshData: {[path: string]: CompressedGeometryData} = {};
-
-  while (fileReader.location < fileBuffer.byteLength) {
-    const sectorStartLocation = fileReader.location;
-    const sectorByteLength = fileReader.readUint32();
-    const sectorMetadata = fileReader.readSectorMetadata(sectorByteLength);
-    const sector = new Sector(sectorMetadata.sectorBBoxMin, sectorMetadata.sectorBBoxMax);
-    idToSectorMap[sectorMetadata.sectorId] = sector;
-
-    if (rootSector === undefined || uncompressedValues === undefined) {
-      rootSector = sector;
-      uncompressedValues = fileReader.readUncompressedValues();
-      preloadMeshFiles(meshLoader, uncompressedValues.fileId!);
-    } else {
-      const parentSector = idToSectorMap[sectorMetadata.parentSectorId];
-      if (parentSector !== undefined) {
-        parentSector.addChild(sector);
-        parentSector.object3d.add(sector.object3d);
-      } else { throw Error('Parent sector not found'); }
-    }
-    const compressedGeometryData = fileReader.readCompressedGeometryData(sectorStartLocation + sectorByteLength);
-    sectorPathToPrimitiveData[sector.path] = compressedGeometryData.primitives;
-    if (compressedGeometryData.instancedMesh) {
-      sectorPathToInstancedMeshData[sector.path] = compressedGeometryData.instancedMesh;
-    }
-    if (compressedGeometryData.mergedMesh) {
-      sectorPathToMergedMeshData[sector.path] = compressedGeometryData.mergedMesh;
-    }
-  }
-
-  unpackPrimitives(rootSector!, uncompressedValues!, sectorPathToPrimitiveData,
-    treeIndexNodeIdMap, colorMap, filterOptions);
-  unpackMergedMeshes(rootSector!, uncompressedValues!, sectorPathToMergedMeshData, sceneStats,
-    treeIndexNodeIdMap, colorMap);
-  unpackInstancedMeshes(rootSector!, uncompressedValues!, sectorPathToInstancedMeshData, sceneStats,
-    treeIndexNodeIdMap, colorMap);
+  unpackPrimitives(rootSector!, uncompressedValues!, compressedData, maps, filterOptions);
+  unpackMergedMeshes(rootSector!, uncompressedValues!, compressedData, maps, sceneStats);
+  unpackInstancedMeshes(rootSector!, uncompressedValues!, compressedData, maps, sceneStats);
   for (const sector of rootSector!.traverseSectors()) {
-    mergeInstancedMeshes(sector, 2500, sceneStats, treeIndexNodeIdMap);
+    mergeInstancedMeshes(sector, 2500, sceneStats, maps.treeIndexNodeIdMap);
     sector.mergedMeshGroup.createTreeIndexMap();
     sector.instancedMeshGroup.createTreeIndexMap();
   }
 
-  const sectors = idToSectorMap;
-  const nodeIdTreeIndexMap: NodeIdTreeIndexMap = {};
-  for (let treeIndex = 0; treeIndex < treeIndexNodeIdMap.length; treeIndex++) {
-    const nodeId = treeIndexNodeIdMap[treeIndex];
-    nodeIdTreeIndexMap[nodeId] = treeIndex;
+  const sectors = maps.idToSectorMap;
+  for (let treeIndex = 0; treeIndex < maps.treeIndexNodeIdMap.length; treeIndex++) {
+    const nodeId = maps.treeIndexNodeIdMap[treeIndex];
+    maps.nodeIdTreeIndexMap.set(nodeId, treeIndex);
   }
 
-  return { rootSector, sectors, sceneStats, maps: { colorMap, treeIndexNodeIdMap, nodeIdTreeIndexMap } };
+  return { rootSector, sectors, sceneStats, maps };
 }

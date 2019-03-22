@@ -19,5 +19,5 @@ export { default as SphericalSegmentGroup } from './geometry/SphericalSegmentGro
 export { default as TorusSegmentGroup } from './geometry/TorusSegmentGroup';
 export { default as TrapeziumGroup } from './geometry/TrapeziumGroup';
 export { Attribute }  from './geometry/PrimitiveGroup';
-export { default as parseCustomFile } from './customFileParser/main';
+export { parseFullCustomFile, parseMultipleCustomFiles } from './customFileParser/main';
 export { computeBoundingBox } from './geometry/GeometryUtils';
