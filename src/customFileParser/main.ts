@@ -107,10 +107,10 @@ function unpackData(
     numInstancedMeshes: 0,
     numMergedMeshes: 0,
   };
-  unpackPrimitives(rootSector!, uncompressedValues!, compressedData, maps, filterOptions);
-  unpackMergedMeshes(rootSector!, uncompressedValues!, compressedData, maps, sceneStats);
-  unpackInstancedMeshes(rootSector!, uncompressedValues!, compressedData, maps, sceneStats);
-  for (const sector of rootSector!.traverseSectors()) {
+  unpackPrimitives(rootSector, uncompressedValues, compressedData, maps, filterOptions);
+  unpackMergedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
+  unpackInstancedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
+  for (const sector of rootSector.traverseSectors()) {
     mergeInstancedMeshes(sector, 2500, sceneStats, maps.treeIndexNodeIdMap);
     sector.mergedMeshGroup.createTreeIndexMap();
     sector.instancedMeshGroup.createTreeIndexMap();
