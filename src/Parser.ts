@@ -183,7 +183,7 @@ export default async function parseProtobuf(
   }
 
   const nodeIdTreeIndexMap: {[s: number]: number} = {};
-  for (let treeIndex = 0; treeIndex < treeIndexNodeIdMap.length; treeIndex++) {
+  for (let treeIndex = 1; treeIndex < treeIndexNodeIdMap.length; treeIndex++) {
     const nodeId = treeIndexNodeIdMap[treeIndex];
     nodeIdTreeIndexMap[nodeId] = treeIndex;
   }

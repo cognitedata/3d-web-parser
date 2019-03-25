@@ -4,6 +4,9 @@ import { SectorMetadata } from './sharedFileParserTypes';
 
 export default function loadSectorMetadata(fileReader: CustomFileReader) {
   const magicBytes = fileReader.readUint32();
+  if (magicBytes !== 1178874697) {
+    throw Error('File start is incorrect. Expected 1178874697, got ' + magicBytes.toString());
+  }
   const formatVersion = fileReader.readUint32();
   const optimizerVersion = fileReader.readUint32();
   const sectorId = fileReader.readUint64();

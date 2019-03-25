@@ -70,7 +70,6 @@ export function parseMultipleCustomFiles(
 
   sectorBuffers.forEach(sectorBuffer => {
     const fileReader = new CustomFileReader(sectorBuffer);
-    const sectorByteLength = fileReader.readUint32();
     const sectorMetadata = fileReader.readSectorMetadata();
     const sector = new Sector(sectorMetadata.sectorBBoxMin, sectorMetadata.sectorBBoxMax);
     maps.idToSectorMap[sectorMetadata.sectorId] = sector;
@@ -86,7 +85,7 @@ export function parseMultipleCustomFiles(
       } else { throw Error('Did not find parent sector'); }
     }
 
-    compressedData[sector.path] = fileReader.readCompressedGeometryData(sectorByteLength);
+    compressedData[sector.path] = fileReader.readCompressedGeometryData(sectorBuffer.byteLength);
   });
 
   if (rootSector === undefined || uncompressedValues === undefined) {
@@ -117,7 +116,7 @@ function unpackData(
   }
 
   const sectors = maps.idToSectorMap;
-  for (let treeIndex = 0; treeIndex < maps.treeIndexNodeIdMap.length; treeIndex++) {
+  for (let treeIndex = 1; treeIndex < maps.treeIndexNodeIdMap.length; treeIndex++) {
     const nodeId = maps.treeIndexNodeIdMap[treeIndex];
     maps.nodeIdTreeIndexMap.set(nodeId, treeIndex);
   }
