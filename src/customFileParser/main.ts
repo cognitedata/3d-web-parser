@@ -3,7 +3,7 @@ import Sector from './../Sector';
 import CustomFileReader from './CustomFileReader';
 import SceneStats from './../SceneStats';
 import mergeInstancedMeshes from './../optimizations/mergeInstancedMeshes';
-import { PerSectorCompressedDataDictionary, UncompressedValues } from './sharedFileParserTypes';
+import { PerSectorCompressedData, UncompressedValues } from './sharedFileParserTypes';
 import { DataMaps, FilterOptions, ParseReturn } from './../parsers/parseUtils';
 
 function preloadMeshFiles(meshLoader: any, fileIds: number[]) {
@@ -24,7 +24,7 @@ export function parseFullCustomFile(
     nodeIdTreeIndexMap: new Map(),
     idToSectorMap: {},
   };
-  const compressedData: PerSectorCompressedDataDictionary = {};
+  const compressedData: PerSectorCompressedData = {};
 
   // Read root sector
   const rootSectorLength = fileReader.readUint32();
@@ -64,7 +64,7 @@ export function parseMultipleCustomFiles(
     nodeIdTreeIndexMap: new Map(),
     idToSectorMap: {},
   };
-  const compressedData: PerSectorCompressedDataDictionary = {};
+  const compressedData: PerSectorCompressedData = {};
   let uncompressedValues: undefined | UncompressedValues;
   let rootSector: undefined | Sector;
 
@@ -99,7 +99,7 @@ export function parseMultipleCustomFiles(
 function unpackData(
   rootSector: Sector,
   uncompressedValues: UncompressedValues,
-  compressedData: PerSectorCompressedDataDictionary,
+  compressedData: PerSectorCompressedData,
   maps: DataMaps,
   filterOptions?: FilterOptions,
   ): ParseReturn {

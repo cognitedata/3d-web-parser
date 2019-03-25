@@ -42,14 +42,14 @@ export interface UncompressedValues {
   fileId?: number[];
 }
 
-export type PerSectorCompressedData = {
+export type SectorCompressedData = {
   primitives: CompressedGeometryData[],
   instancedMesh?: CompressedGeometryData,
   mergedMesh?: CompressedGeometryData,
 };
 
-export type PerSectorCompressedDataDictionary = {
-  [path: string]: PerSectorCompressedData;
+export type PerSectorCompressedData = {
+  [path: string]: SectorCompressedData;
 };
 
 export class NodeIdReader {

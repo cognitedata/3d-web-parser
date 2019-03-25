@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { InstancedMesh, InstancedMeshCollection } from '../../geometry/InstancedMeshGroup';
-import { PerSectorCompressedDataDictionary, UncompressedValues } from './../sharedFileParserTypes';
+import { PerSectorCompressedData, UncompressedValues } from './../sharedFileParserTypes';
 import PropertyLoader from './../PropertyLoader';
 import { xAxis, yAxis, zAxis } from './../../constants';
 import SceneStats from './../../SceneStats';
@@ -13,7 +13,7 @@ const rotation = new THREE.Matrix4();
 export default function unpackInstancedMeshes(
   rootSector: Sector,
   uncompressedValues: UncompressedValues,
-  compressedData: PerSectorCompressedDataDictionary,
+  compressedData: PerSectorCompressedData,
   maps: DataMaps,
   sceneStats: SceneStats,
   ) {

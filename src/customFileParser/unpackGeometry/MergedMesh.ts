@@ -1,4 +1,4 @@
-import { UncompressedValues, PerSectorCompressedDataDictionary } from '../sharedFileParserTypes';
+import { UncompressedValues, PerSectorCompressedData } from '../sharedFileParserTypes';
 import PropertyLoader from '../PropertyLoader';
 import { MergedMeshGroup, MergedMesh } from '../../geometry/MergedMeshGroup';
 import SceneStats from '../../SceneStats';
@@ -8,7 +8,7 @@ import { DataMaps } from './../../parsers/parseUtils';
 export default function unpackMergedMeshes(
   rootSector: Sector,
   uncompressedValues: UncompressedValues,
-  compressedData: PerSectorCompressedDataDictionary,
+  compressedData: PerSectorCompressedData,
   maps: DataMaps,
   sceneStats: SceneStats,
 ) {

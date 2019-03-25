@@ -1,4 +1,4 @@
-import { PerSectorCompressedDataDictionary, UncompressedValues, CompressedGeometryData }
+import { PerSectorCompressedData, UncompressedValues, CompressedGeometryData }
   from './../sharedFileParserTypes';
 import PropertyLoader from './../PropertyLoader';
 import { renderedPrimitiveToAddFunction, renderedPrimitivesPerFilePrimitive, renderedPrimitiveToGroup,
@@ -16,7 +16,7 @@ type PrimitivesPerSectorAndChildren = {[path: string]: {[renderedPrimitive: stri
 export function unpackPrimitives(
   rootSector: Sector,
   uncompressedValues: UncompressedValues,
-  compressedData: PerSectorCompressedDataDictionary,
+  compressedData: PerSectorCompressedData,
   maps: DataMaps,
   filterOptions?: FilterOptions) {
 
@@ -33,7 +33,7 @@ export function unpackPrimitives(
 
 function countRenderedPrimitivesPerSectorAndChildren(
   sector: Sector,
-  compressedData: PerSectorCompressedDataDictionary,
+  compressedData: PerSectorCompressedData,
   primitivesPerSectorAndChildren: PrimitivesPerSectorAndChildren,
 ) {
   // Count rendered primitives in sector

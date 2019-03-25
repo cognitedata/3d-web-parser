@@ -2,7 +2,7 @@ import loadSectorMetadata from './loadSectorMetadata';
 import loadUncompressedValues from './loadUncompressedValues';
 import loadCompressedGeometryData from './loadCompressedGeometryData';
 import FibonacciDecoder from './FibonacciDecoder';
-import { NodeIdReader, CompressedGeometryData, PerSectorCompressedData } from './sharedFileParserTypes';
+import { NodeIdReader, CompressedGeometryData, SectorCompressedData } from './sharedFileParserTypes';
 import { filePrimitiveNames, BYTES_PER_NODE_ID, geometryNameType } from './parserParameters';
 
 export default class CustomFileReader {
@@ -108,7 +108,7 @@ export default class CustomFileReader {
     return loadUncompressedValues(this);
   }
 
-  readCompressedGeometryData(sectorEndLocation: number): PerSectorCompressedData {
+  readCompressedGeometryData(sectorEndLocation: number): SectorCompressedData {
     const geometryDataArray = loadCompressedGeometryData(this, sectorEndLocation);
     const primitives: CompressedGeometryData[] = [];
     let instancedMesh = undefined;
