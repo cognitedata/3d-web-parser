@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 
+let hasWarnedAboutMissingColor = false;
 // reusable variables
 const globalVector = new THREE.Vector3();
 
@@ -12,10 +13,20 @@ export function parsePrimitiveTreeIndex(data: any): number {
 }
 
 export function parsePrimitiveColor(data: any): any {
-  if (data.properties) {
+  if (data.properties && data.properties.color) {
     return data.properties.color.rgb;
   }
-  return data.nodes[0].properties[0].color.rgb;
+  if (data.nodes[0].properties[0].color) {
+    return data.nodes[0].properties[0].color.rgb;
+  }
+  if (!hasWarnedAboutMissingColor) {
+    hasWarnedAboutMissingColor = true;
+    console.warn(
+      '3d-web-parser encountered node with missing color while loading',
+      '(using #ff00ff to highlight objects with missing color).',
+    );
+  }
+  return 0xff00ff;
 }
 
 export interface MatchingGeometries {
