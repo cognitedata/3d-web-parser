@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import CustomFileReader from '../../customFileParser/CustomFileReader';
-import parseCustomFile from '../../customFileParser/main';
+import { parseFullCustomFile } from '../../customFileParser/main';
 import { filePrimitiveNames, filePropertyArrayNames, filePropertyArrayNameType }
   from '../../customFileParser/parserParameters';
 
@@ -31,7 +31,7 @@ describe('customFileIntegrationTest', () => {
   test('read any sector metadata', async() => {
     const fileBuffer = fileToArrayBuffer(rootSectorFilePath);
     const fileReader = new CustomFileReader(fileBuffer);
-    const sectorMetadata = fileReader.readSectorMetadata(fileBuffer.byteLength);
+    const sectorMetadata = fileReader.readSectorMetadata();
 
     expect(sectorMetadata.magicBytes).toBe(1178874697);
     expect(sectorMetadata.formatVersion).toBeDefined();
@@ -49,7 +49,7 @@ describe('customFileIntegrationTest', () => {
   test('read root-sector UncompressedValues', async() => {
     const fileBuffer = fileToArrayBuffer(rootSectorFilePath);
     const fileReader = new CustomFileReader(fileBuffer);
-    const sectorMetadata = fileReader.readSectorMetadata(fileBuffer.byteLength);
+    const sectorMetadata = fileReader.readSectorMetadata();
     expect(sectorMetadata.arrayCount).toBe(filePropertyArrayNames.length);
 
     const uncompressedValues = fileReader.readUncompressedValues();
@@ -73,7 +73,7 @@ describe('customFileIntegrationTest', () => {
   test('read any sector geometry group index pointers', async() => {
     const fileBuffer = fileToArrayBuffer(nonRootSectorFilePath);
     const fileReader = new CustomFileReader(fileBuffer);
-    const sectorMetadata = fileReader.readSectorMetadata(fileBuffer.byteLength);
+    const sectorMetadata = fileReader.readSectorMetadata();
     if (sectorMetadata.arrayCount !== 0) {
       fileReader.readUncompressedValues();
     }
@@ -94,7 +94,7 @@ describe('customFileIntegrationTest', () => {
 
   test('read multi-sector file', async() => {
     const fileBuffer = fileToArrayBuffer(multiSectorFilePath);
-    const { rootSector, sectors, sceneStats } = await parseCustomFile(fileBuffer, new FakeMeshLoader());
+    const { rootSector, sectors, sceneStats } = await parseFullCustomFile(fileBuffer, new FakeMeshLoader());
     Object.keys(sectors).forEach(sectorId => {
       const sector = sectors[sectorId];
       sector.primitiveGroups.forEach(primitiveGroup => {

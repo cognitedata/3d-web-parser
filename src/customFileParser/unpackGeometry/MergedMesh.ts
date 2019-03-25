@@ -1,23 +1,22 @@
-import { CompressedGeometryData, UncompressedValues } from '../sharedFileParserTypes';
+import { UncompressedValues, PerSectorCompressedData } from '../sharedFileParserTypes';
 import PropertyLoader from '../PropertyLoader';
 import { MergedMeshGroup, MergedMesh } from '../../geometry/MergedMeshGroup';
 import SceneStats from '../../SceneStats';
 import Sector from './../../Sector';
-import { TreeIndexNodeIdMap, ColorMap } from './../../parsers/parseUtils';
+import { DataMaps } from './../../parsers/parseUtils';
 
 export default function unpackMergedMeshes(
   rootSector: Sector,
   uncompressedValues: UncompressedValues,
-  sectorPathToMergedMeshData: {[path: string]: CompressedGeometryData},
+  compressedData: PerSectorCompressedData,
+  maps: DataMaps,
   sceneStats: SceneStats,
-  treeIndexNodeIdMap: TreeIndexNodeIdMap,
-  colorMap: ColorMap,
 ) {
   const data = new PropertyLoader(uncompressedValues);
 
   for (const sector of rootSector!.traverseSectors()) {
     sector.mergedMeshGroup = new MergedMeshGroup();
-    const geometryInfo = sectorPathToMergedMeshData[sector.path];
+    const geometryInfo = compressedData[sector.path].mergedMesh;
     if (geometryInfo !== undefined) {
       // count meshes per file Id
       const meshCounts: {[fileId: string]: number} = {};
@@ -41,8 +40,8 @@ export default function unpackMergedMeshes(
       const triangleOffsets: {[fileId: string]: number} = {};
       for (let i = 0; i < geometryInfo.count; i++) {
         data.loadData(geometryInfo);
-        treeIndexNodeIdMap[data.treeIndex] = data.nodeId;
-        colorMap[data.treeIndex] = data.color;
+        maps.treeIndexNodeIdMap[data.treeIndex] = data.nodeId;
+        maps.colorMap[data.treeIndex] = data.color;
 
         triangleOffsets[data.fileId] = triangleOffsets[data.fileId] ? triangleOffsets[data.fileId] : 0;
         mergedMeshes[data.fileId].mappings.add(

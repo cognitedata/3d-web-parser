@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import CustomFileReader from './CustomFileReader';
 import { SectorMetadata } from './sharedFileParserTypes';
 
-export default function loadSectorMetadata(fileReader: CustomFileReader, sectorByteLength: number) {
+export default function loadSectorMetadata(fileReader: CustomFileReader) {
   const magicBytes = fileReader.readUint32();
   const formatVersion = fileReader.readUint32();
   const optimizerVersion = fileReader.readUint32();

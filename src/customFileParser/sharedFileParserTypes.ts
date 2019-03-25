@@ -2,7 +2,7 @@ import FibonacciDecoder from './FibonacciDecoder';
 import { BYTES_PER_NODE_ID, geometryNameType } from './parserParameters';
 import * as THREE from 'three';
 
-interface SectorMetadata {
+export interface SectorMetadata {
   magicBytes: number;
   formatVersion: number;
   optimizerVersion: number;
@@ -13,7 +13,7 @@ interface SectorMetadata {
   sectorBBoxMax: THREE.Vector3;
 }
 
-interface CompressedGeometryData {
+export interface CompressedGeometryData {
   type: geometryNameType;
   nodeIds: NodeIdReader;
   indices: FibonacciDecoder;
@@ -22,7 +22,7 @@ interface CompressedGeometryData {
   attributeCount: number;
 }
 
-interface UncompressedValues {
+export interface UncompressedValues {
   [propertyName: string]: THREE.Color[] | THREE.Vector3[] | number[] | undefined;
   color?: THREE.Color[];
   normal?: THREE.Vector3[];
@@ -42,7 +42,17 @@ interface UncompressedValues {
   fileId?: number[];
 }
 
-class NodeIdReader {
+export type SectorCompressedData = {
+  primitives: CompressedGeometryData[],
+  instancedMesh?: CompressedGeometryData,
+  mergedMesh?: CompressedGeometryData,
+};
+
+export type PerSectorCompressedData = {
+  [path: string]: SectorCompressedData;
+};
+
+export class NodeIdReader {
   private dataView: DataView;
   private location = 0;
 
@@ -62,6 +72,3 @@ class NodeIdReader {
     this.location = 0;
   }
 }
-
-export { CompressedGeometryData, SectorMetadata, NodeIdReader,
-  UncompressedValues, BYTES_PER_NODE_ID };

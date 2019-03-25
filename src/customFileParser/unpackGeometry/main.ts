@@ -1,4 +1,5 @@
-import { CompressedGeometryData, UncompressedValues } from './../sharedFileParserTypes';
+import { PerSectorCompressedData, UncompressedValues, CompressedGeometryData }
+  from './../sharedFileParserTypes';
 import PropertyLoader from './../PropertyLoader';
 import { renderedPrimitiveToAddFunction, renderedPrimitivesPerFilePrimitive, renderedPrimitiveToGroup,
   renderedPrimitiveNames} from '../parserParameters';
@@ -6,7 +7,7 @@ import unpackInstancedMeshes from './InstancedMesh';
 import unpackMergedMeshes from './MergedMesh';
 import { PrimitiveGroup } from '../../geometry/GeometryGroups';
 import { Sector } from '../..';
-import { TreeIndexNodeIdMap, ColorMap, FilterOptions } from './../../parsers/parseUtils';
+import { DataMaps, FilterOptions } from './../../parsers/parseUtils';
 
 export { unpackInstancedMeshes, unpackMergedMeshes };
 
@@ -15,18 +16,16 @@ type PrimitivesPerSectorAndChildren = {[path: string]: {[renderedPrimitive: stri
 export function unpackPrimitives(
   rootSector: Sector,
   uncompressedValues: UncompressedValues,
-  sectorPathToCompressedData: {[path: string]: CompressedGeometryData[]},
-  treeIndexNodeIdMap: TreeIndexNodeIdMap,
-  colorMap: ColorMap,
+  compressedData: PerSectorCompressedData,
+  maps: DataMaps,
   filterOptions?: FilterOptions) {
 
   const primitivesPerSectorAndChildren: PrimitivesPerSectorAndChildren = {};
-  countRenderedPrimitivesPerSectorAndChildren(rootSector, sectorPathToCompressedData, primitivesPerSectorAndChildren);
+  countRenderedPrimitivesPerSectorAndChildren(rootSector, compressedData, primitivesPerSectorAndChildren);
 
   for (const sector of rootSector.traverseSectorsBreadthFirst()) {
-    const compressedPrimitiveData = sectorPathToCompressedData[sector.path];
-    compressedPrimitiveData.forEach(primitiveCompressedData => {
-      unpackFilePrimitive(sector, primitiveCompressedData, uncompressedValues, treeIndexNodeIdMap, colorMap,
+    compressedData[sector.path].primitives.forEach(primitiveCompressedData => {
+      unpackFilePrimitive(sector, primitiveCompressedData, uncompressedValues, maps,
         primitivesPerSectorAndChildren, filterOptions);
     });
   }
@@ -34,7 +33,7 @@ export function unpackPrimitives(
 
 function countRenderedPrimitivesPerSectorAndChildren(
   sector: Sector,
-  sectorPathToCompressedData: {[path: string]: CompressedGeometryData[]},
+  compressedData: PerSectorCompressedData,
   primitivesPerSectorAndChildren: PrimitivesPerSectorAndChildren,
 ) {
   // Count rendered primitives in sector
@@ -43,7 +42,7 @@ function countRenderedPrimitivesPerSectorAndChildren(
     primitivesPerSectorAndChildren[sector.path][renderedPrimitive] = 0;
   });
 
-  sectorPathToCompressedData[sector.path].forEach(fileGeometryData => {
+  compressedData[sector.path].primitives.forEach(fileGeometryData => {
     renderedPrimitivesPerFilePrimitive[fileGeometryData.type].forEach(renderedPrimitiveInfo => {
       primitivesPerSectorAndChildren[sector.path][renderedPrimitiveInfo.name] +=
       renderedPrimitiveInfo.count * fileGeometryData.count;
@@ -54,7 +53,7 @@ function countRenderedPrimitivesPerSectorAndChildren(
   sector.children.forEach(childSector => {
     if (primitivesPerSectorAndChildren[childSector.path] === undefined) {
       countRenderedPrimitivesPerSectorAndChildren(
-        childSector, sectorPathToCompressedData, primitivesPerSectorAndChildren);
+        childSector, compressedData, primitivesPerSectorAndChildren);
     }
     renderedPrimitiveNames.forEach(renderedPrimitive => {
       primitivesPerSectorAndChildren[sector.path][renderedPrimitive] +=
@@ -67,8 +66,7 @@ function unpackFilePrimitive(
   currentSector: Sector,
   primitiveCompressedData: CompressedGeometryData,
   uncompressedValues: UncompressedValues,
-  treeIndexNodeIdMap: TreeIndexNodeIdMap,
-  colorMap: ColorMap,
+  maps: DataMaps,
   primitivesPerSectorAndChildren: PrimitivesPerSectorAndChildren,
   filterOptions?: FilterOptions) {
 
@@ -78,8 +76,8 @@ function unpackFilePrimitive(
     updateDestinationGroups(destinationPrimitiveGroups, currentSector, primitiveCompressedData,
       j, primitivesPerSectorAndChildren);
     data.loadData(primitiveCompressedData);
-    treeIndexNodeIdMap[data.treeIndex] = data.nodeId;
-    colorMap[data.treeIndex] = data.color;
+    maps.treeIndexNodeIdMap[data.treeIndex] = data.nodeId;
+    maps.colorMap[data.treeIndex] = data.color;
     // @ts-ignore
     renderedPrimitiveToAddFunction[primitiveCompressedData.type].call(
       // @ts-ignore

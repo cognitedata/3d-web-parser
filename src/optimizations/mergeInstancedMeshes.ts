@@ -19,7 +19,7 @@ function countMappingsToMerge(collections: InstancedMeshCollection[], triangleCo
   return numMappings;
 }
 
-export default function mergedInstancedMeshes(
+export default function mergeInstancedMeshes(
   sector: Sector,
   triangleCountLimit: number,
   sceneStats: SceneStats,

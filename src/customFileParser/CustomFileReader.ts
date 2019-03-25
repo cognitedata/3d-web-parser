@@ -2,8 +2,8 @@ import loadSectorMetadata from './loadSectorMetadata';
 import loadUncompressedValues from './loadUncompressedValues';
 import loadCompressedGeometryData from './loadCompressedGeometryData';
 import FibonacciDecoder from './FibonacciDecoder';
-import { NodeIdReader, CompressedGeometryData } from './sharedFileParserTypes';
-import { filePrimitiveNames, fileMeshNames, BYTES_PER_NODE_ID, geometryNameType } from './parserParameters';
+import { NodeIdReader, CompressedGeometryData, SectorCompressedData } from './sharedFileParserTypes';
+import { filePrimitiveNames, BYTES_PER_NODE_ID, geometryNameType } from './parserParameters';
 
 export default class CustomFileReader {
   public location: number;
@@ -100,18 +100,15 @@ export default class CustomFileReader {
     this.location += numberOfBytes;
   }
 
-  readSectorMetadata(sectorByteLength: number) {
-    return loadSectorMetadata(this, sectorByteLength);
+  readSectorMetadata() {
+    return loadSectorMetadata(this);
   }
 
   readUncompressedValues() {
     return loadUncompressedValues(this);
   }
 
-  readCompressedGeometryData(sectorEndLocation: number): {
-    primitives: CompressedGeometryData[],
-    instancedMesh?: CompressedGeometryData,
-    mergedMesh?: CompressedGeometryData} {
+  readCompressedGeometryData(sectorEndLocation: number): SectorCompressedData {
     const geometryDataArray = loadCompressedGeometryData(this, sectorEndLocation);
     const primitives: CompressedGeometryData[] = [];
     let instancedMesh = undefined;
@@ -129,8 +126,6 @@ export default class CustomFileReader {
     });
     const primitiveHandlers = geometryDataArray.filter(geometryData => {
       return (filePrimitiveNames.indexOf(geometryData.type as geometryNameType) !== -1); });
-    const meshHandlers = geometryDataArray.filter(geometryData => {
-      return (fileMeshNames.indexOf(geometryData.type) !== -1); });
     return { primitives: primitiveHandlers, instancedMesh, mergedMesh };
   }
 
