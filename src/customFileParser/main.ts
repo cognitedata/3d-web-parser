@@ -6,15 +6,8 @@ import mergeInstancedMeshes from './../optimizations/mergeInstancedMeshes';
 import { PerSectorCompressedData, UncompressedValues } from './sharedFileParserTypes';
 import { DataMaps, FilterOptions, ParseReturn } from './../parsers/parseUtils';
 
-function preloadMeshFiles(meshLoader: any, fileIds: number[]) {
-  fileIds.forEach(fileId => {
-    meshLoader.getGeometry(fileId);
-  });
-}
-
 export function parseFullCustomFile(
   fileBuffer: ArrayBuffer,
-  meshLoader: any,
   filterOptions?: FilterOptions,
   ): ParseReturn {
   const fileReader = new CustomFileReader(fileBuffer);
@@ -55,7 +48,6 @@ export function parseFullCustomFile(
 
 export function parseMultipleCustomFiles(
   sectorBuffers: ArrayBuffer[],
-  meshLoader: any,
   filterOptions?: FilterOptions,
 ): ParseReturn {
   const maps: DataMaps = {
