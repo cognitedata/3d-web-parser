@@ -2,10 +2,12 @@ import * as THREE from 'three';
 import CustomFileReader from './CustomFileReader';
 import { SectorMetadata } from './sharedFileParserTypes';
 
+const MAGIC_BYTES = 0x46443349;
+
 export default function loadSectorMetadata(fileReader: CustomFileReader) {
   const magicBytes = fileReader.readUint32();
-  if (magicBytes !== 1178874697) {
-    throw Error('Start of sector file is incorrect. Expected 1178874697, got ' + magicBytes.toString());
+  if (magicBytes !== MAGIC_BYTES) {
+    throw Error('Start of sector file is incorrect. Expected 0x46443349, got ' + magicBytes.toString(16));
   }
   const formatVersion = fileReader.readUint32();
   const optimizerVersion = fileReader.readUint32();

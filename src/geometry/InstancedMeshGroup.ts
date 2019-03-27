@@ -4,7 +4,7 @@ import { TypedArray, MeshNormalMaterial } from 'three';
 import { computeBoundingBox } from './GeometryUtils';
 
 const globalMatrix = new THREE.Matrix4();
-const tempBox = new THREE.Box3();
+const globalBox = new THREE.Box3();
 interface IndexMap { [s: number]: boolean; }
 
 export class InstancedMeshMappings {
@@ -279,8 +279,8 @@ export class InstancedMeshGroup extends GeometryGroup {
 
       globalMatrix.multiplyMatrices(matrix, globalMatrix);
 
-      computeBoundingBox(tempBox, matrix, position, index, 0, triangleCount);
-      box.union(tempBox);
+      computeBoundingBox(globalBox, matrix, position, index, 0, triangleCount);
+      box.union(globalBox);
     });
 
     return box;
