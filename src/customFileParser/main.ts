@@ -117,7 +117,7 @@ function unpackData(
   }
 
   const sectors = maps.idToSectorMap;
-  for (let treeIndex = 1; treeIndex < maps.treeIndexNodeIdMap.length; treeIndex++) {
+  for (let treeIndex = 0; treeIndex < maps.treeIndexNodeIdMap.length; treeIndex++) {
     const nodeId = maps.treeIndexNodeIdMap[treeIndex];
     maps.nodeIdTreeIndexMap.set(nodeId, treeIndex);
   }
