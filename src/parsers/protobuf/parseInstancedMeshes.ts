@@ -36,7 +36,7 @@ function createCollection(
   // @ts-ignore
   node.properties.forEach(property => {
     const nodeId = Number(property.nodeId);
-    let { treeIndex, transformMatrix } = property;
+    const { treeIndex, transformMatrix } = property;
     if (property.color == null && !hasWarnedAboutMissingColor) {
       hasWarnedAboutMissingColor = true;
       console.warn(

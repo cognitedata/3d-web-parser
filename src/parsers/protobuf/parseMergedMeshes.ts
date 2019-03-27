@@ -35,7 +35,7 @@ export default function parse(data: ParseData): MergedMeshGroup {
     let triangleOffset = 0;
     nodes.forEach(node => {
       const nodeId = Number(node.properties[0].nodeId);
-      let { treeIndex } = node.properties[0];
+      const { treeIndex } = node.properties[0];
       if (node.properties[0].color == null && !hasWarnedAboutMissingColor) {
         hasWarnedAboutMissingColor = true;
         console.warn(
