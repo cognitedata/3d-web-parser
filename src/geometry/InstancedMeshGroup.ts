@@ -4,6 +4,7 @@ import { TypedArray, MeshNormalMaterial } from 'three';
 import { computeBoundingBox } from './GeometryUtils';
 
 const globalMatrix = new THREE.Matrix4();
+const tempBox = new THREE.Box3();
 interface IndexMap { [s: number]: boolean; }
 
 export class InstancedMeshMappings {
@@ -202,7 +203,7 @@ interface MappingData {
 }
 
 interface TreeIndexMap {
-  [s: number]: MappingData;
+  [s: number]: MappingData[];
 }
 
 export class InstancedMeshGroup extends GeometryGroup {
@@ -222,15 +223,14 @@ export class InstancedMeshGroup extends GeometryGroup {
       instancedMesh.collections.forEach( (collection, collectionIndex) => {
         for (let mappingIndex = 0; mappingIndex < collection.mappings.count; mappingIndex++) {
           const treeIndex = collection.mappings.getTreeIndex(mappingIndex);
-          if (this.treeIndexMap[treeIndex] != null) {
-            throw `Error, trying to add treeIndex
-                   ${treeIndex} to InstancedMeshGroup.treeIndexMap, but it already exists.`;
+          if (this.treeIndexMap[treeIndex] === undefined) {
+            this.treeIndexMap[treeIndex] = [];
           }
-          this.treeIndexMap[treeIndex] = {
+          this.treeIndexMap[treeIndex].push({
             meshIndex,
             collectionIndex,
             mappingIndex,
-          };
+          });
         }
       });
     });
@@ -243,8 +243,10 @@ export class InstancedMeshGroup extends GeometryGroup {
   removeTreeIndicesFromCollection(treeIndices: number[], collection: InstancedMeshCollection) {
     const indicesToRemove: IndexMap = {};
     treeIndices.forEach(treeIndex => {
-      const { meshIndex, mappingIndex, collectionIndex } = this.treeIndexMap[treeIndex];
-      indicesToRemove[mappingIndex] = true;
+      this.treeIndexMap[treeIndex].forEach(mesh => {
+        const { meshIndex, mappingIndex, collectionIndex } = mesh;
+        indicesToRemove[mappingIndex] = true;
+      });
     });
     collection.mappings.removeIndices(indicesToRemove);
     this.createTreeIndexMap();
@@ -255,27 +257,32 @@ export class InstancedMeshGroup extends GeometryGroup {
                      treeIndex: number,
                      geometry?: THREE.BufferGeometry): THREE.Box3 {
     box.makeEmpty();
-    // Extract data about geometry
-    const { meshIndex, collectionIndex, mappingIndex } = this.treeIndexMap[treeIndex];
-    const instancedMesh = this.meshes[meshIndex];
-    const collection = instancedMesh.collections[collectionIndex];
 
-    if (geometry == null) {
-      if (collection.geometry == null) {
-        // Geometry may not be loaded yet, just return empty box.
-        return box;
+    this.treeIndexMap[treeIndex].forEach(mesh => {
+      const { meshIndex, collectionIndex, mappingIndex } = mesh;
+      const instancedMesh = this.meshes[meshIndex];
+      const collection = instancedMesh.collections[collectionIndex];
+
+      if (geometry == null) {
+        if (collection.geometry == null) {
+          // Geometry may not be loaded yet, skip this geometry.
+          return;
+        }
+        geometry = collection.geometry;
       }
-      geometry = collection.geometry;
-    }
 
-    collection.mappings.getTransformMatrix(globalMatrix, mappingIndex);
-    const triangleCount = collection.triangleCount;
-    // TriangleOffset is 0 since each collection contains exactly one geometry
-    const index = geometry.getIndex();
-    const position = geometry.getAttribute('position');
+      collection.mappings.getTransformMatrix(globalMatrix, mappingIndex);
+      const triangleCount = collection.triangleCount;
+      // TriangleOffset is 0 since each collection contains exactly one geometry
+      const index = geometry.getIndex();
+      const position = geometry.getAttribute('position');
 
-    globalMatrix.multiplyMatrices(matrix, globalMatrix);
+      globalMatrix.multiplyMatrices(matrix, globalMatrix);
 
-    return computeBoundingBox(box, matrix, position, index, 0, triangleCount);
+      computeBoundingBox(tempBox, matrix, position, index, 0, triangleCount);
+      box.union(tempBox);
+    });
+
+    return box;
   }
 }
