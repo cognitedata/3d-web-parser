@@ -96,8 +96,8 @@ export function addClosedGeneralCylinder(groups: {[name: string]: PrimitiveGroup
     globalVertex.set(Math.cos(data.rotationAngle), Math.sin(data.rotationAngle), 0)
       .applyQuaternion(globalRotation).normalize();
 
-    globalLineStart.copy(globalVertex).multiplyScalar(data.radiusA).add(extB).sub(data.normal);
-    globalLineEnd.copy(globalVertex).multiplyScalar(data.radiusA).add(extA).add(data.normal);
+    globalLineStart.copy(globalVertex).multiplyScalar(data.radiusA).add(globalExtB).sub(data.normal);
+    globalLineEnd.copy(globalVertex).multiplyScalar(data.radiusA).add(globalExtA).add(data.normal);
     globalLine.set(globalLineStart, globalLineEnd);
     plane.intersectLine(globalLine, globalVertex);
 
@@ -116,7 +116,7 @@ export function addSolidOpenGeneralCylinder(groups: {[name: string]: PrimitiveGr
     const distFromBToExtB = data.radiusA * Math.tan(data.slopeB);
     const heightA = distFromBToExtB + data.height;
     const heightB = distFromBToExtB;
-    (groups.GeneralCylinder as GeneralCylinderGroup).add(data.nodeId, data.treeIndex, extA, extB,
+    (groups.GeneralCylinder as GeneralCylinderGroup).add(data.nodeId, data.treeIndex, globalExtA, globalExtB,
       data.radiusA - data.thickness, heightA, heightB, data.slopeA, data.slopeB, data.zAngleA,
       data.zAngleB, data.rotationAngle, data.arcAngle, filterOptions);
 }

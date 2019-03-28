@@ -33,15 +33,19 @@ export function addOpenEccentricCone(groups: {[name: string]: PrimitiveGroup}, d
 export function addClosedCone(
   groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader, filterOptions?: FilterOptions) {
   addOpenCone(groups, data);
-  (groups.Circle as CircleGroup).add(data.nodeId, data.treeIndex, globalCenterA, data.normal, data.radiusA, filterOptions);
-  (groups.Circle as CircleGroup).add(data.nodeId, data.treeIndex, globalCenterB, data.normal, data.radiusB, filterOptions);
+  (groups.Circle as CircleGroup).add(
+    data.nodeId, data.treeIndex, globalCenterA, data.normal, data.radiusA, filterOptions);
+  (groups.Circle as CircleGroup).add(
+    data.nodeId, data.treeIndex, globalCenterB, data.normal, data.radiusB, filterOptions);
 }
 
 export function addClosedEccentricCone(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader,
                                        filterOptions?: FilterOptions) {
   addOpenEccentricCone(groups, data);
-  (groups.Circle as CircleGroup).add(data.nodeId, data.treeIndex, globalCenterA, data.normal, data.radiusA, filterOptions);
-  (groups.Circle as CircleGroup).add(data.nodeId, data.treeIndex, globalCenterB, data.normal, data.radiusB, filterOptions);
+  (groups.Circle as CircleGroup).add(
+    data.nodeId, data.treeIndex, globalCenterA, data.normal, data.radiusA, filterOptions);
+  (groups.Circle as CircleGroup).add(
+    data.nodeId, data.treeIndex, globalCenterB, data.normal, data.radiusB, filterOptions);
 }
 
 export function addOpenGeneralCone(
@@ -68,7 +72,8 @@ export function addClosedGeneralCone(
 export function addSolidOpenGeneralCone(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader,
                                         filterOptions?: FilterOptions) {
   addClosedGeneralCone(groups, data, filterOptions);
-  (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, globalCenterA, globalCenterB, data.radiusA - data.thickness,
+  (groups.Cone as ConeGroup).add(
+    data.nodeId, data.treeIndex, globalCenterA, globalCenterB, data.radiusA - data.thickness,
     data.radiusB - data.thickness, data.rotationAngle, data.arcAngle, filterOptions);
 }
 
