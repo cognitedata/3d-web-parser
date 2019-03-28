@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { FilterOptions } from '../../parsers/parseUtils';
 import { PrimitiveGroup, CircleGroup, SphericalSegmentGroup } from '../../geometry/GeometryGroups';
 
-const centerA = new THREE.Vector3();
+const globalCenterA = new THREE.Vector3();
 
 function addOpenSphericalSegment(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader,
                                  filterOptions?: FilterOptions) {
@@ -16,8 +16,9 @@ function addClosedSphericalSegment(groups: {[name: string]: PrimitiveGroup}, dat
   addOpenSphericalSegment(groups, data, filterOptions);
   const length = data.radiusA - data.height;
   const circleRadius = Math.sqrt(Math.pow(data.radiusA, 2) - Math.pow(length, 2));
-  centerA.copy(data.normal).normalize().multiplyScalar(length).add(data.center);
-  (groups.Circle as CircleGroup).add(data.nodeId, data.treeIndex, centerA, data.normal, circleRadius, filterOptions);
+  globalCenterA.copy(data.normal).normalize().multiplyScalar(length).add(data.center);
+  (groups.Circle as CircleGroup).add(
+    data.nodeId, data.treeIndex, globalCenterA, data.normal, circleRadius, filterOptions);
 }
 
 export { addClosedSphericalSegment, addOpenSphericalSegment };

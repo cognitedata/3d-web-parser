@@ -6,10 +6,10 @@ import { PrimitiveGroup, BoxGroup, NutGroup, CircleGroup, GeneralRingGroup, Sphe
   from '../../geometry/GeometryGroups';
 import { FilterOptions } from '../../parsers/parseUtils';
 
-const centerA = new THREE.Vector3();
-const centerB = new THREE.Vector3();
-const localXAxis = new THREE.Vector3();
-const axisRotation = new THREE.Quaternion();
+const globalCenterA = new THREE.Vector3();
+const globalCenterB = new THREE.Vector3();
+const globalXAxis = new THREE.Vector3();
+const globalAxisRotation = new THREE.Quaternion();
 
 function addBox(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader, filterOptions?: FilterOptions) {
   (groups.Box as BoxGroup).add(data.nodeId, data.treeIndex, data.center, data.normal,
@@ -22,16 +22,16 @@ function addCircle(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoade
 }
 
 function addNut(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader, filterOptions?: FilterOptions) {
-  centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
-  centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
-  (groups.Nut as NutGroup).add(data.nodeId, data.treeIndex, centerA, centerB,
+  globalCenterA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
+  globalCenterB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
+  (groups.Nut as NutGroup).add(data.nodeId, data.treeIndex, globalCenterA, globalCenterB,
     data.radiusA, data.rotationAngle, filterOptions);
 }
 
 function addRing(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader, filterOptions?: FilterOptions) {
-  localXAxis.copy(xAxis).applyQuaternion(axisRotation.setFromUnitVectors(zAxis, data.normal));
+  globalXAxis.copy(xAxis).applyQuaternion(globalAxisRotation.setFromUnitVectors(zAxis, data.normal));
   (groups.GeneralRing as GeneralRingGroup).add(data.nodeId, data.treeIndex, data.center, data.normal,
-    localXAxis, data.radiusB, data.radiusB, data.radiusB - data.radiusA, 0, 2 * Math.PI, filterOptions);
+    globalXAxis, data.radiusB, data.radiusB, data.radiusB - data.radiusA, 0, 2 * Math.PI, filterOptions);
 }
 
 function addSphere(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader, filterOptions?: FilterOptions) {
