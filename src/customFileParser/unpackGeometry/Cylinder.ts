@@ -5,36 +5,37 @@ import { PrimitiveGroup, ConeGroup, GeneralCylinderGroup, TrapeziumGroup, Circle
   from '../../geometry/GeometryGroups';
 import { FilterOptions } from '../../parsers/parseUtils';
 
-const centerA = new THREE.Vector3();
-const centerB = new THREE.Vector3();
-const extA = new THREE.Vector3();
-const extB = new THREE.Vector3();
-const slicingPlaneNormal = new THREE.Vector3();
+const globalCenterA = new THREE.Vector3();
+const globalCenterB = new THREE.Vector3();
+const globalExtA = new THREE.Vector3();
+const globalExtB = new THREE.Vector3();
+const globalSlicingPlaneNormal = new THREE.Vector3();
 const globalVertex = new THREE.Vector3();
-const rotation = new THREE.Quaternion();
+const globalRotation = new THREE.Quaternion();
 const globalPlanes = [new THREE.Plane(), new THREE.Plane()];
 const globalLine = new THREE.Line3();
 const globalLineStart = new THREE.Vector3();
 const globalLineEnd = new THREE.Vector3();
 const globalVector = new THREE.Vector3();
-
 const globalVertices = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
 
 export function addClosedCylinder(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader,
                                   filterOptions?: FilterOptions) {
-  centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
-  centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
-  (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, centerA, centerB,
+  globalCenterA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
+  globalCenterB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
+  (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, globalCenterA, globalCenterB,
     data.radiusA, data.radiusA, 0, 2 * Math.PI, filterOptions);
-  (groups.Circle as CircleGroup).add(data.nodeId, data.treeIndex, centerA, data.normal, data.radiusA, filterOptions);
-  (groups.Circle as CircleGroup).add(data.nodeId, data.treeIndex, centerB, data.normal, data.radiusA, filterOptions);
+  (groups.Circle as CircleGroup).add(
+    data.nodeId, data.treeIndex, globalCenterA, data.normal, data.radiusA, filterOptions);
+  (groups.Circle as CircleGroup).add(
+    data.nodeId, data.treeIndex, globalCenterB, data.normal, data.radiusA, filterOptions);
 }
 
 export function addOpenCylinder(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader,
                                 filterOptions?: FilterOptions) {
-  centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
-  centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
-  (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, centerA, centerB,
+  globalCenterA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
+  globalCenterB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
+  (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, globalCenterA, globalCenterB,
   data.radiusA, data.radiusA, 0, 2 * Math.PI, filterOptions);
 }
 
@@ -57,17 +58,18 @@ function normalizeRadians (angle: number, lowerBound = -Math.PI, upperBound = Ma
 
 export function addOpenGeneralCylinder(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader,
                                        filterOptions?: FilterOptions) {
-  centerA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
-  centerB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
+  globalCenterA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
+  globalCenterB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
 
   const distFromAToExtA = data.radiusA * Math.tan(data.slopeA);
   const distFromBToExtB = data.radiusA * Math.tan(data.slopeB);
   const heightA = distFromBToExtB + data.height;
   const heightB = distFromBToExtB;
-  extA.copy(data.normal).multiplyScalar(distFromAToExtA).add(centerA);
-  extB.copy(data.normal).multiplyScalar(-distFromBToExtB).add(centerB);
+  globalExtA.copy(data.normal).multiplyScalar(distFromAToExtA).add(globalCenterA);
+  globalExtB.copy(data.normal).multiplyScalar(-distFromBToExtB).add(globalCenterB);
 
-  (groups.GeneralCylinder as GeneralCylinderGroup).add(data.nodeId, data.treeIndex, extA, extB, data.radiusA, heightA,
+  (groups.GeneralCylinder as GeneralCylinderGroup).add(
+    data.nodeId, data.treeIndex, globalExtA, globalExtB, data.radiusA, heightA,
     heightB, data.slopeA, data.slopeB, data.zAngleA, data.zAngleB, data.rotationAngle, data.arcAngle, filterOptions);
 }
 
@@ -76,23 +78,23 @@ export function addClosedGeneralCylinder(groups: {[name: string]: PrimitiveGroup
   addOpenGeneralCylinder(groups, data, filterOptions);
 
   [true, false].forEach(isA => {
-    const center = isA ? centerA : centerB;
+    const center = isA ? globalCenterA : globalCenterB;
     const slope = isA ? data.slopeA : data.slopeB;
     const zAngle = isA ? data.zAngleA : data.zAngleB;
     const radius = isA ? data.radiusA : data.radiusB;
 
-    rotation.setFromUnitVectors(zAxis, data.normal);
-    slicingPlaneNormal.copy(zAxis)
-      .applyAxisAngle(yAxis, slope).applyAxisAngle(zAxis, zAngle).applyQuaternion(rotation);
+    globalRotation.setFromUnitVectors(zAxis, data.normal);
+    globalSlicingPlaneNormal.copy(zAxis)
+      .applyAxisAngle(yAxis, slope).applyAxisAngle(zAxis, zAngle).applyQuaternion(globalRotation);
 
     const plane = globalPlanes[Number(Boolean(isA))];
-    plane.setFromNormalAndCoplanarPoint(slicingPlaneNormal, center);
+    plane.setFromNormalAndCoplanarPoint(globalSlicingPlaneNormal, center);
 
     const capXAxis = xAxis.clone().applyAxisAngle(yAxis, slope).applyAxisAngle(zAxis, zAngle)
-      .applyQuaternion(rotation).normalize();
+      .applyQuaternion(globalRotation).normalize();
 
     globalVertex.set(Math.cos(data.rotationAngle), Math.sin(data.rotationAngle), 0)
-      .applyQuaternion(rotation).normalize();
+      .applyQuaternion(globalRotation).normalize();
 
     globalLineStart.copy(globalVertex).multiplyScalar(data.radiusA).add(extB).sub(data.normal);
     globalLineEnd.copy(globalVertex).multiplyScalar(data.radiusA).add(extA).add(data.normal);
@@ -100,9 +102,9 @@ export function addClosedGeneralCylinder(groups: {[name: string]: PrimitiveGroup
     plane.intersectLine(globalLine, globalVertex);
 
     const capAngleAxis = globalVertex.sub(center).normalize();
-    const capAngle = angleBetweenVector3s(capAngleAxis, capXAxis, slicingPlaneNormal);
+    const capAngle = angleBetweenVector3s(capAngleAxis, capXAxis, globalSlicingPlaneNormal);
 
-    (groups.GeneralRing as GeneralRingGroup).add(data.nodeId, data.treeIndex, center, slicingPlaneNormal,
+    (groups.GeneralRing as GeneralRingGroup).add(data.nodeId, data.treeIndex, center, globalSlicingPlaneNormal,
       capXAxis, radius / Math.abs(Math.cos(slope)),
       radius, data.thickness, capAngle, data.arcAngle, filterOptions);
   });
@@ -131,18 +133,18 @@ export function addSolidClosedGeneralCylinder(groups: {[name: string]: Primitive
       : [data.radiusA - data.thickness, data.radiusA];
     globalVertex
       .set(Math.cos(finalAngle), Math.sin(finalAngle), 0)
-      .applyQuaternion(rotation)
+      .applyQuaternion(globalRotation)
       .normalize();
     radii.forEach(r => {
       globalLineStart
         .copy(globalVertex)
         .multiplyScalar(r)
-        .add(extB)
+        .add(globalExtB)
         .sub(data.normal);
       globalLineEnd
         .copy(globalVertex)
         .multiplyScalar(r)
-        .add(extA)
+        .add(globalExtA)
         .add(data.normal);
       globalLine.set(globalLineStart, globalLineEnd);
       globalPlanes.forEach(p => {
