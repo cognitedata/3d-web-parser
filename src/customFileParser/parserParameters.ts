@@ -7,11 +7,12 @@ import { BoxGroup, CircleGroup, ConeGroup, EccentricConeGroup, GeneralCylinderGr
   from '../geometry/GeometryGroups';
 
 import { addBox, addCircle, addNut, addRing, addSphere } from './unpackGeometry/Basic';
-import { addClosedCone, addClosedEccentricCone, addOpenCone, addOpenEccentricCone } from './unpackGeometry/Cone';
+import { addClosedCone, addClosedEccentricCone, addOpenCone, addOpenEccentricCone, addOpenGeneralCone,
+  addClosedGeneralCone, addSolidOpenGeneralCone, addSolidClosedGeneralCone } from './unpackGeometry/Cone';
 import { addExtrudedRing, addClosedExtrudedRingSegment, addOpenExtrudedRingSegment }
   from './unpackGeometry/ExtrudedRing';
-import { addClosedCylinder, addClosedGeneralCylinder, addOpenGeneralCylinder, addOpenCylinder }
-  from './unpackGeometry/Cylinder';
+import { addOpenCylinder, addClosedCylinder, addOpenGeneralCylinder, addClosedGeneralCylinder,
+  addSolidOpenGeneralCylinder, addSolidClosedGeneralCylinder  } from './unpackGeometry/Cylinder';
 import { addClosedEllipsoidSegment, addOpenEllipsoidSegment, addEllipsoid } from './unpackGeometry/Ellipsoid';
 import { addClosedTorusSegment, addOpenTorusSegment, addTorus } from './unpackGeometry/Torus';
 import { addClosedSphericalSegment, addOpenSphericalSegment } from './unpackGeometry/SphericalSegment';
@@ -20,7 +21,8 @@ type primitiveNameType = 'Box' | 'Circle' | 'ClosedCone' | 'ClosedCylinder' | 'C
   'ClosedEllipsoidSegment' | 'ClosedExtrudedRingSegment' | 'ClosedGeneralCylinder' | 'ClosedSphericalSegment' |
   'ClosedTorusSegment' | 'Ellipsoid' | 'ExtrudedRing' | 'Nut' | 'OpenCone' | 'OpenCylinder' | 'OpenEccentricCone' |
   'OpenEllipsoidSegment' | 'OpenExtrudedRingSegment' | 'OpenGeneralCylinder' | 'OpenSphericalSegment' |
-  'OpenTorusSegment' | 'Ring' | 'Sphere' | 'Torus';
+  'OpenTorusSegment' | 'Ring' | 'Sphere' | 'Torus' | 'SolidOpenGeneralCylinder' | 'SolidClosedGeneralCylinder' |
+  'OpenGeneralCone' | 'ClosedGeneralCone' | 'SolidOpenGeneralCone' | 'SolidClosedGeneralCone';
 type meshNameType = 'MergedMesh' | 'InstancedMesh';
 export type geometryNameType = primitiveNameType | meshNameType;
 
@@ -28,7 +30,9 @@ export const filePrimitiveNames: geometryNameType[] = ['Box', 'Circle', 'ClosedC
   'ClosedEccentricCone', 'ClosedEllipsoidSegment', 'ClosedExtrudedRingSegment', 'ClosedGeneralCylinder',
   'ClosedSphericalSegment', 'ClosedTorusSegment', 'Ellipsoid', 'ExtrudedRing', 'Nut', 'OpenCone',
   'OpenCylinder', 'OpenEccentricCone', 'OpenEllipsoidSegment', 'OpenExtrudedRingSegment',
-  'OpenGeneralCylinder', 'OpenSphericalSegment', 'OpenTorusSegment', 'Ring', 'Sphere', 'Torus'];
+  'OpenGeneralCylinder', 'OpenSphericalSegment', 'OpenTorusSegment', 'Ring', 'Sphere', 'Torus',
+  'SolidOpenGeneralCylinder', 'SolidClosedGeneralCylinder',
+  'OpenGeneralCone', 'ClosedGeneralCone', 'SolidOpenGeneralCone', 'SolidClosedGeneralCone'];
 export const fileMeshNames: geometryNameType[] = ['MergedMesh', 'InstancedMesh'];
 
 export const IdToFileGeometryName: {[id: number]: geometryNameType} = {
@@ -56,6 +60,14 @@ export const IdToFileGeometryName: {[id: number]: geometryNameType} = {
   22: 'Ring',
   23: 'Sphere',
   24: 'Torus',
+  30: 'OpenGeneralCylinder',
+  31: 'ClosedGeneralCylinder',
+  32: 'SolidOpenGeneralCylinder',
+  33: 'SolidClosedGeneralCylinder',
+  34: 'OpenGeneralCone',
+  35: 'ClosedGeneralCone',
+  36: 'SolidOpenGeneralCone',
+  37: 'SolidClosedGeneralCone',
   100: 'MergedMesh',
   101: 'InstancedMesh',
 };
@@ -85,8 +97,6 @@ export const fileGeometryProperties: {[name in geometryNameType]: filePropertyNa
   ClosedEllipsoidSegment: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB'],
   ClosedExtrudedRingSegment: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB',
     'rotationAngle', 'arcAngle'],
-  ClosedGeneralCylinder: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB', 'thickness',
-    'rotationAngle', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB'],
   ClosedSphericalSegment: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA'],
   ClosedTorusSegment: ['treeIndex', 'color', 'center', 'normal', 'radiusA', 'radiusB', 'rotationAngle', 'arcAngle'],
   Ellipsoid: ['treeIndex', 'color', 'center', 'normal', 'radiusA', 'radiusB'],
@@ -98,8 +108,6 @@ export const fileGeometryProperties: {[name in geometryNameType]: filePropertyNa
   OpenEllipsoidSegment: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB'],
   OpenExtrudedRingSegment: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB',
     'rotationAngle', 'arcAngle'],
-  OpenGeneralCylinder: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB', 'thickness',
-  'rotationAngle', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB'],
   OpenSphericalSegment: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA'],
   OpenTorusSegment: ['treeIndex', 'color', 'center', 'normal', 'radiusA', 'radiusB', 'rotationAngle', 'arcAngle'],
   Ring: ['treeIndex', 'color', 'center', 'normal', 'radiusA', 'radiusB'],
@@ -108,6 +116,22 @@ export const fileGeometryProperties: {[name in geometryNameType]: filePropertyNa
   MergedMesh: ['treeIndex', 'fileId', 'triangleCount', 'color'],
   InstancedMesh: ['treeIndex', 'fileId', 'triangleOffset', 'triangleCount', 'color', 'translation', 'rotation3',
   'scale'],
+  OpenGeneralCylinder: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA',
+  'rotationAngle', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB'],
+  ClosedGeneralCylinder: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA',
+  'rotationAngle', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB'],
+  SolidOpenGeneralCylinder: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'thickness',
+  'rotationAngle', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB'],
+  SolidClosedGeneralCylinder: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'thickness',
+  'rotationAngle', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB'],
+  OpenGeneralCone: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB',
+  'rotationAngle', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB'],
+  ClosedGeneralCone: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB',
+  'rotationAngle', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB'],
+  SolidOpenGeneralCone: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB', 'thickness',
+  'rotationAngle', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB'],
+  SolidClosedGeneralCone: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB', 'thickness',
+  'rotationAngle', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB'],
 };
 
 export const renderedPrimitiveToAddFunction: {[name in primitiveNameType]: Function} = {
@@ -118,7 +142,6 @@ export const renderedPrimitiveToAddFunction: {[name in primitiveNameType]: Funct
   'ClosedEccentricCone': addClosedEccentricCone,
   'ClosedEllipsoidSegment': addClosedEllipsoidSegment,
   'ClosedExtrudedRingSegment': addClosedExtrudedRingSegment,
-  'ClosedGeneralCylinder': addClosedGeneralCylinder,
   'ClosedSphericalSegment': addClosedSphericalSegment,
   'ClosedTorusSegment': addClosedTorusSegment,
   'Ellipsoid': addEllipsoid,
@@ -129,12 +152,19 @@ export const renderedPrimitiveToAddFunction: {[name in primitiveNameType]: Funct
   'OpenEccentricCone': addOpenEccentricCone,
   'OpenEllipsoidSegment': addOpenEllipsoidSegment,
   'OpenExtrudedRingSegment': addOpenExtrudedRingSegment,
-  'OpenGeneralCylinder': addOpenGeneralCylinder,
   'OpenSphericalSegment': addOpenSphericalSegment,
   'OpenTorusSegment': addOpenTorusSegment,
   'Ring': addRing,
   'Sphere': addSphere,
   'Torus': addTorus,
+  'ClosedGeneralCylinder': addClosedGeneralCylinder,
+  'OpenGeneralCylinder': addOpenGeneralCylinder,
+  'SolidOpenGeneralCylinder': addSolidOpenGeneralCylinder,
+  'SolidClosedGeneralCylinder': addSolidClosedGeneralCylinder,
+  'ClosedGeneralCone': addClosedGeneralCone,
+  'OpenGeneralCone': addOpenGeneralCone,
+  'SolidOpenGeneralCone': addSolidOpenGeneralCone,
+  'SolidClosedGeneralCone': addSolidClosedGeneralCone,
 };
 
 export type renderedPrimitiveNameType = 'Box' | 'Circle' | 'Cone' | 'EccentricCone' | 'EllipsoidSegment' |
@@ -152,8 +182,6 @@ export const renderedPrimitivesPerFilePrimitive:
   ClosedEllipsoidSegment: [{ name: 'EllipsoidSegment', count: 1 }, { name: 'Circle', count: 1 }],
   ClosedExtrudedRingSegment: [{ name: 'Cone', count : 2 }, { name: 'GeneralRing', count : 2 },
     { name: 'Quad', count : 2 }],
-  ClosedGeneralCylinder: [{ name: 'GeneralCylinder', count : 2 }, { name: 'Cone', count : 2 },
-    { name: 'GeneralRing', count : 2 }, { name: 'Circle', count : 2 }, { name: 'Trapezium', count: 2 }],
   ClosedSphericalSegment: [{ name: 'Circle', count: 1 }, { name: 'SphericalSegment', count: 1 }],
   ClosedTorusSegment: [{ name: 'TorusSegment', count: 1 }],
   Ellipsoid: [{ name: 'EllipsoidSegment', count: 1 }],
@@ -164,13 +192,21 @@ export const renderedPrimitivesPerFilePrimitive:
   OpenEccentricCone: [{ name: 'EccentricCone', count: 1 }],
   OpenEllipsoidSegment: [{ name: 'EllipsoidSegment', count: 1 }],
   OpenExtrudedRingSegment: [{ name: 'Cone', count : 2 }, { name: 'GeneralRing', count: 2 }],
-  OpenGeneralCylinder:  [{ name: 'GeneralCylinder', count : 2 }, { name: 'Cone', count : 2 },
-    { name: 'GeneralRing', count : 2 }, { name: 'Circle', count : 2 }],
   OpenSphericalSegment: [{ name: 'SphericalSegment', count: 1 }],
   OpenTorusSegment: [{ name: 'TorusSegment', count: 1 }],
   Ring: [{ name: 'GeneralRing', count: 1 }],
   Sphere: [{ name: 'SphericalSegment', count: 1 }],
   Torus: [{ name: 'TorusSegment', count: 1 }],
+  ClosedGeneralCylinder: [{ name: 'GeneralCylinder', count : 1 }, { name: 'GeneralRing', count : 2 }],
+  OpenGeneralCylinder:  [{ name: 'GeneralCylinder', count : 1 }],
+  SolidOpenGeneralCylinder: [{ name: 'GeneralCylinder', count : 2 }, { name: 'GeneralRing', count : 2 }],
+  SolidClosedGeneralCylinder: [{ name: 'GeneralCylinder', count : 2 }, { name: 'GeneralRing', count : 2 },
+  { name: 'Trapezium', count: 2 }],
+  ClosedGeneralCone: [{ name: 'Cone', count : 1 }, { name: 'GeneralRing', count : 2 }],
+  OpenGeneralCone:  [{ name: 'Cone', count : 1 }],
+  SolidOpenGeneralCone: [{ name: 'Cone', count : 2 }, { name: 'GeneralRing', count : 2 }],
+  SolidClosedGeneralCone: [{ name: 'Cone', count : 2 }, { name: 'GeneralRing', count : 2 },
+  { name: 'Trapezium', count: 2 }],
 };
 
 export const renderedPrimitiveToGroup: {[name: string]: typeof PrimitiveGroup } = {
