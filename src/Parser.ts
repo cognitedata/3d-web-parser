@@ -41,7 +41,7 @@ import { BoxGroup,
 
 import SceneStats from './SceneStats';
 
-import mergeInstancedMeshes from './optimizations/mergeInstancedMeshes';
+import { optimizeMeshes, meshStatusReport } from './optimizations/optimizeMeshes';
 import { MergedMeshGroup } from './geometry/MergedMeshGroup';
 import { PrimitiveGroupMap } from './geometry/PrimitiveGroup';
 import { TreeIndexNodeIdMap, ColorMap } from './parsers/parseUtils';
@@ -171,11 +171,13 @@ export default async function parseProtobuf(
 
   t0 = performance.now();
   const rootSector = sectors['0/'];
+  console.log(meshStatusReport(rootSector));
   for (const sector of rootSector.traverseSectors()) {
-    mergeInstancedMeshes(sector, 2500, sceneStats, treeIndexNodeIdMap);
+    optimizeMeshes(rootSector, sectors, sceneStats, treeIndexNodeIdMap);
     sector.mergedMeshGroup.createTreeIndexMap();
     sector.instancedMeshGroup.createTreeIndexMap();
   }
+  console.log(meshStatusReport(rootSector));
 
   if (printParsingTime) {
     // tslint:disable-next-line
