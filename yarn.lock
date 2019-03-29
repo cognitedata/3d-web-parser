@@ -96,10 +96,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.12.tgz#e15a9d034d9210f00320ef718a50c4a799417c47"
   integrity sha512-Pr+6JRiKkfsFvmU/LK68oBRCQeEg36TyAbPhc2xpez24OOZZCuoIhWGTd39VZy6nGafSbxzGouFPTFD/rR1A0A==
 
-"@types/three@^0.93.9":
-  version "0.93.9"
-  resolved "https://registry.yarnpkg.com/@types/three/-/three-0.93.9.tgz#2932790342e793427691adb9d8851c68ba9ac6b9"
-  integrity sha512-9DsBTC77r+ZRRoMN4CqZo0cAmtudWYletFPRJeNeCjI95zWBC5mZ+HcZiYRMgsZNTvrtMSQK+nUlqgxXHt+Hvg==
+"@types/three@^0.93.28":
+  version "0.93.28"
+  resolved "https://registry.yarnpkg.com/@types/three/-/three-0.93.28.tgz#ea7241b7fbcb7872d954cab6974ed3fe4f2b81fb"
+  integrity sha512-by65PS1Ziy6JL7f6a/kSXapmm5HMXQpzKAdg4MGk/RDhbwIClzCJezLRdYKPo4QJp8WwtgRSFuQO9XBHil+auw==
 
 "@webassemblyjs/ast@1.7.11":
   version "1.7.11"
