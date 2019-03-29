@@ -1,10 +1,10 @@
 import * as THREE from 'three';
 import GeometryGroup from './GeometryGroup';
 
-import { identityMatrix4 } from '../constants';
 import { computeBoundingBox } from './GeometryUtils';
 
 interface IndexMap { [s: number]: boolean; }
+const globalBox = new THREE.Box3();
 
 export class MergedMeshMappings {
   public count: number;
@@ -150,7 +150,7 @@ interface MappingData {
 }
 
 interface TreeIndexMap {
-  [s: number]: MappingData;
+  [s: number]: MappingData[];
 }
 
 export class MergedMeshGroup extends GeometryGroup {
@@ -168,14 +168,13 @@ export class MergedMeshGroup extends GeometryGroup {
     this.meshes.forEach((mergedMesh, meshIndex) => {
       for (let mappingIndex = 0; mappingIndex < mergedMesh.mappings.count; mappingIndex++) {
         const treeIndex = mergedMesh.mappings.getTreeIndex(mappingIndex);
-        if (this.treeIndexMap[treeIndex] != null) {
-          throw `Error, trying to add treeIndex ${treeIndex} to MergedMeshGroup.treeIndexMap, but it already exists.`;
+        if (this.treeIndexMap[treeIndex] === undefined) {
+          this.treeIndexMap[treeIndex] = [];
         }
-
-        this.treeIndexMap[treeIndex] = {
+        this.treeIndexMap[treeIndex].push({
           meshIndex,
           mappingIndex,
-        };
+        });
       }
     });
   }
@@ -192,33 +191,39 @@ export class MergedMeshGroup extends GeometryGroup {
   ): THREE.Box3 {
     box.makeEmpty();
 
-    // Extract data about geometry
-    const { meshIndex, mappingIndex } = this.treeIndexMap[treeIndex];
-    const mergedMesh = this.meshes[meshIndex];
+    this.treeIndexMap[treeIndex].forEach(mesh => {
+      const { meshIndex, mappingIndex } = mesh;
+      const mergedMesh = this.meshes[meshIndex];
 
-    if (geometry == null) {
-      if (mergedMesh.geometry == null) {
-        // Geometry may not be loaded yet, just return empty box.
-        return box;
+      if (geometry == null) {
+        if (mergedMesh.geometry == null) {
+          // Geometry may not be loaded yet, skip this geometry.
+          return;
+        }
+        geometry = mergedMesh.geometry;
       }
-      geometry = mergedMesh.geometry;
-    }
 
-    const triangleCount = mergedMesh.mappings.getTriangleCount(mappingIndex);
-    const triangleOffset = mergedMesh.mappings.getTriangleOffset(mappingIndex);
+      const triangleCount = mergedMesh.mappings.getTriangleCount(mappingIndex);
+      const triangleOffset = mergedMesh.mappings.getTriangleOffset(mappingIndex);
 
-    // index and position buffer containing the merged mesh
-    const index = geometry!.getIndex();
-    const position = geometry!.getAttribute('position');
+      // index and position buffer containing the merged mesh
+      const index = geometry!.getIndex();
+      const position = geometry!.getAttribute('position');
 
-    return computeBoundingBox(box, matrix, position, index, triangleOffset, triangleCount);
+      computeBoundingBox(globalBox, matrix, position, index, triangleOffset, triangleCount);
+      box.union(globalBox);
+    });
+
+    return box;
   }
 
   removeTreeIndicesFromMesh(treeIndices: number[], mergedMesh: MergedMesh) {
     const indicesToRemove: IndexMap = {};
     treeIndices.forEach(treeIndex => {
-      const { meshIndex, mappingIndex } = this.treeIndexMap[treeIndex];
-      indicesToRemove[mappingIndex] = true;
+      this.treeIndexMap[treeIndex].forEach(mesh => {
+        const { meshIndex, mappingIndex } = mesh;
+        indicesToRemove[mappingIndex] = true;
+      });
     });
     mergedMesh.mappings.removeIndices(indicesToRemove);
     this.createTreeIndexMap();
