@@ -21,3 +21,4 @@ export { default as TrapeziumGroup } from './geometry/TrapeziumGroup';
 export { Attribute }  from './geometry/PrimitiveGroup';
 export { parseFullCustomFile, parseMultipleCustomFiles } from './customFileParser/main';
 export { computeBoundingBox } from './geometry/GeometryUtils';
+export { TreeIndexNodeIdMap, ColorMap } from './parsers/parseUtils';
