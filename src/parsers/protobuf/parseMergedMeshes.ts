@@ -4,6 +4,7 @@ import { MatchingGeometries } from './protobufUtils';
 import SceneStats from '../../SceneStats';
 import { ParseData } from '../parseUtils';
 const globalColor = new THREE.Color();
+let hasWarnedAboutMissingColor = false;
 
 function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   const matchingGeometries: MatchingGeometries = {
@@ -34,7 +35,16 @@ export default function parse(data: ParseData): MergedMeshGroup {
     let triangleOffset = 0;
     nodes.forEach(node => {
       const nodeId = Number(node.properties[0].nodeId);
-      const { color, treeIndex } = node.properties[0];
+      const { treeIndex } = node.properties[0];
+      if (node.properties[0].color == null && !hasWarnedAboutMissingColor) {
+        hasWarnedAboutMissingColor = true;
+        console.warn(
+          '3d-web-parser encountered node with missing color while loading',
+          '(using #ff00ff to highlight objects with missing color).',
+        );
+      }
+      const color = node.properties[0].color != null ? node.properties[0].color : { rgb: 0xff00ff };
+
       const { triangleCount } = node;
       globalColor.setHex(color.rgb);
       mergedMesh.mappings.add(triangleOffset, triangleCount, nodeId, treeIndex);

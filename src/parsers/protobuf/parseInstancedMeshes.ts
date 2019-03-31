@@ -6,6 +6,7 @@ import { ParseData } from '../parseUtils';
 import { Scene } from 'three';
 const globalColor = new THREE.Color();
 const globalMatrix = new THREE.Matrix4();
+let hasWarnedAboutMissingColor = false;
 
 function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   const matchingGeometries: MatchingGeometries = {
@@ -35,7 +36,15 @@ function createCollection(
   // @ts-ignore
   node.properties.forEach(property => {
     const nodeId = Number(property.nodeId);
-    const { color, treeIndex, transformMatrix } = property;
+    const { treeIndex, transformMatrix } = property;
+    if (property.color == null && !hasWarnedAboutMissingColor) {
+      hasWarnedAboutMissingColor = true;
+      console.warn(
+        '3d-web-parser encountered node with missing color while loading',
+        '(using #ff00ff to highlight objects with missing color).',
+      );
+    }
+    const color = property.color == null ? property.color : { rgb: 0xff00ff };
     globalColor.setHex(color.rgb);
     parseInstancedMeshTransformMatrix(globalMatrix, transformMatrix);
     collection.addMapping(nodeId, treeIndex, globalMatrix);
