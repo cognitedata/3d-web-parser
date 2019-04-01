@@ -50,22 +50,18 @@ export default function unpackInstancedMeshes(
     });
 
     // Fill mesh collections with matrix data
-    for (const sector of rootSector.traverseSectors()) {
-      const geometryInfo = compressedData[sector.path].instancedMesh;
-      if (geometryInfo !== undefined) {
-        for (let i = 0; i < geometryInfo.count; i++) {
-          data.loadData(geometryInfo);
-          maps.treeIndexNodeIdMap[data.treeIndex] = data.nodeId;
-          maps.colorMap[data.treeIndex] = data.color;
-          matrix.identity().setPosition(data.translation);
-          matrix.multiply(rotation.makeRotationAxis(zAxis, data.rotation3.z));
-          matrix.multiply(rotation.makeRotationAxis(yAxis, data.rotation3.y));
-          matrix.multiply(rotation.makeRotationAxis(xAxis, data.rotation3.x));
-          matrix.scale(data.scale);
-
-          collections[data.fileId][data.triangleOffset].addMapping(
-            data.nodeId, data.treeIndex, matrix);
-        }
+    if (geometryInfo !== undefined) {
+      for (let i = 0; i < geometryInfo.count; i++) {
+        data.loadData(geometryInfo);
+        maps.treeIndexNodeIdMap[data.treeIndex] = data.nodeId;
+        maps.colorMap[data.treeIndex] = data.color;
+        matrix.identity().setPosition(data.translation);
+        matrix.multiply(rotation.makeRotationAxis(zAxis, data.rotation3.z));
+        matrix.multiply(rotation.makeRotationAxis(yAxis, data.rotation3.y));
+        matrix.multiply(rotation.makeRotationAxis(xAxis, data.rotation3.x));
+        matrix.scale(data.scale);
+        collections[data.fileId][data.triangleOffset].addMapping(
+          data.nodeId, data.treeIndex, matrix);
       }
     }
 

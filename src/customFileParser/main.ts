@@ -2,7 +2,7 @@ import { unpackInstancedMeshes, unpackMergedMeshes, unpackPrimitives } from './u
 import Sector from './../Sector';
 import CustomFileReader from './CustomFileReader';
 import SceneStats from './../SceneStats';
-import { optimizeMeshes } from '../optimizations/optimizeMeshes';
+import { optimizeMeshes, meshStatusReport } from '../optimizations/optimizeMeshes';
 import { PerSectorCompressedData, UncompressedValues } from './sharedFileParserTypes';
 import { DataMaps, FilterOptions, ParseReturn } from './../parsers/parseUtils';
 
@@ -110,8 +110,11 @@ function unpackData(
   unpackPrimitives(rootSector, uncompressedValues, compressedData, maps, filterOptions);
   unpackMergedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
   unpackInstancedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
+  console.log(meshStatusReport(rootSector));
+  optimizeMeshes(rootSector, sceneStats, maps.treeIndexNodeIdMap);
+  console.log(meshStatusReport(rootSector));
+  console.log(rootSector);
   for (const sector of rootSector.traverseSectors()) {
-    optimizeMeshes(sector, sceneStats, maps.treeIndexNodeIdMap);
     sector.mergedMeshGroup.createTreeIndexMap();
     sector.instancedMeshGroup.createTreeIndexMap();
   }
