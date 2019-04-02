@@ -1,10 +1,10 @@
 import PropertyLoader from '../PropertyLoader';
-import { xAxis, zAxis } from '../../constants';
+import { xAxis, zAxis } from '../../../constants';
 import * as THREE from 'three';
 
 import { PrimitiveGroup, BoxGroup, NutGroup, CircleGroup, GeneralRingGroup, SphericalSegmentGroup }
-  from '../../geometry/GeometryGroups';
-import { FilterOptions } from '../../parsers/parseUtils';
+  from '../../../geometry/GeometryGroups';
+import { FilterOptions } from '../../parseUtils';
 
 const globalCenterA = new THREE.Vector3();
 const globalCenterB = new THREE.Vector3();

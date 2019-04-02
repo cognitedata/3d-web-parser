@@ -1,6 +1,6 @@
 import PropertyLoader from '../PropertyLoader';
-import { PrimitiveGroup, TorusSegmentGroup } from '../../geometry/GeometryGroups';
-import { FilterOptions } from '../../parsers/parseUtils';
+import { PrimitiveGroup, TorusSegmentGroup } from '../../../geometry/GeometryGroups';
+import { FilterOptions } from '../../parseUtils';
 
 function addOpenTorusSegment(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader,
                              filterOptions?: FilterOptions) {

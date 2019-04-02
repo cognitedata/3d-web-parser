@@ -1,11 +1,11 @@
 import * as THREE from 'three';
-import { InstancedMesh, InstancedMeshCollection } from '../../geometry/InstancedMeshGroup';
-import { PerSectorCompressedData, UncompressedValues } from './../sharedFileParserTypes';
-import PropertyLoader from './../PropertyLoader';
-import { xAxis, yAxis, zAxis } from './../../constants';
-import SceneStats from './../../SceneStats';
-import Sector from './../../Sector';
-import { DataMaps } from './../../parsers/parseUtils';
+import { InstancedMesh, InstancedMeshCollection } from '../../../geometry/InstancedMeshGroup';
+import { PerSectorCompressedData, UncompressedValues } from '../sharedFileParserTypes';
+import PropertyLoader from '../PropertyLoader';
+import { xAxis, yAxis, zAxis } from '../../../constants';
+import SceneStats from '../../../SceneStats';
+import Sector from '../../../Sector';
+import { DataMaps } from '../../parseUtils';
 
 const matrix = new THREE.Matrix4();
 const rotation = new THREE.Matrix4();
