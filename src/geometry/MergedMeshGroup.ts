@@ -210,6 +210,7 @@ export class MergedMeshGroup extends GeometryGroup {
       const index = geometry!.getIndex();
       const position = geometry!.getAttribute('position');
 
+      tempBox.makeEmpty();
       computeBoundingBox(tempBox, matrix, position, index, triangleOffset, triangleCount);
       box.union(tempBox);
     });
