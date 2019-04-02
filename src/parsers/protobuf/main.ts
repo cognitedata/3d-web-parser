@@ -3,14 +3,14 @@
 import ProtobufDecoder from './ProtobufDecoder';
 import * as WebSceneProto from './proto/web_scene.json';
 import * as THREE from 'three';
-import Sector from './Sector';
+import Sector from '../../Sector';
 import { Vector3, Group } from 'three';
-import { getParentPath } from './PathExtractor';
-import { InstancedMesh, InstancedMeshGroup } from './geometry/InstancedMeshGroup';
-import { MergedMesh } from './geometry/MergedMeshGroup';
-import PrimitiveGroup from './geometry/PrimitiveGroup';
-import GeometryGroup from './geometry/GeometryGroup';
-import { FilterOptions, InstancedMeshMap, ParseData } from './parsers/parseUtils';
+import { getParentPath } from '../../PathExtractor';
+import { InstancedMesh, InstancedMeshGroup } from '../../geometry/InstancedMeshGroup';
+import { MergedMesh } from '../../geometry/MergedMeshGroup';
+import PrimitiveGroup from '../../geometry/PrimitiveGroup';
+import GeometryGroup from '../../geometry/GeometryGroup';
+import { FilterOptions, InstancedMeshMap, ParseData } from '../parseUtils';
 import { parseBoxes,
          parseCircles,
          parseCones,
@@ -24,7 +24,7 @@ import { parseBoxes,
          parseTorusSegments,
          parseTrapeziums,
          parseMergedMeshes,
-         parseInstancedMeshes } from './parsers/protobuf/parsers';
+         parseInstancedMeshes } from './parsers';
 
 import { BoxGroup,
          CircleGroup,
@@ -37,14 +37,14 @@ import { BoxGroup,
          QuadGroup,
          SphericalSegmentGroup,
          TorusSegmentGroup,
-         TrapeziumGroup } from './geometry/GeometryGroups';
+         TrapeziumGroup } from '../../geometry/GeometryGroups';
 
-import SceneStats from './SceneStats';
+import SceneStats from '../../SceneStats';
 
-import mergeInstancedMeshes from './optimizations/mergeInstancedMeshes';
-import { MergedMeshGroup } from './geometry/MergedMeshGroup';
-import { PrimitiveGroupMap } from './geometry/PrimitiveGroup';
-import { TreeIndexNodeIdMap, ColorMap } from './parsers/parseUtils';
+import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
+import { MergedMeshGroup } from '../../geometry/MergedMeshGroup';
+import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
+import { TreeIndexNodeIdMap, ColorMap } from '../parseUtils';
 
 const primitiveParsers = [
   { type: 'Box', parser: parseBoxes },

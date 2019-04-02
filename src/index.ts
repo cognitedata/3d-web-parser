@@ -1,6 +1,7 @@
 // Copyright 2019 Cognite AS
 export { default as Sector } from './Sector';
-export { default as parseProtobuf } from './Parser';
+export { default as parseProtobuf } from './parsers/protobuf/main';
+export { parseFullCustomFile, parseMultipleCustomFiles } from './parsers/i3d/main';
 
 export { default as BoxGroup } from './geometry/BoxGroup';
 export { default as CircleGroup } from './geometry/CircleGroup';
@@ -19,6 +20,5 @@ export { default as SphericalSegmentGroup } from './geometry/SphericalSegmentGro
 export { default as TorusSegmentGroup } from './geometry/TorusSegmentGroup';
 export { default as TrapeziumGroup } from './geometry/TrapeziumGroup';
 export { Attribute }  from './geometry/PrimitiveGroup';
-export { parseFullCustomFile, parseMultipleCustomFiles } from './parsers/i3d/main';
 export { computeBoundingBox } from './geometry/GeometryUtils';
 export { TreeIndexNodeIdMap, ColorMap } from './parsers/parseUtils';
