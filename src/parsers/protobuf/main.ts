@@ -82,7 +82,6 @@ function parseGeometries(data: ParseData) {
 export default async function parseProtobuf(
   protobufData?: Uint8Array,
   protobufDataList?: Uint8Array[],
-  printParsingTime: boolean = false,
   filterOptions?: FilterOptions,
 ) {
   const protobufDecoder = new ProtobufDecoder();
@@ -164,22 +163,12 @@ export default async function parseProtobuf(
     throw 'parseProtobuf did not get data to parse';
   }
 
-  if (printParsingTime) {
-    // tslint:disable-next-line
-    console.log('Parsing protobuf took ', performance.now() - t0, ' ms.');
-  }
-
   t0 = performance.now();
   const rootSector = sectors['0/'];
   for (const sector of rootSector.traverseSectors()) {
     mergeInstancedMeshes(sector, 2500, sceneStats, treeIndexNodeIdMap);
     sector.mergedMeshGroup.createTreeIndexMap();
     sector.instancedMeshGroup.createTreeIndexMap();
-  }
-
-  if (printParsingTime) {
-    // tslint:disable-next-line
-    console.log('Optimizing instanced meshes took ', performance.now() - t0, ' ms.');
   }
 
   const nodeIdTreeIndexMap: {[s: number]: number} = {};
