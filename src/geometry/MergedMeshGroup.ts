@@ -4,7 +4,7 @@ import GeometryGroup from './GeometryGroup';
 import { computeBoundingBox } from './GeometryUtils';
 
 interface IndexMap { [s: number]: boolean; }
-const tempBox = new THREE.Box3();
+const globalBox = new THREE.Box3();
 
 export class MergedMeshMappings {
   public count: number;
@@ -210,8 +210,8 @@ export class MergedMeshGroup extends GeometryGroup {
       const index = geometry!.getIndex();
       const position = geometry!.getAttribute('position');
 
-      computeBoundingBox(tempBox, matrix, position, index, triangleOffset, triangleCount);
-      box.union(tempBox);
+      computeBoundingBox(globalBox, matrix, position, index, triangleOffset, triangleCount);
+      box.union(globalBox);
     });
 
     return box;

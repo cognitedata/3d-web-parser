@@ -7,9 +7,9 @@ import { filePrimitiveNames, filePropertyArrayNames, filePropertyArrayNameType }
 // @ts-ignore
 const fs = require('fs');
 
-const rootSectorFilePath = './src/__tests__/fixtures/all_primitives/web_node_4_0.i3d';
-const nonRootSectorFilePath = './src/__tests__/fixtures/all_primitives/web_node_4_0.i3d';
-const multiSectorFilePath = './src/__tests__/fixtures/all_primitives/web_scene.pi3d';
+const rootSectorFilePath = './src/__tests__/fixtures/extra_primitives/web_node_4_0.i3d';
+const nonRootSectorFilePath = './src/__tests__/fixtures/extra_primitives/web_node_4_0.i3d';
+const multiSectorFilePath = './src/__tests__/fixtures/extra_primitives/web_scene_4.i3d';
 
 function fileToArrayBuffer(filePath: string) {
   const fileBuffer = fs.readFileSync(filePath, null);
@@ -31,6 +31,7 @@ describe('customFileIntegrationTest', () => {
   test('read any sector metadata', async() => {
     const fileBuffer = fileToArrayBuffer(rootSectorFilePath);
     const fileReader = new CustomFileReader(fileBuffer);
+    fileReader.readUint32(); // skip file length
     const sectorMetadata = fileReader.readSectorMetadata();
 
     expect(sectorMetadata.magicBytes).toBe(1178874697);
@@ -49,6 +50,7 @@ describe('customFileIntegrationTest', () => {
   test('read root-sector UncompressedValues', async() => {
     const fileBuffer = fileToArrayBuffer(rootSectorFilePath);
     const fileReader = new CustomFileReader(fileBuffer);
+    fileReader.readUint32(); // skip file length
     const sectorMetadata = fileReader.readSectorMetadata();
     expect(sectorMetadata.arrayCount).toBe(filePropertyArrayNames.length);
 
@@ -73,6 +75,7 @@ describe('customFileIntegrationTest', () => {
   test('read any sector geometry group index pointers', async() => {
     const fileBuffer = fileToArrayBuffer(nonRootSectorFilePath);
     const fileReader = new CustomFileReader(fileBuffer);
+    fileReader.readUint32(); // skip file length
     const sectorMetadata = fileReader.readSectorMetadata();
     if (sectorMetadata.arrayCount !== 0) {
       fileReader.readUncompressedValues();
