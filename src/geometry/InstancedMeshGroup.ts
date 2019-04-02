@@ -279,7 +279,6 @@ export class InstancedMeshGroup extends GeometryGroup {
 
       globalMatrix.multiplyMatrices(matrix, globalMatrix);
 
-      tempBox.makeEmpty();
       computeBoundingBox(tempBox, matrix, position, index, 0, triangleCount);
       box.union(tempBox);
     });

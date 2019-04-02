@@ -21,6 +21,7 @@ export function computeBoundingBox(
   triangleOffset: number,
   triangleCount: number,
 ) {
+  box.makeEmpty();
   const start = 3 * triangleOffset;
   const end = start + 3 * triangleCount;
   const { array } = index;
