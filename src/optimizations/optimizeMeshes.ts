@@ -59,10 +59,10 @@ const triangleCountLimit = 5000;
 function countMappingsToMerge(collections: InstancedMeshCollection[]) {
   let numMappings = 0;
   collections.forEach(collection => {
-    const triangleCount = (collection.mappings.count - 1) * collection.triangleCount;
-    if (triangleCount < triangleCountLimit) {
-      numMappings += collection.mappings.count;
-    }
+    // const triangleCount = (collection.mappings.count - 1) * collection.triangleCount;
+    // if (triangleCount < triangleCountLimit) {
+    numMappings += collection.mappings.count;
+    // }
   });
   return numMappings;
 }
@@ -83,29 +83,29 @@ function createMergedMeshes(
       for (let index = instancedMesh.collections.length - 1; index >= 0; index--) {
         const collection = instancedMesh.collections[index];
         const triangleCount = (collection.mappings.count - 1) * collection.triangleCount;
-        if (triangleCount < triangleCountLimit) {
-          for (let i = 0; i < collection.mappings.count; i++) {
-            const treeIndex = collection.mappings.getTreeIndex(i);
-            const nodeId = treeIndexNodeIdMap[treeIndex];
-            collection.mappings.getTransformMatrix(globalMatrix, i);
+        // if (triangleCount < triangleCountLimit) {
+        for (let i = 0; i < collection.mappings.count; i++) {
+          const treeIndex = collection.mappings.getTreeIndex(i);
+          const nodeId = treeIndexNodeIdMap[treeIndex];
+          collection.mappings.getTransformMatrix(globalMatrix, i);
 
-            mergedMesh.mappings.add(
-              collection.triangleOffset,
-              collection.triangleCount,
-              nodeId,
-              treeIndex,
-              globalMatrix,
-            );
-          }
-
-          instancedMesh.collections.splice(index, 1);
+          mergedMesh.mappings.add(
+            collection.triangleOffset,
+            collection.triangleCount,
+            nodeId,
+            treeIndex,
+            globalMatrix,
+          );
         }
+
+        instancedMesh.collections.splice(index, 1);
+        // }
       }
       sceneStats.numMergedMeshes += 1;
       sector.mergedMeshGroup.addMesh(mergedMesh);
     });
 
-    for (let i = sector.instancedMeshGroup.meshes.length - 1; i >= 1; i--) {
+    for (let i = sector.instancedMeshGroup.meshes.length - 1; i >= 0; i--) {
       if (sector.instancedMeshGroup.meshes[i].collections.length === 0) {
         sector.instancedMeshGroup.meshes.splice(i, 1);
       }
