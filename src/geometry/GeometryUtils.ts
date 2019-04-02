@@ -2,8 +2,6 @@ import * as THREE from 'three';
 import { identityMatrix4 } from '../constants';
 
 const globalVector = new THREE.Vector3();
-const SI = new THREE.Matrix4();
-SI.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1);
 
 export function computeBoundingBox(
   box: THREE.Box3,
