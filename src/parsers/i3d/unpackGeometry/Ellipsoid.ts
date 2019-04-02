@@ -1,7 +1,7 @@
 import PropertyLoader from '../PropertyLoader';
 import * as THREE from 'three';
-import { PrimitiveGroup, EllipsoidSegmentGroup, CircleGroup } from '../../geometry/GeometryGroups';
-import { FilterOptions } from '../../parsers/parseUtils';
+import { PrimitiveGroup, EllipsoidSegmentGroup, CircleGroup } from '../../../geometry/GeometryGroups';
+import { FilterOptions } from '../../parseUtils';
 
 const globalCenterA = new THREE.Vector3();
 

@@ -1,10 +1,10 @@
 // After making changes to this file, run parserParametersTest to make sure everything is still valid
 import * as THREE from 'three';
 
-import PrimitiveGroup from '../geometry/PrimitiveGroup';
+import PrimitiveGroup from '../../geometry/PrimitiveGroup';
 import { BoxGroup, CircleGroup, ConeGroup, EccentricConeGroup, GeneralCylinderGroup, GeneralRingGroup,
   NutGroup, QuadGroup, SphericalSegmentGroup, TorusSegmentGroup, TrapeziumGroup, EllipsoidSegmentGroup }
-  from '../geometry/GeometryGroups';
+  from '../../geometry/GeometryGroups';
 
 import { addBox, addCircle, addNut, addRing, addSphere } from './unpackGeometry/Basic';
 import { addClosedCone, addClosedEccentricCone, addOpenCone, addOpenEccentricCone, addOpenGeneralCone,
