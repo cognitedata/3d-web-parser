@@ -121,6 +121,7 @@ export default class CustomFileReader {
       } else if (geometryData.type === 'MergedMesh' as geometryNameType) {
         mergedMesh = geometryData;
       } else {
+        // This will happen if file type 4 is used
         console.warn('Unrecognized geometry data type ' + geometryData.type);
       }
     });

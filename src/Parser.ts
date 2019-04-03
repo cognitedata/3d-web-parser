@@ -171,13 +171,11 @@ export default async function parseProtobuf(
 
   t0 = performance.now();
   const rootSector = sectors['0/'];
-  console.log(meshStatusReport(rootSector));
   for (const sector of rootSector.traverseSectors()) {
-    optimizeMeshes(rootSector, sectors, sceneStats, treeIndexNodeIdMap);
+    optimizeMeshes(rootSector, sceneStats, treeIndexNodeIdMap);
     sector.mergedMeshGroup.createTreeIndexMap();
     sector.instancedMeshGroup.createTreeIndexMap();
   }
-  console.log(meshStatusReport(rootSector));
 
   if (printParsingTime) {
     // tslint:disable-next-line
