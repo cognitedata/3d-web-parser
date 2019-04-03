@@ -2,7 +2,7 @@ import { unpackInstancedMeshes, unpackMergedMeshes, unpackPrimitives } from './u
 import Sector from './../Sector';
 import CustomFileReader from './CustomFileReader';
 import SceneStats from './../SceneStats';
-import { optimizeMeshes, meshStatusReport } from '../optimizations/optimizeMeshes';
+import optimizeMeshes from '../optimizations/optimizeMeshes';
 import { PerSectorCompressedData, UncompressedValues } from './sharedFileParserTypes';
 import { DataMaps, FilterOptions, ParseReturn } from './../parsers/parseUtils';
 

@@ -41,8 +41,7 @@ import { BoxGroup,
 
 import SceneStats from './SceneStats';
 
-import { optimizeMeshes, meshStatusReport } from './optimizations/optimizeMeshes';
-import { MergedMeshGroup } from './geometry/MergedMeshGroup';
+import optimizeMeshes from './optimizations/optimizeMeshes';
 import { PrimitiveGroupMap } from './geometry/PrimitiveGroup';
 import { TreeIndexNodeIdMap, ColorMap } from './parsers/parseUtils';
 
