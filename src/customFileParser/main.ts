@@ -113,7 +113,6 @@ function unpackData(
   console.log(meshStatusReport(rootSector));
   optimizeMeshes(rootSector, sceneStats, maps.treeIndexNodeIdMap);
   console.log(meshStatusReport(rootSector));
-  console.log(rootSector);
   for (const sector of rootSector.traverseSectors()) {
     sector.mergedMeshGroup.createTreeIndexMap();
     sector.instancedMeshGroup.createTreeIndexMap();
