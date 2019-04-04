@@ -87,7 +87,6 @@ describe('MeshGroup', () => {
 
       // Resize
       {
-        // @ts-ignore
         nodeMappings1.resize(2);
         expect(nodeMappings1.count).toBe(2);
         expect(nodeMappings1.capacity).toBe(2);

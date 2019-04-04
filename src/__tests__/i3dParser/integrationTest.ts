@@ -4,7 +4,6 @@ import { parseFullCustomFile } from '../../parsers/i3d/main';
 import { filePrimitiveNames, filePropertyArrayNames, filePropertyArrayNameType }
   from '../../parsers/i3d/parserParameters';
 
-// @ts-ignore
 const fs = require('fs');
 
 const rootSectorFilePath = './src/__tests__/fixtures/extra_primitives/web_node_4_0.i3d';
