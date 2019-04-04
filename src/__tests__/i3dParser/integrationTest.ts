@@ -1,8 +1,8 @@
 import * as THREE from 'three';
-import CustomFileReader from '../../customFileParser/CustomFileReader';
-import { parseFullCustomFile } from '../../customFileParser/main';
+import CustomFileReader from '../../parsers/i3d/CustomFileReader';
+import { parseFullCustomFile } from '../../parsers/i3d/main';
 import { filePrimitiveNames, filePropertyArrayNames, filePropertyArrayNameType }
-  from '../../customFileParser/parserParameters';
+  from '../../parsers/i3d/parserParameters';
 
 // @ts-ignore
 const fs = require('fs');

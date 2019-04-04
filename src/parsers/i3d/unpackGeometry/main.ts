@@ -5,9 +5,9 @@ import { renderedPrimitiveToAddFunction, renderedPrimitivesPerFilePrimitive, ren
   renderedPrimitiveNames} from '../parserParameters';
 import unpackInstancedMeshes from './InstancedMesh';
 import unpackMergedMeshes from './MergedMesh';
-import { PrimitiveGroup } from '../../geometry/GeometryGroups';
-import { Sector } from '../..';
-import { DataMaps, FilterOptions } from './../../parsers/parseUtils';
+import { PrimitiveGroup } from '../../../geometry/GeometryGroups';
+import Sector from '../../../Sector';
+import { DataMaps, FilterOptions } from '../../parseUtils';
 
 export { unpackInstancedMeshes, unpackMergedMeshes };
 

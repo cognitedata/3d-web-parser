@@ -1,4 +1,4 @@
-import FibonacciDecoder from '../../customFileParser/FibonacciDecoder';
+import FibonacciDecoder from '../../parsers/FibonacciDecoder';
 
 describe('FibonacciDecoder', () => {
   test('parse fibonacci encoding', async() => {

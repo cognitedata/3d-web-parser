@@ -1,7 +1,8 @@
 import PropertyLoader from '../PropertyLoader';
 import * as THREE from 'three';
-import { xAxis, zAxis } from '../../constants';
-import { FilterOptions } from '../../parsers/parseUtils';
+import { xAxis, zAxis } from '../../../constants';
+import { FilterOptions } from '../../parseUtils';
+import { PrimitiveGroup, GeneralRingGroup, ConeGroup, QuadGroup } from '../../../geometry/GeometryGroups';
 
 const globalCenterA = new THREE.Vector3();
 const globalCenterB = new THREE.Vector3();
@@ -13,7 +14,6 @@ const globalVertex3 = new THREE.Vector3();
 const globalQuadNorm = new THREE.Vector3();
 const globalAxisRotation = new THREE.Quaternion();
 const globalXAxis = new THREE.Vector3();
-import { PrimitiveGroup, GeneralRingGroup, ConeGroup, QuadGroup } from '../../geometry/GeometryGroups';
 
 function addOpenExtrudedRingSegment(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader,
                                     filterOptions?: FilterOptions) {

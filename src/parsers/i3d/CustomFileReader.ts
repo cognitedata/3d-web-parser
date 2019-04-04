@@ -1,7 +1,7 @@
 import loadSectorMetadata from './loadSectorMetadata';
 import loadUncompressedValues from './loadUncompressedValues';
 import loadCompressedGeometryData from './loadCompressedGeometryData';
-import FibonacciDecoder from './FibonacciDecoder';
+import FibonacciDecoder from '../FibonacciDecoder';
 import { NodeIdReader, CompressedGeometryData, SectorCompressedData } from './sharedFileParserTypes';
 import { filePrimitiveNames, BYTES_PER_NODE_ID, geometryNameType } from './parserParameters';
 
