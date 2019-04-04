@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import PropertyLoader from '../PropertyLoader';
 import * as THREE from 'three';
 import { PrimitiveGroup, ConeGroup, EccentricConeGroup, CircleGroup, GeneralRingGroup, TrapeziumGroup }

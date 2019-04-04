@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import * as THREE from 'three';
 import { MergedMeshMappings } from '../geometry/MergedMeshGroup';
 

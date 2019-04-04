@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import * as THREE from 'three';
 import GeometryGroup from './GeometryGroup';
 import { TypedArray, MeshNormalMaterial } from 'three';
