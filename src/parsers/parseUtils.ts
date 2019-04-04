@@ -46,4 +46,5 @@ export interface ParseReturn {
   sceneStats: SceneStats;
   maps: DataMaps;
   loadMeshesCallback?: Function;
+  numberOfTreeIndices?: number;
 }
