@@ -168,15 +168,18 @@ export default async function parseProtobuf(
     sector.mergedMeshGroup.createTreeIndexMap();
     sector.instancedMeshGroup.createTreeIndexMap();
 
+    sceneStats.numSectors++;
     sector.primitiveGroups.forEach(primitiveGroup => {
       sceneStats.geometryCount[primitiveGroup.type] += primitiveGroup.data.count;
     });
   }
+  sceneStats.numNodes = treeIndexNodeIdMap.length;
 
   const nodeIdTreeIndexMap: {[s: number]: number} = {};
   for (let treeIndex = 0; treeIndex < treeIndexNodeIdMap.length; treeIndex++) {
     const nodeId = treeIndexNodeIdMap[treeIndex];
     nodeIdTreeIndexMap[nodeId] = treeIndex;
   }
+  console.log('Scene stats: ', sceneStats);
   return { rootSector, sectors, sceneStats, maps: { colorMap, treeIndexNodeIdMap, nodeIdTreeIndexMap } };
 }
