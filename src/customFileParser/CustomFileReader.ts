@@ -121,7 +121,7 @@ export default class CustomFileReader {
       } else if (geometryData.type === 'MergedMesh' as geometryNameType) {
         mergedMesh = geometryData;
       } else {
-        // throw Error('Unrecognized geometry data type ' + geometryData.type);
+        throw Error('Unrecognized geometry data type ' + geometryData.type);
       }
     });
     const primitiveHandlers = geometryDataArray.filter(geometryData => {
