@@ -1,7 +1,6 @@
 import { GeometryType } from './geometry/Types';
 
 export default interface SceneStats {
-  memoryUsage: number;
   numNodes: number;
   numSectors: number;
   geometryCount: {
@@ -11,7 +10,6 @@ export default interface SceneStats {
 
 function createSceneStats(): SceneStats {
   return {
-    memoryUsage: 0,
     numNodes: 0,
     numSectors: 0,
     geometryCount: {
