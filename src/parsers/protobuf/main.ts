@@ -111,7 +111,6 @@ export default async function parseProtobuf(
   const treeIndexNodeIdMap: TreeIndexNodeIdMap = [];
   const colorMap: ColorMap = [];
 
-  let t0 = performance.now();
   const handleWebNode = (webNode: any) => {
     const { boundingBox, path } = webNode;
     const boundingBoxMin = new Vector3(boundingBox.min.x, boundingBox.min.y, boundingBox.min.z);
@@ -161,7 +160,6 @@ export default async function parseProtobuf(
     throw 'parseProtobuf did not get data to parse';
   }
 
-  t0 = performance.now();
   const rootSector = sectors['0/'];
   for (const sector of rootSector.traverseSectors()) {
     mergeInstancedMeshes(sector, 2500, sceneStats, treeIndexNodeIdMap);
@@ -180,6 +178,6 @@ export default async function parseProtobuf(
     const nodeId = treeIndexNodeIdMap[treeIndex];
     nodeIdTreeIndexMap[nodeId] = treeIndex;
   }
-  console.log('Scene stats: ', sceneStats);
+
   return { rootSector, sectors, sceneStats, maps: { colorMap, treeIndexNodeIdMap, nodeIdTreeIndexMap } };
 }
