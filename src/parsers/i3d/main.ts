@@ -111,7 +111,13 @@ function unpackData(
     mergeInstancedMeshes(sector, 2500, sceneStats, maps.treeIndexNodeIdMap);
     sector.mergedMeshGroup.createTreeIndexMap();
     sector.instancedMeshGroup.createTreeIndexMap();
+
+    sceneStats.numSectors++;
+    sector.primitiveGroups.forEach(primitiveGroup => {
+      sceneStats.geometryCount[primitiveGroup.type] += primitiveGroup.data.count;
+    });
   }
+  sceneStats.numNodes = maps.treeIndexNodeIdMap.length;
 
   const sectors = maps.idToSectorMap;
   for (let treeIndex = 0; treeIndex < maps.treeIndexNodeIdMap.length; treeIndex++) {
