@@ -1,10 +1,10 @@
 import { unpackInstancedMeshes, unpackMergedMeshes, unpackPrimitives } from './unpackGeometry/main';
-import Sector from './../Sector';
+import Sector from '../../Sector';
 import CustomFileReader from './CustomFileReader';
-import SceneStats from './../SceneStats';
-import mergeInstancedMeshes from './../optimizations/mergeInstancedMeshes';
+import SceneStats from '../../SceneStats';
+import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
 import { PerSectorCompressedData, UncompressedValues } from './sharedFileParserTypes';
-import { DataMaps, FilterOptions, ParseReturn } from './../parsers/parseUtils';
+import { DataMaps, FilterOptions, ParseReturn } from '../parseUtils';
 
 function preloadMeshFiles(meshLoader: any, fileIds: number[]) {
   fileIds.forEach(fileId => {

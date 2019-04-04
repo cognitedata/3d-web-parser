@@ -37,7 +37,6 @@
     "@types/jest": "^23.3.12",
     "@types/node": "^10.12.12",
     "@types/three": "^0.93.28",
-    "clean-webpack-plugin": "^1.0.0",
     "es-check": "^5.0.0",
     "jest": "^23.6.0",
     "prettier": "^1.15.2",

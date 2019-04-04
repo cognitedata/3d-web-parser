@@ -3,14 +3,14 @@
 import ProtobufDecoder from './ProtobufDecoder';
 import * as WebSceneProto from './proto/web_scene.json';
 import * as THREE from 'three';
-import Sector from './Sector';
+import Sector from '../../Sector';
 import { Vector3, Group } from 'three';
-import { getParentPath } from './PathExtractor';
-import { InstancedMesh, InstancedMeshGroup } from './geometry/InstancedMeshGroup';
-import { MergedMesh } from './geometry/MergedMeshGroup';
-import PrimitiveGroup from './geometry/PrimitiveGroup';
-import GeometryGroup from './geometry/GeometryGroup';
-import { FilterOptions, InstancedMeshMap, ParseData } from './parsers/parseUtils';
+import { getParentPath } from '../../PathExtractor';
+import { InstancedMesh, InstancedMeshGroup } from '../../geometry/InstancedMeshGroup';
+import { MergedMesh } from '../../geometry/MergedMeshGroup';
+import PrimitiveGroup from '../../geometry/PrimitiveGroup';
+import GeometryGroup from '../../geometry/GeometryGroup';
+import { FilterOptions, InstancedMeshMap, ParseData } from '../parseUtils';
 import { parseBoxes,
          parseCircles,
          parseCones,
@@ -24,7 +24,7 @@ import { parseBoxes,
          parseTorusSegments,
          parseTrapeziums,
          parseMergedMeshes,
-         parseInstancedMeshes } from './parsers/protobuf/parsers';
+         parseInstancedMeshes } from './parsers';
 
 import { BoxGroup,
          CircleGroup,
@@ -37,14 +37,14 @@ import { BoxGroup,
          QuadGroup,
          SphericalSegmentGroup,
          TorusSegmentGroup,
-         TrapeziumGroup } from './geometry/GeometryGroups';
+         TrapeziumGroup } from '../../geometry/GeometryGroups';
 
-import SceneStats from './SceneStats';
+import SceneStats from '../../SceneStats';
 
-import mergeInstancedMeshes from './optimizations/mergeInstancedMeshes';
-import { MergedMeshGroup } from './geometry/MergedMeshGroup';
-import { PrimitiveGroupMap } from './geometry/PrimitiveGroup';
-import { TreeIndexNodeIdMap, ColorMap } from './parsers/parseUtils';
+import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
+import { MergedMeshGroup } from '../../geometry/MergedMeshGroup';
+import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
+import { TreeIndexNodeIdMap, ColorMap } from '../parseUtils';
 
 const primitiveParsers = [
   { type: 'Box', parser: parseBoxes },
@@ -82,7 +82,6 @@ function parseGeometries(data: ParseData) {
 export default async function parseProtobuf(
   protobufData?: Uint8Array,
   protobufDataList?: Uint8Array[],
-  printParsingTime: boolean = false,
   filterOptions?: FilterOptions,
 ) {
   const protobufDecoder = new ProtobufDecoder();
@@ -164,22 +163,12 @@ export default async function parseProtobuf(
     throw 'parseProtobuf did not get data to parse';
   }
 
-  if (printParsingTime) {
-    // tslint:disable-next-line
-    console.log('Parsing protobuf took ', performance.now() - t0, ' ms.');
-  }
-
   t0 = performance.now();
   const rootSector = sectors['0/'];
   for (const sector of rootSector.traverseSectors()) {
     mergeInstancedMeshes(sector, 2500, sceneStats, treeIndexNodeIdMap);
     sector.mergedMeshGroup.createTreeIndexMap();
     sector.instancedMeshGroup.createTreeIndexMap();
-  }
-
-  if (printParsingTime) {
-    // tslint:disable-next-line
-    console.log('Optimizing instanced meshes took ', performance.now() - t0, ' ms.');
   }
 
   const nodeIdTreeIndexMap: {[s: number]: number} = {};
