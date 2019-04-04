@@ -91,6 +91,22 @@ export default async function parseProtobuf(
   const sceneStats: SceneStats = {
     numInstancedMeshes: 0,
     numMergedMeshes: 0,
+    numNodes: 0,
+    numSectors: 0,
+    numPrimitives: {
+      box: 0,
+      circle: 0,
+      cone: 0,
+      eccentriccone: 0,
+      ellipsoidsegment: 0,
+      generalcylinder: 0,
+      generalring: 0,
+      nut: 0,
+      quad: 0,
+      sphericalsegment: 0,
+      torussegment: 0,
+      trapezium: 0,
+    },
   };
   // Create map since we will reuse primitive groups until the count is above some threshold.
   // This reduces the number of draw calls.
