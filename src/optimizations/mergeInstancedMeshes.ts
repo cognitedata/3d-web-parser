@@ -52,7 +52,7 @@ export default function mergeInstancedMeshes(
         instancedMesh.collections.splice(index, 1);
       }
     }
-    sceneStats.numMergedMeshes += 1;
+    sceneStats.geometryCount.MergedMesh += 1;
     sector.mergedMeshGroup.addMesh(mergedMesh);
   });
 }

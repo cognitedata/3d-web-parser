@@ -39,7 +39,7 @@ import { BoxGroup,
          TorusSegmentGroup,
          TrapeziumGroup } from '../../geometry/GeometryGroups';
 
-import SceneStats from '../../SceneStats';
+import { SceneStats, createSceneStats } from '../../SceneStats';
 
 import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
 import { MergedMeshGroup } from '../../geometry/MergedMeshGroup';
@@ -64,11 +64,11 @@ const primitiveParsers = [
 function parseGeometries(data: ParseData) {
   const primitiveGroups: PrimitiveGroup[] = [];
   primitiveParsers.forEach(({ type, parser }) => {
+    const count = data.primitiveGroupMap[type].group.data.count;
     const didCreateNewGroup = parser(data);
 
     if (didCreateNewGroup) {
-      // TODO(anders.hafreager) Learn TypeScript and fix this
-      // @ts-ignore
+      // data.sceneStats.geometryCount[type]
       primitiveGroups.push(data.primitiveGroupMap[type].group);
     }
   });
@@ -88,26 +88,7 @@ export default async function parseProtobuf(
 
   const sectors: { [path: string]: Sector } = { };
   const instancedMeshMap: { [key: number]: InstancedMesh } = {};
-  const sceneStats: SceneStats = {
-    numInstancedMeshes: 0,
-    numMergedMeshes: 0,
-    numNodes: 0,
-    numSectors: 0,
-    numPrimitives: {
-      box: 0,
-      circle: 0,
-      cone: 0,
-      eccentriccone: 0,
-      ellipsoidsegment: 0,
-      generalcylinder: 0,
-      generalring: 0,
-      nut: 0,
-      quad: 0,
-      sphericalsegment: 0,
-      torussegment: 0,
-      trapezium: 0,
-    },
-  };
+  const sceneStats: SceneStats = createSceneStats();
   // Create map since we will reuse primitive groups until the count is above some threshold.
   // This reduces the number of draw calls.
   const primitiveGroupMap: PrimitiveGroupMap = {
@@ -185,6 +166,10 @@ export default async function parseProtobuf(
     mergeInstancedMeshes(sector, 2500, sceneStats, treeIndexNodeIdMap);
     sector.mergedMeshGroup.createTreeIndexMap();
     sector.instancedMeshGroup.createTreeIndexMap();
+
+    sector.primitiveGroups.forEach(primitiveGroup => {
+      sceneStats.geometryCount[primitiveGroup.type] += primitiveGroup.data.count;
+    });
   }
 
   const nodeIdTreeIndexMap: {[s: number]: number} = {};

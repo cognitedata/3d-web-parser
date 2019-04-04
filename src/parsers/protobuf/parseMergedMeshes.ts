@@ -54,7 +54,7 @@ export default function parse(data: ParseData): MergedMeshGroup {
       data.colorMap[treeIndex] = globalColor.clone();
     });
 
-    data.sceneStats.numMergedMeshes += 1;
+    data.sceneStats.geometryCount.MergedMesh += 1;
     group.addMesh(mergedMesh);
   });
 

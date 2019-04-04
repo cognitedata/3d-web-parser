@@ -1,14 +1,35 @@
-export { default as parseBoxes } from './parseBoxes';
-export { default as parseCircles } from './parseCircles';
-export { default as parseCones } from './parseCones';
-export { default as parseEccentricCones } from './parseEccentricCones';
-export { default as parseEllipsoidSegments } from './parseEllipsoidSegments';
-export { default as parseGeneralCylinders } from './parseGeneralCylinders';
-export { default as parseGeneralRings } from './parseGeneralRings';
-export { default as parseNuts } from './parseNuts';
-export { default as parseQuads } from './parseQuads';
-export { default as parseSphericalSegments } from './parseSphericalSegments';
-export { default as parseTorusSegments } from './parseTorusSegments';
-export { default as parseTrapeziums } from './parseTrapeziums';
-export { default as parseMergedMeshes } from './parseMergedMeshes';
-export { default as parseInstancedMeshes } from './parseInstancedMeshes';
+import { ParseData } from '../parseUtils';
+
+import parseBoxes from './parseBoxes';
+import parseCircles from './parseCircles';
+import parseCones from './parseCones';
+import parseEccentricCones from './parseEccentricCones';
+import parseEllipsoidSegments from './parseEllipsoidSegments';
+import parseGeneralCylinders from './parseGeneralCylinders';
+import parseGeneralRings from './parseGeneralRings';
+import parseNuts from './parseNuts';
+import parseQuads from './parseQuads';
+import parseSphericalSegments from './parseSphericalSegments';
+import parseTorusSegments from './parseTorusSegments';
+import parseTrapeziums from './parseTrapeziums';
+import parseMergedMeshes from './parseMergedMeshes';
+import parseInstancedMeshes from './parseInstancedMeshes';
+type ProtobufParser = (args: ParseData) => boolean;
+
+export {
+  parseBoxes,
+  parseCircles,
+  parseCones,
+  parseEccentricCones,
+  parseEllipsoidSegments,
+  parseGeneralCylinders,
+  parseGeneralRings,
+  parseNuts,
+  parseQuads,
+  parseSphericalSegments,
+  parseTorusSegments,
+  parseTrapeziums,
+  parseMergedMeshes,
+  parseInstancedMeshes,
+  ProtobufParser,
+};

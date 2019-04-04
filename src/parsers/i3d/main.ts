@@ -1,7 +1,7 @@
 import { unpackInstancedMeshes, unpackMergedMeshes, unpackPrimitives } from './unpackGeometry/main';
 import Sector from '../../Sector';
 import CustomFileReader from './CustomFileReader';
-import SceneStats from '../../SceneStats';
+import { SceneStats, createSceneStats }  from '../../SceneStats';
 import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
 import { PerSectorCompressedData, UncompressedValues } from './sharedFileParserTypes';
 import { DataMaps, FilterOptions, ParseReturn } from '../parseUtils';
@@ -103,10 +103,7 @@ function unpackData(
   maps: DataMaps,
   filterOptions?: FilterOptions,
   ): ParseReturn {
-  const sceneStats: SceneStats = {
-    numInstancedMeshes: 0,
-    numMergedMeshes: 0,
-  };
+  const sceneStats: SceneStats = createSceneStats();
   unpackPrimitives(rootSector, uncompressedValues, compressedData, maps, filterOptions);
   unpackMergedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
   unpackInstancedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
