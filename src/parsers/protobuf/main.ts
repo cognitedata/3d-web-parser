@@ -45,8 +45,10 @@ import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
 import { MergedMeshGroup } from '../../geometry/MergedMeshGroup';
 import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
 import { TreeIndexNodeIdMap, ColorMap } from '../parseUtils';
+import { GeometryType } from '../../geometry/Types';
+type PrimitiveParserMap = {type: GeometryType, parser: (data: ParseData) => boolean };
 
-const primitiveParsers = [
+const primitiveParsers: PrimitiveParserMap[] = [
   { type: 'Box', parser: parseBoxes },
   { type: 'Circle', parser: parseCircles },
   { type: 'Cone', parser: parseCones },
@@ -68,7 +70,6 @@ function parseGeometries(data: ParseData) {
     const didCreateNewGroup = parser(data);
 
     if (didCreateNewGroup) {
-      // data.sceneStats.geometryCount[type]
       primitiveGroups.push(data.primitiveGroupMap[type].group);
     }
   });
