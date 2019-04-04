@@ -45,4 +45,5 @@ export interface ParseReturn {
   sectors: {[name: string]: Sector};
   sceneStats: SceneStats;
   maps: DataMaps;
+  loadMeshesCallback?: Function;
 }

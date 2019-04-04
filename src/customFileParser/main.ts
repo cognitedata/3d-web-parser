@@ -108,6 +108,22 @@ function unpackData(
     numMergedMeshes: 0,
   };
   unpackPrimitives(rootSector, uncompressedValues, compressedData, maps, filterOptions);
+  const sectors = maps.idToSectorMap;
+  const loadMeshesCallback = () => {return new Promise(function(resolve, reject) {
+    parseMerged(rootSector, uncompressedValues, compressedData, maps, sceneStats).then(() => {
+      resolve('ok');
+    });
+  }); };
+  return { rootSector, sectors, sceneStats, maps, loadMeshesCallback };
+}
+
+async function parseMerged(
+  rootSector: Sector,
+  uncompressedValues: UncompressedValues,
+  compressedData: PerSectorCompressedData,
+  maps: DataMaps,
+  sceneStats: SceneStats,
+) {
   unpackMergedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
   unpackInstancedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
   for (const sector of rootSector.traverseSectors()) {
@@ -116,11 +132,8 @@ function unpackData(
     sector.instancedMeshGroup.createTreeIndexMap();
   }
 
-  const sectors = maps.idToSectorMap;
   for (let treeIndex = 0; treeIndex < maps.treeIndexNodeIdMap.length; treeIndex++) {
     const nodeId = maps.treeIndexNodeIdMap[treeIndex];
     maps.nodeIdTreeIndexMap.set(nodeId, treeIndex);
   }
-
-  return { rootSector, sectors, sceneStats, maps };
 }
