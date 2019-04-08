@@ -89,7 +89,7 @@ export default async function parseProtobuf(
 
   const sectors: { [path: string]: Sector } = { };
   const instancedMeshMap: { [key: number]: InstancedMesh } = {};
-  const sceneStats: SceneStats = createSceneStats();
+  const sceneStats = createSceneStats();
   // Create map since we will reuse primitive groups until the count is above some threshold.
   // This reduces the number of draw calls.
   const primitiveGroupMap: PrimitiveGroupMap = {

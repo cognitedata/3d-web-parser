@@ -103,7 +103,7 @@ function unpackData(
   maps: DataMaps,
   filterOptions?: FilterOptions,
   ): ParseReturn {
-  const sceneStats: SceneStats = createSceneStats();
+  const sceneStats = createSceneStats();
   unpackPrimitives(rootSector, uncompressedValues, compressedData, maps, filterOptions);
   unpackMergedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
   unpackInstancedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
