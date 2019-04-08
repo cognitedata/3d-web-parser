@@ -7,7 +7,7 @@ import { TreeIndexNodeIdMap } from '../parsers/parseUtils';
 
 const globalMatrix = new THREE.Matrix4();
 
-const TRIANGLE_COUNT_LIMIT = 100000;
+const TRIANGLE_COUNT_LIMIT = 10000;
 
 function countMappingsToMerge(collections: InstancedMeshCollection[]) {
   let numMappings = 0;
