@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import * as THREE from 'three';
 import { InstancedMeshGroup, InstancedMeshMappings } from '../geometry/InstancedMeshGroup';
 import { expectMatrix4Equal } from '../TestUtils';

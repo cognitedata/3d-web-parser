@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import * as THREE from 'three';
 import { CompressedGeometryData, UncompressedValues } from './sharedFileParserTypes';
 import { DEFAULT_COLOR, fileGeometryProperties } from './parserParameters';

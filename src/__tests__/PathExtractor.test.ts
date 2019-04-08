@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import { getParentPath } from '../PathExtractor';
 
 // Copyright 2019 Cognite AS

@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import * as THREE from 'three';
 import { InstancedMeshGroup, InstancedMesh, InstancedMeshCollection } from '../../geometry/InstancedMeshGroup';
 import { MatchingGeometries, parseInstancedMeshTransformMatrix } from './protobufUtils';

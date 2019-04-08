@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import PropertyLoader from '../PropertyLoader';
 import { FilterOptions } from '../../parseUtils';
 import { PrimitiveGroup, CircleGroup, SphericalSegmentGroup } from '../../../geometry/GeometryGroups';

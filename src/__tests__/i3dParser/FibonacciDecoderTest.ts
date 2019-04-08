@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import FibonacciDecoder from '../../parsers/FibonacciDecoder';
 
 describe('FibonacciDecoder', () => {

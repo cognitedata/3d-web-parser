@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import { float64Properties, float32Properties, vector3Properties, matrix4Properties,
   primitiveName, primitiveProperties, propertyName, colorProperties, vector4Properties,
   primitiveAttributeProperties }

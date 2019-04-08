@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import { GeometryType } from './geometry/Types';
 
 export default interface SceneStats {

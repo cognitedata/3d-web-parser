@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 export { default as PrimitiveGroup } from './PrimitiveGroup';
 export { default as BoxGroup } from './BoxGroup';
 export { default as CircleGroup } from './CircleGroup';

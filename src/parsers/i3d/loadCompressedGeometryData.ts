@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import CustomFileReader from './CustomFileReader';
 import { IdToFileGeometryName } from './parserParameters';
 import { CompressedGeometryData } from './sharedFileParserTypes';

@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import { ParseData } from '../parseUtils';
 
 import parseBoxes from './parseBoxes';
@@ -33,3 +35,4 @@ export {
   parseInstancedMeshes,
   ProtobufParser,
 };
+

@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import loadSectorMetadata from './loadSectorMetadata';
 import loadUncompressedValues from './loadUncompressedValues';
 import loadCompressedGeometryData from './loadCompressedGeometryData';

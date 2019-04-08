@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import { UncompressedValues, PerSectorCompressedData } from '../sharedFileParserTypes';
 import PropertyLoader from '../PropertyLoader';
 import { MergedMeshGroup, MergedMesh } from '../../../geometry/MergedMeshGroup';

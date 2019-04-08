@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import Sector from '../Sector';
 import { MergedMesh, MergedMeshMappings } from '../geometry/MergedMeshGroup';
 import * as THREE from 'three';
