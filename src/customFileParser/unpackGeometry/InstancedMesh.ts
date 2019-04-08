@@ -20,7 +20,7 @@ export default function unpackInstancedMeshes(
 
   const data = new PropertyLoader(uncompressedValues);
 
-  for (const sector of rootSector!.traverseSectors()) {
+  for (const sector of rootSector.traverseSectors()) {
     sector.instancedMeshGroup = new InstancedMeshGroup();
     const meshCounts: {[fileId: string]: {[triangleOffset: string]: { count: number, triangleCount: number }}} = {};
 
@@ -41,7 +41,7 @@ export default function unpackInstancedMeshes(
     // Create mesh collections for each file Id and triangle offset
     const collections: {[fileId: string]: {[triangleOffset: string]: InstancedMeshCollection}} = {};
     Object.keys(meshCounts).forEach(fileId => {
-      collections[fileId] = collections[fileId] ? collections[fileId] : {};
+      collections[fileId] = (collections[fileId] !== undefined) ? collections[fileId] : {};
       Object.keys(meshCounts[fileId]).forEach(triangleOffset => {
         const { count, triangleCount } = meshCounts[fileId][triangleOffset];
         collections[fileId][triangleOffset] = new InstancedMeshCollection(
