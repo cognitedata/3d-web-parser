@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 export type primitiveName = 'Primitive' | 'Box' | 'Circle' | 'Cone' | 'EccentricCone' | 'EllipsoidSegment' |
 'GeneralCylinder' |
 'GeneralRing' | 'Nut' | 'Quad' | 'SphericalSegment' | 'TorusSegment' | 'Trapezium';

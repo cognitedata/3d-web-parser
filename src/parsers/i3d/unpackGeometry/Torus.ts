@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import PropertyLoader from '../PropertyLoader';
 import { PrimitiveGroup, TorusSegmentGroup } from '../../../geometry/GeometryGroups';
 import { FilterOptions } from '../../parseUtils';

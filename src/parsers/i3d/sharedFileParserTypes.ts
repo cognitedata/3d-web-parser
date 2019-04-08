@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import FibonacciDecoder from '../FibonacciDecoder';
 import { BYTES_PER_NODE_ID, geometryNameType } from './parserParameters';
 import * as THREE from 'three';

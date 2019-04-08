@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import * as THREE from 'three';
 import SphericalSegmentGroup from '../../geometry/SphericalSegmentGroup';
 import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';

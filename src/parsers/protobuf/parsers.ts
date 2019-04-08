@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 export { default as parseBoxes } from './parseBoxes';
 export { default as parseCircles } from './parseCircles';
 export { default as parseCones } from './parseCones';

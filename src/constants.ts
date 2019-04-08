@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import * as THREE from 'three';
 
 const xAxis = new THREE.Vector3(1, 0, 0);

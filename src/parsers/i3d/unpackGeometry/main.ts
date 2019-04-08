@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import { PerSectorCompressedData, UncompressedValues, CompressedGeometryData }
   from './../sharedFileParserTypes';
 import PropertyLoader from './../PropertyLoader';
