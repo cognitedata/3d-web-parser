@@ -7,6 +7,33 @@ interface IndexMap { [s: number]: boolean; }
 const globalBox = new THREE.Box3();
 
 export class MergedMeshMappings {
+  public static concat(mappings: MergedMeshMappings[]) {
+    let capacity = 0; mappings.forEach(mapping => { capacity += mapping.count; });
+    const newMapping = new MergedMeshMappings(capacity);
+    newMapping.count = capacity;
+    let offset = 0;
+    let globalTriangleOffset = 0;
+    mappings.forEach(mapping => {
+      newMapping.triangleOffsets.set(mapping.triangleOffsets, offset);
+      newMapping.triangleCounts.set(mapping.triangleCounts, offset);
+      newMapping.treeIndex.set(mapping.treeIndex, offset);
+      for (let i = 0; i < mapping.count; i++) {
+        newMapping.triangleOffsets[offset + i] += globalTriangleOffset;
+        newMapping.transform0[offset + i] = mapping.transform0[i];
+        newMapping.transform1[offset + i] = mapping.transform1[i];
+        newMapping.transform2[offset + i] = mapping.transform2[i];
+        newMapping.transform3[offset + i] = mapping.transform3[i];
+      }
+
+      for (let i = 0; i < mapping.count; i++) {
+        globalTriangleOffset += mapping.triangleCounts[i];
+      }
+      offset += mapping.count;
+    });
+
+    return newMapping;
+  }
+
   public count: number;
   public capacity: number;
   public triangleOffsets: Uint32Array;
@@ -119,7 +146,7 @@ export class MergedMeshMappings {
     const columns = [0, 1, 2, 3].map(columnIndex => {
       // @ts-ignore
       const transform = this[`transform${columnIndex}`];
-      return transform[this.count] = new Float32Array(3);
+      return transform[index] = new Float32Array(3);
     });
     let matrixIndex = 0;
     for (let columnIndex = 0; columnIndex < 4; ++columnIndex, ++matrixIndex) {

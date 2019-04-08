@@ -7,12 +7,12 @@ import { TreeIndexNodeIdMap } from '../parsers/parseUtils';
 
 const globalMatrix = new THREE.Matrix4();
 
-const TRIANGLE_COUNT_LIMIT = 10000;
+const TRIANGLE_COUNT_LIMIT = 100000;
 
 function countMappingsToMerge(collections: InstancedMeshCollection[]) {
   let numMappings = 0;
   collections.forEach(collection => {
-    const triangleCount = (collection.mappings.count - 1) * collection.triangleCount;
+    const triangleCount = collection.mappings.count * collection.triangleCount;
     if (triangleCount < TRIANGLE_COUNT_LIMIT) {
       numMappings += collection.mappings.count;
     }
@@ -35,7 +35,7 @@ export default function optimizeMeshes(
 
       for (let index = instancedMesh.collections.length - 1; index >= 0; index--) {
         const collection = instancedMesh.collections[index];
-        const triangleCount = (collection.mappings.count - 1) * collection.triangleCount;
+        const triangleCount = collection.mappings.count * collection.triangleCount;
         if (triangleCount < TRIANGLE_COUNT_LIMIT) {
           for (let i = 0; i < collection.mappings.count; i++) {
             const treeIndex = collection.mappings.getTreeIndex(i);
