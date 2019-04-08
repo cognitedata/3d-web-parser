@@ -24,7 +24,7 @@ export default function unpackInstancedMeshes(
     sector.instancedMeshGroup = new InstancedMeshGroup();
     const meshCounts: {[fileId: string]: {[triangleOffset: string]: { count: number, triangleCount: number }}} = {};
 
-    // Count meshes per file Id and triangle offset
+    // Count meshes per file id and triangle offset
     const geometryInfo = compressedData[sector.path].instancedMesh;
     if (geometryInfo !== undefined) {
       for (let i = 0; i < geometryInfo.count; i++) {
