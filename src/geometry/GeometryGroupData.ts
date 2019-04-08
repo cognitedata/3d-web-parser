@@ -55,6 +55,8 @@ export default class GeometryGroupData {
         throw Error('Primitive attributes issue. Property: ' + property + ', type: ' + this.type);
       }
     });
+
+    this.sort();
   }
 
   setNumber(property: propertyName, value: number, index: number) {
@@ -111,6 +113,7 @@ export default class GeometryGroupData {
   }
 
   memoryUsage(usage: any) {
+    this.sort();
     let totalSize = 0;
     Object.keys(this.arrays).forEach(property => {
       const array = this.arrays[property];
@@ -139,5 +142,12 @@ export default class GeometryGroupData {
     });
 
     return data;
+  }
+
+  sort() {
+    if (this.arrays.radiusA) {
+      // @ts-ignore
+      console.log(this.arrays.radiusA.map((radius) => [radius]));
+    }
   }
 }
