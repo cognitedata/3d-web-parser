@@ -173,10 +173,10 @@ export default async function parseProtobuf(
   }
   sceneStats.numNodes = treeIndexNodeIdMap.length;
 
-  const nodeIdTreeIndexMap: {[s: number]: number} = {};
+  const nodeIdTreeIndexMap: Map<number, number> = new Map();
   for (let treeIndex = 0; treeIndex < treeIndexNodeIdMap.length; treeIndex++) {
     const nodeId = treeIndexNodeIdMap[treeIndex];
-    nodeIdTreeIndexMap[nodeId] = treeIndex;
+    nodeIdTreeIndexMap.set(nodeId, treeIndex);
   }
 
   return { rootSector, sectors, sceneStats, maps: { colorMap, treeIndexNodeIdMap, nodeIdTreeIndexMap } };
