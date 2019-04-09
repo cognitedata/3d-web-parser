@@ -46,7 +46,7 @@ function createCollection(
         '(using #ff00ff to highlight objects with missing color).',
       );
     }
-    const color = property.color == null ? property.color : { rgb: 0xff00ff };
+    const color = property.color != null ? property.color : { rgb: 0xff00ff };
     globalColor.setHex(color.rgb);
     parseInstancedMeshTransformMatrix(globalMatrix, transformMatrix);
     collection.addMapping(nodeId, treeIndex, globalMatrix);
