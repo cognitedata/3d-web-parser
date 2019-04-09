@@ -78,11 +78,14 @@ export default function parse(args: ParseData): boolean {
     ({ x = 0, y = 0, z = 0 } = primitiveInfo.centerB);
     globalCenterB.set(x, y, z);
 
+    const diagonalSize = Math.sqrt((2 * primitiveInfo.radius) ** 2 + globalCenterA.distanceTo(globalCenterB) ** 2);
+
     if (geometry.type === 'cylinder') {
       const { radius } = primitiveInfo;
       added = group.add(
         nodeId,
         treeIndex,
+        diagonalSize,
         globalCenterA,
         globalCenterB,
         radius,
@@ -96,6 +99,7 @@ export default function parse(args: ParseData): boolean {
       added = group.add(
         nodeId,
         treeIndex,
+        diagonalSize,
         globalCenterA,
         globalCenterB,
         radiusA,
@@ -111,6 +115,7 @@ export default function parse(args: ParseData): boolean {
         added = group.add(
           nodeId,
           treeIndex,
+          diagonalSize,
           globalCenterA,
           globalCenterB,
           radiusA,
@@ -124,6 +129,7 @@ export default function parse(args: ParseData): boolean {
       added = group.add(
         nodeId,
         treeIndex,
+        diagonalSize,
         globalCenterA,
         globalCenterB,
         innerRadius,
@@ -135,6 +141,7 @@ export default function parse(args: ParseData): boolean {
       added = group.add(
         nodeId,
         treeIndex,
+        diagonalSize,
         globalCenterA,
         globalCenterB,
         outerRadius,

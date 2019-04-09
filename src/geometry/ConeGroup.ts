@@ -29,6 +29,7 @@ export default class ConeGroup extends PrimitiveGroup {
   add(
     nodeId: number,
     treeIndex: number,
+    diagonalSize: number,
     centerA: THREE.Vector3,
     centerB: THREE.Vector3,
     radiusA: number,
@@ -43,6 +44,7 @@ export default class ConeGroup extends PrimitiveGroup {
     localXAxis.copy(xAxis).applyQuaternion(rotation);
 
     this.data.add({
+      diagonalSize,
       centerA,
       centerB,
       radiusA,

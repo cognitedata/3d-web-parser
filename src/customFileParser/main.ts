@@ -50,6 +50,9 @@ export function parseFullCustomFile(
     compressedData[sector.path] = fileReader.readCompressedGeometryData(sectorStartLocation + sectorByteLength);
   }
 
+  console.log(rootSector);
+  console.log(compressedData);
+  console.log(uncompressedValues);
   return unpackData(rootSector, uncompressedValues, compressedData, maps, filterOptions);
 }
 

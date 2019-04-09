@@ -4,7 +4,7 @@ import { FilterOptions } from '../../parsers/parseUtils';
 
 function addOpenTorusSegment(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader,
                              filterOptions?: FilterOptions) {
-  (groups.TorusSegment as TorusSegmentGroup).add(data.nodeId, data.treeIndex, data.center, data.normal, data.radiusA,
+  (groups.TorusSegment as TorusSegmentGroup).add(data.nodeId, data.treeIndex, data.diagonalSize, data.center, data.normal, data.radiusA,
     data.radiusB, data.rotationAngle, data.arcAngle, filterOptions);
 }
 
@@ -17,7 +17,7 @@ function addClosedTorusSegment(groups: {[name: string]: PrimitiveGroup}, data: P
 
 function addTorus(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader,
                   filterOptions?: FilterOptions) {
-  (groups.TorusSegment as TorusSegmentGroup).add(data.nodeId, data.treeIndex, data.center, data.normal,
+  (groups.TorusSegment as TorusSegmentGroup).add(data.nodeId, data.treeIndex, data.diagonalSize, data.center, data.normal,
     data.radiusA, data.radiusB, 0, Math.PI * 2, filterOptions);
 }
 

@@ -1,5 +1,5 @@
 import FibonacciDecoder from './FibonacciDecoder';
-import { BYTES_PER_NODE_ID, geometryNameType } from './parserParameters';
+import { BYTES_PER_NODE_ID, fileGeometryNameType } from './parserParameters';
 import * as THREE from 'three';
 
 export interface SectorMetadata {
@@ -14,7 +14,7 @@ export interface SectorMetadata {
 }
 
 export interface CompressedGeometryData {
-  type: geometryNameType;
+  type: fileGeometryNameType;
   nodeIds: NodeIdReader;
   indices: FibonacciDecoder;
   count: number;
@@ -25,6 +25,7 @@ export interface CompressedGeometryData {
 export interface UncompressedValues {
   [propertyName: string]: THREE.Color[] | THREE.Vector3[] | number[] | undefined;
   color?: THREE.Color[];
+  diagonalSize?: number[];
   normal?: THREE.Vector3[];
   centerX?: number[];
   centerY?: number[];

@@ -27,6 +27,7 @@ export default class EccentricConeGroup extends PrimitiveGroup {
   add(
     nodeId: number,
     treeIndex: number,
+    diagonalSize: number,
     centerA: THREE.Vector3,
     centerB: THREE.Vector3,
     radiusA: number,
@@ -36,6 +37,7 @@ export default class EccentricConeGroup extends PrimitiveGroup {
   ): boolean {
     this.setTreeIndex(treeIndex, this.data.count);
     this.data.add({
+      diagonalSize,
       centerA,
       centerB,
       radiusA,

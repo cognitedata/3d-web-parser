@@ -64,9 +64,12 @@ export default function parse(args: ParseData): boolean {
       arcAngle = 2 * Math.PI,
     } = primitiveInfo;
 
+    const diagonalSize = Math.sqrt((2 * primitiveInfo.radius) ** 2 + (2 * tubeRadius) ** 2);
+
     const added = group.add(
       nodeId,
       treeIndex,
+      diagonalSize,
       center,
       normal,
       radius,

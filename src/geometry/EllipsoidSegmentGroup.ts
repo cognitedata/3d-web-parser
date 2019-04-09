@@ -83,6 +83,7 @@ export default class EllipsoidSegmentGroup extends PrimitiveGroup {
   add(
     nodeId: number,
     treeIndex: number,
+    diagonalSize: number,
     center: THREE.Vector3,
     normal: THREE.Vector3,
     horizontalRadius: number,
@@ -92,6 +93,7 @@ export default class EllipsoidSegmentGroup extends PrimitiveGroup {
   ): boolean {
     this.setTreeIndex(treeIndex, this.data.count);
     this.data.add({
+      diagonalSize,
       center,
       normal,
       hRadius: horizontalRadius,

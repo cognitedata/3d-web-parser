@@ -101,11 +101,12 @@ export default function parse(args: ParseData): boolean {
         .multiplyScalar(innerRadius)
         .add(centerB);
 
+      const diagonalSize = (vertex.distanceTo(vertex2) + vertex1.distanceTo(vertex3)) / 2;
       if (isSecondQuad) {
         // swap the order of vertex1 and vertex2 to flip the normal
-        added = group.add(nodeId, treeIndex, vertex2, vertex1, vertex3, filterOptions) || added;
+        added = group.add(nodeId, treeIndex, diagonalSize, vertex2, vertex1, vertex3, filterOptions) || added;
       } else {
-        added = group.add(nodeId, treeIndex, vertex1, vertex2, vertex3, filterOptions) || added;
+        added = group.add(nodeId, treeIndex, diagonalSize, vertex1, vertex2, vertex3, filterOptions) || added;
       }
     });
 

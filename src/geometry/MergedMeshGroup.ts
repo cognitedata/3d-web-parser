@@ -43,6 +43,8 @@ export class MergedMeshMappings {
   public transform2: Float32Array[];
   public transform3: Float32Array[];
 
+  public diagonalSize: Float32Array;
+
   constructor(capacity: number) {
     this.count = 0;
     this.capacity = capacity;
@@ -53,6 +55,8 @@ export class MergedMeshMappings {
     this.transform1 = []; this.transform1.length = capacity;
     this.transform2 = []; this.transform2.length = capacity;
     this.transform3 = []; this.transform3.length = capacity;
+
+    this.diagonalSize = new Float32Array(this.capacity);
   }
 
   public add(
@@ -60,6 +64,7 @@ export class MergedMeshMappings {
     triangleCount: number,
     nodeId: number,
     treeIndex: number,
+    diagonalSize: number,
     transformMatrix?: THREE.Matrix4,
   ) {
     if (this.count + 1 > this.capacity) {
@@ -68,6 +73,7 @@ export class MergedMeshMappings {
     this.setTriangleOffset(triangleOffset, this.count);
     this.setTriangleCount(triangleCount, this.count);
     this.setTreeIndex(treeIndex, this.count);
+    this.setDiagonalSize(diagonalSize, this.count);
     if (transformMatrix !== undefined) {
       this.setTransform(transformMatrix, this.count);
     }
@@ -109,6 +115,10 @@ export class MergedMeshMappings {
     return this.triangleOffsets[index];
   }
 
+  public getDiagonalSize(index: number) {
+    return this.diagonalSize[index];
+  }
+
   public removeIndices(indicesToRemove: IndexMap) {
     let newIndex = 0;
     for (let i = 0; i < this.count; i++) {
@@ -138,6 +148,10 @@ export class MergedMeshMappings {
 
   public setTreeIndex(value: number, index: number) {
     this.treeIndex[index] = value;
+  }
+
+  public setDiagonalSize(value: number, index: number) {
+    this.diagonalSize[index] = value;
   }
 
   public setTransform(source: THREE.Matrix4, index: number) {
@@ -181,6 +195,8 @@ export class MergedMeshGroup extends GeometryGroup {
   meshes: MergedMesh[];
   treeIndexMap: TreeIndexMap;
   geometry?: THREE.BufferGeometry;
+  geometrySizes?: Float32Array;
+
   constructor () {
     super();
     this.meshes = [];

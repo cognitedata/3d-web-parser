@@ -83,14 +83,17 @@ function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup, fil
 
   ({ x = 0, y = 0, z = 0 } = primitiveInfo.centerB);
   centerB.set(x, y, z);
+
+  const diagonalSize = 2 * primitiveInfo.radius;
+
   // @ts-ignore
   if (geometry.type === 'cylinder') {
     const { radius = 0 } = primitiveInfo;
     normal.copy(centerA)
     .sub(centerB)
     .normalize();
-    added = group.add(nodeId, treeIndex, centerA, normal, radius, filterOptions);
-    added = group.add(nodeId, treeIndex, centerB, normal, radius, filterOptions) || added;
+    added = group.add(nodeId, treeIndex, diagonalSize, centerA, normal, radius, filterOptions);
+    added = group.add(nodeId, treeIndex, diagonalSize, centerB, normal, radius, filterOptions) || added;
   // @ts-ignore
   } else if (geometry.type === 'cone') {
     const { radiusA = 0, radiusB = 0 } = primitiveInfo;
@@ -99,8 +102,8 @@ function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup, fil
     .sub(centerB)
     .normalize();
 
-    added = group.add(nodeId, treeIndex, centerA, normal, radiusA, filterOptions);
-    added = group.add(nodeId, treeIndex, centerB, normal, radiusB, filterOptions) || added;
+    added = group.add(nodeId, treeIndex, diagonalSize, centerA, normal, radiusA, filterOptions);
+    added = group.add(nodeId, treeIndex, diagonalSize, centerB, normal, radiusB, filterOptions) || added;
   // @ts-ignore
   } else if (geometry.type === 'eccentricCone') {
     const { radiusA, radiusB } = primitiveInfo;
@@ -112,8 +115,8 @@ function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup, fil
     if (dotProduct > 0) {
       normal.negate();
     }
-    added = group.add(nodeId, treeIndex, centerA, normal, radiusA, filterOptions);
-    added = group.add(nodeId, treeIndex, centerB, normal, radiusB, filterOptions) || added;
+    added = group.add(nodeId, treeIndex, diagonalSize, centerA, normal, radiusA, filterOptions);
+    added = group.add(nodeId, treeIndex, diagonalSize, centerB, normal, radiusB, filterOptions) || added;
   }
 
   return added;
@@ -154,11 +157,13 @@ export default function parse(args: ParseData): boolean {
       ({ x = 0, y = 0, z = 0 } = primitiveInfo.center);
       center.set(x, y, z);
 
+      const diagonalSize = 2 * radius;
+
       if (geometry.type === 'sphericalSegment') {
         const { height } = primitiveInfo;
         const circleRadius = Math.sqrt(height * (2 * radius - height));
         center.add(vector.copy(normal).multiplyScalar(radius - height));
-        added = group.add(nodeId, treeIndex, center, normal, circleRadius, filterOptions);
+        added = group.add(nodeId, treeIndex, diagonalSize, center, normal, circleRadius, filterOptions);
       } else if (geometry.type === 'ellipsoidSegment') {
         const { verticalRadius, horizontalRadius, height } = primitiveInfo;
         const length = verticalRadius - height;
@@ -166,10 +171,10 @@ export default function parse(args: ParseData): boolean {
               (Math.sqrt(verticalRadius * verticalRadius - length * length) * horizontalRadius)
               / verticalRadius;
         center.add(vector.copy(normal).normalize().multiplyScalar(length));
-        added = group.add(nodeId, treeIndex, center, normal, circleRadius, filterOptions);
+        added = group.add(nodeId, treeIndex, diagonalSize, center, normal, circleRadius, filterOptions);
       } else {
         // Regular circles
-        added = group.add(nodeId, treeIndex, center, normal, radius, filterOptions);
+        added = group.add(nodeId, treeIndex, diagonalSize, center, normal, radius, filterOptions);
       }
     }
     if (added) {

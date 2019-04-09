@@ -17,6 +17,8 @@ export class InstancedMeshMappings {
   public transform2: Float32Array;
   public transform3: Float32Array;
 
+  public diagonalSize: Float32Array;
+
   constructor(capacity: number) {
     this.count = 0;
     this.capacity = capacity;
@@ -27,6 +29,8 @@ export class InstancedMeshMappings {
     this.transform1 = new Float32Array(3 * this.capacity);
     this.transform2 = new Float32Array(3 * this.capacity);
     this.transform3 = new Float32Array(3 * this.capacity);
+
+    this.diagonalSize = new Float32Array(this.capacity);
   }
 
   public removeIndices(indicesToRemove: IndexMap) {
@@ -60,17 +64,23 @@ export class InstancedMeshMappings {
   public add(
     nodeId: number,
     treeIndex: number,
+    diagonalSize: number,
     transformMatrix?: THREE.Matrix4,
   ) {
     this.setTreeIndex(treeIndex, this.count);
     if (transformMatrix !== undefined) {
       this.setTransform(transformMatrix, this.count);
     }
+    this.setDiagonalSize(diagonalSize, this.count);
     this.count += 1;
   }
 
   public getTreeIndex(index: number): number {
     return this.treeIndex[index];
+  }
+
+  public getDiagonalSize(index: number) {
+    return this.diagonalSize[index];
   }
 
   public getTransformMatrix(target: THREE.Matrix4, index: number) {
@@ -135,6 +145,10 @@ export class InstancedMeshMappings {
     this.count = newCapacity;
   }
 
+  public setDiagonalSize(value: number, index: number) {
+    this.diagonalSize[index] = value;
+  }
+
   private setTreeIndex(value: number, index: number) {
     this.treeIndex[index] = value;
   }
@@ -156,6 +170,7 @@ export class InstancedMeshCollection {
   triangleOffset: number;
   triangleCount: number;
   geometry?: THREE.InstancedBufferGeometry;
+  geometrySizes?: Float32Array;
   mappings: InstancedMeshMappings;
   constructor(triangleOffset: number, triangleCount: number, capacity: number) {
     this.triangleOffset = triangleOffset;
@@ -165,8 +180,9 @@ export class InstancedMeshCollection {
 
   addMapping(nodeId: number,
              treeIndex: number,
+             diagonalSize: number,
              transformMatrix?: THREE.Matrix4) {
-    this.mappings.add(nodeId, treeIndex, transformMatrix);
+    this.mappings.add(nodeId, treeIndex, diagonalSize, transformMatrix);
   }
 }
 

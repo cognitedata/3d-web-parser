@@ -1,8 +1,9 @@
 import { PerSectorCompressedData, UncompressedValues, CompressedGeometryData }
   from './../sharedFileParserTypes';
 import PropertyLoader from './../PropertyLoader';
-import { renderedPrimitiveToAddFunction, renderedPrimitivesPerFilePrimitive, renderedPrimitiveToGroup,
-  renderedPrimitiveNames} from '../parserParameters';
+import { renderedPrimitiveToAddFunction, renderedPrimitivesPerFilePrimitive, renderedPrimitiveToGroup }
+  from '../parserParameters';
+import { renderedPrimitiveNames } from './../../geometry/GeometryGroupDataParameters';
 import unpackInstancedMeshes from './InstancedMesh';
 import unpackMergedMeshes from './MergedMesh';
 import { PrimitiveGroup } from '../../geometry/GeometryGroups';

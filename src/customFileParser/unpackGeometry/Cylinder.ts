@@ -23,19 +23,19 @@ export function addClosedCylinder(groups: {[name: string]: PrimitiveGroup}, data
                                   filterOptions?: FilterOptions) {
   globalCenterA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
   globalCenterB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
-  (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, globalCenterA, globalCenterB,
+  (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, data.diagonalSize, globalCenterA, globalCenterB,
     data.radiusA, data.radiusA, 0, 2 * Math.PI, filterOptions);
   (groups.Circle as CircleGroup).add(
-    data.nodeId, data.treeIndex, globalCenterA, data.normal, data.radiusA, filterOptions);
+    data.nodeId, data.treeIndex, data.diagonalSize, globalCenterA, data.normal, data.radiusA, filterOptions);
   (groups.Circle as CircleGroup).add(
-    data.nodeId, data.treeIndex, globalCenterB, data.normal, data.radiusA, filterOptions);
+    data.nodeId, data.treeIndex, data.diagonalSize, globalCenterB, data.normal, data.radiusA, filterOptions);
 }
 
 export function addOpenCylinder(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader,
                                 filterOptions?: FilterOptions) {
   globalCenterA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
   globalCenterB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
-  (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, globalCenterA, globalCenterB,
+  (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, data.diagonalSize, globalCenterA, globalCenterB,
   data.radiusA, data.radiusA, 0, 2 * Math.PI, filterOptions);
 }
 
@@ -69,7 +69,7 @@ export function addOpenGeneralCylinder(groups: {[name: string]: PrimitiveGroup},
   globalExtB.copy(data.normal).multiplyScalar(-distFromBToExtB).add(globalCenterB);
 
   (groups.GeneralCylinder as GeneralCylinderGroup).add(
-    data.nodeId, data.treeIndex, globalExtA, globalExtB, data.radiusA, heightA,
+    data.nodeId, data.treeIndex, data.diagonalSize, globalExtA, globalExtB, data.radiusA, heightA,
     heightB, data.slopeA, data.slopeB, data.zAngleA, data.zAngleB, data.rotationAngle, data.arcAngle, filterOptions);
 }
 
@@ -104,7 +104,7 @@ export function addClosedGeneralCylinder(groups: {[name: string]: PrimitiveGroup
     const capAngleAxis = globalVertex.sub(center).normalize();
     const capAngle = angleBetweenVector3s(capAngleAxis, capXAxis, globalSlicingPlaneNormal);
 
-    (groups.GeneralRing as GeneralRingGroup).add(data.nodeId, data.treeIndex, center, globalSlicingPlaneNormal,
+    (groups.GeneralRing as GeneralRingGroup).add(data.nodeId, data.treeIndex, data.diagonalSize, center, globalSlicingPlaneNormal,
       capXAxis, radius / Math.abs(Math.cos(slope)),
       radius, data.thickness, capAngle, data.arcAngle, filterOptions);
   });
@@ -116,7 +116,7 @@ export function addSolidOpenGeneralCylinder(groups: {[name: string]: PrimitiveGr
     const distFromBToExtB = data.radiusA * Math.tan(data.slopeB);
     const heightA = distFromBToExtB + data.height;
     const heightB = distFromBToExtB;
-    (groups.GeneralCylinder as GeneralCylinderGroup).add(data.nodeId, data.treeIndex, globalExtA, globalExtB,
+    (groups.GeneralCylinder as GeneralCylinderGroup).add(data.nodeId, data.treeIndex, data.diagonalSize, globalExtA, globalExtB,
       data.radiusA - data.thickness, heightA, heightB, data.slopeA, data.slopeB, data.zAngleA,
       data.zAngleB, data.rotationAngle, data.arcAngle, filterOptions);
 }
@@ -156,6 +156,7 @@ export function addSolidClosedGeneralCylinder(groups: {[name: string]: Primitive
     (groups.Trapezium as TrapeziumGroup).add(
       data.nodeId,
       data.treeIndex,
+      data.diagonalSize,
       globalVertices[0],
       globalVertices[1],
       globalVertices[2],

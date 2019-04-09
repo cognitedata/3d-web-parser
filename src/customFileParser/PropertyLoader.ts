@@ -10,6 +10,7 @@ export default class PropertyLoader {
 
   public treeIndex = 0;
   public color = new THREE.Color();
+  public diagonalSize = 0;
   public center = new THREE.Vector3();
   public normal = new THREE.Vector3();
   public delta = new THREE.Vector3();
@@ -89,6 +90,8 @@ export default class PropertyLoader {
     'triangleCount':  (geometry: CGD) => { this.triangleCount                = geometry.indices.nextValue() ; },
     'thickness':      (geometry: CGD) => { this.thickness = this.values.radius![geometry.indices.nextValue()]; },
     'fileId':         (geometry: CGD) => { this.fileId    = this.values.fileId![geometry.indices.nextValue()]; },
+    'diagonalSize':   (geometry: CGD) => {
+      this.diagonalSize = this.values.diagonalSize![geometry.indices.nextValue()]; },
   };
 
   constructor(uncompressedValues: UncompressedValues) {
