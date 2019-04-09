@@ -16,6 +16,7 @@ export class InstancedMeshMappings {
   public transform1: Float32Array;
   public transform2: Float32Array;
   public transform3: Float32Array;
+  public sizes: Float32Array;
 
   constructor(capacity: number) {
     this.count = 0;
@@ -27,6 +28,7 @@ export class InstancedMeshMappings {
     this.transform1 = new Float32Array(3 * this.capacity);
     this.transform2 = new Float32Array(3 * this.capacity);
     this.transform3 = new Float32Array(3 * this.capacity);
+    this.sizes = new Float32Array(this.capacity);
   }
 
   public removeIndices(indicesToRemove: IndexMap) {
@@ -60,6 +62,7 @@ export class InstancedMeshMappings {
   public add(
     nodeId: number,
     treeIndex: number,
+    size: number,
     transformMatrix?: THREE.Matrix4,
   ) {
     this.setTreeIndex(treeIndex, this.count);

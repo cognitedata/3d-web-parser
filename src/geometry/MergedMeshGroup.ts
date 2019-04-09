@@ -14,23 +14,21 @@ export class MergedMeshMappings {
     let offset = 0;
     let globalTriangleOffset = 0;
     mappings.forEach(mapping => {
+      for (let i = 0; i < mapping.count; i++) {
+        mapping.triangleOffsets[i] += globalTriangleOffset;
+      }
       newMapping.triangleOffsets.set(mapping.triangleOffsets, offset);
       newMapping.triangleCounts.set(mapping.triangleCounts, offset);
       newMapping.treeIndex.set(mapping.treeIndex, offset);
       for (let i = 0; i < mapping.count; i++) {
-        newMapping.triangleOffsets[offset + i] += globalTriangleOffset;
         newMapping.transform0[offset + i] = mapping.transform0[i];
         newMapping.transform1[offset + i] = mapping.transform1[i];
         newMapping.transform2[offset + i] = mapping.transform2[i];
         newMapping.transform3[offset + i] = mapping.transform3[i];
-      }
-
-      for (let i = 0; i < mapping.count; i++) {
         globalTriangleOffset += mapping.triangleCounts[i];
       }
       offset += mapping.count;
     });
-
     return newMapping;
   }
 
@@ -160,7 +158,6 @@ export class MergedMeshMappings {
 export class MergedMesh {
   mappings: MergedMeshMappings;
   fileId: number;
-  geometry?: THREE.BufferGeometry;
   treeIndexMap: { [s: number]: number; };
   createdByInstancedMesh: boolean;
   constructor(capacity: number, fileId: number, createdByInstancedMesh: boolean = false) {
@@ -183,6 +180,7 @@ interface TreeIndexMap {
 export class MergedMeshGroup extends GeometryGroup {
   meshes: MergedMesh[];
   treeIndexMap: TreeIndexMap;
+  geometry?: THREE.BufferGeometry;
   constructor () {
     super();
     this.meshes = [];
@@ -223,11 +221,11 @@ export class MergedMeshGroup extends GeometryGroup {
       const mergedMesh = this.meshes[meshIndex];
 
       if (geometry == null) {
-        if (mergedMesh.geometry == null) {
+        if (this.geometry == null) {
           // Geometry may not be loaded yet, skip this geometry.
           return;
         }
-        geometry = mergedMesh.geometry;
+        geometry = this.geometry;
       }
 
       const triangleCount = mergedMesh.mappings.getTriangleCount(mappingIndex);
