@@ -35,4 +35,3 @@ export {
   parseInstancedMeshes,
   ProtobufParser,
 };
-
