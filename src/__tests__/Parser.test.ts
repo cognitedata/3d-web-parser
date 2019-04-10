@@ -1,7 +1,7 @@
 // Copyright 2019 Cognite AS
 
 const fs = require('fs');
-import parse from '../Parser';
+import parse from '../parsers/protobuf/main';
 import Sector from '../Sector';
 import * as TestScene from './fixtures/test_scene.json';
 import { expectBoundingBoxEqual } from '../TestUtils';

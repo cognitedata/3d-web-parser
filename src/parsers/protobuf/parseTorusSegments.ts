@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import * as THREE from 'three';
 import TorusSegmentGroup from '../../geometry/TorusSegmentGroup';
 import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';

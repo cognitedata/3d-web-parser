@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import * as THREE from 'three';
 import { InstancedMeshGroup, InstancedMesh, InstancedMeshCollection } from '../../geometry/InstancedMeshGroup';
 import { MatchingGeometries, parseInstancedMeshTransformMatrix } from './protobufUtils';
@@ -44,7 +46,7 @@ function createCollection(
         '(using #ff00ff to highlight objects with missing color).',
       );
     }
-    const color = property.color == null ? property.color : { rgb: 0xff00ff };
+    const color = property.color != null ? property.color : { rgb: 0xff00ff };
     globalColor.setHex(color.rgb);
     parseInstancedMeshTransformMatrix(globalMatrix, transformMatrix);
     // diagonal size is calculated later

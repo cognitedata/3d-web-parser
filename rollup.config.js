@@ -24,7 +24,7 @@ export default {
     json({
       // All JSON files will be parsed by default,
       // but you can also specifically include/exclude files
-      include: ['src/proto/**', 'node_modules/**'],
+      include: ['src/parsers/protobuf/proto/**', 'node_modules/**'],
       exclude: ['src/__tests__/fixtures/**'],
 
       // for tree-shaking, properties will be declared as

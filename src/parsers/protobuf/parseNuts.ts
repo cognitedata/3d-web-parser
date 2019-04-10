@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import * as THREE from 'three';
 import NutGroup from '../../geometry/NutGroup';
 import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
