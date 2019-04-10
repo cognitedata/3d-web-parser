@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import PropertyLoader from '../PropertyLoader';
 import { xAxis, zAxis } from '../../../constants';
 import * as THREE from 'three';

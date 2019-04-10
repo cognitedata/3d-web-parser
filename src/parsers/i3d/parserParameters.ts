@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 // After making changes to this file, run parserParametersTest to make sure everything is still valid
 import * as THREE from 'three';
 

@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import * as THREE from 'three';
 import { InstancedMesh, InstancedMeshCollection } from '../../../geometry/InstancedMeshGroup';
 import { PerSectorCompressedData, UncompressedValues } from '../sharedFileParserTypes';

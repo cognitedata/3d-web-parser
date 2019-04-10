@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import * as THREE from 'three';
 import CustomFileReader from '../../parsers/i3d/CustomFileReader';
 import { parseFullCustomFile } from '../../parsers/i3d/main';

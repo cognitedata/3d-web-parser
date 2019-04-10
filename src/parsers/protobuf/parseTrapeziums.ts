@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import * as THREE from 'three';
 import TrapeziumGroup from '../../geometry/TrapeziumGroup';
 import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';

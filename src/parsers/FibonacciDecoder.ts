@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 const FIBONACCI_MAX_LENGTH = 77; // Any 53 bit integer will take at most 77 bits in a fibonacci encoding.
 
 const fibonacciLookup = [1, 2];

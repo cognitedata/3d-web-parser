@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import { unpackInstancedMeshes, unpackMergedMeshes, unpackPrimitives } from './unpackGeometry/main';
 import Sector from '../../Sector';
 import CustomFileReader from './CustomFileReader';
