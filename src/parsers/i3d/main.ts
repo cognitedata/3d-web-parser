@@ -149,7 +149,7 @@ function findLargestTreeIndexInMeshes(compressedData: PerSectorCompressedData) {
 
     [instancedMeshData, mergedMeshData].forEach(data => {
       if (data !== undefined) {
-       largestTreeIndex = Math.max(largestTreeIndex, data.indices.findLargestValue());
+       largestTreeIndex = Math.max(largestTreeIndex, data.indices.findLargestValue() + 1);
       }
     });
   });
