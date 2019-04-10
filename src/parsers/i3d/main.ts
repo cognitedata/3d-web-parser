@@ -87,7 +87,6 @@ export function parseMultipleCustomFiles(
       const parentSector = maps.idToSectorMap[sectorMetadata.parentSectorId];
       if (parentSector !== undefined) {
         parentSector.addChild(sector);
-        parentSector.object3d.add(sector.object3d);
       } else { throw Error('Did not find parent sector'); }
     }
 
