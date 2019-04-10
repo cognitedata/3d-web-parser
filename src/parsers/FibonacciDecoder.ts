@@ -60,4 +60,18 @@ export default class FibonacciDecoder {
 
     throw Error('Did not find termination bit');
   }
+
+  findLargestValue() {
+    const { numberOfValuesRead, currentValue, previousBit8, nextFibIndex, readBitId } = this;
+
+    let largestTreeIndex = 0;
+    this.rewind();
+    while (this.numberOfValuesRead < this.numberOfValues) {
+      const treeIndex = this.nextValue();
+      largestTreeIndex = Math.max(largestTreeIndex, treeIndex);
+    }
+
+    Object.assign(this, { numberOfValuesRead, currentValue, previousBit8, nextFibIndex, readBitId });
+    return largestTreeIndex;
+  }
 }

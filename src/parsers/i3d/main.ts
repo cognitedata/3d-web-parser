@@ -113,14 +113,14 @@ function unpackData(
   const sectors = maps.idToSectorMap;
   const numberOfTreeIndices = Math.max(maps.treeIndexNodeIdMap.length, findLargestTreeIndexInMeshes(compressedData));
   const loadMeshesCallback = () => { return new Promise(function(resolve, reject) {
-    parseMerged(rootSector, uncompressedValues, compressedData, maps, sceneStats).then(() => {
+    parseMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats).then(() => {
       resolve('ok');
     });
   }); };
   return { rootSector, sectors, sceneStats, maps, loadMeshesCallback, numberOfTreeIndices };
 }
 
-async function parseMerged(
+async function parseMeshes(
   rootSector: Sector,
   uncompressedValues: UncompressedValues,
   compressedData: PerSectorCompressedData,
@@ -143,20 +143,13 @@ async function parseMerged(
 
 function findLargestTreeIndexInMeshes(compressedData: PerSectorCompressedData) {
   let largestTreeIndex = 0;
-
   Object.keys(compressedData).forEach(sectorPath => {
     const instancedMeshData = compressedData[sectorPath].instancedMesh;
     const mergedMeshData = compressedData[sectorPath].mergedMesh;
 
     [instancedMeshData, mergedMeshData].forEach(data => {
       if (data !== undefined) {
-        const indices = data.indices;
-        indices.rewind();
-        while (indices.numberOfValuesRead < indices.numberOfValues) {
-          const treeIndex = indices.nextValue();
-          largestTreeIndex = Math.max(largestTreeIndex, treeIndex);
-        }
-        indices.rewind();
+       largestTreeIndex = Math.max(largestTreeIndex, data.indices.findLargestValue());
       }
     });
   });
