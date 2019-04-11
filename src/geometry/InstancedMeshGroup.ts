@@ -107,14 +107,18 @@ export class InstancedMeshMappings {
   public resize(capacity: number) {
     // TODO(anders.hafreager) Create proper helper functions to simplify/automate constructor and resize
 
-    if (capacity < this.count) {
-      throw 'Error, tried to resize InstancedMeshMappings to smaller value than current count.';
+    if (capacity < this.count) {git
+                                throw 'Error, tried to resize InstancedMeshMappings to smaller value than current count.';
     }
 
     let tmp: TypedArray;
     tmp = this.treeIndex;
     this.treeIndex = new Float32Array(capacity);
     this.treeIndex.set(tmp.subarray(0, this.count), 0);
+
+    tmp = this.diagonalSize;
+    this.diagonalSize = new Float32Array(capacity);
+    this.diagonalSize.set(tmp.subarray(0, this.count), 0);
 
     tmp = this.transform0;
     this.transform0 = new Float32Array(3 * capacity);
@@ -141,6 +145,7 @@ export class InstancedMeshMappings {
     this.resize(newCapacity);
 
     this.treeIndex.set(otherMappings.treeIndex.subarray(0, otherMappings.count), this.count);
+    this.diagonalSize.set(otherMappings.diagonalSize.subarray(0, otherMappings.count), this.count);
     this.transform0.set(otherMappings.transform0.subarray(0, 3 * otherMappings.count), 3 * this.count);
     this.transform1.set(otherMappings.transform1.subarray(0, 3 * otherMappings.count), 3 * this.count);
     this.transform2.set(otherMappings.transform2.subarray(0, 3 * otherMappings.count), 3 * this.count);
