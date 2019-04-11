@@ -10,7 +10,7 @@ const globalBox = new THREE.Box3();
 
 export class MergedMeshMappings {
   public static concat(mappings: MergedMeshMappings[]) {
-    let capacity = 0; mappings.forEach(mapping => { capacity += mapping.count; });
+    const capacity = mappings.reduce((sum, mapping) => sum + mapping.count, 0);
     const newMapping = new MergedMeshMappings(capacity);
     newMapping.count = capacity;
     let offset = 0;
