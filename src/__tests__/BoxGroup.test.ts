@@ -12,7 +12,8 @@ function createBoxGroup(): BoxGroup {
   const normal = new THREE.Vector3(4, 5, 6);
   const angle = 1.0;
   const delta = new THREE.Vector3(1, 1, 1);
-  group.add(nodeId, treeIndex, center, normal, angle, delta);
+  const diagonalSize = Math.sqrt(delta.x ** 2 + delta.y ** 2 + delta.z ** 2);
+  group.add(nodeId, treeIndex, diagonalSize, center, normal, angle, delta);
   return group;
 }
 
@@ -56,8 +57,9 @@ describe('BoxGroup', () => {
     const normal = new THREE.Vector3(4, 5, 6);
     const angle = 10.0;
     const delta = new THREE.Vector3(10, 10, 10);
+    const diagonalSize = Math.sqrt(delta.x ** 2 + delta.y ** 2 + delta.z ** 2);
 
-    group.add(nodeId, treeIndex, center, normal, angle, delta);
+    group.add(nodeId, treeIndex, diagonalSize, center, normal, angle, delta);
     const targetVector = new THREE.Vector3();
 
     expect(group.data.count).toBe(1);

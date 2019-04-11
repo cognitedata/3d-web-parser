@@ -67,7 +67,7 @@ export default function parse(args: ParseData): boolean {
       normal.set(0, -1, 0);
     }
 
-    const diagonalSize = Math.sqrt((2 * primitiveInfo.radius) ** 2 + height ** 2);
+    const diagonalSize = Math.sqrt((2 * radius) ** 2 + height ** 2);
 
     const added = group.add(nodeId, treeIndex, diagonalSize, center, normal, radius, height, filterOptions);
     if (added) {

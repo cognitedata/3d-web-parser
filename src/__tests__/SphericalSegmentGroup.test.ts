@@ -56,8 +56,9 @@ describe('SphericalSegmentGroup', () => {
     const normal = new THREE.Vector3(0.1, 0.2, 0.3);
     const radius = 1.5;
     const height = 1.1;
+    const diagonalSize = Math.sqrt((2 * radius) ** 2 + height ** 2);
 
-    group.add(nodeId, treeIndex, center, normal, radius, height);
+    group.add(nodeId, treeIndex, diagonalSize, center, normal, radius, height);
 
     expect(group.data.count).toBe(1);
 

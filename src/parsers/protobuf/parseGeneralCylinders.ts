@@ -117,7 +117,7 @@ export default function parse(args: ParseData): boolean {
       .multiplyScalar(-distFromBToExtB)
       .add(centerB);
 
-    const diagonalSize = Math.sqrt((2 * primitiveInfo.radius) ** 2 + centerA.distanceTo(centerB) ** 2);
+    const diagonalSize = Math.sqrt((2 * radiusA) ** 2 + centerA.distanceTo(centerB) ** 2);
 
     added = group.add(nodeId, treeIndex, diagonalSize, extA, extB,
               radiusA, heightA,

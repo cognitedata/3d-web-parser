@@ -80,10 +80,9 @@ export default function parse(args: ParseData): boolean {
     ({ x = 0, y = 0, z = 0 } = primitiveInfo.centerB);
     globalCenterB.set(x, y, z);
 
-    const diagonalSize = Math.sqrt((2 * primitiveInfo.radius) ** 2 + globalCenterA.distanceTo(globalCenterB) ** 2);
-
     if (geometry.type === 'cylinder') {
       const { radius } = primitiveInfo;
+      const diagonalSize = Math.sqrt((2 * radius) ** 2 + globalCenterA.distanceTo(globalCenterB) ** 2);
       added = group.add(
         nodeId,
         treeIndex,
@@ -98,6 +97,8 @@ export default function parse(args: ParseData): boolean {
     } else if (geometry.type === 'cone' || geometry.type === 'generalCylinder') {
       let { radiusA, radiusB } = primitiveInfo;
       const { angle = 0, arcAngle  = 2.0 * Math.PI, thickness = 0 } = primitiveInfo;
+      const radius = Math.max(radiusA, radiusB);
+      const diagonalSize = Math.sqrt((2 * radius) ** 2 + globalCenterA.distanceTo(globalCenterB) ** 2);
       added = group.add(
         nodeId,
         treeIndex,
@@ -128,6 +129,7 @@ export default function parse(args: ParseData): boolean {
       }
     } else if (geometry.type === 'extrudedRing' || geometry.type === 'extrudedRingSegment') {
       const { innerRadius, outerRadius, angle = 0, arcAngle = 2.0 * Math.PI } = primitiveInfo;
+      const diagonalSize = Math.sqrt((2 * outerRadius) ** 2 + globalCenterA.distanceTo(globalCenterB) ** 2);
       added = group.add(
         nodeId,
         treeIndex,

@@ -25,7 +25,7 @@ describe('MeshGroup', () => {
       const triangleCount = 1234;
       const nodeId = 123;
       const treeIndex = 456;
-      nodeMappings.add(triangleOffset, triangleCount, nodeId, treeIndex);
+      nodeMappings.add(triangleOffset, triangleCount, nodeId, treeIndex, 0);
       expect(nodeMappings.count).toBe(index + 1);
       expect(nodeMappings.capacity).toBe(capacity);
 
@@ -51,7 +51,7 @@ describe('MeshGroup', () => {
         0,  0,  0,  1,
       );
 
-      nodeMappings.add(triangleOffset, triangleCount, nodeId, treeIndex, transformMatrix);
+      nodeMappings.add(triangleOffset, triangleCount, nodeId, treeIndex, 0, transformMatrix);
       expect(nodeMappings.count).toBe(index + 1);
       expect(nodeMappings.capacity).toBe(capacity);
 

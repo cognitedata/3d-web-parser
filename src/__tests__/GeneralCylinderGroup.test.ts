@@ -92,10 +92,12 @@ describe('GeneralCylinderGroup', () => {
     const zAngleB = 7.1;
     const angle = 1.3;
     const arcAngle = 1.05;
+    const diagonalSize = Math.sqrt((2 * radius) ** 2 + centerA.distanceTo(centerB) ** 2);
 
     group.add(
       nodeId,
       treeIndex,
+      diagonalSize,
       centerA,
       centerB,
       radius,
