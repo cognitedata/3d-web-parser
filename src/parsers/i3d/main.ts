@@ -3,8 +3,8 @@
 import { unpackInstancedMeshes, unpackMergedMeshes, unpackPrimitives } from './unpackGeometry/main';
 import Sector from '../../Sector';
 import CustomFileReader from './CustomFileReader';
-import SceneStats from '../../SceneStats';
 import optimizeMeshes from '../../optimizations/optimizeMeshes';
+import { SceneStats, createSceneStats }  from '../../SceneStats';
 import { PerSectorCompressedData, UncompressedValues } from './sharedFileParserTypes';
 import { DataMaps, FilterOptions, ParseReturn } from '../parseUtils';
 
@@ -52,9 +52,6 @@ export function parseFullCustomFile(
     compressedData[sector.path] = fileReader.readCompressedGeometryData(sectorStartLocation + sectorByteLength);
   }
 
-  console.log(rootSector);
-  console.log(compressedData);
-  console.log(uncompressedValues);
   return unpackData(rootSector, uncompressedValues, compressedData, maps, filterOptions);
 }
 
@@ -107,10 +104,7 @@ function unpackData(
   maps: DataMaps,
   filterOptions?: FilterOptions,
   ): ParseReturn {
-  const sceneStats: SceneStats = {
-    numInstancedMeshes: 0,
-    numMergedMeshes: 0,
-  };
+  const sceneStats = createSceneStats();
   unpackPrimitives(rootSector, uncompressedValues, compressedData, maps, filterOptions);
   unpackMergedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
   unpackInstancedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
@@ -118,7 +112,13 @@ function unpackData(
   for (const sector of rootSector.traverseSectors()) {
     sector.mergedMeshGroup.createTreeIndexMap();
     sector.instancedMeshGroup.createTreeIndexMap();
+
+    sceneStats.numSectors++;
+    sector.primitiveGroups.forEach(primitiveGroup => {
+      sceneStats.geometryCount[primitiveGroup.type] += primitiveGroup.data.count;
+    });
   }
+  sceneStats.numNodes = maps.treeIndexNodeIdMap.length;
 
   const sectors = maps.idToSectorMap;
   for (let treeIndex = 0; treeIndex < maps.treeIndexNodeIdMap.length; treeIndex++) {

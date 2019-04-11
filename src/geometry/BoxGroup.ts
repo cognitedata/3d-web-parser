@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import PrimitiveGroup from './PrimitiveGroup';
 import { zAxis } from '../constants';
 import { FilterOptions } from '../parsers/parseUtils';
+import { GeometryType } from './Types';
 import GeometryGroupData from './GeometryGroupData';
 
 // reusable variables
@@ -16,6 +17,7 @@ const globalCenter = new THREE.Vector3();
 const globalPoint = new THREE.Vector3();
 
 export default class BoxGroup extends PrimitiveGroup {
+  public type: GeometryType;
   public data: GeometryGroupData;
   constructor(capacity: number) {
     super(capacity);

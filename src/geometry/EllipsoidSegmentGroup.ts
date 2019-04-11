@@ -5,6 +5,7 @@ import PrimitiveGroup from './PrimitiveGroup';
 import { computeCircleBoundingBox } from './CircleGroup';
 import { zAxis } from './../constants';
 import { FilterOptions } from '../parsers/parseUtils';
+import { GeometryType } from './Types';
 import GeometryGroupData from './GeometryGroupData';
 
 // reusable variables
@@ -70,6 +71,7 @@ export function computeEllipsoidBoundingBox(
 }
 
 export default class EllipsoidSegmentGroup extends PrimitiveGroup {
+  public type: GeometryType;
   public data: GeometryGroupData;
 
   constructor(capacity: number) {
@@ -79,7 +81,6 @@ export default class EllipsoidSegmentGroup extends PrimitiveGroup {
     this.data = new GeometryGroupData('EllipsoidSegment', capacity, this.attributes);
   }
 
-  // @ts-ignore
   add(
     nodeId: number,
     treeIndex: number,

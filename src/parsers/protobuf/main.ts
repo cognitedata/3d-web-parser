@@ -39,13 +39,15 @@ import { BoxGroup,
          TorusSegmentGroup,
          TrapeziumGroup } from '../../geometry/GeometryGroups';
 
-import SceneStats from '../../SceneStats';
+import { SceneStats, createSceneStats } from '../../SceneStats';
 
 import optimizeMeshes from '../../optimizations/optimizeMeshes';
 import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
 import { TreeIndexNodeIdMap, ColorMap } from '../parseUtils';
+import { GeometryType } from '../../geometry/Types';
+type PrimitiveParserMap = {type: GeometryType, parser: (data: ParseData) => boolean };
 
-const primitiveParsers = [
+const primitiveParsers: PrimitiveParserMap[] = [
   { type: 'Box', parser: parseBoxes },
   { type: 'Circle', parser: parseCircles },
   { type: 'Cone', parser: parseCones },
@@ -63,11 +65,10 @@ const primitiveParsers = [
 function parseGeometries(data: ParseData) {
   const primitiveGroups: PrimitiveGroup[] = [];
   primitiveParsers.forEach(({ type, parser }) => {
+    const count = data.primitiveGroupMap[type].group.data.count;
     const didCreateNewGroup = parser(data);
 
     if (didCreateNewGroup) {
-      // TODO(anders.hafreager) Learn TypeScript and fix this
-      // @ts-ignore
       primitiveGroups.push(data.primitiveGroupMap[type].group);
     }
   });
@@ -87,10 +88,7 @@ export default async function parseProtobuf(
 
   const sectors: { [path: string]: Sector } = { };
   const instancedMeshMap: { [key: number]: InstancedMesh } = {};
-  const sceneStats: SceneStats = {
-    numInstancedMeshes: 0,
-    numMergedMeshes: 0,
-  };
+  const sceneStats = createSceneStats();
   // Create map since we will reuse primitive groups until the count is above some threshold.
   // This reduces the number of draw calls.
   const primitiveGroupMap: PrimitiveGroupMap = {
@@ -112,7 +110,6 @@ export default async function parseProtobuf(
   const treeIndexNodeIdMap: TreeIndexNodeIdMap = [];
   const colorMap: ColorMap = [];
 
-  let t0 = performance.now();
   const handleWebNode = (webNode: any) => {
     const { boundingBox, path } = webNode;
     const boundingBoxMin = new Vector3(boundingBox.min.x, boundingBox.min.y, boundingBox.min.z);
@@ -162,18 +159,24 @@ export default async function parseProtobuf(
     throw 'parseProtobuf did not get data to parse';
   }
 
-  t0 = performance.now();
   const rootSector = sectors['0/'];
   for (const sector of rootSector.traverseSectors()) {
     optimizeMeshes(rootSector, sceneStats, treeIndexNodeIdMap);
     sector.mergedMeshGroup.createTreeIndexMap();
     sector.instancedMeshGroup.createTreeIndexMap();
+
+    sceneStats.numSectors++;
+    sector.primitiveGroups.forEach(primitiveGroup => {
+      sceneStats.geometryCount[primitiveGroup.type] += primitiveGroup.data.count;
+    });
   }
+  sceneStats.numNodes = treeIndexNodeIdMap.length;
 
   const nodeIdTreeIndexMap: Map<number, number> = new Map();
   for (let treeIndex = 0; treeIndex < treeIndexNodeIdMap.length; treeIndex++) {
     const nodeId = treeIndexNodeIdMap[treeIndex];
     nodeIdTreeIndexMap.set(nodeId, treeIndex);
   }
+
   return { rootSector, sectors, sceneStats, maps: { colorMap, treeIndexNodeIdMap, nodeIdTreeIndexMap } };
 }

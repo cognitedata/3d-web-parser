@@ -2,7 +2,7 @@
 
 import * as THREE from 'three';
 import GeometryGroup from './GeometryGroup';
-
+import { GeometryType } from './Types';
 import { computeBoundingBox } from './GeometryUtils';
 
 interface IndexMap { [s: number]: boolean; }
@@ -194,6 +194,7 @@ interface TreeIndexMap {
 }
 
 export class MergedMeshGroup extends GeometryGroup {
+  public type: GeometryType;
   meshes: MergedMesh[];
   treeIndexMap: TreeIndexMap;
   geometry?: THREE.BufferGeometry;

@@ -5,6 +5,7 @@ import PrimitiveGroup from './PrimitiveGroup';
 import { zAxis } from './../constants';
 import { FilterOptions } from '../parsers/parseUtils';
 import GeometryGroupData from './GeometryGroupData';
+import { GeometryType } from './Types';
 import { colorProperties } from './GeometryGroupDataParameters';
 
 // reusable variables
@@ -20,7 +21,8 @@ const globalCenterB = new THREE.Vector3();
 const globalPoint = new THREE.Vector3();
 
 export default class NutGroup extends PrimitiveGroup {
-    public data: GeometryGroupData;
+  public type: GeometryType;
+  public data: GeometryGroupData;
 
   constructor(capacity: number) {
     super(capacity);

@@ -5,6 +5,7 @@ import PrimitiveGroup from './PrimitiveGroup';
 import { computeCircleBoundingBox } from './CircleGroup';
 import { FilterOptions } from '../parsers/parseUtils';
 import GeometryGroupData from './GeometryGroupData';
+import { GeometryType } from './Types';
 import { colorProperties } from './GeometryGroupDataParameters';
 
 // constants
@@ -29,6 +30,7 @@ const globalCenter = new THREE.Vector3();
 const globalNormal = new THREE.Vector3();
 
 export default class SphericalSegmentGroup extends PrimitiveGroup {
+  public type: GeometryType;
   public data: GeometryGroupData;
 
   constructor(capacity: number) {
@@ -43,7 +45,6 @@ export default class SphericalSegmentGroup extends PrimitiveGroup {
     });
   }
 
-  // @ts-ignore
   add(
     nodeId: number,
     treeIndex: number,

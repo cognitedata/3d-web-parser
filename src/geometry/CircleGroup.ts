@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import PrimitiveGroup from './PrimitiveGroup';
 import { zAxis } from '../constants';
 import { FilterOptions } from '../parsers/parseUtils';
+import { GeometryType } from './Types';
 import GeometryGroupData from './GeometryGroupData';
 
 // reusable variables
@@ -21,20 +22,21 @@ export function computeCircleBoundingBox(
   normal: THREE.Vector3,
   radius: number,
   box: THREE.Box3,
-) {
-  normal.normalize();
-  globalDot.multiplyVectors(normal, normal);
-  const twoRadius = 2 * radius;
-  const size = globalDot.set(
-    twoRadius * Math.sqrt(1 - globalDot.x),
-    twoRadius * Math.sqrt(1 - globalDot.y),
-    twoRadius * Math.sqrt(1 - globalDot.z),
-  );
+  ) {
+    normal.normalize();
+    globalDot.multiplyVectors(normal, normal);
+    const twoRadius = 2 * radius;
+    const size = globalDot.set(
+      twoRadius * Math.sqrt(1 - globalDot.x),
+      twoRadius * Math.sqrt(1 - globalDot.y),
+      twoRadius * Math.sqrt(1 - globalDot.z),
+      );
 
-  return box.setFromCenterAndSize(center, size);
-}
+    return box.setFromCenterAndSize(center, size);
+    }
 
 export default class CircleGroup extends PrimitiveGroup {
+  public type: GeometryType;
   public data: GeometryGroupData;
   constructor(capacity: number) {
     super(capacity);
