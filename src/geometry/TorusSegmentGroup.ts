@@ -8,6 +8,7 @@ import { FilterOptions } from '../parsers/parseUtils';
 import GeometryGroupData from './GeometryGroupData';
 import { colorProperties } from './GeometryGroupDataParameters';
 import { Geometry } from 'three';
+import { GeometryType } from './Types';
 
 // reusable variables
 const firstRotation = new THREE.Quaternion();
@@ -22,6 +23,7 @@ const vector1 = new THREE.Vector3();
 const vector2 = new THREE.Vector3();
 
 export default class TorusSegmentGroup extends PrimitiveGroup {
+  public type: GeometryType;
   public data: GeometryGroupData;
   constructor(capacity: number) {
     super(capacity);
@@ -29,7 +31,6 @@ export default class TorusSegmentGroup extends PrimitiveGroup {
     this.data = new GeometryGroupData('TorusSegment', capacity, this.attributes);
   }
 
-  // @ts-ignore
   add(
     nodeId: number,
     treeIndex: number,

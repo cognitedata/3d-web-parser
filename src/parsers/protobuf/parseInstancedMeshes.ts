@@ -80,7 +80,7 @@ export default function parse(data: ParseData): InstancedMeshGroup {
     // Only add it to the group if we created a new one. If we didn't,
     // the instanced mesh is on another sector.
     if (didCreateNewInstancedMesh) {
-      data.sceneStats.numInstancedMeshes += 1;
+      data.sceneStats.geometryCount.InstancedMesh += 1;
       group.addMesh(instancedMesh);
     }
 

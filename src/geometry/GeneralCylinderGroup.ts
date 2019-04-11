@@ -7,6 +7,7 @@ import { FilterOptions } from '../parsers/parseUtils';
 import GeometryGroupData from './GeometryGroupData';
 import { computeEllipsoidBoundingBox } from './EllipsoidSegmentGroup';
 import { colorProperties } from './GeometryGroupDataParameters';
+import { GeometryType } from './Types';
 import { angleBetweenVector3s } from '../parsers/protobuf/protobufUtils';
 
 const globalBox = new THREE.Box3();
@@ -47,6 +48,7 @@ export default class GeneralCylinderGroup extends PrimitiveGroup {
     );
   }
 
+  public type: GeometryType;
   public data: GeometryGroupData;
 
   constructor(capacity: number) {
@@ -56,9 +58,6 @@ export default class GeneralCylinderGroup extends PrimitiveGroup {
     this.data = new GeometryGroupData('GeneralCylinder', capacity, this.attributes);
   }
 
-  // TODO(anders.hafreager) TS is angry since add already exists with
-  // different signature in parent class.
-  // @ts-ignore
   add(
     nodeId: number,
     treeIndex: number,

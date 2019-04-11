@@ -1,7 +1,7 @@
 // Copyright 2019 Cognite AS
 import * as THREE from 'three';
 import GeometryGroupData from './GeometryGroupData';
-
+import { GeometryType } from './Types';
 export interface GeometryNode {
   groupIndex: {collectionIndex?: number, mappingIndex: number};
   treeIndex: number;
@@ -15,10 +15,7 @@ export interface GeometryMap {
 }
 
 export abstract class GeometryGroup {
-  public type: string;
-  constructor() {
-    this.type = '';
-  }
+  public abstract type: GeometryType;
 
   memoryUsage(usage: any) {
     Object.keys(this).forEach(key => {

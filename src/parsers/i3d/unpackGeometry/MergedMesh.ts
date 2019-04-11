@@ -54,7 +54,7 @@ export default function unpackMergedMeshes(
       // add meshes to groups
       Object.keys(mergedMeshes).forEach(fileId => {
         sector.mergedMeshGroup.addMesh(mergedMeshes[fileId]);
-        sceneStats.numMergedMeshes += 1;
+        sceneStats.geometryCount.MergedMesh += 1;
       });
     }
   }
