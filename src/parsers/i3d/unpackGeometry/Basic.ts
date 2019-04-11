@@ -37,8 +37,8 @@ function addRing(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader,
 }
 
 function addSphere(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader, filterOptions?: FilterOptions) {
-  (groups.SphericalSegment as SphericalSegmentGroup).add(data.nodeId, data.treeIndex, data.diagonalSize, data.center, zAxis,
-  data.radiusA, 2 * data.radiusA, filterOptions);
+  (groups.SphericalSegment as SphericalSegmentGroup).add(data.nodeId, data.treeIndex, data.diagonalSize,
+    data.center, zAxis, data.radiusA, 2 * data.radiusA, filterOptions);
 }
 
 export { addBox, addCircle, addNut, addRing, addSphere };

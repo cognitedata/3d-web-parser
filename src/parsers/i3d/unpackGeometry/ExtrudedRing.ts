@@ -23,16 +23,16 @@ function addOpenExtrudedRingSegment(groups: {[name: string]: PrimitiveGroup}, da
   globalCenterB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
   globalXAxis.copy(xAxis).applyQuaternion(globalAxisRotation.setFromUnitVectors(zAxis, data.normal));
 
-  (groups.GeneralRing as GeneralRingGroup).add(data.nodeId, data.treeIndex, data.diagonalSize, globalCenterA, data.normal,
-    globalXAxis, data.radiusB, data.radiusB, data.radiusB - data.radiusA,
+  (groups.GeneralRing as GeneralRingGroup).add(data.nodeId, data.treeIndex, data.diagonalSize,
+    globalCenterA, data.normal, globalXAxis, data.radiusB, data.radiusB, data.radiusB - data.radiusA,
     data.rotationAngle, data.arcAngle, filterOptions);
-  (groups.GeneralRing as GeneralRingGroup).add(data.nodeId, data.treeIndex, data.diagonalSize, globalCenterB, data.normal,
-    globalXAxis, data.radiusB, data.radiusB, data.radiusB - data.radiusA,
+  (groups.GeneralRing as GeneralRingGroup).add(data.nodeId, data.treeIndex, data.diagonalSize,
+    globalCenterB, data.normal, globalXAxis, data.radiusB, data.radiusB, data.radiusB - data.radiusA,
     data.rotationAngle, data.arcAngle, filterOptions);
-  (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, data.diagonalSize, globalCenterA, globalCenterB, data.radiusA,
-    data.radiusA, data.rotationAngle, data.arcAngle, filterOptions);
-  (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, data.diagonalSize, globalCenterA, globalCenterB, data.radiusB,
-    data.radiusB, data.rotationAngle, data.arcAngle, filterOptions);
+  (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, data.diagonalSize, globalCenterA,
+    globalCenterB, data.radiusA, data.radiusA, data.rotationAngle, data.arcAngle, filterOptions);
+  (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, data.diagonalSize, globalCenterA,
+    globalCenterB, data.radiusB, data.radiusB, data.rotationAngle, data.arcAngle, filterOptions);
 }
 
 function addClosedExtrudedRingSegment(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader,

@@ -107,8 +107,8 @@ export class InstancedMeshMappings {
   public resize(capacity: number) {
     // TODO(anders.hafreager) Create proper helper functions to simplify/automate constructor and resize
 
-    if (capacity < this.count) {git
-                                throw 'Error, tried to resize InstancedMeshMappings to smaller value than current count.';
+    if (capacity < this.count) {
+      throw 'Error, tried to resize InstancedMeshMappings to smaller value than current count.';
     }
 
     let tmp: TypedArray;

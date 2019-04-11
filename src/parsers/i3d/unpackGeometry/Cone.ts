@@ -28,8 +28,8 @@ export function addOpenEccentricCone(groups: {[name: string]: PrimitiveGroup}, d
                                      filterOptions?: FilterOptions) {
   globalCenterA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
   globalCenterB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
-  (groups.EccentricCone as EccentricConeGroup).add(data.nodeId, data.treeIndex, data.diagonalSize, globalCenterA, globalCenterB,
-    data.radiusA, data.radiusB, data.normal, filterOptions);
+  (groups.EccentricCone as EccentricConeGroup).add(data.nodeId, data.treeIndex, data.diagonalSize,
+    globalCenterA, globalCenterB, data.radiusA, data.radiusB, data.normal, filterOptions);
 }
 
 export function addClosedCone(
@@ -54,8 +54,8 @@ export function addOpenGeneralCone(
   groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader, filterOptions?: FilterOptions) {
   globalCenterA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
   globalCenterB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
-  (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, data.diagonalSize, globalCenterA, globalCenterB, data.radiusA, data.radiusB,
-    data.rotationAngle, data.arcAngle, filterOptions);
+  (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, data.diagonalSize, globalCenterA, globalCenterB,
+    data.radiusA, data.radiusB, data.rotationAngle, data.arcAngle, filterOptions);
 }
 
 export function addClosedGeneralCone(
@@ -63,11 +63,11 @@ export function addClosedGeneralCone(
   addOpenGeneralCone(groups, data, filterOptions);
 
   globalXAxis.copy(xAxis).applyQuaternion(globalAxisRotation.setFromUnitVectors(zAxis, data.normal));
-  (groups.GeneralRing as GeneralRingGroup).add(data.nodeId, data.treeIndex, data.diagonalSize, globalCenterA, data.normal,
-    globalXAxis, data.radiusA, data.radiusA, data.thickness,
+  (groups.GeneralRing as GeneralRingGroup).add(data.nodeId, data.treeIndex, data.diagonalSize, globalCenterA,
+    data.normal, globalXAxis, data.radiusA, data.radiusA, data.thickness,
     data.rotationAngle, data.arcAngle, filterOptions);
-  (groups.GeneralRing as GeneralRingGroup).add(data.nodeId, data.treeIndex, data.diagonalSize, globalCenterB, data.normal,
-    globalXAxis, data.radiusB, data.radiusB, data.thickness,
+  (groups.GeneralRing as GeneralRingGroup).add(data.nodeId, data.treeIndex, data.diagonalSize, globalCenterB,
+    data.normal, globalXAxis, data.radiusB, data.radiusB, data.thickness,
   data.rotationAngle, data.arcAngle, filterOptions);
 }
 

@@ -106,7 +106,8 @@ export function addClosedGeneralCylinder(groups: {[name: string]: PrimitiveGroup
     const capAngleAxis = globalVertex.sub(center).normalize();
     const capAngle = angleBetweenVector3s(capAngleAxis, capXAxis, globalSlicingPlaneNormal);
 
-    (groups.GeneralRing as GeneralRingGroup).add(data.nodeId, data.treeIndex, data.diagonalSize, center, globalSlicingPlaneNormal,
+    (groups.GeneralRing as GeneralRingGroup).add(data.nodeId, data.treeIndex, data.diagonalSize,
+      center, globalSlicingPlaneNormal,
       capXAxis, radius / Math.abs(Math.cos(slope)),
       radius, data.thickness, capAngle, data.arcAngle, filterOptions);
   });
@@ -118,7 +119,8 @@ export function addSolidOpenGeneralCylinder(groups: {[name: string]: PrimitiveGr
     const distFromBToExtB = data.radiusA * Math.tan(data.slopeB);
     const heightA = distFromBToExtB + data.height;
     const heightB = distFromBToExtB;
-    (groups.GeneralCylinder as GeneralCylinderGroup).add(data.nodeId, data.treeIndex, data.diagonalSize, globalExtA, globalExtB,
+    (groups.GeneralCylinder as GeneralCylinderGroup).add(data.nodeId, data.treeIndex, data.diagonalSize,
+      globalExtA, globalExtB,
       data.radiusA - data.thickness, heightA, heightB, data.slopeA, data.slopeB, data.zAngleA,
       data.zAngleB, data.rotationAngle, data.arcAngle, filterOptions);
 }
