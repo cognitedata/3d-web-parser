@@ -3,7 +3,7 @@
 import { unpackInstancedMeshes, unpackMergedMeshes, unpackPrimitives } from './unpackGeometry/main';
 import Sector from '../../Sector';
 import CustomFileReader from './CustomFileReader';
-import SceneStats from '../../SceneStats';
+import { SceneStats, createSceneStats }  from '../../SceneStats';
 import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
 import { PerSectorCompressedData, UncompressedValues } from './sharedFileParserTypes';
 import { DataMaps, FilterOptions, ParseReturn } from '../parseUtils';
@@ -105,10 +105,7 @@ function unpackData(
   maps: DataMaps,
   filterOptions?: FilterOptions,
   ): ParseReturn {
-  const sceneStats: SceneStats = {
-    numInstancedMeshes: 0,
-    numMergedMeshes: 0,
-  };
+  const sceneStats = createSceneStats();
   unpackPrimitives(rootSector, uncompressedValues, compressedData, maps, filterOptions);
   const sectors = maps.idToSectorMap;
   const numberOfTreeIndices = Math.max(maps.treeIndexNodeIdMap.length, findLargestTreeIndexInMeshes(compressedData));
@@ -133,7 +130,13 @@ async function parseMeshes(
     mergeInstancedMeshes(sector, 2500, sceneStats, maps.treeIndexNodeIdMap);
     sector.mergedMeshGroup.createTreeIndexMap();
     sector.instancedMeshGroup.createTreeIndexMap();
+
+    sceneStats.numSectors++;
+    sector.primitiveGroups.forEach(primitiveGroup => {
+      sceneStats.geometryCount[primitiveGroup.type] += primitiveGroup.data.count;
+    });
   }
+  sceneStats.numNodes = maps.treeIndexNodeIdMap.length;
 
   for (let treeIndex = 0; treeIndex < maps.treeIndexNodeIdMap.length; treeIndex++) {
     const nodeId = maps.treeIndexNodeIdMap[treeIndex];

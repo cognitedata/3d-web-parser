@@ -79,6 +79,6 @@ export default function unpackInstancedMeshes(
       instancedMesh.addCollection(collections[fileId][triangleOffset]);
     });
     fileIdToSector[fileId].instancedMeshGroup.addMesh(instancedMesh);
-    sceneStats.numInstancedMeshes += 1;
+    sceneStats.geometryCount.InstancedMesh += 1;
   });
 }

@@ -3,6 +3,7 @@
 import * as THREE from 'three';
 import PrimitiveGroup from './PrimitiveGroup';
 import { FilterOptions } from '../parsers/parseUtils';
+import { GeometryType } from './Types';
 import GeometryGroupData from './GeometryGroupData';
 
 // reusable variables
@@ -10,8 +11,9 @@ const point = new THREE.Vector3();
 const vertex = new THREE.Vector3();
 
 export default class TrapeziumGroup extends PrimitiveGroup {
-
+  public type: GeometryType;
   public data: GeometryGroupData;
+
   constructor(capacity: number) {
     super(capacity);
     this.type = 'Trapezium';

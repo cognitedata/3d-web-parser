@@ -18,6 +18,7 @@ import TrapeziumGroup from './TrapeziumGroup';
 import { FilterOptions } from '../parsers/parseUtils';
 import { identityMatrix4 } from '../constants';
 import GeometryGroupData from './GeometryGroupData';
+import { GeometryType } from './Types';
 
 const matrix = new THREE.Matrix4();
 const globalBox = new THREE.Box3();
@@ -52,6 +53,7 @@ interface TreeIndexMap {
 }
 
 export default abstract class PrimitiveGroup extends GeometryGroup {
+  public abstract type: GeometryType;
   public capacity: number;
   public treeIndex: Float32Array;
   public treeIndexMap: TreeIndexMap;
