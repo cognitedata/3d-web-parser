@@ -49,7 +49,7 @@ function createCollection(
     const color = property.color != null ? property.color : { rgb: 0xff00ff };
     globalColor.setHex(color.rgb);
     parseInstancedMeshTransformMatrix(globalMatrix, transformMatrix);
-    // diagonal size is calculated later
+    // size is calculated later
     collection.addMapping(nodeId, treeIndex, 0, globalMatrix);
 
     data.treeIndexNodeIdMap[treeIndex] = nodeId;

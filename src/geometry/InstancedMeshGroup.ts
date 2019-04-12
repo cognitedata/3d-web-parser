@@ -19,7 +19,6 @@ export class InstancedMeshMappings {
   public transform1: Float32Array;
   public transform2: Float32Array;
   public transform3: Float32Array;
-
   public size: Float32Array;
 
   constructor(capacity: number) {
@@ -32,7 +31,6 @@ export class InstancedMeshMappings {
     this.transform1 = new Float32Array(3 * this.capacity);
     this.transform2 = new Float32Array(3 * this.capacity);
     this.transform3 = new Float32Array(3 * this.capacity);
-
     this.size = new Float32Array(this.capacity);
   }
 
