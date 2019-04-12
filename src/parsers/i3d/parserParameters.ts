@@ -20,25 +20,25 @@ import { addClosedEllipsoidSegment, addOpenEllipsoidSegment, addEllipsoid } from
 import { addClosedTorusSegment, addOpenTorusSegment, addTorus } from './unpackGeometry/Torus';
 import { addClosedSphericalSegment, addOpenSphericalSegment } from './unpackGeometry/SphericalSegment';
 
-export type filePrimitiveNameType = 'Box' | 'Circle' | 'ClosedCone' | 'ClosedCylinder' | 'ClosedEccentricCone' |
+export type FilePrimitiveNameType = 'Box' | 'Circle' | 'ClosedCone' | 'ClosedCylinder' | 'ClosedEccentricCone' |
   'ClosedEllipsoidSegment' | 'ClosedExtrudedRingSegment' | 'ClosedGeneralCylinder' | 'ClosedSphericalSegment' |
   'ClosedTorusSegment' | 'Ellipsoid' | 'ExtrudedRing' | 'Nut' | 'OpenCone' | 'OpenCylinder' | 'OpenEccentricCone' |
   'OpenEllipsoidSegment' | 'OpenExtrudedRingSegment' | 'OpenGeneralCylinder' | 'OpenSphericalSegment' |
   'OpenTorusSegment' | 'Ring' | 'Sphere' | 'Torus' | 'SolidOpenGeneralCylinder' | 'SolidClosedGeneralCylinder' |
   'OpenGeneralCone' | 'ClosedGeneralCone' | 'SolidOpenGeneralCone' | 'SolidClosedGeneralCone';
-export type fileMeshNameType = 'MergedMesh' | 'InstancedMesh';
-export type fileGeometryNameType = filePrimitiveNameType | fileMeshNameType;
+export type FileMeshNameType = 'MergedMesh' | 'InstancedMesh';
+export type FileGeometryNameType = FilePrimitiveNameType | FileMeshNameType;
 
-export const filePrimitiveNames: filePrimitiveNameType[] = ['Box', 'Circle', 'ClosedCone', 'ClosedCylinder',
+export const FilePrimitiveNames: FilePrimitiveNameType[] = ['Box', 'Circle', 'ClosedCone', 'ClosedCylinder',
   'ClosedEccentricCone', 'ClosedEllipsoidSegment', 'ClosedExtrudedRingSegment', 'ClosedGeneralCylinder',
   'ClosedSphericalSegment', 'ClosedTorusSegment', 'Ellipsoid', 'ExtrudedRing', 'Nut', 'OpenCone',
   'OpenCylinder', 'OpenEccentricCone', 'OpenEllipsoidSegment', 'OpenExtrudedRingSegment',
   'OpenGeneralCylinder', 'OpenSphericalSegment', 'OpenTorusSegment', 'Ring', 'Sphere', 'Torus',
   'SolidOpenGeneralCylinder', 'SolidClosedGeneralCylinder',
   'OpenGeneralCone', 'ClosedGeneralCone', 'SolidOpenGeneralCone', 'SolidClosedGeneralCone'];
-export const fileMeshNames: fileMeshNameType[] = ['MergedMesh', 'InstancedMesh'];
+export const FileMeshNames: FileMeshNameType[] = ['MergedMesh', 'InstancedMesh'];
 
-export const IdToFileGeometryName: {[id: number]: fileGeometryNameType} = {
+export const IdToFileGeometryName: {[id: number]: FileGeometryNameType} = {
   1: 'Box',
   2: 'Circle',
   3: 'ClosedCone',
@@ -76,21 +76,21 @@ export const IdToFileGeometryName: {[id: number]: fileGeometryNameType} = {
 export const BYTES_PER_NODE_ID = 7;
 export const DEFAULT_COLOR = new THREE.Color(0, 0, 100);
 
-export type filePropertyArrayNameType = 'color' | 'size'| 'centerX' | 'centerY' | 'centerZ'  |
+export type FilePropertyArrayNameType = 'color' | 'size'| 'centerX' | 'centerY' | 'centerZ'  |
   'normal' | 'delta' | 'height' | 'radius' | 'angle' | 'translationX' | 'translationY' | 'translationZ' |
   'scaleX' | 'scaleY' | 'scaleZ' | 'fileId';
-export const filePropertyArrayNames: filePropertyArrayNameType[] = ['color', 'size', 'centerX', 'centerY',
+export const FilePropertyArrayNames: FilePropertyArrayNameType[] = ['color', 'size', 'centerX', 'centerY',
   'centerZ', 'normal', 'delta', 'height', 'radius', 'angle', 'translationX', 'translationY', 'translationZ',
   'scaleX', 'scaleY', 'scaleZ', 'fileId'];
-export type filePropertyNames = 'treeIndex' | 'color' | 'center' | 'normal' | 'delta' | 'height' | 'radiusA' |
+export type FilePropertyNames = 'treeIndex' | 'color' | 'center' | 'normal' | 'delta' | 'height' | 'radiusA' |
   'radiusB' | 'rotationAngle' | 'capNormal' | 'thickness' | 'arcAngle' | 'slopeA' | 'slopeB' | 'zAngleA' | 'zAngleB' |
   'fileId' | 'triangleOffset' | 'translation' | 'rotation3' | 'scale' | 'triangleCount' | 'size';
-export const fileProperties: filePropertyNames[] = ['treeIndex', 'color', 'size', 'center', 'normal', 'delta',
+export const FileProperties: FilePropertyNames[] = ['treeIndex', 'color', 'size', 'center', 'normal', 'delta',
   'height', 'radiusA', 'radiusB', 'rotationAngle', 'capNormal', 'thickness', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA',
   'zAngleB', 'fileId'];
 
 // If adding new parameters, also update PropergeometryNameType
-export const fileGeometryProperties: {[name in fileGeometryNameType]: filePropertyNames[]} = {
+export const fileGeometryProperties: {[name in FileGeometryNameType]: FilePropertyNames[]} = {
   Box: ['treeIndex', 'color', 'size', 'center', 'normal', 'delta', 'rotationAngle'],
   Circle: ['treeIndex', 'color', 'size', 'center', 'normal', 'radiusA'],
   ClosedCone: ['treeIndex', 'color', 'size', 'center', 'normal', 'height', 'radiusA', 'radiusB'],
@@ -140,7 +140,7 @@ export const fileGeometryProperties: {[name in fileGeometryNameType]: fileProper
   'radiusB', 'thickness', 'rotationAngle', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB'],
 };
 
-export const renderedPrimitiveToAddFunction: {[name in filePrimitiveNameType]: Function} = {
+export const renderedPrimitiveToAddFunction: {[name in FilePrimitiveNameType]: Function} = {
   'Box': addBox,
   'Circle': addCircle,
   'ClosedCone': addClosedCone,
