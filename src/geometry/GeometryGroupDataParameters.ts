@@ -1,18 +1,18 @@
 // Copyright 2019 Cognite AS
 
-export type renderedPrimitiveNameType = 'Primitive' | 'Box' | 'Circle' | 'Cone' | 'EccentricCone' | 'EllipsoidSegment' |
+export type RenderedPrimitiveNameType = 'Primitive' | 'Box' | 'Circle' | 'Cone' | 'EccentricCone' | 'EllipsoidSegment' |
   'GeneralCylinder' | 'GeneralRing' | 'Nut' | 'Quad' | 'SphericalSegment' | 'TorusSegment' | 'Trapezium';
-export const renderedPrimitiveNames: renderedPrimitiveNameType[] = ['Box', 'Circle', 'Cone', 'EccentricCone',
+export const RenderedPrimitiveNames: RenderedPrimitiveNameType[] = ['Box', 'Circle', 'Cone', 'EccentricCone',
   'EllipsoidSegment', 'GeneralCylinder', 'GeneralRing', 'Nut', 'Quad', 'SphericalSegment', 'TorusSegment', 'Trapezium'];
 
-export type renderedPropertyNameType = 'nodeId' | 'treeIndex' | 'color' | 'size' | 'center' |
+export type RenderedPropertyNameType = 'nodeId' | 'treeIndex' | 'color' | 'size' | 'center' |
   'centerA' | 'centerB'| 'radius' | 'radiusA' |
   'radiusB' | 'hRadius' | 'vRadius' | 'normal' | 'angle' | 'delta' | 'arcAngle' | 'height' | 'heightA' | 'heightB' |
   'slopeA' | 'slopeB' | 'zAngleA' | 'zAngleB' | 'localXAxis' |
   'thickness' | 'transformMatrix' | 'triangleOffset' | 'rotationAngle' | 'triangleCount' | 'vertex1' | 'vertex2' |
   'vertex3' | 'vertex4' | 'planeA' | 'planeB' | 'capNormalA' | 'capNormalB' | 'localXAxis' | 'tubeRadius';
 
-export const primitiveProperties: { [name in renderedPrimitiveNameType]: renderedPropertyNameType[]} = {
+export const primitiveProperties: { [name in RenderedPrimitiveNameType]: RenderedPropertyNameType[]} = {
   Primitive: [],
   Box: ['size', 'center', 'normal', 'angle', 'delta'],
   Circle: ['size', 'center', 'normal', 'radiusA'],
@@ -30,7 +30,7 @@ export const primitiveProperties: { [name in renderedPrimitiveNameType]: rendere
   Trapezium: ['size', 'vertex1', 'vertex2', 'vertex3', 'vertex4'],
 };
 
-export const primitiveAttributes: { [name in renderedPrimitiveNameType]: renderedPropertyNameType[]} = {
+export const primitiveAttributes: { [name in RenderedPrimitiveNameType]: RenderedPropertyNameType[]} = {
   Primitive: [],
   Box: [],
   Circle: [],
@@ -46,13 +46,13 @@ export const primitiveAttributes: { [name in renderedPrimitiveNameType]: rendere
   Trapezium: ['vertex1', 'vertex2', 'vertex3', 'vertex4'],
 };
 
-export const float64Properties: renderedPropertyNameType[] = ['nodeId'];
-export const float32Properties: renderedPropertyNameType[] =
+export const float64Properties: RenderedPropertyNameType[] = ['nodeId'];
+export const float32Properties: RenderedPropertyNameType[] =
   ['treeIndex', 'radiusA', 'radiusB', 'angle', 'arcAngle', 'heightA', 'heightB', 'slopeA',
     'slopeB', 'zAngleA', 'zAngleB', 'thickness', 'triangleOffset', 'triangleCount', 'rotationAngle',
     'radius', 'tubeRadius', 'height', 'vRadius', 'hRadius', 'size'];
-export const vector3Properties: renderedPropertyNameType[] = ['centerA', 'centerB', 'normal', 'delta', 'localXAxis',
+export const vector3Properties: RenderedPropertyNameType[] = ['centerA', 'centerB', 'normal', 'delta', 'localXAxis',
   'vertex1', 'vertex2', 'vertex3', 'vertex4', 'capNormalA', 'capNormalB', 'center'];
-export const vector4Properties: renderedPropertyNameType[] = ['planeA', 'planeB'];
-export const colorProperties: renderedPropertyNameType[] = ['color'];
-export const matrix4Properties: renderedPropertyNameType[] = ['transformMatrix'];
+export const vector4Properties: RenderedPropertyNameType[] = ['planeA', 'planeB'];
+export const colorProperties: RenderedPropertyNameType[] = ['color'];
+export const matrix4Properties: RenderedPropertyNameType[] = ['transformMatrix'];

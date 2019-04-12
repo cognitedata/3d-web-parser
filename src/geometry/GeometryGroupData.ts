@@ -1,12 +1,12 @@
 // Copyright 2019 Cognite AS
 
 import { float64Properties, float32Properties, vector3Properties, matrix4Properties,
-  renderedPrimitiveNameType, primitiveProperties, renderedPropertyNameType, colorProperties, vector4Properties,
+  RenderedPrimitiveNameType, primitiveProperties, RenderedPropertyNameType, colorProperties, vector4Properties,
   primitiveAttributes }
   from './GeometryGroupDataParameters';
 import * as THREE from 'three';
 
-function getAttributeItemSize(property: renderedPropertyNameType): number {
+function getAttributeItemSize(property: RenderedPropertyNameType): number {
   if (float32Properties.indexOf(property) !== -1) {
     return 1;
   } else if (vector3Properties.indexOf(property) !== -1) {
@@ -21,12 +21,12 @@ function getAttributeItemSize(property: renderedPropertyNameType): number {
 }
 
 export default class GeometryGroupData {
-  type: renderedPrimitiveNameType;
+  type: RenderedPrimitiveNameType;
   count: number;
   capacity: number;
   public arrays: {[name: string]: Float64Array | Float32Array };
 
-  constructor(type: renderedPrimitiveNameType, capacity: number, attributesPointer: any) {
+  constructor(type: RenderedPrimitiveNameType, capacity: number, attributesPointer: any) {
     this.type = type;
     this.count = 0;
     this.capacity = capacity;
@@ -59,35 +59,35 @@ export default class GeometryGroupData {
     });
   }
 
-  setNumber(property: renderedPropertyNameType, value: number, index: number) {
+  setNumber(property: RenderedPropertyNameType, value: number, index: number) {
     this.arrays[property][index] = value;
   }
 
-  setVector3(property: renderedPropertyNameType, value: THREE.Vector3, index: number) {
+  setVector3(property: RenderedPropertyNameType, value: THREE.Vector3, index: number) {
     this.arrays[property][3 * index] = value.x;
     this.arrays[property][3 * index + 1] = value.y;
     this.arrays[property][3 * index + 2] = value.z;
   }
 
-  setVector4(property: renderedPropertyNameType, value: THREE.Vector4, index: number) {
+  setVector4(property: RenderedPropertyNameType, value: THREE.Vector4, index: number) {
     this.arrays[property][4 * index] = value.x;
     this.arrays[property][4 * index + 1] = value.y;
     this.arrays[property][4 * index + 2] = value.z;
     this.arrays[property][4 * index + 3] = value.w;
   }
 
-  getNumber(property: renderedPropertyNameType, index: number): number {
+  getNumber(property: RenderedPropertyNameType, index: number): number {
     return this.arrays[property][index];
   }
 
-  getVector3(property: renderedPropertyNameType, target: THREE.Vector3, index: number): THREE.Vector3 {
+  getVector3(property: RenderedPropertyNameType, target: THREE.Vector3, index: number): THREE.Vector3 {
     target.x = this.arrays[property][3 * index];
     target.y = this.arrays[property][3 * index + 1];
     target.z = this.arrays[property][3 * index + 2];
     return target;
   }
 
-  getVector4(property: renderedPropertyNameType, target: THREE.Vector4, index: number): THREE.Vector4 {
+  getVector4(property: RenderedPropertyNameType, target: THREE.Vector4, index: number): THREE.Vector4 {
     target.x = this.arrays[property][4 * index];
     target.y = this.arrays[property][4 * index + 1];
     target.z = this.arrays[property][4 * index + 2];
@@ -101,7 +101,7 @@ export default class GeometryGroupData {
         throw Error('Property ' + (property as string) + ' is not present on groups with type ' +
           (this.type as string) + '. See primitiveProperties in GeometryGroupDataParameters.ts');
       }
-      const name = property as renderedPropertyNameType;
+      const name = property as RenderedPropertyNameType;
       if (float64Properties.indexOf(name) !== -1 || float32Properties.indexOf(name) !== -1)  {
         this.setNumber(name, properties[property], this.count);
       } else if (vector3Properties.indexOf(name) !== -1) {
@@ -132,7 +132,7 @@ export default class GeometryGroupData {
   getPropertiesAsObject(index: number) {
     const data: {[name: string]: any} = {};
     Object.keys(this.arrays).forEach(property => {
-      const name = property as renderedPropertyNameType;
+      const name = property as RenderedPropertyNameType;
       if (float64Properties.indexOf(name) !== -1 || float32Properties.indexOf(name) !== -1)  {
         data[property] = this.getNumber(name, index);
       } else if (vector3Properties.indexOf(name) !== -1) {
