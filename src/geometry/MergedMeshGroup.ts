@@ -44,7 +44,6 @@ export class MergedMeshMappings {
   public transform1: Float32Array[];
   public transform2: Float32Array[];
   public transform3: Float32Array[];
-
   public diagonalSize: Float32Array;
 
   constructor(capacity: number) {
@@ -57,7 +56,6 @@ export class MergedMeshMappings {
     this.transform1 = []; this.transform1.length = capacity;
     this.transform2 = []; this.transform2.length = capacity;
     this.transform3 = []; this.transform3.length = capacity;
-
     this.diagonalSize = new Float32Array(this.capacity);
   }
 
