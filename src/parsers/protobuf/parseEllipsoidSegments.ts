@@ -66,7 +66,7 @@ export default function parse(args: ParseData): boolean {
       height = primitiveInfo.height;
     }
 
-    const size = Math.sqrt((2 * primitiveInfo.radius) ** 2 + height ** 2);
+    const size = Math.sqrt((2 * horizontalRadius) ** 2 + height ** 2);
 
     const added = group.add(
       nodeId,
