@@ -83,10 +83,6 @@ describe('customFileIntegrationTest', () => {
     }
     const compressedPrimitiveData = fileReader.readCompressedGeometryData(fileBuffer.byteLength).primitives;
 
-    // TODO(verkhovskaya): Get a better file for testing this
-    // Check that the sector has geometries. If it doesn't, run this test on a different file.
-    // expect(compressedPrimitiveData!.length).toBeGreaterThan(0);
-
     compressedPrimitiveData.forEach(compressedPrimitive => {
       expect((filePrimitiveNames).indexOf(compressedPrimitive.type as filePrimitiveNameType)).not.toBe(-1);
       expect(compressedPrimitive.nodeIds).toBeDefined();

@@ -61,7 +61,7 @@ export default class GeneralCylinderGroup extends PrimitiveGroup {
   add(
     nodeId: number,
     treeIndex: number,
-    diagonalSize: number,
+    size: number,
     centerA: THREE.Vector3,
     centerB: THREE.Vector3,
     radius: number,
@@ -101,7 +101,7 @@ export default class GeneralCylinderGroup extends PrimitiveGroup {
     localXAxis.copy(xAxis).applyQuaternion(globalRotation);
     this.setTreeIndex(treeIndex, this.data.count);
     this.data.add({
-      diagonalSize,
+      size,
       centerA,
       centerB,
       radiusA: radius,

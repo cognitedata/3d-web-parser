@@ -34,7 +34,7 @@ export default class TorusSegmentGroup extends PrimitiveGroup {
   add(
     nodeId: number,
     treeIndex: number,
-    diagonalSize: number,
+    size: number,
     center: THREE.Vector3,
     normal: THREE.Vector3,
     radius: number,
@@ -45,7 +45,7 @@ export default class TorusSegmentGroup extends PrimitiveGroup {
   ): boolean {
     this.setTreeIndex(treeIndex, this.data.count);
     this.data.add({
-      diagonalSize,
+      size,
       center,
       normal,
       radius,

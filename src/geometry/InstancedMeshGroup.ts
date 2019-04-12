@@ -178,7 +178,6 @@ export class InstancedMeshCollection {
   triangleOffset: number;
   triangleCount: number;
   geometry?: THREE.InstancedBufferGeometry;
-  geometrySizes?: Float32Array;
   mappings: InstancedMeshMappings;
   constructor(triangleOffset: number, triangleCount: number, capacity: number) {
     this.triangleOffset = triangleOffset;

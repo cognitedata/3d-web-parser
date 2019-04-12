@@ -33,7 +33,7 @@ export default class QuadGroup extends PrimitiveGroup {
   add(
     nodeId: number,
     treeIndex: number,
-    diagonalSize: number,
+    size: number,
     vertex1: THREE.Vector3,
     vertex2: THREE.Vector3,
     vertex3: THREE.Vector3,
@@ -41,7 +41,7 @@ export default class QuadGroup extends PrimitiveGroup {
   ): boolean {
     this.setTreeIndex(treeIndex, this.data.count);
     this.data.add({
-      diagonalSize,
+      size,
       vertex1,
       vertex2,
       vertex3,

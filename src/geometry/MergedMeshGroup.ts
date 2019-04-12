@@ -13,23 +13,23 @@ export class MergedMeshMappings {
     const capacity = mappings.reduce((sum, mapping) => sum + mapping.count, 0);
     const newMapping = new MergedMeshMappings(capacity);
     newMapping.count = capacity;
-    let offset = 0;
+    let indexOffset = 0;
     let globalTriangleOffset = 0;
     mappings.forEach(mapping => {
       for (let i = 0; i < mapping.count; i++) {
         mapping.triangleOffsets[i] += globalTriangleOffset;
       }
-      newMapping.triangleOffsets.set(mapping.triangleOffsets, offset);
-      newMapping.triangleCounts.set(mapping.triangleCounts, offset);
-      newMapping.treeIndex.set(mapping.treeIndex, offset);
+      newMapping.triangleOffsets.set(mapping.triangleOffsets, indexOffset);
+      newMapping.triangleCounts.set(mapping.triangleCounts, indexOffset);
+      newMapping.treeIndex.set(mapping.treeIndex, indexOffset);
       for (let i = 0; i < mapping.count; i++) {
-        newMapping.transform0[offset + i] = mapping.transform0[i];
-        newMapping.transform1[offset + i] = mapping.transform1[i];
-        newMapping.transform2[offset + i] = mapping.transform2[i];
-        newMapping.transform3[offset + i] = mapping.transform3[i];
+        newMapping.transform0[indexOffset + i] = mapping.transform0[i];
+        newMapping.transform1[indexOffset + i] = mapping.transform1[i];
+        newMapping.transform2[indexOffset + i] = mapping.transform2[i];
+        newMapping.transform3[indexOffset + i] = mapping.transform3[i];
         globalTriangleOffset += mapping.triangleCounts[i];
       }
-      offset += mapping.count;
+      indexOffset += mapping.count;
     });
     return newMapping;
   }

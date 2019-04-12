@@ -22,7 +22,7 @@ function countMappingsToMerge(collections: InstancedMeshCollection[]) {
   return numMappings;
 }
 
-export default function optimizeMeshes(
+export default function mergeInstancedMeshes(
   rootSector: Sector,
   sceneStats: SceneStats,
   treeIndexNodeIdMap: TreeIndexNodeIdMap) {

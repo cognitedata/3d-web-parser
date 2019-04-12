@@ -27,7 +27,7 @@ export interface CompressedGeometryData {
 export interface UncompressedValues {
   [propertyName: string]: THREE.Color[] | THREE.Vector3[] | number[] | undefined;
   color?: THREE.Color[];
-  diagonalSize?: number[];
+  size?: number[];
   normal?: THREE.Vector3[];
   centerX?: number[];
   centerY?: number[];
