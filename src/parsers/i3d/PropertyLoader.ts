@@ -10,7 +10,7 @@ export default class PropertyLoader {
 
   public treeIndex = 0;
   public color = new THREE.Color();
-  public diagonalSize = 0;
+  public size = 0;
   public center = new THREE.Vector3();
   public normal = new THREE.Vector3();
   public delta = new THREE.Vector3();
@@ -90,8 +90,8 @@ export default class PropertyLoader {
     'triangleCount':  (indices: FibonacciDecoder) => { this.triangleCount                = indices.nextValue() ; },
     'thickness':      (indices: FibonacciDecoder) => { this.thickness = this.values.radius![indices.nextValue()]; },
     'fileId':         (indices: FibonacciDecoder) => { this.fileId    = this.values.fileId![indices.nextValue()]; },
-    'diagonalSize':   (indices: FibonacciDecoder) => {
-      this.diagonalSize = this.values.diagonalSize![indices.nextValue()]; },
+    'size':   (indices: FibonacciDecoder) => {
+      this.size = this.values.size![indices.nextValue()]; },
   };
 
   constructor(uncompressedValues: UncompressedValues) {

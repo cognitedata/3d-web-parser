@@ -79,11 +79,11 @@ function parseRing(primitiveInfo: any,
 
   globalLocalXAxis.copy(xAxis).applyQuaternion(globalRotation.setFromUnitVectors(zAxis, globalNormal));
 
-  const diagonalSize = Math.sqrt((2 * outerRadius) ** 2 + globalCenterA.distanceTo(globalCenterB) ** 2);
+  const size = Math.sqrt((2 * outerRadius) ** 2 + globalCenterA.distanceTo(globalCenterB) ** 2);
 
   return group.add(nodeId,
             treeIndex,
-            diagonalSize,
+            size,
             globalCenter,
             globalNormal,
             globalLocalXAxis,
@@ -119,12 +119,12 @@ function parseCone(primitiveInfo: any,
   } = primitiveInfo;
 
   const radius = Math.max(radiusA, radiusB);
-  const diagonalSize = Math.sqrt((2 * radius) ** 2 + globalCenterA.distanceTo(globalCenterB) ** 2);
+  const size = Math.sqrt((2 * radius) ** 2 + globalCenterA.distanceTo(globalCenterB) ** 2);
 
-  let added = group.add(nodeId, treeIndex, diagonalSize, globalCenterA,
+  let added = group.add(nodeId, treeIndex, size, globalCenterA,
             globalCapZAxis, globalCapXAxis, radiusA,
             radiusA, thickness, angle, arcAngle, filterOptions);
-  added = group.add(nodeId, treeIndex, diagonalSize, globalCenterB,
+  added = group.add(nodeId, treeIndex, size, globalCenterB,
             globalCapZAxis, globalCapXAxis, radiusB,
             radiusB, thickness, angle, arcAngle, filterOptions) || added;
 
@@ -153,11 +153,11 @@ function parseExtrudedRing(primitiveInfo: any,
   globalRotation.setFromUnitVectors(zAxis, globalNormal);
   globalCapXAxis.copy(xAxis).applyQuaternion(globalRotation);
 
-  const diagonalSize = Math.sqrt((2 * outerRadius) ** 2 + globalCenterA.distanceTo(globalCenterB) ** 2);
+  const size = Math.sqrt((2 * outerRadius) ** 2 + globalCenterA.distanceTo(globalCenterB) ** 2);
 
   let added = group.add(nodeId,
             treeIndex,
-            diagonalSize,
+            size,
             globalCenterA,
             globalNormal,
             globalCapXAxis,
@@ -169,7 +169,7 @@ function parseExtrudedRing(primitiveInfo: any,
             filterOptions);
   added = group.add(nodeId,
               treeIndex,
-              diagonalSize,
+              size,
               globalCenterB,
               globalNormal,
               globalCapXAxis,
@@ -273,10 +273,10 @@ function parseGeneralCylinder(primitiveInfo: any,
     const capAngleAxis = globalVertex.sub(center).normalize();
     const capAngle = angleBetweenVector3s(capAngleAxis, capXAxis, normal);
 
-    const diagonalSize = Math.sqrt((2 * radius) ** 2 + globalCenterA.distanceTo(globalCenterB) ** 2);
+    const size = Math.sqrt((2 * radius) ** 2 + globalCenterA.distanceTo(globalCenterB) ** 2);
 
     if (thickness > 0) {
-      added = group.add(nodeId, treeIndex, diagonalSize, center, normal,
+      added = group.add(nodeId, treeIndex, size, center, normal,
                 capXAxis, radius / Math.abs(Math.cos(slope)),
                 radius, thickness, normalizeRadians(capAngle), arcAngle, filterOptions) || added;
     }

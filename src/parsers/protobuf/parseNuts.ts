@@ -58,12 +58,12 @@ export default function parse(args: ParseData): boolean {
     centerB.set(x, y, z);
     const { radius = 0, rotationAngle = 0 } = primitiveInfo;
 
-    const diagonalSize = Math.sqrt((2 * radius) ** 2 + centerA.distanceTo(centerB) ** 2);
+    const size = Math.sqrt((2 * radius) ** 2 + centerA.distanceTo(centerB) ** 2);
 
     const added = group.add(
       nodeId,
       treeIndex,
-      diagonalSize,
+      size,
       centerA,
       centerB,
       radius,

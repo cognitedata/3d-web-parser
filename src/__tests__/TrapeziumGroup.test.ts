@@ -64,9 +64,9 @@ describe('TrapeziumGroup', () => {
     const vertex2 = new THREE.Vector3(10.112, 21.5, 40.5);
     const vertex3 = new THREE.Vector3(5.1, 221.5, 33.5);
     const vertex4 = new THREE.Vector3(3.1, 22.5, 330.5);
-    const diagonalSize = (vertex4.distanceTo(vertex2) + vertex1.distanceTo(vertex3)) / 2;
+    const size = (vertex4.distanceTo(vertex2) + vertex1.distanceTo(vertex3)) / 2;
 
-    group.add(nodeId, treeIndex, diagonalSize, vertex1, vertex2, vertex3, vertex4);
+    group.add(nodeId, treeIndex, size, vertex1, vertex2, vertex3, vertex4);
     const targetVector = new THREE.Vector3();
 
     expect(group.data.count).toBe(1);

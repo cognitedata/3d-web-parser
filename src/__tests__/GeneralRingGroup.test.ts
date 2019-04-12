@@ -71,9 +71,9 @@ describe('GeneralRingGroup', () => {
     const thickness = 3.0;
     const angle = 4.0;
     const arcAngle = 5.0;
-    const diagonalSize = Math.sqrt((2 * yRadius) ** 2 + (2 * yRadius));
+    const size = Math.sqrt((2 * yRadius) ** 2 + (2 * yRadius));
 
-    group.add(nodeId, treeIndex, diagonalSize, center, normal, localXAxis, xRadius, yRadius,
+    group.add(nodeId, treeIndex, size, center, normal, localXAxis, xRadius, yRadius,
       thickness, angle, arcAngle);
     const targetVector = new THREE.Vector3();
     const targetColor = new THREE.Color();

@@ -63,7 +63,7 @@ export default function unpackInstancedMeshes(
         matrix.multiply(rotation.makeRotationAxis(xAxis, data.rotation3.x));
         matrix.scale(data.scale);
         collections[data.fileId][data.triangleOffset].addMapping(
-          data.nodeId, data.treeIndex, data.diagonalSize, matrix);
+          data.nodeId, data.treeIndex, data.size, matrix);
       }
     }
 

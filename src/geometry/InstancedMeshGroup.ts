@@ -20,7 +20,7 @@ export class InstancedMeshMappings {
   public transform2: Float32Array;
   public transform3: Float32Array;
 
-  public diagonalSize: Float32Array;
+  public size: Float32Array;
 
   constructor(capacity: number) {
     this.count = 0;
@@ -33,7 +33,7 @@ export class InstancedMeshMappings {
     this.transform2 = new Float32Array(3 * this.capacity);
     this.transform3 = new Float32Array(3 * this.capacity);
 
-    this.diagonalSize = new Float32Array(this.capacity);
+    this.size = new Float32Array(this.capacity);
   }
 
   public removeIndices(indicesToRemove: IndexMap) {
@@ -67,14 +67,14 @@ export class InstancedMeshMappings {
   public add(
     nodeId: number,
     treeIndex: number,
-    diagonalSize: number,
+    size: number,
     transformMatrix?: THREE.Matrix4,
   ) {
     this.setTreeIndex(treeIndex, this.count);
     if (transformMatrix !== undefined) {
       this.setTransform(transformMatrix, this.count);
     }
-    this.setDiagonalSize(diagonalSize, this.count);
+    this.setSize(size, this.count);
     this.count += 1;
   }
 
@@ -82,8 +82,8 @@ export class InstancedMeshMappings {
     return this.treeIndex[index];
   }
 
-  public getDiagonalSize(index: number) {
-    return this.diagonalSize[index];
+  public getSize(index: number) {
+    return this.size[index];
   }
 
   public getTransformMatrix(target: THREE.Matrix4, index: number) {
@@ -116,9 +116,9 @@ export class InstancedMeshMappings {
     this.treeIndex = new Float32Array(capacity);
     this.treeIndex.set(tmp.subarray(0, this.count), 0);
 
-    tmp = this.diagonalSize;
-    this.diagonalSize = new Float32Array(capacity);
-    this.diagonalSize.set(tmp.subarray(0, this.count), 0);
+    tmp = this.size;
+    this.size = new Float32Array(capacity);
+    this.size.set(tmp.subarray(0, this.count), 0);
 
     tmp = this.transform0;
     this.transform0 = new Float32Array(3 * capacity);
@@ -145,7 +145,7 @@ export class InstancedMeshMappings {
     this.resize(newCapacity);
 
     this.treeIndex.set(otherMappings.treeIndex.subarray(0, otherMappings.count), this.count);
-    this.diagonalSize.set(otherMappings.diagonalSize.subarray(0, otherMappings.count), this.count);
+    this.size.set(otherMappings.size.subarray(0, otherMappings.count), this.count);
     this.transform0.set(otherMappings.transform0.subarray(0, 3 * otherMappings.count), 3 * this.count);
     this.transform1.set(otherMappings.transform1.subarray(0, 3 * otherMappings.count), 3 * this.count);
     this.transform2.set(otherMappings.transform2.subarray(0, 3 * otherMappings.count), 3 * this.count);
@@ -153,8 +153,8 @@ export class InstancedMeshMappings {
     this.count = newCapacity;
   }
 
-  public setDiagonalSize(value: number, index: number) {
-    this.diagonalSize[index] = value;
+  public setSize(value: number, index: number) {
+    this.size[index] = value;
   }
 
   private setTreeIndex(value: number, index: number) {
@@ -188,9 +188,9 @@ export class InstancedMeshCollection {
 
   addMapping(nodeId: number,
              treeIndex: number,
-             diagonalSize: number,
+             size: number,
              transformMatrix?: THREE.Matrix4) {
-    this.mappings.add(nodeId, treeIndex, diagonalSize, transformMatrix);
+    this.mappings.add(nodeId, treeIndex, size, transformMatrix);
   }
 }
 

@@ -74,12 +74,12 @@ export default function parse(args: ParseData): boolean {
     }
 
     const radius = Math.max(radiusA, radiusB);
-    const diagonalSize = Math.sqrt((2 * radius) ** 2 + centerA.distanceTo(centerB) ** 2);
+    const size = Math.sqrt((2 * radius) ** 2 + centerA.distanceTo(centerB) ** 2);
 
     const added = group.add(
       nodeId,
       treeIndex,
-      diagonalSize,
+      size,
       centerA,
       centerB,
       radiusA,

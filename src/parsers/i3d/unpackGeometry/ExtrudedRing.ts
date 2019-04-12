@@ -23,15 +23,15 @@ function addOpenExtrudedRingSegment(groups: {[name: string]: PrimitiveGroup}, da
   globalCenterB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
   globalXAxis.copy(xAxis).applyQuaternion(globalAxisRotation.setFromUnitVectors(zAxis, data.normal));
 
-  (groups.GeneralRing as GeneralRingGroup).add(data.nodeId, data.treeIndex, data.diagonalSize,
+  (groups.GeneralRing as GeneralRingGroup).add(data.nodeId, data.treeIndex, data.size,
     globalCenterA, data.normal, globalXAxis, data.radiusB, data.radiusB, data.radiusB - data.radiusA,
     data.rotationAngle, data.arcAngle, filterOptions);
-  (groups.GeneralRing as GeneralRingGroup).add(data.nodeId, data.treeIndex, data.diagonalSize,
+  (groups.GeneralRing as GeneralRingGroup).add(data.nodeId, data.treeIndex, data.size,
     globalCenterB, data.normal, globalXAxis, data.radiusB, data.radiusB, data.radiusB - data.radiusA,
     data.rotationAngle, data.arcAngle, filterOptions);
-  (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, data.diagonalSize, globalCenterA,
+  (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, data.size, globalCenterA,
     globalCenterB, data.radiusA, data.radiusA, data.rotationAngle, data.arcAngle, filterOptions);
-  (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, data.diagonalSize, globalCenterA,
+  (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, data.size, globalCenterA,
     globalCenterB, data.radiusB, data.radiusB, data.rotationAngle, data.arcAngle, filterOptions);
 }
 
@@ -49,7 +49,7 @@ function addClosedExtrudedRingSegment(groups: {[name: string]: PrimitiveGroup}, 
   globalVertex3.copy(globalVertex).multiplyScalar(data.radiusB).add(globalCenterB);
 
   (groups.Quad as QuadGroup).add(
-    data.nodeId, data.treeIndex, data.diagonalSize, globalVertex2, globalVertex1, globalVertex3, filterOptions);
+    data.nodeId, data.treeIndex, data.size, globalVertex2, globalVertex1, globalVertex3, filterOptions);
 
   // quad 2
   globalQuadNorm.copy(globalCenterA).sub(globalCenterB).normalize();
@@ -62,7 +62,7 @@ function addClosedExtrudedRingSegment(groups: {[name: string]: PrimitiveGroup}, 
 
   // Note that globalVertexes 2 and 1 are flipped
   (groups.Quad as QuadGroup).add(
-    data.nodeId, data.treeIndex, data.diagonalSize, globalVertex1, globalVertex2, globalVertex3, filterOptions);
+    data.nodeId, data.treeIndex, data.size, globalVertex1, globalVertex2, globalVertex3, filterOptions);
 }
 
 function addExtrudedRing(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader,

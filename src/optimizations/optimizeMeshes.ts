@@ -42,7 +42,7 @@ export default function optimizeMeshes(
           for (let i = 0; i < collection.mappings.count; i++) {
             const treeIndex = collection.mappings.getTreeIndex(i);
             const nodeId = treeIndexNodeIdMap[treeIndex];
-            const diagonalSize = collection.mappings.getDiagonalSize(i);
+            const size = collection.mappings.getSize(i);
             collection.mappings.getTransformMatrix(globalMatrix, i);
 
             mergedMesh.mappings.add(
@@ -50,7 +50,7 @@ export default function optimizeMeshes(
               collection.triangleCount,
               nodeId,
               treeIndex,
-              diagonalSize,
+              size,
               globalMatrix,
             );
           }

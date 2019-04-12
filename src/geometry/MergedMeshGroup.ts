@@ -45,7 +45,7 @@ export class MergedMeshMappings {
   public transform2: Float32Array[];
   public transform3: Float32Array[];
 
-  public diagonalSize: Float32Array;
+  public size: Float32Array;
 
   constructor(capacity: number) {
     this.count = 0;
@@ -58,7 +58,7 @@ export class MergedMeshMappings {
     this.transform2 = []; this.transform2.length = capacity;
     this.transform3 = []; this.transform3.length = capacity;
 
-    this.diagonalSize = new Float32Array(this.capacity);
+    this.size = new Float32Array(this.capacity);
   }
 
   public add(
@@ -66,7 +66,7 @@ export class MergedMeshMappings {
     triangleCount: number,
     nodeId: number,
     treeIndex: number,
-    diagonalSize: number,
+    size: number,
     transformMatrix?: THREE.Matrix4,
   ) {
     if (this.count + 1 > this.capacity) {
@@ -75,7 +75,7 @@ export class MergedMeshMappings {
     this.setTriangleOffset(triangleOffset, this.count);
     this.setTriangleCount(triangleCount, this.count);
     this.setTreeIndex(treeIndex, this.count);
-    this.setDiagonalSize(diagonalSize, this.count);
+    this.setSize(size, this.count);
     if (transformMatrix !== undefined) {
       this.setTransform(transformMatrix, this.count);
     }
@@ -117,8 +117,8 @@ export class MergedMeshMappings {
     return this.triangleOffsets[index];
   }
 
-  public getDiagonalSize(index: number) {
-    return this.diagonalSize[index];
+  public getSize(index: number) {
+    return this.size[index];
   }
 
   public removeIndices(indicesToRemove: IndexMap) {
@@ -152,8 +152,8 @@ export class MergedMeshMappings {
     this.treeIndex[index] = value;
   }
 
-  public setDiagonalSize(value: number, index: number) {
-    this.diagonalSize[index] = value;
+  public setSize(value: number, index: number) {
+    this.size[index] = value;
   }
 
   public setTransform(source: THREE.Matrix4, index: number) {
