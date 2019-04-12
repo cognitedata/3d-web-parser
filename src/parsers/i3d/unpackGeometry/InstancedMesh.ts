@@ -3,7 +3,7 @@
 import * as THREE from 'three';
 import { InstancedMesh, InstancedMeshCollection, InstancedMeshGroup } from '../../../geometry/InstancedMeshGroup';
 import { PerSectorCompressedData, UncompressedValues } from './../sharedFileParserTypes';
-import PropertyLoader from './../PropertyLoader';
+import PropertyLoader from '../PropertyLoader';
 import { xAxis, yAxis, zAxis } from '../../../constants';
 import SceneStats from '../../../SceneStats';
 import Sector from '../../../Sector';
