@@ -12,7 +12,7 @@ function createCircleGroup(): CircleGroup {
   const center = new THREE.Vector3(1, 2, 3);
   const normal = new THREE.Vector3(4, 5, 6);
   const radius = 10.0;
-  const diagonalSize = radius;
+  const diagonalSize = 2 * radius;
 
   group.add(nodeId, treeIndex, diagonalSize, center, normal, radius);
   return group;
