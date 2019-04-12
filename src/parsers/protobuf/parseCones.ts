@@ -82,9 +82,11 @@ export default function parse(args: ParseData): boolean {
 
     if (geometry.type === 'cylinder') {
       const { radius } = primitiveInfo;
+      const size = Math.sqrt((2 * radius) ** 2 + globalCenterA.distanceTo(globalCenterB) ** 2);
       added = group.add(
         nodeId,
         treeIndex,
+        size,
         globalCenterA,
         globalCenterB,
         radius,
@@ -95,9 +97,12 @@ export default function parse(args: ParseData): boolean {
     } else if (geometry.type === 'cone' || geometry.type === 'generalCylinder') {
       let { radiusA, radiusB } = primitiveInfo;
       const { angle = 0, arcAngle  = 2.0 * Math.PI, thickness = 0 } = primitiveInfo;
+      const radius = Math.max(radiusA, radiusB);
+      const size = Math.sqrt((2 * radius) ** 2 + globalCenterA.distanceTo(globalCenterB) ** 2);
       added = group.add(
         nodeId,
         treeIndex,
+        size,
         globalCenterA,
         globalCenterB,
         radiusA,
@@ -113,6 +118,7 @@ export default function parse(args: ParseData): boolean {
         added = group.add(
           nodeId,
           treeIndex,
+          size,
           globalCenterA,
           globalCenterB,
           radiusA,
@@ -123,9 +129,11 @@ export default function parse(args: ParseData): boolean {
       }
     } else if (geometry.type === 'extrudedRing' || geometry.type === 'extrudedRingSegment') {
       const { innerRadius, outerRadius, angle = 0, arcAngle = 2.0 * Math.PI } = primitiveInfo;
+      const size = Math.sqrt((2 * outerRadius) ** 2 + globalCenterA.distanceTo(globalCenterB) ** 2);
       added = group.add(
         nodeId,
         treeIndex,
+        size,
         globalCenterA,
         globalCenterB,
         innerRadius,
@@ -137,6 +145,7 @@ export default function parse(args: ParseData): boolean {
       added = group.add(
         nodeId,
         treeIndex,
+        size,
         globalCenterA,
         globalCenterB,
         outerRadius,

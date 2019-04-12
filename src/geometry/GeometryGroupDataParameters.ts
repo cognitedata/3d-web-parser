@@ -1,34 +1,36 @@
 // Copyright 2019 Cognite AS
 
-export type primitiveName = 'Primitive' | 'Box' | 'Circle' | 'Cone' | 'EccentricCone' | 'EllipsoidSegment' |
-'GeneralCylinder' |
-'GeneralRing' | 'Nut' | 'Quad' | 'SphericalSegment' | 'TorusSegment' | 'Trapezium';
-export type propertyName = 'nodeId' | 'treeIndex' | 'color' | 'center' | 'centerA' | 'centerB' | 'radius' | 'radiusA' |
-  'radiusB' |
-  'hRadius' | 'vRadius' | 'normal' | 'angle' | 'delta' | 'arcAngle' | 'height' | 'heightA' | 'heightB' | 'slopeA' |
-  'slopeB' | 'zAngleA' | 'zAngleB' | 'localXAxis' |
+export type RenderedPrimitiveNameType = 'Primitive' | 'Box' | 'Circle' | 'Cone' | 'EccentricCone' | 'EllipsoidSegment' |
+  'GeneralCylinder' | 'GeneralRing' | 'Nut' | 'Quad' | 'SphericalSegment' | 'TorusSegment' | 'Trapezium';
+export const RenderedPrimitiveNames: RenderedPrimitiveNameType[] = ['Box', 'Circle', 'Cone', 'EccentricCone',
+  'EllipsoidSegment', 'GeneralCylinder', 'GeneralRing', 'Nut', 'Quad', 'SphericalSegment', 'TorusSegment', 'Trapezium'];
+
+export type RenderedPropertyNameType = 'nodeId' | 'treeIndex' | 'color' | 'size' | 'center' |
+  'centerA' | 'centerB'| 'radius' | 'radiusA' |
+  'radiusB' | 'hRadius' | 'vRadius' | 'normal' | 'angle' | 'delta' | 'arcAngle' | 'height' | 'heightA' | 'heightB' |
+  'slopeA' | 'slopeB' | 'zAngleA' | 'zAngleB' | 'localXAxis' |
   'thickness' | 'transformMatrix' | 'triangleOffset' | 'rotationAngle' | 'triangleCount' | 'vertex1' | 'vertex2' |
   'vertex3' | 'vertex4' | 'planeA' | 'planeB' | 'capNormalA' | 'capNormalB' | 'localXAxis' | 'tubeRadius';
 
-export const primitiveProperties: { [name in primitiveName]: propertyName[]} = {
+export const primitiveProperties: { [name in RenderedPrimitiveNameType]: RenderedPropertyNameType[]} = {
   Primitive: [],
-  Box: ['center', 'normal', 'angle', 'delta'],
-  Circle: ['center', 'normal', 'radiusA'],
-  Cone: ['centerA', 'centerB', 'radiusA', 'radiusB', 'angle', 'arcAngle', 'localXAxis'],
-  EccentricCone: ['centerA', 'centerB', 'radiusA', 'radiusB', 'normal'],
-  EllipsoidSegment: ['center', 'normal', 'hRadius', 'vRadius', 'height'],
-  GeneralCylinder: ['centerA', 'centerB', 'radiusA', 'heightA', 'heightB', 'slopeA',
+  Box: ['size', 'center', 'normal', 'angle', 'delta'],
+  Circle: ['size', 'center', 'normal', 'radiusA'],
+  Cone: ['size', 'centerA', 'centerB', 'radiusA', 'radiusB', 'angle', 'arcAngle', 'localXAxis'],
+  EccentricCone: ['size', 'centerA', 'centerB', 'radiusA', 'radiusB', 'normal'],
+  EllipsoidSegment: ['size', 'center', 'normal', 'hRadius', 'vRadius', 'height'],
+  GeneralCylinder: ['size', 'centerA', 'centerB', 'radiusA', 'heightA', 'heightB', 'slopeA',
     'slopeB', 'zAngleA', 'zAngleB', 'angle', 'arcAngle', 'planeA', 'planeB', 'capNormalA', 'capNormalB', 'localXAxis'],
-  GeneralRing: ['center', 'normal', 'radiusA', 'radiusB', 'thickness',
-    'angle', 'arcAngle', 'localXAxis'],
-  Nut: ['centerA', 'centerB', 'radiusA', 'rotationAngle'],
-  Quad: ['vertex1', 'vertex2', 'vertex3'],
-  SphericalSegment: ['center', 'normal', 'hRadius', 'height'],
-  TorusSegment: ['center', 'normal', 'radius', 'tubeRadius', 'angle', 'arcAngle'],
-  Trapezium: ['vertex1', 'vertex2', 'vertex3', 'vertex4'],
+  GeneralRing: ['size', 'center', 'normal', 'radiusA', 'radiusB', 'thickness', 'angle',
+    'arcAngle', 'localXAxis'],
+  Nut: ['size', 'centerA', 'centerB', 'radiusA', 'rotationAngle'],
+  Quad: ['size', 'vertex1', 'vertex2', 'vertex3'],
+  SphericalSegment: ['size', 'center', 'normal', 'hRadius', 'height'],
+  TorusSegment: ['size', 'center', 'normal', 'radius', 'tubeRadius', 'angle', 'arcAngle'],
+  Trapezium: ['size', 'vertex1', 'vertex2', 'vertex3', 'vertex4'],
 };
 
-export const primitiveAttributeProperties: { [name in primitiveName]: propertyName[]} = {
+export const primitiveAttributes: { [name in RenderedPrimitiveNameType]: RenderedPropertyNameType[]} = {
   Primitive: [],
   Box: [],
   Circle: [],
@@ -44,45 +46,13 @@ export const primitiveAttributeProperties: { [name in primitiveName]: propertyNa
   Trapezium: ['vertex1', 'vertex2', 'vertex3', 'vertex4'],
 };
 
-export interface AddArgs {
-nodeId?: any;
-treeIndex?: any;
-color?: any;
-centerA?: any;
-centerB?: any;
-radiusA?: any;
-radiusB?: any;
-normal?: any;
-angle?: any;
-delta?: any;
-arcAngle?: any;
-heightA?: any;
-heightB?: any;
-slopeA?: any;
-slopeB?: any;
-zAngleA?: any;
-zAngleB?: any;
-localXAxis?: any;
-thickness?: any;
-transformMatrix?: any;
-triangleOffset?: any;
-rotationAngle?: any;
-triangleCount?: any;
-vertex1?: any;
-vertex2?: any;
-vertex3?: any;
-vertex4?: any;
-}
-
-export const float64Properties: propertyName[] = ['nodeId'];
-export const float32Properties: propertyName[] =
+export const float64Properties: RenderedPropertyNameType[] = ['nodeId'];
+export const float32Properties: RenderedPropertyNameType[] =
   ['treeIndex', 'radiusA', 'radiusB', 'angle', 'arcAngle', 'heightA', 'heightB', 'slopeA',
-   'slopeB', 'zAngleA', 'zAngleB', 'thickness', 'triangleOffset', 'triangleCount', 'rotationAngle',
-   'radius', 'tubeRadius', 'height', 'vRadius', 'hRadius'];
-export const vector3Properties: propertyName[] =
-  ['centerA', 'centerB', 'normal', 'delta', 'localXAxis', 'vertex1', 'vertex2', 'vertex3', 'vertex4',
-   'capNormalA', 'capNormalB', 'center'];
-export const vector4Properties: propertyName[] =
-  ['planeA', 'planeB'];
-export const colorProperties: propertyName[] = ['color'];
-export const matrix4Properties: propertyName[] = ['transformMatrix'];
+    'slopeB', 'zAngleA', 'zAngleB', 'thickness', 'triangleOffset', 'triangleCount', 'rotationAngle',
+    'radius', 'tubeRadius', 'height', 'vRadius', 'hRadius', 'size'];
+export const vector3Properties: RenderedPropertyNameType[] = ['centerA', 'centerB', 'normal', 'delta', 'localXAxis',
+  'vertex1', 'vertex2', 'vertex3', 'vertex4', 'capNormalA', 'capNormalB', 'center'];
+export const vector4Properties: RenderedPropertyNameType[] = ['planeA', 'planeB'];
+export const colorProperties: RenderedPropertyNameType[] = ['color'];
+export const matrix4Properties: RenderedPropertyNameType[] = ['transformMatrix'];

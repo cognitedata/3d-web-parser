@@ -4,6 +4,7 @@
 import * as THREE from 'three';
 
 import PrimitiveGroup from '../../geometry/PrimitiveGroup';
+import { RenderedPrimitiveNameType } from '../../geometry/GeometryGroupDataParameters';
 import { BoxGroup, CircleGroup, ConeGroup, EccentricConeGroup, GeneralCylinderGroup, GeneralRingGroup,
   NutGroup, QuadGroup, SphericalSegmentGroup, TorusSegmentGroup, TrapeziumGroup, EllipsoidSegmentGroup }
   from '../../geometry/GeometryGroups';
@@ -19,25 +20,25 @@ import { addClosedEllipsoidSegment, addOpenEllipsoidSegment, addEllipsoid } from
 import { addClosedTorusSegment, addOpenTorusSegment, addTorus } from './unpackGeometry/Torus';
 import { addClosedSphericalSegment, addOpenSphericalSegment } from './unpackGeometry/SphericalSegment';
 
-type primitiveNameType = 'Box' | 'Circle' | 'ClosedCone' | 'ClosedCylinder' | 'ClosedEccentricCone' |
+export type FilePrimitiveNameType = 'Box' | 'Circle' | 'ClosedCone' | 'ClosedCylinder' | 'ClosedEccentricCone' |
   'ClosedEllipsoidSegment' | 'ClosedExtrudedRingSegment' | 'ClosedGeneralCylinder' | 'ClosedSphericalSegment' |
   'ClosedTorusSegment' | 'Ellipsoid' | 'ExtrudedRing' | 'Nut' | 'OpenCone' | 'OpenCylinder' | 'OpenEccentricCone' |
   'OpenEllipsoidSegment' | 'OpenExtrudedRingSegment' | 'OpenGeneralCylinder' | 'OpenSphericalSegment' |
   'OpenTorusSegment' | 'Ring' | 'Sphere' | 'Torus' | 'SolidOpenGeneralCylinder' | 'SolidClosedGeneralCylinder' |
   'OpenGeneralCone' | 'ClosedGeneralCone' | 'SolidOpenGeneralCone' | 'SolidClosedGeneralCone';
-type meshNameType = 'MergedMesh' | 'InstancedMesh';
-export type geometryNameType = primitiveNameType | meshNameType;
+export type FileMeshNameType = 'MergedMesh' | 'InstancedMesh';
+export type FileGeometryNameType = FilePrimitiveNameType | FileMeshNameType;
 
-export const filePrimitiveNames: geometryNameType[] = ['Box', 'Circle', 'ClosedCone', 'ClosedCylinder',
+export const FilePrimitiveNames: FilePrimitiveNameType[] = ['Box', 'Circle', 'ClosedCone', 'ClosedCylinder',
   'ClosedEccentricCone', 'ClosedEllipsoidSegment', 'ClosedExtrudedRingSegment', 'ClosedGeneralCylinder',
   'ClosedSphericalSegment', 'ClosedTorusSegment', 'Ellipsoid', 'ExtrudedRing', 'Nut', 'OpenCone',
   'OpenCylinder', 'OpenEccentricCone', 'OpenEllipsoidSegment', 'OpenExtrudedRingSegment',
   'OpenGeneralCylinder', 'OpenSphericalSegment', 'OpenTorusSegment', 'Ring', 'Sphere', 'Torus',
   'SolidOpenGeneralCylinder', 'SolidClosedGeneralCylinder',
   'OpenGeneralCone', 'ClosedGeneralCone', 'SolidOpenGeneralCone', 'SolidClosedGeneralCone'];
-export const fileMeshNames: geometryNameType[] = ['MergedMesh', 'InstancedMesh'];
+export const FileMeshNames: FileMeshNameType[] = ['MergedMesh', 'InstancedMesh'];
 
-export const IdToFileGeometryName: {[id: number]: geometryNameType} = {
+export const IdToFileGeometryName: {[id: number]: FileGeometryNameType} = {
   1: 'Box',
   2: 'Circle',
   3: 'ClosedCone',
@@ -75,66 +76,71 @@ export const IdToFileGeometryName: {[id: number]: geometryNameType} = {
 export const BYTES_PER_NODE_ID = 7;
 export const DEFAULT_COLOR = new THREE.Color(0, 0, 100);
 
-export type filePropertyArrayNameType = 'color' | 'centerX' | 'centerY' | 'centerZ' | 'normal' | 'delta' | 'height' |
-  'radius' | 'angle' | 'translationX' | 'translationY' | 'translationZ' | 'scaleX' | 'scaleY' | 'scaleZ' | 'fileId';
-export const filePropertyArrayNames: filePropertyArrayNameType[] = ['color', 'centerX', 'centerY', 'centerZ', 'normal',
-  'delta', 'height', 'radius', 'angle', 'translationX', 'translationY', 'translationZ', 'scaleX', 'scaleY', 'scaleZ',
-  'fileId'];
-export type filePropertyNames = 'treeIndex' | 'color' | 'center' | 'normal' | 'delta' | 'height' | 'radiusA' |
+export type FilePropertyArrayNameType = 'color' | 'size'| 'centerX' | 'centerY' | 'centerZ'  |
+  'normal' | 'delta' | 'height' | 'radius' | 'angle' | 'translationX' | 'translationY' | 'translationZ' |
+  'scaleX' | 'scaleY' | 'scaleZ' | 'fileId';
+export const FilePropertyArrayNames: FilePropertyArrayNameType[] = ['color', 'size', 'centerX', 'centerY',
+  'centerZ', 'normal', 'delta', 'height', 'radius', 'angle', 'translationX', 'translationY', 'translationZ',
+  'scaleX', 'scaleY', 'scaleZ', 'fileId'];
+export type FilePropertyNames = 'treeIndex' | 'color' | 'center' | 'normal' | 'delta' | 'height' | 'radiusA' |
   'radiusB' | 'rotationAngle' | 'capNormal' | 'thickness' | 'arcAngle' | 'slopeA' | 'slopeB' | 'zAngleA' | 'zAngleB' |
-  'fileId' | 'triangleOffset' | 'translation' | 'rotation3' | 'scale' | 'triangleCount';
-export const fileProperties: filePropertyNames[] = ['treeIndex', 'color', 'center', 'normal', 'delta', 'height',
-  'radiusA', 'radiusB', 'rotationAngle', 'capNormal', 'thickness', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB',
-  'fileId'];
+  'fileId' | 'triangleOffset' | 'translation' | 'rotation3' | 'scale' | 'triangleCount' | 'size';
+export const FileProperties: FilePropertyNames[] = ['treeIndex', 'color', 'size', 'center', 'normal', 'delta',
+  'height', 'radiusA', 'radiusB', 'rotationAngle', 'capNormal', 'thickness', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA',
+  'zAngleB', 'fileId'];
 
 // If adding new parameters, also update PropergeometryNameType
-export const fileGeometryProperties: {[name in geometryNameType]: filePropertyNames[]} = {
-  Box: ['treeIndex', 'color', 'center', 'normal', 'delta', 'rotationAngle'],
-  Circle: ['treeIndex', 'color', 'center', 'normal', 'radiusA'],
-  ClosedCone: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB'],
-  ClosedCylinder: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA'],
-  ClosedEccentricCone: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB', 'capNormal'],
-  ClosedEllipsoidSegment: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB'],
-  ClosedExtrudedRingSegment: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB',
+export const fileGeometryProperties: {[name in FileGeometryNameType]: FilePropertyNames[]} = {
+  Box: ['treeIndex', 'color', 'size', 'center', 'normal', 'delta', 'rotationAngle'],
+  Circle: ['treeIndex', 'color', 'size', 'center', 'normal', 'radiusA'],
+  ClosedCone: ['treeIndex', 'color', 'size', 'center', 'normal', 'height', 'radiusA', 'radiusB'],
+  ClosedCylinder: ['treeIndex', 'color', 'size', 'center', 'normal', 'height', 'radiusA'],
+  ClosedEccentricCone: ['treeIndex', 'color', 'size', 'center', 'normal', 'height', 'radiusA',
+    'radiusB', 'capNormal'],
+  ClosedEllipsoidSegment: ['treeIndex', 'color', 'size', 'center', 'normal', 'height', 'radiusA', 'radiusB'],
+  ClosedExtrudedRingSegment: ['treeIndex', 'color', 'size', 'center', 'normal', 'height', 'radiusA', 'radiusB',
     'rotationAngle', 'arcAngle'],
-  ClosedSphericalSegment: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA'],
-  ClosedTorusSegment: ['treeIndex', 'color', 'center', 'normal', 'radiusA', 'radiusB', 'rotationAngle', 'arcAngle'],
-  Ellipsoid: ['treeIndex', 'color', 'center', 'normal', 'radiusA', 'radiusB'],
-  ExtrudedRing: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB'],
-  Nut: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'rotationAngle'],
-  OpenCone: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB'],
-  OpenCylinder: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA'],
-  OpenEccentricCone: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB', 'capNormal'],
-  OpenEllipsoidSegment: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB'],
-  OpenExtrudedRingSegment: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB',
+  ClosedSphericalSegment: ['treeIndex', 'color', 'size', 'center', 'normal', 'height', 'radiusA'],
+  ClosedTorusSegment: ['treeIndex', 'color', 'size', 'center', 'normal', 'radiusA', 'radiusB',
     'rotationAngle', 'arcAngle'],
-  OpenSphericalSegment: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA'],
-  OpenTorusSegment: ['treeIndex', 'color', 'center', 'normal', 'radiusA', 'radiusB', 'rotationAngle', 'arcAngle'],
-  Ring: ['treeIndex', 'color', 'center', 'normal', 'radiusA', 'radiusB'],
-  Sphere: ['treeIndex', 'color', 'center', 'radiusA'],
-  Torus: ['treeIndex', 'color', 'center', 'normal', 'radiusA', 'radiusB'],
-  MergedMesh: ['treeIndex', 'fileId', 'triangleCount', 'color'],
-  InstancedMesh: ['treeIndex', 'fileId', 'triangleOffset', 'triangleCount', 'color', 'translation', 'rotation3',
-  'scale'],
-  OpenGeneralCylinder: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA',
+  Ellipsoid: ['treeIndex', 'color', 'size', 'center', 'normal', 'radiusA', 'radiusB'],
+  ExtrudedRing: ['treeIndex', 'color', 'size', 'center', 'normal', 'height', 'radiusA', 'radiusB'],
+  Nut: ['treeIndex', 'color', 'size', 'center', 'normal', 'height', 'radiusA', 'rotationAngle'],
+  OpenCone: ['treeIndex', 'color', 'size', 'center', 'normal', 'height', 'radiusA', 'radiusB'],
+  OpenCylinder: ['treeIndex', 'color', 'size', 'center', 'normal', 'height', 'radiusA'],
+  OpenEccentricCone: ['treeIndex', 'color', 'size', 'center', 'normal', 'height', 'radiusA',
+    'radiusB', 'capNormal'],
+  OpenEllipsoidSegment: ['treeIndex', 'color', 'size', 'center', 'normal', 'height', 'radiusA', 'radiusB'],
+  OpenExtrudedRingSegment: ['treeIndex', 'color', 'size', 'center', 'normal', 'height', 'radiusA', 'radiusB',
+    'rotationAngle', 'arcAngle'],
+  OpenSphericalSegment: ['treeIndex', 'color', 'size', 'center', 'normal', 'height', 'radiusA'],
+  OpenTorusSegment: ['treeIndex', 'color', 'size', 'center', 'normal', 'radiusA', 'radiusB',
+    'rotationAngle', 'arcAngle'],
+  Ring: ['treeIndex', 'color', 'size', 'center', 'normal', 'radiusA', 'radiusB'],
+  Sphere: ['treeIndex', 'color', 'size', 'center', 'radiusA'],
+  Torus: ['treeIndex', 'color', 'size', 'center', 'normal', 'radiusA', 'radiusB'],
+  MergedMesh: ['treeIndex', 'fileId', 'triangleCount', 'color', 'size'],
+  InstancedMesh: ['treeIndex', 'fileId', 'triangleOffset', 'triangleCount', 'color', 'size',
+  'translation', 'rotation3', 'scale'],
+  OpenGeneralCylinder: ['treeIndex', 'color', 'size', 'center', 'normal', 'height', 'radiusA',
   'rotationAngle', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB'],
-  ClosedGeneralCylinder: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA',
+  ClosedGeneralCylinder: ['treeIndex', 'color', 'size', 'center', 'normal', 'height', 'radiusA',
   'rotationAngle', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB'],
-  SolidOpenGeneralCylinder: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'thickness',
+  SolidOpenGeneralCylinder: ['treeIndex', 'color', 'size', 'center', 'normal', 'height', 'radiusA', 'thickness',
   'rotationAngle', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB'],
-  SolidClosedGeneralCylinder: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'thickness',
+  SolidClosedGeneralCylinder: ['treeIndex', 'color', 'size', 'center', 'normal', 'height',
+  'radiusA', 'thickness', 'rotationAngle', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB'],
+  OpenGeneralCone: ['treeIndex', 'color', 'size', 'center', 'normal', 'height', 'radiusA', 'radiusB',
   'rotationAngle', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB'],
-  OpenGeneralCone: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB',
+  ClosedGeneralCone: ['treeIndex', 'color', 'size', 'center', 'normal', 'height', 'radiusA', 'radiusB',
   'rotationAngle', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB'],
-  ClosedGeneralCone: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB',
-  'rotationAngle', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB'],
-  SolidOpenGeneralCone: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB', 'thickness',
-  'rotationAngle', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB'],
-  SolidClosedGeneralCone: ['treeIndex', 'color', 'center', 'normal', 'height', 'radiusA', 'radiusB', 'thickness',
-  'rotationAngle', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB'],
+  SolidOpenGeneralCone: ['treeIndex', 'color', 'size', 'center', 'normal', 'height', 'radiusA',
+  'radiusB', 'thickness', 'rotationAngle', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB'],
+  SolidClosedGeneralCone: ['treeIndex', 'color', 'size', 'center', 'normal', 'height', 'radiusA',
+  'radiusB', 'thickness', 'rotationAngle', 'arcAngle', 'slopeA', 'slopeB', 'zAngleA', 'zAngleB'],
 };
 
-export const renderedPrimitiveToAddFunction: {[name in primitiveNameType]: Function} = {
+export const renderedPrimitiveToAddFunction: {[name in FilePrimitiveNameType]: Function} = {
   'Box': addBox,
   'Circle': addCircle,
   'ClosedCone': addClosedCone,
@@ -167,13 +173,8 @@ export const renderedPrimitiveToAddFunction: {[name in primitiveNameType]: Funct
   'SolidClosedGeneralCone': addSolidClosedGeneralCone,
 };
 
-export type renderedPrimitiveNameType = 'Box' | 'Circle' | 'Cone' | 'EccentricCone' | 'EllipsoidSegment' |
-  'GeneralCylinder' | 'GeneralRing' | 'Nut' | 'Quad' | 'SphericalSegment' | 'TorusSegment' | 'Trapezium';
-export const renderedPrimitiveNames: renderedPrimitiveNameType[] = ['Box', 'Circle', 'Cone', 'EccentricCone',
-  'EllipsoidSegment', 'GeneralCylinder', 'GeneralRing', 'Nut', 'Quad', 'SphericalSegment', 'TorusSegment', 'Trapezium'];
-
 export const renderedPrimitivesPerFilePrimitive:
-  {[name: string]: {name: renderedPrimitiveNameType, count: number}[]} = {
+  {[name: string]: {name: RenderedPrimitiveNameType, count: number}[]} = {
   Box: [{ name: 'Box', count: 1 }],
   Circle: [{ name: 'Circle', count: 1 }],
   ClosedCone: [{ name: 'Circle', count: 2 }, { name: 'Cone', count: 1 }],

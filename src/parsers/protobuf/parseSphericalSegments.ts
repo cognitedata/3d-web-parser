@@ -67,7 +67,9 @@ export default function parse(args: ParseData): boolean {
       normal.set(0, -1, 0);
     }
 
-    const added = group.add(nodeId, treeIndex, center, normal, radius, height, filterOptions);
+    const size = Math.sqrt((2 * radius) ** 2 + height ** 2);
+
+    const added = group.add(nodeId, treeIndex, size, center, normal, radius, height, filterOptions);
     if (added) {
       treeIndexNodeIdMap[treeIndex] = nodeId;
       colorMap[treeIndex] = color.clone();

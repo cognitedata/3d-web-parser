@@ -16,7 +16,7 @@ SI.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1);
 const M = new THREE.Matrix4();
 const MT = new THREE.Matrix4();
 const boundingBoxCenter = new THREE.Vector3();
-const size = new THREE.Vector3();
+const sizeVector = new THREE.Vector3();
 const arr = new Array(16);
 
 // reusable variables
@@ -60,12 +60,12 @@ export function computeEllipsoidBoundingBox(
   const r34 = arr[11];
   const r44 = arr[15];
   boundingBoxCenter.set(r14 / r44, r24 / r44, r34 / r44);
-  size.set(
+  sizeVector.set(
     Math.abs(Math.sqrt(r14 * r14 - r44 * r11) / r44),
     Math.abs(Math.sqrt(r24 * r24 - r44 * r22) / r44),
     Math.abs(Math.sqrt(r34 * r34 - r44 * r33) / r44),
   );
-  box.setFromCenterAndSize(boundingBoxCenter, size);
+  box.setFromCenterAndSize(boundingBoxCenter, sizeVector);
 
   return box;
 }
@@ -84,6 +84,7 @@ export default class EllipsoidSegmentGroup extends PrimitiveGroup {
   add(
     nodeId: number,
     treeIndex: number,
+    size: number,
     center: THREE.Vector3,
     normal: THREE.Vector3,
     horizontalRadius: number,
@@ -93,6 +94,7 @@ export default class EllipsoidSegmentGroup extends PrimitiveGroup {
   ): boolean {
     this.setTreeIndex(treeIndex, this.data.count);
     this.data.add({
+      size,
       center,
       normal,
       hRadius: horizontalRadius,

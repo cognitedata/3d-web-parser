@@ -59,7 +59,7 @@ describe('MeshGroup', () => {
     let index = 0;
     // add first node mapping
     {
-      nodeMappings1.add(nodeIds[index], treeIndices[index], transformMatrices[index]);
+      nodeMappings1.add(nodeIds[index], treeIndices[index], 0, transformMatrices[index]);
       expect(nodeMappings1.count).toBe(index + 1);
       expect(nodeMappings1.capacity).toBe(capacity);
 
@@ -75,7 +75,7 @@ describe('MeshGroup', () => {
 
     // add second node mapping
     {
-      nodeMappings1.add(nodeIds[index], treeIndices[index], transformMatrices[index]);
+      nodeMappings1.add(nodeIds[index], treeIndices[index], 0, transformMatrices[index]);
       expect(nodeMappings1.count).toBe(index + 1);
       expect(nodeMappings1.capacity).toBe(capacity);
 
@@ -106,8 +106,8 @@ describe('MeshGroup', () => {
     {
       const nodeMappings2 = new InstancedMeshMappings(2);
 
-      nodeMappings2.add(nodeIds[2], treeIndices[2], transformMatrices[2]);
-      nodeMappings2.add(nodeIds[3], treeIndices[3], transformMatrices[3]);
+      nodeMappings2.add(nodeIds[2], treeIndices[2], 0, transformMatrices[2]);
+      nodeMappings2.add(nodeIds[3], treeIndices[3], 0, transformMatrices[3]);
       nodeMappings1.mergeWithMappings(nodeMappings2);
       expect(nodeMappings1.count).toBe(4);
       expect(nodeMappings1.capacity).toBe(4);

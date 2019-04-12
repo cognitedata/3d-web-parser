@@ -9,6 +9,31 @@ interface IndexMap { [s: number]: boolean; }
 const globalBox = new THREE.Box3();
 
 export class MergedMeshMappings {
+  public static concat(mappings: MergedMeshMappings[]) {
+    const capacity = mappings.reduce((sum, mapping) => sum + mapping.count, 0);
+    const newMapping = new MergedMeshMappings(capacity);
+    newMapping.count = capacity;
+    let indexOffset = 0;
+    let globalTriangleOffset = 0;
+    mappings.forEach(mapping => {
+      for (let i = 0; i < mapping.count; i++) {
+        mapping.triangleOffsets[i] += globalTriangleOffset;
+      }
+      newMapping.triangleOffsets.set(mapping.triangleOffsets, indexOffset);
+      newMapping.triangleCounts.set(mapping.triangleCounts, indexOffset);
+      newMapping.treeIndex.set(mapping.treeIndex, indexOffset);
+      for (let i = 0; i < mapping.count; i++) {
+        newMapping.transform0[indexOffset + i] = mapping.transform0[i];
+        newMapping.transform1[indexOffset + i] = mapping.transform1[i];
+        newMapping.transform2[indexOffset + i] = mapping.transform2[i];
+        newMapping.transform3[indexOffset + i] = mapping.transform3[i];
+        globalTriangleOffset += mapping.triangleCounts[i];
+      }
+      indexOffset += mapping.count;
+    });
+    return newMapping;
+  }
+
   public count: number;
   public capacity: number;
   public triangleOffsets: Uint32Array;
@@ -20,6 +45,8 @@ export class MergedMeshMappings {
   public transform2: Float32Array[];
   public transform3: Float32Array[];
 
+  public size: Float32Array;
+
   constructor(capacity: number) {
     this.count = 0;
     this.capacity = capacity;
@@ -30,6 +57,8 @@ export class MergedMeshMappings {
     this.transform1 = []; this.transform1.length = capacity;
     this.transform2 = []; this.transform2.length = capacity;
     this.transform3 = []; this.transform3.length = capacity;
+
+    this.size = new Float32Array(this.capacity);
   }
 
   public add(
@@ -37,6 +66,7 @@ export class MergedMeshMappings {
     triangleCount: number,
     nodeId: number,
     treeIndex: number,
+    size: number,
     transformMatrix?: THREE.Matrix4,
   ) {
     if (this.count + 1 > this.capacity) {
@@ -45,6 +75,7 @@ export class MergedMeshMappings {
     this.setTriangleOffset(triangleOffset, this.count);
     this.setTriangleCount(triangleCount, this.count);
     this.setTreeIndex(treeIndex, this.count);
+    this.setSize(size, this.count);
     if (transformMatrix !== undefined) {
       this.setTransform(transformMatrix, this.count);
     }
@@ -86,6 +117,10 @@ export class MergedMeshMappings {
     return this.triangleOffsets[index];
   }
 
+  public getSize(index: number) {
+    return this.size[index];
+  }
+
   public removeIndices(indicesToRemove: IndexMap) {
     let newIndex = 0;
     for (let i = 0; i < this.count; i++) {
@@ -117,11 +152,15 @@ export class MergedMeshMappings {
     this.treeIndex[index] = value;
   }
 
+  public setSize(value: number, index: number) {
+    this.size[index] = value;
+  }
+
   public setTransform(source: THREE.Matrix4, index: number) {
     const columns = [0, 1, 2, 3].map(columnIndex => {
       // @ts-ignore
       const transform = this[`transform${columnIndex}`];
-      return transform[this.count] = new Float32Array(3);
+      return transform[index] = new Float32Array(3);
     });
     let matrixIndex = 0;
     for (let columnIndex = 0; columnIndex < 4; ++columnIndex, ++matrixIndex) {
@@ -135,7 +174,6 @@ export class MergedMeshMappings {
 export class MergedMesh {
   mappings: MergedMeshMappings;
   fileId: number;
-  geometry?: THREE.BufferGeometry;
   treeIndexMap: { [s: number]: number; };
   createdByInstancedMesh: boolean;
   constructor(capacity: number, fileId: number, createdByInstancedMesh: boolean = false) {
@@ -157,8 +195,11 @@ interface TreeIndexMap {
 
 export class MergedMeshGroup extends GeometryGroup {
   public type: GeometryType;
-  public meshes: MergedMesh[];
-  public treeIndexMap: TreeIndexMap;
+  meshes: MergedMesh[];
+  treeIndexMap: TreeIndexMap;
+  geometry?: THREE.BufferGeometry;
+  geometrySizes?: Float32Array;
+
   constructor () {
     super();
     this.meshes = [];
@@ -199,11 +240,11 @@ export class MergedMeshGroup extends GeometryGroup {
       const mergedMesh = this.meshes[meshIndex];
 
       if (geometry == null) {
-        if (mergedMesh.geometry == null) {
+        if (this.geometry == null) {
           // Geometry may not be loaded yet, skip this geometry.
           return;
         }
-        geometry = mergedMesh.geometry;
+        geometry = this.geometry;
       }
 
       const triangleCount = mergedMesh.mappings.getTriangleCount(mappingIndex);

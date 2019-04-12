@@ -73,9 +73,13 @@ export default function parse(args: ParseData): boolean {
       normal.negate();
     }
 
+    const radius = Math.max(radiusA, radiusB);
+    const size = Math.sqrt((2 * radius) ** 2 + centerA.distanceTo(centerB) ** 2);
+
     const added = group.add(
       nodeId,
       treeIndex,
+      size,
       centerA,
       centerB,
       radiusA,

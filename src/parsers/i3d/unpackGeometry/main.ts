@@ -3,8 +3,9 @@
 import { PerSectorCompressedData, UncompressedValues, CompressedGeometryData }
   from './../sharedFileParserTypes';
 import PropertyLoader from './../PropertyLoader';
-import { renderedPrimitiveToAddFunction, renderedPrimitivesPerFilePrimitive, renderedPrimitiveToGroup,
-  renderedPrimitiveNames} from '../parserParameters';
+import { renderedPrimitiveToAddFunction, renderedPrimitivesPerFilePrimitive, renderedPrimitiveToGroup }
+  from '../parserParameters';
+import { RenderedPrimitiveNames } from '../../../geometry/GeometryGroupDataParameters';
 import unpackInstancedMeshes from './InstancedMesh';
 import unpackMergedMeshes from './MergedMesh';
 import { PrimitiveGroup } from '../../../geometry/GeometryGroups';
@@ -40,7 +41,7 @@ function countRenderedPrimitivesPerSectorAndChildren(
 ) {
   // Count rendered primitives in sector
   primitivesPerSectorAndChildren[sector.path] = {};
-  renderedPrimitiveNames.forEach(renderedPrimitive => {
+  RenderedPrimitiveNames.forEach(renderedPrimitive => {
     primitivesPerSectorAndChildren[sector.path][renderedPrimitive] = 0;
   });
 
@@ -57,7 +58,7 @@ function countRenderedPrimitivesPerSectorAndChildren(
       countRenderedPrimitivesPerSectorAndChildren(
         childSector, compressedData, primitivesPerSectorAndChildren);
     }
-    renderedPrimitiveNames.forEach(renderedPrimitive => {
+    RenderedPrimitiveNames.forEach(renderedPrimitive => {
       primitivesPerSectorAndChildren[sector.path][renderedPrimitive] +=
         primitivesPerSectorAndChildren[childSector.path][renderedPrimitive];
     });

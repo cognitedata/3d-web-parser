@@ -47,7 +47,7 @@ export default function unpackMergedMeshes(
 
         triangleOffsets[data.fileId] = triangleOffsets[data.fileId] ? triangleOffsets[data.fileId] : 0;
         mergedMeshes[data.fileId].mappings.add(
-          triangleOffsets[data.fileId], data.triangleCount, data.nodeId, data.treeIndex);
+          triangleOffsets[data.fileId], data.triangleCount, data.nodeId, data.treeIndex, data.size);
         triangleOffsets[data.fileId] += data.triangleCount;
       }
 

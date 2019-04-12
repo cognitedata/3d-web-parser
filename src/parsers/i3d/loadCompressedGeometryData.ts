@@ -9,7 +9,12 @@ export default function loadGeometryIndices(file: CustomFileReader, sectorEndLoc
 
   const geometryIndices: CompressedGeometryData[] = [];
   while (file.location < sectorEndLocation) {
-    const type = IdToFileGeometryName[file.readUint8()];
+    const typeId = file.readUint8();
+    const type = IdToFileGeometryName[typeId];
+    if (type === undefined) {
+      // This will happen if file type 4 is used
+      console.warn('Unknown typeId ', typeId);
+    }
     const count = file.readUint32();
     const attributeCount = file.readUint8();
     const byteCount = file.readUint32();

@@ -59,7 +59,9 @@ describe('TorusSegmentGroup', () => {
     const angle = 1.4;
     const arcAngle = 1.5;
 
-    group.add(nodeId, treeIndex, center, normal, radius, tubeRadius, angle, arcAngle);
+    const size = Math.sqrt((2 * radius) ** 2 + (2 * tubeRadius) ** 2);
+
+    group.add(nodeId, treeIndex, size, center, normal, radius, tubeRadius, angle, arcAngle);
 
     expect(group.data.count).toBe(1);
 

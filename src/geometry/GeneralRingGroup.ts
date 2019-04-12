@@ -33,6 +33,7 @@ export default class GeneralRingGroup extends PrimitiveGroup {
   add(
     nodeId: number,
     treeIndex: number,
+    size: number,
     center: THREE.Vector3,
     normal: THREE.Vector3,
     localXAxis: THREE.Vector3,
@@ -45,6 +46,7 @@ export default class GeneralRingGroup extends PrimitiveGroup {
   ): boolean {
     this.setTreeIndex(treeIndex, this.data.count);
     this.data.add({
+      size,
       center,
       normal,
       localXAxis,

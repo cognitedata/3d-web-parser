@@ -42,7 +42,6 @@ import { BoxGroup,
 import { SceneStats, createSceneStats } from '../../SceneStats';
 
 import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
-import { MergedMeshGroup } from '../../geometry/MergedMeshGroup';
 import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
 import { TreeIndexNodeIdMap, ColorMap } from '../parseUtils';
 import { GeometryType } from '../../geometry/Types';
@@ -161,8 +160,8 @@ export default async function parseProtobuf(
   }
 
   const rootSector = sectors['0/'];
+  mergeInstancedMeshes(rootSector, sceneStats, treeIndexNodeIdMap);
   for (const sector of rootSector.traverseSectors()) {
-    mergeInstancedMeshes(sector, 2500, sceneStats, treeIndexNodeIdMap);
     sector.mergedMeshGroup.createTreeIndexMap();
     sector.instancedMeshGroup.createTreeIndexMap();
 

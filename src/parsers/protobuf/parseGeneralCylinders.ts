@@ -117,13 +117,15 @@ export default function parse(args: ParseData): boolean {
       .multiplyScalar(-distFromBToExtB)
       .add(centerB);
 
-    added = group.add(nodeId, treeIndex, extA, extB,
+    const size = Math.sqrt((2 * radiusA) ** 2 + centerA.distanceTo(centerB) ** 2);
+
+    added = group.add(nodeId, treeIndex, size, extA, extB,
               radiusA, heightA,
               heightB, slopeA, slopeB, zAngleA, zAngleB,
               angle, arcAngle, filterOptions);
     if (thickness > 0) {
       if (thickness !== radiusA) {
-        added = group.add(nodeId, treeIndex, extA, extB,
+        added = group.add(nodeId, treeIndex, size, extA, extB,
                   radiusA - thickness, heightA,
                   heightB, slopeA, slopeB, zAngleA, zAngleB,
                   angle, arcAngle, filterOptions) || added;

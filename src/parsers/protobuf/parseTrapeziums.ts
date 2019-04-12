@@ -105,9 +105,11 @@ function parseCone(primitiveInfo: any,
         );
       });
     });
+    const size = (vertices[0].distanceTo(vertices[2]) + vertices[1].distanceTo(vertices[3])) / 2;
     added = group.add(
       nodeId,
       treeIndex,
+      size,
       vertices[0],
       vertices[1],
       vertices[2],
@@ -206,8 +208,12 @@ function parseGeneralCylinder(primitiveInfo: any,
       });
     });
 
+    const size = (globalVertices[0].distanceTo(globalVertices[2]) +
+      globalVertices[1].distanceTo(globalVertices[3])) / 2;
+
     added = group.add(nodeId,
       treeIndex,
+      size,
       globalVertices[0],
       globalVertices[1],
       globalVertices[2],

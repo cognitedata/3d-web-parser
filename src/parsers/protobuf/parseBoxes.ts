@@ -63,7 +63,8 @@ export default function parse(args: ParseData): boolean {
     delta.set(x, y, z);
 
     const { angle = 0 } = geometry.primitiveInfo.box;
-    const added = group.add(nodeId, treeIndex, center, normal, angle, delta, filterOptions);
+    const size = Math.sqrt(delta.x ** 2 + delta.y ** 2 + delta.z ** 2);
+    const added = group.add(nodeId, treeIndex, size, center, normal, angle, delta, filterOptions);
     if (added) {
       treeIndexNodeIdMap[treeIndex] = nodeId;
       colorMap[treeIndex] = color.clone();

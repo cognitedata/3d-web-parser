@@ -24,6 +24,7 @@ export default class TrapeziumGroup extends PrimitiveGroup {
   add(
     nodeId: number,
     treeIndex: number,
+    size: number,
     vertex1: THREE.Vector3,
     vertex2: THREE.Vector3,
     vertex3: THREE.Vector3,
@@ -32,6 +33,7 @@ export default class TrapeziumGroup extends PrimitiveGroup {
   ): boolean {
     this.setTreeIndex(treeIndex, this.data.count);
     this.data.add({
+      size,
       vertex1,
       vertex2,
       vertex3,

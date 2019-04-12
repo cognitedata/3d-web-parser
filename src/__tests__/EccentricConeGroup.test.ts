@@ -49,8 +49,9 @@ describe('EccentricConeGroup', () => {
     const radiusA = 100.0;
     const radiusB = 150.0;
     const normal = new THREE.Vector3(7, 8, 9);
+    const size = Math.sqrt((2 * radiusB) ** 2 + centerA.distanceTo(centerB) ** 2);
 
-    group.add(nodeId, treeIndex, centerA, centerB, radiusA, radiusB, normal);
+    group.add(nodeId, treeIndex, size, centerA, centerB, radiusA, radiusB, normal);
     const targetVector = new THREE.Vector3();
     const targetColor = new THREE.Color();
 

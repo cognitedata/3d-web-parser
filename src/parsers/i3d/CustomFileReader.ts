@@ -5,7 +5,7 @@ import loadUncompressedValues from './loadUncompressedValues';
 import loadCompressedGeometryData from './loadCompressedGeometryData';
 import FibonacciDecoder from '../FibonacciDecoder';
 import { NodeIdReader, CompressedGeometryData, SectorCompressedData } from './sharedFileParserTypes';
-import { filePrimitiveNames, BYTES_PER_NODE_ID, geometryNameType } from './parserParameters';
+import { FilePrimitiveNames, BYTES_PER_NODE_ID, FileGeometryNameType, FilePrimitiveNameType } from './parserParameters';
 
 export default class CustomFileReader {
   public location: number;
@@ -116,18 +116,18 @@ export default class CustomFileReader {
     let instancedMesh = undefined;
     let mergedMesh = undefined;
     geometryDataArray.forEach(geometryData => {
-      if (filePrimitiveNames.indexOf(geometryData.type) !== -1) {
+      if (FilePrimitiveNames.indexOf(geometryData.type as FilePrimitiveNameType) !== -1) {
         primitives.push(geometryData);
-      } else if (geometryData.type === 'InstancedMesh' as geometryNameType) {
+      } else if (geometryData.type === 'InstancedMesh' as FileGeometryNameType) {
         instancedMesh = geometryData;
-      } else if (geometryData.type === 'MergedMesh' as geometryNameType) {
+      } else if (geometryData.type === 'MergedMesh' as FileGeometryNameType) {
         mergedMesh = geometryData;
       } else {
-        throw Error('Unrecognized geometry data type ' + geometryData.type);
+        console.warn('Unrecognized geometry data type ' + geometryData.type);
       }
     });
     const primitiveHandlers = geometryDataArray.filter(geometryData => {
-      return (filePrimitiveNames.indexOf(geometryData.type as geometryNameType) !== -1); });
+      return (FilePrimitiveNames.indexOf(geometryData.type as FilePrimitiveNameType) !== -1); });
     return { primitives: primitiveHandlers, instancedMesh, mergedMesh };
   }
 

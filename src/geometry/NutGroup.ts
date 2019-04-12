@@ -33,6 +33,7 @@ export default class NutGroup extends PrimitiveGroup {
   add(
     nodeId: number,
     treeIndex: number,
+    size: number,
     centerA: THREE.Vector3,
     centerB: THREE.Vector3,
     radius: number,
@@ -41,6 +42,7 @@ export default class NutGroup extends PrimitiveGroup {
   ): boolean {
     this.setTreeIndex(treeIndex, this.data.count);
     this.data.add({
+      size,
       centerA,
       centerB,
       radiusA: radius,

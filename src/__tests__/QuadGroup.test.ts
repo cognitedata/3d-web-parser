@@ -52,8 +52,9 @@ describe('QuadGroup', () => {
     const vertex1 = new THREE.Vector3(10.1, 20.5, 30.5);
     const vertex2 = new THREE.Vector3(10.112, 21.5, 40.5);
     const vertex3 = new THREE.Vector3(5.1, 221.5, 33.5);
+    const size = vertex1.distanceTo(vertex3);
 
-    group.add(nodeId, treeIndex, vertex1, vertex2, vertex3);
+    group.add(nodeId, treeIndex, size, vertex1, vertex2, vertex3);
     const targetVector = new THREE.Vector3();
 
     expect(group.data.count).toBe(1);

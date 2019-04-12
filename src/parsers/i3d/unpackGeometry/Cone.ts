@@ -20,7 +20,7 @@ export function addOpenCone(
   groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader, filterOptions?: FilterOptions) {
   globalCenterA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
   globalCenterB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
-  (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, globalCenterA, globalCenterB,
+  (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, data.size, globalCenterA, globalCenterB,
   data.radiusA, data.radiusB, 0, Math.PI * 2, filterOptions);
 }
 
@@ -28,34 +28,34 @@ export function addOpenEccentricCone(groups: {[name: string]: PrimitiveGroup}, d
                                      filterOptions?: FilterOptions) {
   globalCenterA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
   globalCenterB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
-  (groups.EccentricCone as EccentricConeGroup).add(data.nodeId, data.treeIndex, globalCenterA, globalCenterB,
-    data.radiusA, data.radiusB, data.normal, filterOptions);
+  (groups.EccentricCone as EccentricConeGroup).add(data.nodeId, data.treeIndex, data.size,
+    globalCenterA, globalCenterB, data.radiusA, data.radiusB, data.normal, filterOptions);
 }
 
 export function addClosedCone(
   groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader, filterOptions?: FilterOptions) {
   addOpenCone(groups, data);
   (groups.Circle as CircleGroup).add(
-    data.nodeId, data.treeIndex, globalCenterA, data.normal, data.radiusA, filterOptions);
+    data.nodeId, data.treeIndex, data.size, globalCenterA, data.normal, data.radiusA, filterOptions);
   (groups.Circle as CircleGroup).add(
-    data.nodeId, data.treeIndex, globalCenterB, data.normal, data.radiusB, filterOptions);
+    data.nodeId, data.treeIndex, data.size, globalCenterB, data.normal, data.radiusB, filterOptions);
 }
 
 export function addClosedEccentricCone(groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader,
                                        filterOptions?: FilterOptions) {
   addOpenEccentricCone(groups, data);
   (groups.Circle as CircleGroup).add(
-    data.nodeId, data.treeIndex, globalCenterA, data.normal, data.radiusA, filterOptions);
+    data.nodeId, data.treeIndex, data.size, globalCenterA, data.normal, data.radiusA, filterOptions);
   (groups.Circle as CircleGroup).add(
-    data.nodeId, data.treeIndex, globalCenterB, data.normal, data.radiusB, filterOptions);
+    data.nodeId, data.treeIndex, data.size, globalCenterB, data.normal, data.radiusB, filterOptions);
 }
 
 export function addOpenGeneralCone(
   groups: {[name: string]: PrimitiveGroup}, data: PropertyLoader, filterOptions?: FilterOptions) {
   globalCenterA.copy(data.normal).multiplyScalar(data.height / 2).add(data.center);
   globalCenterB.copy(data.normal).multiplyScalar(-data.height / 2).add(data.center);
-  (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, globalCenterA, globalCenterB, data.radiusA, data.radiusB,
-    data.rotationAngle, data.arcAngle, filterOptions);
+  (groups.Cone as ConeGroup).add(data.nodeId, data.treeIndex, data.size, globalCenterA, globalCenterB,
+    data.radiusA, data.radiusB, data.rotationAngle, data.arcAngle, filterOptions);
 }
 
 export function addClosedGeneralCone(
@@ -63,11 +63,11 @@ export function addClosedGeneralCone(
   addOpenGeneralCone(groups, data, filterOptions);
 
   globalXAxis.copy(xAxis).applyQuaternion(globalAxisRotation.setFromUnitVectors(zAxis, data.normal));
-  (groups.GeneralRing as GeneralRingGroup).add(data.nodeId, data.treeIndex, globalCenterA, data.normal,
-    globalXAxis, data.radiusA, data.radiusA, data.thickness,
+  (groups.GeneralRing as GeneralRingGroup).add(data.nodeId, data.treeIndex, data.size, globalCenterA,
+    data.normal, globalXAxis, data.radiusA, data.radiusA, data.thickness,
     data.rotationAngle, data.arcAngle, filterOptions);
-  (groups.GeneralRing as GeneralRingGroup).add(data.nodeId, data.treeIndex, globalCenterB, data.normal,
-    globalXAxis, data.radiusB, data.radiusB, data.thickness,
+  (groups.GeneralRing as GeneralRingGroup).add(data.nodeId, data.treeIndex, data.size, globalCenterB,
+    data.normal, globalXAxis, data.radiusB, data.radiusB, data.thickness,
   data.rotationAngle, data.arcAngle, filterOptions);
 }
 
@@ -75,7 +75,7 @@ export function addSolidOpenGeneralCone(groups: {[name: string]: PrimitiveGroup}
                                         filterOptions?: FilterOptions) {
   addClosedGeneralCone(groups, data, filterOptions);
   (groups.Cone as ConeGroup).add(
-    data.nodeId, data.treeIndex, globalCenterA, globalCenterB, data.radiusA - data.thickness,
+    data.nodeId, data.treeIndex, data.size, globalCenterA, globalCenterB, data.radiusA - data.thickness,
     data.radiusB - data.thickness, data.rotationAngle, data.arcAngle, filterOptions);
 }
 
@@ -111,6 +111,7 @@ export function addSolidClosedGeneralCone(
   (groups.Trapezium as TrapeziumGroup).add(
     data.nodeId,
     data.treeIndex,
+    data.size,
     vertices[0],
     vertices[1],
     vertices[2],

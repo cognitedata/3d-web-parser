@@ -3,8 +3,8 @@
 import { unpackInstancedMeshes, unpackMergedMeshes, unpackPrimitives } from './unpackGeometry/main';
 import Sector from '../../Sector';
 import CustomFileReader from './CustomFileReader';
-import { SceneStats, createSceneStats }  from '../../SceneStats';
 import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
+import { SceneStats, createSceneStats }  from '../../SceneStats';
 import { PerSectorCompressedData, UncompressedValues } from './sharedFileParserTypes';
 import { DataMaps, FilterOptions, ParseReturn } from '../parseUtils';
 
@@ -84,7 +84,6 @@ export function parseMultipleCustomFiles(
       const parentSector = maps.idToSectorMap[sectorMetadata.parentSectorId];
       if (parentSector !== undefined) {
         parentSector.addChild(sector);
-        parentSector.object3d.add(sector.object3d);
       } else { throw Error('Did not find parent sector'); }
     }
 
@@ -109,8 +108,8 @@ function unpackData(
   unpackPrimitives(rootSector, uncompressedValues, compressedData, maps, filterOptions);
   unpackMergedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
   unpackInstancedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
+  mergeInstancedMeshes(rootSector, sceneStats, maps.treeIndexNodeIdMap);
   for (const sector of rootSector.traverseSectors()) {
-    mergeInstancedMeshes(sector, 2500, sceneStats, maps.treeIndexNodeIdMap);
     sector.mergedMeshGroup.createTreeIndexMap();
     sector.instancedMeshGroup.createTreeIndexMap();
 

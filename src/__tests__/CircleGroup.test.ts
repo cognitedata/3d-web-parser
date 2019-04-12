@@ -12,8 +12,9 @@ function createCircleGroup(): CircleGroup {
   const center = new THREE.Vector3(1, 2, 3);
   const normal = new THREE.Vector3(4, 5, 6);
   const radius = 10.0;
+  const size = 2 * radius;
 
-  group.add(nodeId, treeIndex, center, normal, radius);
+  group.add(nodeId, treeIndex, size, center, normal, radius);
   return group;
 }
 
@@ -41,8 +42,9 @@ describe('CircleGroup', () => {
     const center = new THREE.Vector3(1, 2, 3);
     const normal = new THREE.Vector3(4, 5, 6);
     const radius = 10.0;
+    const size = 2 * radius;
 
-    group.add(nodeId, treeIndex, center, normal, radius);
+    group.add(nodeId, treeIndex, size, center, normal, radius);
 
     const targetVector = new THREE.Vector3();
 
