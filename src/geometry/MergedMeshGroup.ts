@@ -198,7 +198,6 @@ export class MergedMeshGroup extends GeometryGroup {
   meshes: MergedMesh[];
   treeIndexMap: TreeIndexMap;
   geometry?: THREE.BufferGeometry;
-  geometrySizes?: Float32Array;
 
   constructor () {
     super();
