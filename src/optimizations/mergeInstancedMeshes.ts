@@ -1,7 +1,7 @@
 // Copyright 2019 Cognite AS
 
 import Sector from '../Sector';
-import { MergedMesh, MergedMeshMapping } from '../geometry/MergedMeshGroup';
+import { MergedMesh, MergedMeshMappings } from '../geometry/MergedMeshGroup';
 import * as THREE from 'three';
 import { InstancedMeshCollection } from '../geometry/InstancedMeshGroup';
 import SceneStats from '../SceneStats';

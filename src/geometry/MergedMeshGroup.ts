@@ -8,7 +8,7 @@ import { computeBoundingBox } from './GeometryUtils';
 interface IndexMap { [s: number]: boolean; }
 const globalBox = new THREE.Box3();
 
-export class MergedMeshMapping {
+export class MergedMeshMappings {
   public count: number;
   public capacity: number;
   public triangleOffsets: Uint32Array;
@@ -44,7 +44,7 @@ export class MergedMeshMapping {
     transformMatrix?: THREE.Matrix4,
   ) {
     if (this.count + 1 > this.capacity) {
-      throw 'Error in MergedMeshMapping::add. Trying to add more than capacity.';
+      throw 'Error in MergedMeshMappings::add. Trying to add more than capacity.';
     }
     this.setTriangleOffset(triangleOffset, this.count);
     this.setTriangleCount(triangleCount, this.count);
@@ -146,12 +146,12 @@ export class MergedMeshMapping {
 }
 
 export class MergedMesh {
-  mappings: MergedMeshMapping;
+  mappings: MergedMeshMappings;
   fileId: number;
   treeIndexMap: { [s: number]: number; };
   createdByInstancedMesh: boolean;
   constructor(capacity: number, fileId: number, createdByInstancedMesh: boolean = false) {
-    this.mappings = new MergedMeshMapping(capacity);
+    this.mappings = new MergedMeshMappings(capacity);
     this.fileId = fileId;
     this.treeIndexMap = {};
     this.createdByInstancedMesh = createdByInstancedMesh;
