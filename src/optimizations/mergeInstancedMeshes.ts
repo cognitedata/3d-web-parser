@@ -1,7 +1,7 @@
 // Copyright 2019 Cognite AS
 
 import Sector from '../Sector';
-import { MergedMesh, MergedMeshMappings } from '../geometry/MergedMeshGroup';
+import { MergedMesh, MergedMeshMapping } from '../geometry/MergedMeshGroup';
 import * as THREE from 'three';
 import { InstancedMeshCollection } from '../geometry/InstancedMeshGroup';
 import SceneStats from '../SceneStats';
@@ -41,14 +41,12 @@ export default function mergeInstancedMeshes(
         if (triangleCount < TRIANGLE_COUNT_LIMIT) {
           for (let i = 0; i < collection.mappings.count; i++) {
             const treeIndex = collection.mappings.getTreeIndex(i);
-            const nodeId = treeIndexNodeIdMap[treeIndex];
             const size = collection.mappings.getSize(i);
             collection.mappings.getTransformMatrix(globalMatrix, i);
 
             mergedMesh.mappings.add(
               collection.triangleOffset,
               collection.triangleCount,
-              nodeId,
               treeIndex,
               size,
               globalMatrix,

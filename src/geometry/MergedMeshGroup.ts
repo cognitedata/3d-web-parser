@@ -8,32 +8,7 @@ import { computeBoundingBox } from './GeometryUtils';
 interface IndexMap { [s: number]: boolean; }
 const globalBox = new THREE.Box3();
 
-export class MergedMeshMappings {
-  public static concat(mappings: MergedMeshMappings[]) {
-    const capacity = mappings.reduce((sum, mapping) => sum + mapping.count, 0);
-    const newMapping = new MergedMeshMappings(capacity);
-    newMapping.count = capacity;
-    let indexOffset = 0;
-    let globalTriangleOffset = 0;
-    mappings.forEach(mapping => {
-      for (let i = 0; i < mapping.count; i++) {
-        mapping.triangleOffsets[i] += globalTriangleOffset;
-      }
-      newMapping.triangleOffsets.set(mapping.triangleOffsets, indexOffset);
-      newMapping.triangleCounts.set(mapping.triangleCounts, indexOffset);
-      newMapping.treeIndex.set(mapping.treeIndex, indexOffset);
-      for (let i = 0; i < mapping.count; i++) {
-        newMapping.transform0[indexOffset + i] = mapping.transform0[i];
-        newMapping.transform1[indexOffset + i] = mapping.transform1[i];
-        newMapping.transform2[indexOffset + i] = mapping.transform2[i];
-        newMapping.transform3[indexOffset + i] = mapping.transform3[i];
-        globalTriangleOffset += mapping.triangleCounts[i];
-      }
-      indexOffset += mapping.count;
-    });
-    return newMapping;
-  }
-
+export class MergedMeshMapping {
   public count: number;
   public capacity: number;
   public triangleOffsets: Uint32Array;
@@ -64,13 +39,12 @@ export class MergedMeshMappings {
   public add(
     triangleOffset: number,
     triangleCount: number,
-    nodeId: number,
     treeIndex: number,
     size: number,
     transformMatrix?: THREE.Matrix4,
   ) {
     if (this.count + 1 > this.capacity) {
-      throw 'Error in MergedMeshMappings::add. Trying to add more than capacity.';
+      throw 'Error in MergedMeshMapping::add. Trying to add more than capacity.';
     }
     this.setTriangleOffset(triangleOffset, this.count);
     this.setTriangleCount(triangleCount, this.count);
@@ -172,12 +146,12 @@ export class MergedMeshMappings {
 }
 
 export class MergedMesh {
-  mappings: MergedMeshMappings;
+  mappings: MergedMeshMapping;
   fileId: number;
   treeIndexMap: { [s: number]: number; };
   createdByInstancedMesh: boolean;
   constructor(capacity: number, fileId: number, createdByInstancedMesh: boolean = false) {
-    this.mappings = new MergedMeshMappings(capacity);
+    this.mappings = new MergedMeshMapping(capacity);
     this.fileId = fileId;
     this.treeIndexMap = {};
     this.createdByInstancedMesh = createdByInstancedMesh;

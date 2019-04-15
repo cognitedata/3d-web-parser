@@ -126,5 +126,7 @@ function unpackData(
     maps.nodeIdTreeIndexMap.set(nodeId, treeIndex);
   }
 
+  console.log(rootSector);
+
   return { rootSector, sectors, sceneStats, maps };
 }

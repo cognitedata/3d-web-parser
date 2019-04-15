@@ -1,12 +1,12 @@
 // Copyright 2019 Cognite AS
 
 import * as THREE from 'three';
-import { MergedMeshMappings } from '../geometry/MergedMeshGroup';
+import { MergedMeshMapping } from '../geometry/MergedMeshGroup';
 
 describe('MeshGroup', () => {
-  test('MergedMeshMappings', () => {
+  test('MergedMeshMapping', () => {
     const capacity = 5;
-    const nodeMappings = new MergedMeshMappings(capacity);
+    const nodeMappings = new MergedMeshMapping(capacity);
 
     expect(nodeMappings.triangleOffsets.length).toBe(capacity);
     expect(nodeMappings.triangleCounts.length).toBe(capacity);

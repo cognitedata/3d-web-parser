@@ -50,7 +50,7 @@ export default function parse(data: ParseData): MergedMeshGroup {
       const { triangleCount } = node;
       globalColor.setHex(color.rgb);
       // size is calculated later
-      mergedMesh.mappings.add(triangleOffset, triangleCount, nodeId, treeIndex, 0);
+      mergedMesh.mappings.add(triangleOffset, triangleCount, treeIndex, 0);
       triangleOffset += triangleCount;
 
       data.treeIndexNodeIdMap[treeIndex] = nodeId;
