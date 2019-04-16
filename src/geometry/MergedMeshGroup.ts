@@ -80,7 +80,14 @@ export class MergedMeshMappings {
     const [n12, n22, n32] = columns[1];
     const [n13, n23, n33] = columns[2];
     const [n14, n24, n34] = columns[3];
-    target.set(n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, 0, 0, 0, 1);
+    // tslint:disable:prettier
+    target.set(
+      n11, n12, n13, n14,
+      n21, n22, n23, n24,
+      n31, n32, n33, n34,
+      0, 0, 0, 1
+    );
+    // tslint:enable:prettier
     return target;
   }
 

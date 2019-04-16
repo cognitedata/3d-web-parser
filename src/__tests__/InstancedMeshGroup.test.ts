@@ -23,13 +23,35 @@ describe('MeshGroup', () => {
     const treeIndices = [10, 20, 30, 40];
     const transformMatrices = [new THREE.Matrix4(), new THREE.Matrix4(), new THREE.Matrix4(), new THREE.Matrix4()];
 
-    transformMatrices[0].set(11, 12, 13, 14, 21, 22, 23, 24, 31, 32, 33, 34, 0, 0, 0, 1);
+    // tslint:disable:prettier
+    transformMatrices[0].set(
+      11, 12, 13, 14,
+      21, 22, 23, 24,
+      31, 32, 33, 34,
+      0, 0, 0, 1
+    );
 
-    transformMatrices[1].set(112, 122, 132, 142, 212, 222, 232, 242, 312, 322, 332, 342, 0, 0, 0, 1);
+    transformMatrices[1].set(
+      112, 122, 132, 142,
+      212, 222, 232, 242,
+      312, 322, 332, 342,
+      0, 0, 0, 1
+    );
 
-    transformMatrices[2].set(113, 123, 133, 143, 213, 223, 233, 243, 313, 323, 333, 343, 0, 0, 0, 1);
+    transformMatrices[2].set(
+      113, 123, 133, 143,
+      213, 223, 233, 243, 
+      313, 323, 333, 343,
+      0, 0, 0, 1
+    );
 
-    transformMatrices[3].set(114, 124, 134, 144, 214, 224, 234, 244, 314, 324, 334, 344, 0, 0, 0, 1);
+    transformMatrices[3].set(
+      114, 124, 134, 144,
+      214, 224, 234, 244,
+      314, 324, 334, 344,
+      0, 0, 0, 1
+    );
+    // tslint:enable:prettier
 
     let index = 0;
     // add first node mapping

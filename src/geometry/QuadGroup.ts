@@ -62,7 +62,14 @@ export default class QuadGroup extends PrimitiveGroup {
     side1.normalize();
     side2.normalize();
 
-    basis.set(side2.x, side1.x, normal.x, 0, side2.y, side1.y, normal.y, 0, side2.z, side1.z, normal.z, 0, 0, 0, 0, 1);
+    // tslint:disable:prettier
+    basis.set(
+      side2.x, side1.x, normal.x, 0,
+      side2.y, side1.y, normal.y, 0,
+      side2.z, side1.z, normal.z, 0,
+            0,       0,        0, 1
+    );
+    // tslint:enable:prettier
 
     outputMatrix = outputMatrix.identity().compose(
       center.set(0, 0, 0),
@@ -73,7 +80,14 @@ export default class QuadGroup extends PrimitiveGroup {
     outputMatrix.premultiply(basis);
 
     center.addVectors(globalVertex1, globalVertex2).multiplyScalar(0.5);
-    basis.set(1, 0, 0, center.x, 0, 1, 0, center.y, 0, 0, 1, center.z, 0, 0, 0, 1);
+    // tslint:disable:prettier
+    basis.set(
+      1, 0, 0, center.x,
+      0, 1, 0, center.y,
+      0, 0, 1, center.z,
+      0, 0, 0, 1
+    );
+    // tslint:enable:prettier
 
     outputMatrix.premultiply(basis);
 
