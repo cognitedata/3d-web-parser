@@ -1,6 +1,6 @@
 {
   "name": "@cognite/3d-web-parser",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "description": "Parser for Cognite 3D viewer",
   "browser": "dist/main.js",
   "contributors": [
