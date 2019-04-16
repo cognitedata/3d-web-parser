@@ -27,7 +27,7 @@ export default function mergeInstancedMeshes(
             collectionIndex, mappingIndex, size: collection.mappings.getSize(mappingIndex) });
         }
       });
-      mappingsSortedBySize.sort((a: MappingInfo, b: MappingInfo) => a.size - b.size);
+      mappingsSortedBySize.sort((a: MappingInfo, b: MappingInfo) => b.size - a.size);
 
       // Create a new merged mesh
       const smallCollectionsTriangleCount = smallCollections.reduce((acc, collection) =>
