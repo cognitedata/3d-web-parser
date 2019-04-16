@@ -24,7 +24,7 @@ export default function mergeInstancedMeshes(
       smallCollections.forEach((collection, collectionIndex) => {
         for (let mappingIndex = 0; mappingIndex < collection.mappings.capacity; mappingIndex++) {
           mappingsSortedBySize.push({
-            collectionIndex: collectionIndex, mappingIndex: i, size: collection.mappings.getSize(i) });
+            collectionIndex, mappingIndex, size: collection.mappings.getSize(i) });
         }
       });
       mappingsSortedBySize.sort((a: MappingInfo, b: MappingInfo) => a.size - b.size);
