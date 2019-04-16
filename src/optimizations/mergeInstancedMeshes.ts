@@ -9,7 +9,7 @@ import { TreeIndexNodeIdMap } from '../parsers/parseUtils';
 
 const globalMatrix = new THREE.Matrix4();
 
-const TRIANGLE_COUNT_LIMIT = 10000;
+const TRIANGLE_COUNT_LIMIT = 100;
 
 function countMappingsToMerge(collections: InstancedMeshCollection[]) {
   let numMappings = 0;
@@ -24,17 +24,18 @@ function countMappingsToMerge(collections: InstancedMeshCollection[]) {
 
 export default function mergeInstancedMeshes(
   rootSector: Sector,
-  sceneStats: SceneStats,
-  treeIndexNodeIdMap: TreeIndexNodeIdMap) {
+  sceneStats: SceneStats) {
 
   for (const sector of rootSector.traverseSectorsBreadthFirst()) {
     sector.instancedMeshGroup.meshes.forEach(instancedMesh => {
+      // preallocate memory for new merged mesh
       const mergedMesh = new MergedMesh(
         countMappingsToMerge(instancedMesh.collections),
         instancedMesh.fileId,
         true,
       );
 
+      // Cycle through instanced meshes, move small ones into the merged mesh, sorted by size
       for (let index = instancedMesh.collections.length - 1; index >= 0; index--) {
         const collection = instancedMesh.collections[index];
         const triangleCount = collection.mappings.count * collection.triangleCount;
@@ -43,7 +44,6 @@ export default function mergeInstancedMeshes(
             const treeIndex = collection.mappings.getTreeIndex(i);
             const size = collection.mappings.getSize(i);
             collection.mappings.getTransformMatrix(globalMatrix, i);
-
             mergedMesh.mappings.add(
               collection.triangleOffset,
               collection.triangleCount,

@@ -94,6 +94,7 @@ export function parseMultipleCustomFiles(
     throw Error('Did not find root sector');
   }
 
+  console.log(rootSector);
   return unpackData(rootSector, uncompressedValues, compressedData, maps, filterOptions);
 }
 
@@ -108,7 +109,7 @@ function unpackData(
   unpackPrimitives(rootSector, uncompressedValues, compressedData, maps, filterOptions);
   unpackMergedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
   unpackInstancedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
-  mergeInstancedMeshes(rootSector, sceneStats, maps.treeIndexNodeIdMap);
+  mergeInstancedMeshes(rootSector, sceneStats);
   for (const sector of rootSector.traverseSectors()) {
     sector.mergedMeshGroup.createTreeIndexMap();
     sector.instancedMeshGroup.createTreeIndexMap();
