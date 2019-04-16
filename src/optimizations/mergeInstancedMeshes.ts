@@ -52,8 +52,9 @@ export default function mergeInstancedMeshes(
           size,
           globalMatrix,
         );
-
-        instancedMesh.collections.splice(collectionIndex, 1);
+      });
+      smallCollections.forEach(collection => {
+        instancedMesh.collections.splice(instancedMesh.collections.indexOf(collection), 1);
       });
       sceneStats.geometryCount.MergedMesh += 1;
       sector.mergedMeshGroup.addMesh(mergedMesh);
