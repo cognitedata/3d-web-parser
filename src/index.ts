@@ -23,4 +23,3 @@ export { default as TrapeziumGroup } from './geometry/TrapeziumGroup';
 export { Attribute }  from './geometry/PrimitiveGroup';
 export { computeBoundingBox } from './geometry/GeometryUtils';
 export { TreeIndexNodeIdMap, ColorMap } from './parsers/parseUtils';
-export { InstancedMeshCollectionSizeSorter, MergedMeshSizeSorter } from './optimizations/meshSorters';

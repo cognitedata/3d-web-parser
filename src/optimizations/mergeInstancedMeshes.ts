@@ -4,11 +4,11 @@ import Sector from '../Sector';
 import { MergedMesh } from '../geometry/MergedMeshGroup';
 import * as THREE from 'three';
 import SceneStats from '../SceneStats';
-import { InstancedMeshCollectionSizeSorter } from '../optimizations/meshSorters';
 
 const globalMatrix = new THREE.Matrix4();
 
 const TRIANGLE_COUNT_LIMIT = 10000;
+type MappingInfo = {collectionIndex: number, mappingIndex: number, size: number};
 
 export default function mergeInstancedMeshes(
   rootSector: Sector,
@@ -20,7 +20,14 @@ export default function mergeInstancedMeshes(
       // Get all small instanced mesh collections, sorted by size
       const smallCollections = instancedMesh.collections.filter(
         collection => (collection.mappings.count * collection.triangleCount <= TRIANGLE_COUNT_LIMIT));
-      const collectionSorter = new InstancedMeshCollectionSizeSorter(smallCollections);
+      const mappingsSortedBySize: MappingInfo[] = [];
+      smallCollections.forEach((collection, collectionIndex) => {
+        for (let i = 0; i < collection.mappings.capacity; i++) {
+          mappingsSortedBySize.push({
+            collectionIndex: collectionIndex, mappingIndex: i, size: collection.mappings.getSize(i) });
+        }
+      });
+      mappingsSortedBySize.sort((a: MappingInfo, b: MappingInfo) => a.size - b.size);
 
       // Create a new merged mesh
       const smallCollectionsTriangleCount = smallCollections.reduce((acc, collection) =>
@@ -32,8 +39,9 @@ export default function mergeInstancedMeshes(
       );
 
       // Move the instanced meshes into one merged mesh, sorted by size
-      while (collectionSorter.isNotEmpty()) {
-        const { collection, mappingIndex } = collectionSorter.getNext();
+      mappingsSortedBySize.forEach(mappingInfo => {
+        const { collectionIndex, mappingIndex } =  mappingInfo;
+        const collection = smallCollections[collectionIndex];
         const treeIndex = collection.mappings.getTreeIndex(mappingIndex);
         const size = collection.mappings.getSize(mappingIndex);
         collection.mappings.getTransformMatrix(globalMatrix, mappingIndex);
@@ -45,9 +53,8 @@ export default function mergeInstancedMeshes(
           globalMatrix,
         );
 
-        const collectionIndex = instancedMesh.collections.indexOf(collection);
         instancedMesh.collections.splice(collectionIndex, 1);
-      }
+      });
       sceneStats.geometryCount.MergedMesh += 1;
       sector.mergedMeshGroup.addMesh(mergedMesh);
     });
