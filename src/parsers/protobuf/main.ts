@@ -178,6 +178,5 @@ export default async function parseProtobuf(
     nodeIdTreeIndexMap.set(nodeId, treeIndex);
   }
 
-  console.log(rootSector);
   return { rootSector, sectors, sceneStats, maps: { colorMap, treeIndexNodeIdMap, nodeIdTreeIndexMap } };
 }

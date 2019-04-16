@@ -22,7 +22,7 @@ export default function mergeInstancedMeshes(
         collection => (collection.mappings.count * collection.triangleCount <= TRIANGLE_COUNT_LIMIT));
       const collectionSorter = new InstancedMeshCollectionSizeSorter(smallCollections);
 
-      // Preallocate memory for a new merged mesh
+      // Create a new merged mesh
       const smallCollectionsTriangleCount = smallCollections.reduce((acc, collection) =>
         acc + collection.mappings.count, 0);
       const mergedMesh = new MergedMesh(
