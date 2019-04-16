@@ -160,7 +160,7 @@ export default async function parseProtobuf(
   }
 
   const rootSector = sectors['0/'];
-  mergeInstancedMeshes(rootSector, sceneStats, treeIndexNodeIdMap);
+  mergeInstancedMeshes(rootSector, sceneStats);
   for (const sector of rootSector.traverseSectors()) {
     sector.mergedMeshGroup.createTreeIndexMap();
     sector.instancedMeshGroup.createTreeIndexMap();
