@@ -5,7 +5,9 @@ import GeometryGroup from './GeometryGroup';
 import { GeometryType } from './Types';
 import { computeBoundingBox } from './GeometryUtils';
 
-interface IndexMap { [s: number]: boolean; }
+interface IndexMap {
+  [s: number]: boolean;
+}
 const globalBox = new THREE.Box3();
 
 export class MergedMeshMappings {
@@ -28,10 +30,14 @@ export class MergedMeshMappings {
     this.triangleOffsets = new Uint32Array(this.capacity);
     this.triangleCounts = new Uint32Array(this.capacity);
     this.treeIndex = new Float32Array(this.capacity);
-    this.transform0 = []; this.transform0.length = capacity;
-    this.transform1 = []; this.transform1.length = capacity;
-    this.transform2 = []; this.transform2.length = capacity;
-    this.transform3 = []; this.transform3.length = capacity;
+    this.transform0 = [];
+    this.transform0.length = capacity;
+    this.transform1 = [];
+    this.transform1.length = capacity;
+    this.transform2 = [];
+    this.transform2.length = capacity;
+    this.transform3 = [];
+    this.transform3.length = capacity;
 
     this.size = new Float32Array(this.capacity);
   }
@@ -41,10 +47,10 @@ export class MergedMeshMappings {
     triangleCount: number,
     treeIndex: number,
     size: number,
-    transformMatrix?: THREE.Matrix4,
+    transformMatrix?: THREE.Matrix4
   ) {
     if (this.count + 1 > this.capacity) {
-      throw 'Error in MergedMeshMappings::add. Trying to add more than capacity.';
+      throw new Error('Error in MergedMeshMappings::add. Trying to add more than capacity.');
     }
     this.setTriangleOffset(triangleOffset, this.count);
     this.setTriangleCount(triangleCount, this.count);
@@ -61,7 +67,7 @@ export class MergedMeshMappings {
   }
 
   public hasTransform(index: number): boolean {
-  return this.transform0[index] !== undefined;
+    return this.transform0[index] !== undefined;
   }
 
   public getTransformMatrix(target: THREE.Matrix4, index: number) {
@@ -70,16 +76,11 @@ export class MergedMeshMappings {
       const transform = this[`transform${columnIndex}`];
       return transform[index];
     });
-    const [ n11, n21, n31 ] = columns[0];
-    const [ n12, n22, n32 ] = columns[1];
-    const [ n13, n23, n33 ] = columns[2];
-    const [ n14, n24, n34 ] = columns[3];
-    target.set(
-      n11, n12, n13, n14,
-      n21, n22, n23, n24,
-      n31, n32, n33, n34,
-      0,   0,   0,   1,
-    );
+    const [n11, n21, n31] = columns[0];
+    const [n12, n22, n32] = columns[1];
+    const [n13, n23, n33] = columns[2];
+    const [n14, n24, n34] = columns[3];
+    target.set(n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, 0, 0, 0, 1);
     return target;
   }
 
@@ -134,7 +135,7 @@ export class MergedMeshMappings {
     const columns = [0, 1, 2, 3].map(columnIndex => {
       // @ts-ignore
       const transform = this[`transform${columnIndex}`];
-      return transform[index] = new Float32Array(3);
+      return (transform[index] = new Float32Array(3));
     });
     let matrixIndex = 0;
     for (let columnIndex = 0; columnIndex < 4; ++columnIndex, ++matrixIndex) {
@@ -148,7 +149,7 @@ export class MergedMeshMappings {
 export class MergedMesh {
   mappings: MergedMeshMappings;
   fileId: number;
-  treeIndexMap: { [s: number]: number; };
+  treeIndexMap: { [s: number]: number };
   createdByInstancedMesh: boolean;
   constructor(capacity: number, fileId: number, createdByInstancedMesh: boolean = false) {
     this.mappings = new MergedMeshMappings(capacity);
@@ -173,7 +174,7 @@ export class MergedMeshGroup extends GeometryGroup {
   treeIndexMap: TreeIndexMap;
   geometry?: THREE.BufferGeometry;
 
-  constructor () {
+  constructor() {
     super();
     this.meshes = [];
     this.type = 'MergedMesh';
@@ -190,7 +191,7 @@ export class MergedMeshGroup extends GeometryGroup {
         }
         this.treeIndexMap[treeIndex].push({
           meshIndex,
-          mappingIndex,
+          mappingIndex
         });
       }
     });
@@ -204,7 +205,7 @@ export class MergedMeshGroup extends GeometryGroup {
     matrix: THREE.Matrix4,
     box: THREE.Box3,
     treeIndex: number,
-    geometry?: THREE.BufferGeometry,
+    geometry?: THREE.BufferGeometry
   ): THREE.Box3 {
     box.makeEmpty();
 

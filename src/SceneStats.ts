@@ -5,9 +5,7 @@ import { GeometryType } from './geometry/Types';
 export default interface SceneStats {
   numNodes: number;
   numSectors: number;
-  geometryCount: {
-    [s in GeometryType]: number;
-  };
+  geometryCount: { [s in GeometryType]: number };
 }
 
 function createSceneStats(): SceneStats {
@@ -28,12 +26,9 @@ function createSceneStats(): SceneStats {
       Quad: 0,
       SphericalSegment: 0,
       TorusSegment: 0,
-      Trapezium: 0,
-    },
+      Trapezium: 0
+    }
   };
 }
 
-export {
-  SceneStats,
-  createSceneStats,
-};
+export { SceneStats, createSceneStats };

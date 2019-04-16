@@ -8,10 +8,10 @@ const globalVector = new THREE.Vector3();
 export function computeBoundingBox(
   box: THREE.Box3,
   matrix: THREE.Matrix4,
-  position: THREE.BufferAttribute|THREE.InterleavedBufferAttribute,
+  position: THREE.BufferAttribute | THREE.InterleavedBufferAttribute,
   index: THREE.BufferAttribute,
   triangleOffset: number,
-  triangleCount: number,
+  triangleCount: number
 ) {
   box.makeEmpty();
   const start = 3 * triangleOffset;

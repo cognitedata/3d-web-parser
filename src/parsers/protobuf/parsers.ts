@@ -33,5 +33,5 @@ export {
   parseTrapeziums,
   parseMergedMeshes,
   parseInstancedMeshes,
-  ProtobufParser,
+  ProtobufParser
 };

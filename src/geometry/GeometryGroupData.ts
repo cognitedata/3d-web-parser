@@ -1,9 +1,17 @@
 // Copyright 2019 Cognite AS
 
-import { float64Properties, float32Properties, vector3Properties, matrix4Properties,
-  RenderedPrimitiveNameType, primitiveProperties, RenderedPropertyNameType, colorProperties, vector4Properties,
-  primitiveAttributes }
-  from './GeometryGroupDataParameters';
+import {
+  float64Properties,
+  float32Properties,
+  vector3Properties,
+  matrix4Properties,
+  RenderedPrimitiveNameType,
+  primitiveProperties,
+  RenderedPropertyNameType,
+  colorProperties,
+  vector4Properties,
+  primitiveAttributes
+} from './GeometryGroupDataParameters';
 import * as THREE from 'three';
 
 function getAttributeItemSize(property: RenderedPropertyNameType): number {
@@ -24,7 +32,7 @@ export default class GeometryGroupData {
   type: RenderedPrimitiveNameType;
   count: number;
   capacity: number;
-  public arrays: {[name: string]: Float64Array | Float32Array };
+  public arrays: { [name: string]: Float64Array | Float32Array };
 
   constructor(type: RenderedPrimitiveNameType, capacity: number, attributesPointer: any) {
     this.type = type;
@@ -50,7 +58,7 @@ export default class GeometryGroupData {
       attributesPointer.push({
         name: 'a_' + property,
         array: this.arrays[property],
-        itemSize: getAttributeItemSize(property),
+        itemSize: getAttributeItemSize(property)
       });
 
       if (this.arrays[property] === undefined) {
@@ -98,11 +106,16 @@ export default class GeometryGroupData {
   add(properties: any) {
     Object.keys(properties).forEach(property => {
       if (this.arrays[property] === undefined) {
-        throw Error('Property ' + (property as string) + ' is not present on groups with type ' +
-          (this.type as string) + '. See primitiveProperties in GeometryGroupDataParameters.ts');
+        throw Error(
+          'Property ' +
+            (property as string) +
+            ' is not present on groups with type ' +
+            (this.type as string) +
+            '. See primitiveProperties in GeometryGroupDataParameters.ts'
+        );
       }
       const name = property as RenderedPropertyNameType;
-      if (float64Properties.indexOf(name) !== -1 || float32Properties.indexOf(name) !== -1)  {
+      if (float64Properties.indexOf(name) !== -1 || float32Properties.indexOf(name) !== -1) {
         this.setNumber(name, properties[property], this.count);
       } else if (vector3Properties.indexOf(name) !== -1) {
         this.setVector3(name, properties[property], this.count);
@@ -130,15 +143,15 @@ export default class GeometryGroupData {
   }
 
   getPropertiesAsObject(index: number) {
-    const data: {[name: string]: any} = {};
+    const data: { [name: string]: any } = {};
     Object.keys(this.arrays).forEach(property => {
       const name = property as RenderedPropertyNameType;
-      if (float64Properties.indexOf(name) !== -1 || float32Properties.indexOf(name) !== -1)  {
+      if (float64Properties.indexOf(name) !== -1 || float32Properties.indexOf(name) !== -1) {
         data[property] = this.getNumber(name, index);
       } else if (vector3Properties.indexOf(name) !== -1) {
         data[property] = this.getVector3(name, new THREE.Vector3(), index);
       } else if (vector4Properties.indexOf(name) !== -1) {
-        data[property] = this.getVector4(name, new THREE.Vector4(),  index);
+        data[property] = this.getVector4(name, new THREE.Vector4(), index);
       } else {
         throw Error('Property ' + name + ' does not have an associated memory structure');
       }

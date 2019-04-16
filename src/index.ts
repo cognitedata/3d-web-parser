@@ -20,6 +20,6 @@ export { default as QuadGroup } from './geometry/QuadGroup';
 export { default as SphericalSegmentGroup } from './geometry/SphericalSegmentGroup';
 export { default as TorusSegmentGroup } from './geometry/TorusSegmentGroup';
 export { default as TrapeziumGroup } from './geometry/TrapeziumGroup';
-export { Attribute }  from './geometry/PrimitiveGroup';
+export { Attribute } from './geometry/PrimitiveGroup';
 export { computeBoundingBox } from './geometry/GeometryUtils';
 export { TreeIndexNodeIdMap, ColorMap } from './parsers/parseUtils';

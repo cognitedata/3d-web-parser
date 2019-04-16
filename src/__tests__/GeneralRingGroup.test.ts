@@ -30,7 +30,7 @@ describe('GeneralRingGroup', () => {
     const localXAxis = new THREE.Vector3(1, 2, 3);
     const target = new THREE.Vector3();
 
-    group.data.setVector3('localXAxis',  localXAxis, 0);
+    group.data.setVector3('localXAxis', localXAxis, 0);
     group.data.getVector3('localXAxis', target, 0);
     expect(target.x).toBeCloseTo(localXAxis.x);
     expect(target.y).toBeCloseTo(localXAxis.y);
@@ -40,22 +40,22 @@ describe('GeneralRingGroup', () => {
   test('(set/get)Thickness', () => {
     const group = new GeneralRingGroup(2);
     const thickness = 1.0;
-    group.data.setNumber('thickness',  thickness, 0);
-    expect(group.data.getNumber('thickness',  0)).toBeCloseTo(thickness);
+    group.data.setNumber('thickness', thickness, 0);
+    expect(group.data.getNumber('thickness', 0)).toBeCloseTo(thickness);
   });
 
   test('(set/get)Angle', () => {
     const group = new GeneralRingGroup(2);
     const angle = 1.0;
-    group.data.setNumber('angle',  angle, 0);
-    expect(group.data.getNumber('angle',  0)).toBeCloseTo(angle);
+    group.data.setNumber('angle', angle, 0);
+    expect(group.data.getNumber('angle', 0)).toBeCloseTo(angle);
   });
 
   test('(set/get)ArcAngle', () => {
     const group = new GeneralRingGroup(2);
     const arcAngle = 1.0;
-    group.data.setNumber('arcAngle',  arcAngle, 0);
-    expect(group.data.getNumber('arcAngle',  0)).toBeCloseTo(arcAngle);
+    group.data.setNumber('arcAngle', arcAngle, 0);
+    expect(group.data.getNumber('arcAngle', 0)).toBeCloseTo(arcAngle);
   });
 
   test('add', () => {
@@ -71,10 +71,9 @@ describe('GeneralRingGroup', () => {
     const thickness = 3.0;
     const angle = 4.0;
     const arcAngle = 5.0;
-    const size = Math.sqrt((2 * yRadius) ** 2 + (2 * yRadius));
+    const size = Math.sqrt((2 * yRadius) ** 2 + 2 * yRadius);
 
-    group.add(nodeId, treeIndex, size, center, normal, localXAxis, xRadius, yRadius,
-      thickness, angle, arcAngle);
+    group.add(nodeId, treeIndex, size, center, normal, localXAxis, xRadius, yRadius, thickness, angle, arcAngle);
     const targetVector = new THREE.Vector3();
     const targetColor = new THREE.Color();
 
@@ -94,8 +93,8 @@ describe('GeneralRingGroup', () => {
     group.data.getVector3('localXAxis', targetVector, 0);
     expectVector3Equal(targetVector, localXAxis);
 
-    expect(group.data.getNumber('thickness',  0)).toBeCloseTo(thickness / yRadius);
-    expect(group.data.getNumber('angle',  0)).toBeCloseTo(angle);
-    expect(group.data.getNumber('arcAngle',  0)).toBeCloseTo(arcAngle);
+    expect(group.data.getNumber('thickness', 0)).toBeCloseTo(thickness / yRadius);
+    expect(group.data.getNumber('angle', 0)).toBeCloseTo(angle);
+    expect(group.data.getNumber('arcAngle', 0)).toBeCloseTo(arcAngle);
   });
 });

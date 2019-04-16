@@ -27,19 +27,19 @@ type TypedArray = Float32Array | Float64Array;
 type THREEVector = THREE.Vector2 | THREE.Vector3 | THREE.Vector4;
 
 export interface PrimitiveGroupMap {
-  Box: {capacity: number, group: BoxGroup};
-  Circle: {capacity: number, group: CircleGroup};
-  Cone: {capacity: number, group: ConeGroup};
-  EccentricCone: {capacity: number, group: EccentricConeGroup};
-  EllipsoidSegment: {capacity: number, group: EllipsoidSegmentGroup};
-  GeneralCylinder: {capacity: number, group: GeneralCylinderGroup};
-  GeneralRing: {capacity: number, group: GeneralRingGroup};
-  Nut: {capacity: number, group: NutGroup};
-  Quad: {capacity: number, group: QuadGroup};
-  SphericalSegment: {capacity: number, group: SphericalSegmentGroup};
-  TorusSegment: {capacity: number, group: TorusSegmentGroup};
-  Trapezium: {capacity: number, group: TrapeziumGroup};
-  [s: string]: {capacity: number, group: PrimitiveGroup};
+  Box: { capacity: number; group: BoxGroup };
+  Circle: { capacity: number; group: CircleGroup };
+  Cone: { capacity: number; group: ConeGroup };
+  EccentricCone: { capacity: number; group: EccentricConeGroup };
+  EllipsoidSegment: { capacity: number; group: EllipsoidSegmentGroup };
+  GeneralCylinder: { capacity: number; group: GeneralCylinderGroup };
+  GeneralRing: { capacity: number; group: GeneralRingGroup };
+  Nut: { capacity: number; group: NutGroup };
+  Quad: { capacity: number; group: QuadGroup };
+  SphericalSegment: { capacity: number; group: SphericalSegmentGroup };
+  TorusSegment: { capacity: number; group: TorusSegmentGroup };
+  Trapezium: { capacity: number; group: TrapeziumGroup };
+  [s: string]: { capacity: number; group: PrimitiveGroup };
 }
 
 export interface Attribute {
@@ -76,9 +76,7 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     this.transform1 = new Float32Array(0);
     this.transform2 = new Float32Array(0);
     this.transform3 = new Float32Array(0);
-    this.attributes = [
-      { name: 'treeIndex', array: this.treeIndex, itemSize: 1 },
-    ];
+    this.attributes = [{ name: 'treeIndex', array: this.treeIndex, itemSize: 1 }];
     this.hasCustomTransformAttributes = false;
     this.data = new GeometryGroupData('Primitive', 0, this.attributes); // Placeholder, overwritten in children classes
   }
@@ -92,8 +90,8 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     }
     const index = this.data.count - 1;
     this.computeBoundingBox(identityMatrix4, globalBox, index);
-    const boundingBoxFilterResult = filterOptions.boundingBoxFilter
-                                    && !filterOptions.boundingBoxFilter.intersectsBox(globalBox);
+    const boundingBoxFilterResult =
+      filterOptions.boundingBoxFilter && !filterOptions.boundingBoxFilter.intersectsBox(globalBox);
     const nodeIdFilterResult = filterOptions.nodeIdFilter && filterOptions.nodeIdFilter.indexOf(nodeId) === -1;
     if (boundingBoxFilterResult || nodeIdFilterResult) {
       // Reduce count, i.e. remove last geometry
@@ -150,25 +148,25 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     this.attributes.push({
       name: 'matCol0',
       array: this.transform0,
-      itemSize: 3,
+      itemSize: 3
     });
 
     this.attributes.push({
       name: 'matCol1',
       array: this.transform1,
-      itemSize: 3,
+      itemSize: 3
     });
 
     this.attributes.push({
       name: 'matCol2',
       array: this.transform2,
-      itemSize: 3,
+      itemSize: 3
     });
 
     this.attributes.push({
       name: 'matCol3',
       array: this.transform3,
-      itemSize: 3,
+      itemSize: 3
     });
   }
 }

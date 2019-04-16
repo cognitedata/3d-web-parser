@@ -3,11 +3,13 @@
 import * as THREE from 'three';
 import EllipsoidSegmentGroup from '../../geometry/EllipsoidSegmentGroup';
 import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
-import { MatchingGeometries,
-         parsePrimitiveColor,
-         parsePrimitiveNodeId,
-         parsePrimitiveTreeIndex,
-         getPrimitiveType} from './protobufUtils';
+import {
+  MatchingGeometries,
+  parsePrimitiveColor,
+  parsePrimitiveNodeId,
+  parsePrimitiveTreeIndex,
+  getPrimitiveType
+} from './protobufUtils';
 import { ParseData } from '../parseUtils';
 
 const color = new THREE.Color();
@@ -17,11 +19,11 @@ const normal = new THREE.Vector3();
 function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   const matchingGeometries: MatchingGeometries = {
     count: 0,
-    geometries: [],
+    geometries: []
   };
 
   geometries.forEach(geometry => {
-    if (geometry.type === 'ellipsoid' || geometry.type === 'ellipsoidSegment') {
+    if (geometry.type === 'ellipsoid' || geometry.type === 'ellipsoidSegment') {
       matchingGeometries.geometries.push(geometry);
       matchingGeometries.count += 1;
     }
@@ -32,11 +34,12 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 
 function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
   if (
-    primitiveGroupMap.EllipsoidSegment.group.data.count + minimumRequiredCapacity
-    > primitiveGroupMap.EllipsoidSegment.group.capacity) {
-      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.EllipsoidSegment.capacity);
-      primitiveGroupMap.EllipsoidSegment.group = new EllipsoidSegmentGroup(capacity);
-      return true;
+    primitiveGroupMap.EllipsoidSegment.group.data.count + minimumRequiredCapacity >
+    primitiveGroupMap.EllipsoidSegment.group.capacity
+  ) {
+    const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.EllipsoidSegment.capacity);
+    primitiveGroupMap.EllipsoidSegment.group = new EllipsoidSegmentGroup(capacity);
+    return true;
   }
   return false;
 }
@@ -77,7 +80,7 @@ export default function parse(args: ParseData): boolean {
       horizontalRadius,
       verticalRadius,
       height,
-      filterOptions,
+      filterOptions
     );
 
     if (added) {

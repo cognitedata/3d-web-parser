@@ -3,12 +3,14 @@
 import * as THREE from 'three';
 import CircleGroup from '../../geometry/CircleGroup';
 import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
-import { MatchingGeometries,
-         parsePrimitiveColor,
-         parsePrimitiveNodeId,
-         parsePrimitiveTreeIndex,
-         getPrimitiveType,
-         isPrimitive } from './protobufUtils';
+import {
+  MatchingGeometries,
+  parsePrimitiveColor,
+  parsePrimitiveNodeId,
+  parsePrimitiveTreeIndex,
+  getPrimitiveType,
+  isPrimitive
+} from './protobufUtils';
 
 import { ParseData, FilterOptions } from '../parseUtils';
 
@@ -22,7 +24,7 @@ const vector = new THREE.Vector3();
 function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   const matchingGeometries: MatchingGeometries = {
     count: 0,
-    geometries: [],
+    geometries: []
   };
 
   geometries.forEach(geometry => {
@@ -91,22 +93,24 @@ function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup, fil
   // @ts-ignore
   if (geometry.type === 'cylinder') {
     const { radius = 0 } = primitiveInfo;
-    normal.copy(centerA)
-    .sub(centerB)
-    .normalize();
+    normal
+      .copy(centerA)
+      .sub(centerB)
+      .normalize();
     added = group.add(nodeId, treeIndex, size, centerA, normal, radius, filterOptions);
     added = group.add(nodeId, treeIndex, size, centerB, normal, radius, filterOptions) || added;
-  // @ts-ignore
+    // @ts-ignore
   } else if (geometry.type === 'cone') {
     const { radiusA = 0, radiusB = 0 } = primitiveInfo;
 
-    normal.copy(centerA)
-    .sub(centerB)
-    .normalize();
+    normal
+      .copy(centerA)
+      .sub(centerB)
+      .normalize();
 
     added = group.add(nodeId, treeIndex, size, centerA, normal, radiusA, filterOptions);
     added = group.add(nodeId, treeIndex, size, centerB, normal, radiusB, filterOptions) || added;
-  // @ts-ignore
+    // @ts-ignore
   } else if (geometry.type === 'eccentricCone') {
     const { radiusA, radiusB } = primitiveInfo;
 
@@ -126,9 +130,9 @@ function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup, fil
 
 function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
   if (primitiveGroupMap.Circle.group.data.count + minimumRequiredCapacity > primitiveGroupMap.Circle.group.capacity) {
-      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Circle.capacity);
-      primitiveGroupMap.Circle.group = new CircleGroup(capacity);
-      return true;
+    const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Circle.capacity);
+    primitiveGroupMap.Circle.group = new CircleGroup(capacity);
+    return true;
   }
   return false;
 }
@@ -170,9 +174,13 @@ export default function parse(args: ParseData): boolean {
         const { verticalRadius, horizontalRadius, height } = primitiveInfo;
         const length = verticalRadius - height;
         const circleRadius =
-              (Math.sqrt(verticalRadius * verticalRadius - length * length) * horizontalRadius)
-              / verticalRadius;
-        center.add(vector.copy(normal).normalize().multiplyScalar(length));
+          (Math.sqrt(verticalRadius * verticalRadius - length * length) * horizontalRadius) / verticalRadius;
+        center.add(
+          vector
+            .copy(normal)
+            .normalize()
+            .multiplyScalar(length)
+        );
         added = group.add(nodeId, treeIndex, size, center, normal, circleRadius, filterOptions);
       } else {
         // Regular circles

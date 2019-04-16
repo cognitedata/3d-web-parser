@@ -3,11 +3,13 @@
 import * as THREE from 'three';
 import BoxGroup from '../../geometry/BoxGroup';
 import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
-import { MatchingGeometries,
-         parsePrimitiveColor,
-         parsePrimitiveNodeId,
-         parsePrimitiveTreeIndex,
-         getPrimitiveType } from './protobufUtils';
+import {
+  MatchingGeometries,
+  parsePrimitiveColor,
+  parsePrimitiveNodeId,
+  parsePrimitiveTreeIndex,
+  getPrimitiveType
+} from './protobufUtils';
 import { ParseData } from '../parseUtils';
 
 const color = new THREE.Color();
@@ -18,7 +20,7 @@ const delta = new THREE.Vector3();
 function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   const matchingGeometries: MatchingGeometries = {
     count: 0,
-    geometries: [],
+    geometries: []
   };
 
   geometries.forEach(geometry => {
@@ -33,9 +35,9 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 
 function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
   if (primitiveGroupMap.Box.group.data.count + minimumRequiredCapacity > primitiveGroupMap.Box.group.capacity) {
-      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Box.capacity);
-      primitiveGroupMap.Box.group = new BoxGroup(capacity);
-      return true;
+    const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Box.capacity);
+    primitiveGroupMap.Box.group = new BoxGroup(capacity);
+    return true;
   }
   return false;
 }

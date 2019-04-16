@@ -46,9 +46,9 @@ export interface UncompressedValues {
 }
 
 export type SectorCompressedData = {
-  primitives: CompressedGeometryData[],
-  instancedMesh?: CompressedGeometryData,
-  mergedMesh?: CompressedGeometryData,
+  primitives: CompressedGeometryData[];
+  instancedMesh?: CompressedGeometryData;
+  mergedMesh?: CompressedGeometryData;
 };
 
 export type PerSectorCompressedData = {

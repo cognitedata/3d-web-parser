@@ -34,8 +34,8 @@ describe('TorusSegmentGroup', () => {
 
     const angle = 1.0;
 
-    group.data.setNumber('angle',  angle, 0);
-    expect(group.data.getNumber('angle',  0)).toBeCloseTo(angle);
+    group.data.setNumber('angle', angle, 0);
+    expect(group.data.getNumber('angle', 0)).toBeCloseTo(angle);
   });
 
   test('(set/get)ArcAngle', () => {
@@ -43,8 +43,8 @@ describe('TorusSegmentGroup', () => {
 
     const arcAngle = 1.0;
 
-    group.data.setNumber('arcAngle',  arcAngle, 0);
-    expect(group.data.getNumber('arcAngle',  0)).toBeCloseTo(arcAngle);
+    group.data.setNumber('arcAngle', arcAngle, 0);
+    expect(group.data.getNumber('arcAngle', 0)).toBeCloseTo(arcAngle);
   });
 
   test('add', () => {
@@ -71,7 +71,7 @@ describe('TorusSegmentGroup', () => {
 
     expect(group.data.getNumber('radius', 0)).toBeCloseTo(radius);
     expect(group.data.getNumber('tubeRadius', 0)).toBeCloseTo(tubeRadius);
-    expect(group.data.getNumber('angle',  0)).toBeCloseTo(angle);
-    expect(group.data.getNumber('arcAngle',  0)).toBeCloseTo(arcAngle);
+    expect(group.data.getNumber('angle', 0)).toBeCloseTo(angle);
+    expect(group.data.getNumber('arcAngle', 0)).toBeCloseTo(arcAngle);
   });
 });

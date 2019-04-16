@@ -17,14 +17,13 @@ export default function unpackInstancedMeshes(
   uncompressedValues: UncompressedValues,
   compressedData: PerSectorCompressedData,
   maps: DataMaps,
-  sceneStats: SceneStats,
-  ) {
-
+  sceneStats: SceneStats
+) {
   const data = new PropertyLoader(uncompressedValues);
 
   for (const sector of rootSector.traverseSectors()) {
     sector.instancedMeshGroup = new InstancedMeshGroup();
-    const meshCounts: {[fileId: string]: {[triangleOffset: string]: { count: number, triangleCount: number }}} = {};
+    const meshCounts: { [fileId: string]: { [triangleOffset: string]: { count: number; triangleCount: number } } } = {};
 
     // Count meshes per file id and triangle offset
     const geometryInfo = compressedData[sector.path].instancedMesh;
@@ -32,8 +31,9 @@ export default function unpackInstancedMeshes(
       for (let i = 0; i < geometryInfo.count; i++) {
         data.loadData(geometryInfo);
         meshCounts[data.fileId] = meshCounts[data.fileId] ? meshCounts[data.fileId] : {};
-        meshCounts[data.fileId][data.triangleOffset] = meshCounts[data.fileId][data.triangleOffset] ?
-          meshCounts[data.fileId][data.triangleOffset] : { count: 0, triangleCount: data.triangleCount };
+        meshCounts[data.fileId][data.triangleOffset] = meshCounts[data.fileId][data.triangleOffset]
+          ? meshCounts[data.fileId][data.triangleOffset]
+          : { count: 0, triangleCount: data.triangleCount };
         meshCounts[data.fileId][data.triangleOffset].count++;
       }
       geometryInfo.indices.rewind();
@@ -41,13 +41,16 @@ export default function unpackInstancedMeshes(
     }
 
     // Create mesh collections for each file Id and triangle offset
-    const collections: {[fileId: string]: {[triangleOffset: string]: InstancedMeshCollection}} = {};
+    const collections: { [fileId: string]: { [triangleOffset: string]: InstancedMeshCollection } } = {};
     Object.keys(meshCounts).forEach(fileId => {
-      collections[fileId] = (collections[fileId] !== undefined) ? collections[fileId] : {};
+      collections[fileId] = collections[fileId] !== undefined ? collections[fileId] : {};
       Object.keys(meshCounts[fileId]).forEach(triangleOffset => {
         const { count, triangleCount } = meshCounts[fileId][triangleOffset];
         collections[fileId][triangleOffset] = new InstancedMeshCollection(
-          parseInt(triangleOffset, 10), triangleCount, count);
+          parseInt(triangleOffset, 10),
+          triangleCount,
+          count
+        );
       });
     });
 
@@ -62,8 +65,7 @@ export default function unpackInstancedMeshes(
         matrix.multiply(rotation.makeRotationAxis(yAxis, data.rotation3.y));
         matrix.multiply(rotation.makeRotationAxis(xAxis, data.rotation3.x));
         matrix.scale(data.scale);
-        collections[data.fileId][data.triangleOffset].addMapping(
-          data.nodeId, data.treeIndex, data.size, matrix);
+        collections[data.fileId][data.triangleOffset].addMapping(data.nodeId, data.treeIndex, data.size, matrix);
       }
     }
 

@@ -3,7 +3,7 @@
 import FibonacciDecoder from '../../parsers/FibonacciDecoder';
 
 describe('FibonacciDecoder', () => {
-  test('parse fibonacci encoding', async() => {
+  test('parse fibonacci encoding', async () => {
     const uncompressedData = new ArrayBuffer(12);
     const uncompressedView = new Uint8Array(uncompressedData);
     uncompressedView[0] = parseInt('11110011', 2);

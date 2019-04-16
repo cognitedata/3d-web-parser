@@ -55,7 +55,7 @@ describe('CircleGroup', () => {
     group.data.getVector3('center', targetVector, 0);
     expectVector3Equal(targetVector, center);
 
-    group.data.getVector3('normal', targetVector, 0 );
+    group.data.getVector3('normal', targetVector, 0);
     expectVector3Equal(targetVector, normal);
 
     expect(group.data.getNumber('radiusA', 0)).toBeCloseTo(radius);
@@ -68,7 +68,8 @@ describe('CircleGroup', () => {
     group.computeModelMatrix(matrix, 0);
 
     const expectedMatrix = new THREE.Matrix4();
-    expectedMatrix.set(12.888888888888888,
+    expectedMatrix.set(
+      12.888888888888888,
       -8.88888888888889,
       -12.444444444444445,
       0,
@@ -83,7 +84,8 @@ describe('CircleGroup', () => {
       1,
       2,
       3,
-      1);
+      1
+    );
     expectedMatrix.transpose(); // See https://threejs.org/docs/#api/en/math/Matrix4
     for (let i = 0; i < 16; i++) {
       expect(matrix.elements[i]).toBeCloseTo(expectedMatrix.elements[i]);

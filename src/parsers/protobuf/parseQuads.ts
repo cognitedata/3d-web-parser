@@ -3,12 +3,14 @@
 import * as THREE from 'three';
 import QuadGroup from '../../geometry/QuadGroup';
 import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
-import { MatchingGeometries,
-         parsePrimitiveColor,
-         parsePrimitiveNodeId,
-         parsePrimitiveTreeIndex,
-         getPrimitiveType,
-         isPrimitive} from './protobufUtils';
+import {
+  MatchingGeometries,
+  parsePrimitiveColor,
+  parsePrimitiveNodeId,
+  parsePrimitiveTreeIndex,
+  getPrimitiveType,
+  isPrimitive
+} from './protobufUtils';
 import { ParseData } from '../parseUtils';
 import { zAxis } from '../../constants';
 
@@ -25,7 +27,7 @@ const axisRotation = new THREE.Quaternion();
 function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   const matchingGeometries: MatchingGeometries = {
     count: 0,
-    geometries: [],
+    geometries: []
   };
 
   geometries.forEach(geometry => {
@@ -36,12 +38,14 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
     const { arcAngle = 0, isClosed = false } = primitiveInfo;
 
-    if ( (geometry.type === 'extrudedRing' || geometry.type === 'extrudedRingSegment')
-        && arcAngle < 2 * Math.PI
-        && isClosed) {
-          matchingGeometries.geometries.push(geometry);
-          matchingGeometries.count += 2;
-      }
+    if (
+      (geometry.type === 'extrudedRing' || geometry.type === 'extrudedRingSegment') &&
+      arcAngle < 2 * Math.PI &&
+      isClosed
+    ) {
+      matchingGeometries.geometries.push(geometry);
+      matchingGeometries.count += 2;
+    }
   });
 
   return matchingGeometries;
@@ -49,9 +53,9 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 
 function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
   if (primitiveGroupMap.Quad.group.data.count + minimumRequiredCapacity > primitiveGroupMap.Quad.group.capacity) {
-      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Quad.capacity);
-      primitiveGroupMap.Quad.group = new QuadGroup(capacity);
-      return true;
+    const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Quad.capacity);
+    primitiveGroupMap.Quad.group = new QuadGroup(capacity);
+    return true;
   }
   return false;
 }
@@ -69,12 +73,7 @@ export default function parse(args: ParseData): boolean {
     const nodeId = parsePrimitiveNodeId(geometry);
     const treeIndex = parsePrimitiveTreeIndex(geometry);
     globalColor.setHex(parsePrimitiveColor(geometry));
-    const {
-      angle = 0,
-      innerRadius,
-      outerRadius,
-      arcAngle = 2 * Math.PI,
-    } = primitiveInfo;
+    const { angle = 0, innerRadius, outerRadius, arcAngle = 2 * Math.PI } = primitiveInfo;
 
     let { x = 0, y = 0, z = 0 } = primitiveInfo.centerA;
     centerA.set(x, y, z);
@@ -82,7 +81,10 @@ export default function parse(args: ParseData): boolean {
     ({ x = 0, y = 0, z = 0 } = primitiveInfo.centerB);
     centerB.set(x, y, z);
 
-    normal.copy(centerA).sub(centerB).normalize();
+    normal
+      .copy(centerA)
+      .sub(centerB)
+      .normalize();
     axisRotation.setFromUnitVectors(zAxis, normal);
 
     [false, true].forEach(isSecondQuad => {
@@ -91,15 +93,18 @@ export default function parse(args: ParseData): boolean {
         .set(Math.cos(finalAngle), Math.sin(finalAngle), 0)
         .applyQuaternion(axisRotation)
         .normalize();
-      vertex1.copy(vertex)
+      vertex1
+        .copy(vertex)
         .multiplyScalar(innerRadius)
         .add(centerA);
 
-      vertex2.copy(vertex)
+      vertex2
+        .copy(vertex)
         .multiplyScalar(outerRadius)
         .add(centerB);
 
-      vertex3.copy(vertex)
+      vertex3
+        .copy(vertex)
         .multiplyScalar(innerRadius)
         .add(centerB);
 

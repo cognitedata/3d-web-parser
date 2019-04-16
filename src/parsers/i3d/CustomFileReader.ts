@@ -113,21 +113,23 @@ export default class CustomFileReader {
   readCompressedGeometryData(sectorEndLocation: number): SectorCompressedData {
     const geometryDataArray = loadCompressedGeometryData(this, sectorEndLocation);
     const primitives: CompressedGeometryData[] = [];
-    let instancedMesh = undefined;
-    let mergedMesh = undefined;
+    let instancedMesh;
+    let mergedMesh;
     geometryDataArray.forEach(geometryData => {
       if (FilePrimitiveNames.indexOf(geometryData.type as FilePrimitiveNameType) !== -1) {
         primitives.push(geometryData);
-      } else if (geometryData.type === 'InstancedMesh' as FileGeometryNameType) {
+      } else if (geometryData.type === ('InstancedMesh' as FileGeometryNameType)) {
         instancedMesh = geometryData;
-      } else if (geometryData.type === 'MergedMesh' as FileGeometryNameType) {
+      } else if (geometryData.type === ('MergedMesh' as FileGeometryNameType)) {
         mergedMesh = geometryData;
       } else {
+        // tslint:disable-next-line:no-console
         console.warn('Unrecognized geometry data type ' + geometryData.type);
       }
     });
     const primitiveHandlers = geometryDataArray.filter(geometryData => {
-      return (FilePrimitiveNames.indexOf(geometryData.type as FilePrimitiveNameType) !== -1); });
+      return FilePrimitiveNames.indexOf(geometryData.type as FilePrimitiveNameType) !== -1;
+    });
     return { primitives: primitiveHandlers, instancedMesh, mergedMesh };
   }
 

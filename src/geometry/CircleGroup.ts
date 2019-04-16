@@ -21,19 +21,19 @@ export function computeCircleBoundingBox(
   center: THREE.Vector3,
   normal: THREE.Vector3,
   radius: number,
-  box: THREE.Box3,
-  ) {
-    normal.normalize();
-    globalDot.multiplyVectors(normal, normal);
-    const twoRadius = 2 * radius;
-    const size = globalDot.set(
-      twoRadius * Math.sqrt(1 - globalDot.x),
-      twoRadius * Math.sqrt(1 - globalDot.y),
-      twoRadius * Math.sqrt(1 - globalDot.z),
-      );
+  box: THREE.Box3
+) {
+  normal.normalize();
+  globalDot.multiplyVectors(normal, normal);
+  const twoRadius = 2 * radius;
+  const size = globalDot.set(
+    twoRadius * Math.sqrt(1 - globalDot.x),
+    twoRadius * Math.sqrt(1 - globalDot.y),
+    twoRadius * Math.sqrt(1 - globalDot.z)
+  );
 
-    return box.setFromCenterAndSize(center, size);
-    }
+  return box.setFromCenterAndSize(center, size);
+}
 
 export default class CircleGroup extends PrimitiveGroup {
   public type: GeometryType;
@@ -51,14 +51,14 @@ export default class CircleGroup extends PrimitiveGroup {
     center: THREE.Vector3,
     normal: THREE.Vector3,
     radius: number,
-    filterOptions?: FilterOptions,
+    filterOptions?: FilterOptions
   ): boolean {
     this.setTreeIndex(treeIndex, this.data.count);
     this.data.add({
       size,
       center,
       normal,
-      radiusA: radius,
+      radiusA: radius
     });
 
     return this.filterLastObject(nodeId, filterOptions);
@@ -71,7 +71,7 @@ export default class CircleGroup extends PrimitiveGroup {
     return outputMatrix.compose(
       this.data.getVector3('center', globalCenter, index),
       globalQuaternion, // Rotation
-      globalScale, // Scale
+      globalScale // Scale
     );
   }
 
@@ -82,11 +82,6 @@ export default class CircleGroup extends PrimitiveGroup {
     const scaling = matrix.getMaxScaleOnAxis();
     const radius = scaling * this.data.getNumber('radiusA', index);
 
-    return computeCircleBoundingBox(
-      globalTransformedCenter,
-      globalTransformedNormal,
-      radius,
-      box,
-    );
+    return computeCircleBoundingBox(globalTransformedCenter, globalTransformedNormal, radius, box);
   }
 }

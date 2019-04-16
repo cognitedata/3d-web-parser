@@ -1,5 +1,7 @@
 // Copyright 2019 Cognite AS
 
+// tslint:disable:no-bitwise
+
 const FIBONACCI_MAX_LENGTH = 77; // Any 53 bit integer will take at most 77 bits in a fibonacci encoding.
 
 const fibonacciLookup = [1, 2];
@@ -33,7 +35,9 @@ export default class FibonacciDecoder {
   }
 
   nextValue() {
-    if (this.numberOfValuesRead >= this.numberOfValues) { throw Error('Reading past end of FibonacciDecoder'); }
+    if (this.numberOfValuesRead >= this.numberOfValues) {
+      throw Error('Reading past end of FibonacciDecoder');
+    }
     this.numberOfValuesRead++;
 
     // Read until you find two 1 bits in a row. Before then, each 1 corresponds to the (n+1)th fibinacci number.
@@ -42,7 +46,7 @@ export default class FibonacciDecoder {
       const currentByte = this.data[Math.floor(this.readBitId / 8)];
       const currentBit8 = currentByte & (1 << (7 - (this.readBitId % 8)));
       if (currentBit8 !== 0) {
-        if ((this.previousBit8 !== 0) && (this.nextFibIndex !== 0)) {
+        if (this.previousBit8 !== 0 && this.nextFibIndex !== 0) {
           this.previousBit8 = currentBit8;
           const returnValue = this.currentValue - 1;
           this.currentValue = 0;
