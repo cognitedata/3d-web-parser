@@ -22,7 +22,7 @@ export default function mergeInstancedMeshes(
         collection => (collection.mappings.count * collection.triangleCount <= TRIANGLE_COUNT_LIMIT));
       const mappingsSortedBySize: MappingInfo[] = [];
       smallCollections.forEach((collection, collectionIndex) => {
-        for (let i = 0; i < collection.mappings.capacity; i++) {
+        for (let mappingIndex = 0; mappingIndex < collection.mappings.capacity; mappingIndex++) {
           mappingsSortedBySize.push({
             collectionIndex: collectionIndex, mappingIndex: i, size: collection.mappings.getSize(i) });
         }
