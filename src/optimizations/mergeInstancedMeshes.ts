@@ -41,14 +41,12 @@ export default function mergeInstancedMeshes(
         if (triangleCount < TRIANGLE_COUNT_LIMIT) {
           for (let i = 0; i < collection.mappings.count; i++) {
             const treeIndex = collection.mappings.getTreeIndex(i);
-            const nodeId = treeIndexNodeIdMap[treeIndex];
             const size = collection.mappings.getSize(i);
             collection.mappings.getTransformMatrix(globalMatrix, i);
 
             mergedMesh.mappings.add(
               collection.triangleOffset,
               collection.triangleCount,
-              nodeId,
               treeIndex,
               size,
               globalMatrix,

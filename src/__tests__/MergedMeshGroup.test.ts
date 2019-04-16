@@ -25,7 +25,7 @@ describe('MeshGroup', () => {
       const triangleCount = 1234;
       const nodeId = 123;
       const treeIndex = 456;
-      nodeMappings.add(triangleOffset, triangleCount, nodeId, treeIndex, 0);
+      nodeMappings.add(triangleOffset, triangleCount, treeIndex, 0);
       expect(nodeMappings.count).toBe(index + 1);
       expect(nodeMappings.capacity).toBe(capacity);
 
@@ -41,7 +41,6 @@ describe('MeshGroup', () => {
     {
       const triangleOffset = 995;
       const triangleCount = 4322;
-      const nodeId = 11;
       const treeIndex = 10;
       const transformMatrix = new THREE.Matrix4();
       transformMatrix.set(
@@ -51,7 +50,7 @@ describe('MeshGroup', () => {
         0,  0,  0,  1,
       );
 
-      nodeMappings.add(triangleOffset, triangleCount, nodeId, treeIndex, 0, transformMatrix);
+      nodeMappings.add(triangleOffset, triangleCount, treeIndex, 0, transformMatrix);
       expect(nodeMappings.count).toBe(index + 1);
       expect(nodeMappings.capacity).toBe(capacity);
 
