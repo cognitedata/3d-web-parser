@@ -94,7 +94,6 @@ export function parseMultipleCustomFiles(
     throw Error('Did not find root sector');
   }
 
-  console.log(rootSector);
   return unpackData(rootSector, uncompressedValues, compressedData, maps, filterOptions);
 }
 
@@ -127,5 +126,6 @@ function unpackData(
     maps.nodeIdTreeIndexMap.set(nodeId, treeIndex);
   }
 
+  console.log(rootSector);
   return { rootSector, sectors, sceneStats, maps };
 }

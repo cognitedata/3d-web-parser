@@ -1,60 +1,52 @@
 // Copyright 2019 Cognite AS
 
 import Sector from '../Sector';
-import { MergedMesh, MergedMeshMappings } from '../geometry/MergedMeshGroup';
+import { MergedMesh } from '../geometry/MergedMeshGroup';
 import * as THREE from 'three';
-import { InstancedMeshCollection } from '../geometry/InstancedMeshGroup';
 import SceneStats from '../SceneStats';
-import { TreeIndexNodeIdMap } from '../parsers/parseUtils';
+import { InstancedMeshCollectionSizeSorter } from '../optimizations/meshSorters';
 
 const globalMatrix = new THREE.Matrix4();
 
-const TRIANGLE_COUNT_LIMIT = 100;
-
-function countMappingsToMerge(collections: InstancedMeshCollection[]) {
-  let numMappings = 0;
-  collections.forEach(collection => {
-    const triangleCount = collection.mappings.count * collection.triangleCount;
-    if (triangleCount < TRIANGLE_COUNT_LIMIT) {
-      numMappings += collection.mappings.count;
-    }
-  });
-  return numMappings;
-}
+const TRIANGLE_COUNT_LIMIT = 10000;
 
 export default function mergeInstancedMeshes(
   rootSector: Sector,
   sceneStats: SceneStats) {
 
   for (const sector of rootSector.traverseSectorsBreadthFirst()) {
+    // for each instanced mesh object with a given fileId
     sector.instancedMeshGroup.meshes.forEach(instancedMesh => {
-      // preallocate memory for new merged mesh
+      // Get all small instanced mesh collections, sorted by size
+      const smallCollections = instancedMesh.collections.filter(
+        collection => (collection.mappings.count * collection.triangleCount <= TRIANGLE_COUNT_LIMIT));
+      const collectionSorter = new InstancedMeshCollectionSizeSorter(smallCollections);
+
+      // Preallocate memory for a new merged mesh
+      const smallCollectionsTriangleCount = smallCollections.reduce((acc, collection) =>
+        acc + collection.mappings.count, 0);
       const mergedMesh = new MergedMesh(
-        countMappingsToMerge(instancedMesh.collections),
+        smallCollectionsTriangleCount,
         instancedMesh.fileId,
         true,
       );
 
-      // Cycle through instanced meshes, move small ones into the merged mesh, sorted by size
-      for (let index = instancedMesh.collections.length - 1; index >= 0; index--) {
-        const collection = instancedMesh.collections[index];
-        const triangleCount = collection.mappings.count * collection.triangleCount;
-        if (triangleCount < TRIANGLE_COUNT_LIMIT) {
-          for (let i = 0; i < collection.mappings.count; i++) {
-            const treeIndex = collection.mappings.getTreeIndex(i);
-            const size = collection.mappings.getSize(i);
-            collection.mappings.getTransformMatrix(globalMatrix, i);
-            mergedMesh.mappings.add(
-              collection.triangleOffset,
-              collection.triangleCount,
-              treeIndex,
-              size,
-              globalMatrix,
-            );
-          }
+      // Move the instanced meshes into one merged mesh, sorted by size
+      while (collectionSorter.isNotEmpty()) {
+        const { collection, mappingIndex } = collectionSorter.getNext();
+        const treeIndex = collection.mappings.getTreeIndex(mappingIndex);
+        const size = collection.mappings.getSize(mappingIndex);
+        collection.mappings.getTransformMatrix(globalMatrix, mappingIndex);
+        mergedMesh.mappings.add(
+          collection.triangleOffset,
+          collection.triangleCount,
+          treeIndex,
+          size,
+          globalMatrix,
+        );
 
-          instancedMesh.collections.splice(index, 1);
-        }
+        const collectionIndex = instancedMesh.collections.indexOf(collection);
+        instancedMesh.collections.splice(collectionIndex, 1);
       }
       sceneStats.geometryCount.MergedMesh += 1;
       sector.mergedMeshGroup.addMesh(mergedMesh);
