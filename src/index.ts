@@ -4,6 +4,7 @@ export { default as Sector } from './Sector';
 export { default as parseProtobuf } from './parsers/protobuf/main';
 export { parseFullCustomFile, parseMultipleCustomFiles } from './parsers/i3d/main';
 
+export { GeometryType } from './geometry/Types';
 export { default as BoxGroup } from './geometry/BoxGroup';
 export { default as CircleGroup } from './geometry/CircleGroup';
 export { default as ConeGroup } from './geometry/ConeGroup';
@@ -22,4 +23,5 @@ export { default as TorusSegmentGroup } from './geometry/TorusSegmentGroup';
 export { default as TrapeziumGroup } from './geometry/TrapeziumGroup';
 export { Attribute } from './geometry/PrimitiveGroup';
 export { computeBoundingBox } from './geometry/GeometryUtils';
-export { TreeIndexNodeIdMap, ColorMap } from './parsers/parseUtils';
+export { TreeIndexNodeIdMap, ColorMap, DataMaps, ParseReturn } from './parsers/parseUtils';
+export { default as SceneStats } from './SceneStats';
