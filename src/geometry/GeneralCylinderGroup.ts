@@ -25,12 +25,7 @@ const globalRotation = new THREE.Quaternion();
 const globalSlicingPlaneNormal = new THREE.Vector3();
 
 export default class GeneralCylinderGroup extends PrimitiveGroup {
-
-  static slicingPlane(target: THREE.Vector4,
-                      slope: number,
-                      zAngle: number,
-                      height: number,
-                      invertNormal: boolean) {
+  static slicingPlane(target: THREE.Vector4, slope: number, zAngle: number, height: number, invertNormal: boolean) {
     globalSlicingPlaneNormal
       .copy(zAxis)
       .applyAxisAngle(yAxis, slope)
@@ -40,12 +35,7 @@ export default class GeneralCylinderGroup extends PrimitiveGroup {
       globalSlicingPlaneNormal.negate();
     }
 
-    target.set(
-      globalSlicingPlaneNormal.x,
-      globalSlicingPlaneNormal.y,
-      globalSlicingPlaneNormal.z,
-      height,
-    );
+    target.set(globalSlicingPlaneNormal.x, globalSlicingPlaneNormal.y, globalSlicingPlaneNormal.z, height);
   }
 
   public type: GeometryType;
@@ -73,28 +63,17 @@ export default class GeneralCylinderGroup extends PrimitiveGroup {
     zAngleB: number,
     angle: number = 0,
     arcAngle: number = Math.PI * 2.0,
-    filterOptions?: FilterOptions,
+    filterOptions?: FilterOptions
   ): boolean {
-
     normal.subVectors(centerA, centerB).normalize();
     globalRotation.setFromUnitVectors(zAxis, normal);
 
     // Calculate global plane (also used to calculate normal A and B)
-    GeneralCylinderGroup.slicingPlane(
-      planeA,
-      slopeA,
-      zAngleA,
-      heightA,
-      false);
+    GeneralCylinderGroup.slicingPlane(planeA, slopeA, zAngleA, heightA, false);
 
     capNormalA.set(planeA.x, planeA.y, planeA.z).applyQuaternion(globalRotation);
 
-    GeneralCylinderGroup.slicingPlane(
-      planeB,
-      slopeB,
-      zAngleB,
-      heightB,
-      true);
+    GeneralCylinderGroup.slicingPlane(planeB, slopeB, zAngleB, heightB, true);
 
     capNormalB.set(planeB.x, planeB.y, planeB.z).applyQuaternion(globalRotation);
 
@@ -117,7 +96,7 @@ export default class GeneralCylinderGroup extends PrimitiveGroup {
       arcAngle,
       capNormalA,
       capNormalB,
-      localXAxis,
+      localXAxis
     });
 
     return this.filterLastObject(nodeId, filterOptions);
@@ -132,12 +111,21 @@ export default class GeneralCylinderGroup extends PrimitiveGroup {
     globalBox.makeEmpty();
     this.data.getVector3('centerA', extA, index);
     this.data.getVector3('centerB', extB, index);
-    normal.copy(extA).sub(extB).normalize();
+    normal
+      .copy(extA)
+      .sub(extB)
+      .normalize();
 
     const distFromAToExtA = this.data.getNumber('radiusA', index) * Math.tan(this.data.getNumber('slopeA', index));
     const distFromBToExtB = this.data.getNumber('radiusA', index) * Math.tan(this.data.getNumber('slopeB', index));
-    ringCenterA.copy(normal).multiplyScalar(-distFromAToExtA).add(extA);
-    ringCenterB.copy(normal).multiplyScalar(distFromBToExtB).add(extB);
+    ringCenterA
+      .copy(normal)
+      .multiplyScalar(-distFromAToExtA)
+      .add(extA);
+    ringCenterB
+      .copy(normal)
+      .multiplyScalar(distFromBToExtB)
+      .add(extB);
 
     computeEllipsoidBoundingBox(
       ringCenterA,
@@ -146,7 +134,7 @@ export default class GeneralCylinderGroup extends PrimitiveGroup {
       this.data.getNumber('radiusA', index) / Math.abs(Math.cos(this.data.getNumber('slopeA', index))),
       0,
       matrix,
-      globalBox,
+      globalBox
     );
 
     box.union(globalBox);
@@ -158,7 +146,7 @@ export default class GeneralCylinderGroup extends PrimitiveGroup {
       this.data.getNumber('radiusA', index) / Math.abs(Math.cos(this.data.getNumber('slopeB', index))),
       0,
       matrix,
-      globalBox,
+      globalBox
     );
     box.union(globalBox);
 

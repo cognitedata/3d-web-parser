@@ -13,7 +13,7 @@ let hasWarnedAboutMissingColor = false;
 function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   const matchingGeometries: MatchingGeometries = {
     count: 0,
-    geometries: [],
+    geometries: []
   };
 
   geometries.forEach(geometry => {
@@ -26,24 +26,19 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-function createCollection(
-  node: any,
-  data: ParseData) {
+function createCollection(node: any, data: ParseData) {
   const { triangleCount, triangleOffset } = node;
-  const collection = new InstancedMeshCollection(
-    triangleOffset,
-    triangleCount,
-    node.properties.length,
-  );
+  const collection = new InstancedMeshCollection(triangleOffset, triangleCount, node.properties.length);
   // @ts-ignore
   node.properties.forEach(property => {
     const nodeId = Number(property.nodeId);
     const { treeIndex, transformMatrix } = property;
     if (property.color == null && !hasWarnedAboutMissingColor) {
       hasWarnedAboutMissingColor = true;
+      // tslint:disable-next-line:no-console
       console.warn(
         '3d-web-parser encountered node with missing color while loading',
-        '(using #ff00ff to highlight objects with missing color).',
+        '(using #ff00ff to highlight objects with missing color).'
       );
     }
     const color = property.color != null ? property.color : { rgb: 0xff00ff };
@@ -82,7 +77,6 @@ export default function parse(data: ParseData): InstancedMeshGroup {
       data.sceneStats.geometryCount.InstancedMesh += 1;
       group.addMesh(instancedMesh);
     }
-
   });
 
   return group;

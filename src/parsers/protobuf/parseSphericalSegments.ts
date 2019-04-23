@@ -3,11 +3,13 @@
 import * as THREE from 'three';
 import SphericalSegmentGroup from '../../geometry/SphericalSegmentGroup';
 import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
-import { MatchingGeometries,
-         parsePrimitiveColor,
-         parsePrimitiveNodeId,
-         parsePrimitiveTreeIndex,
-         getPrimitiveType} from './protobufUtils';
+import {
+  MatchingGeometries,
+  parsePrimitiveColor,
+  parsePrimitiveNodeId,
+  parsePrimitiveTreeIndex,
+  getPrimitiveType
+} from './protobufUtils';
 import { ParseData } from '../parseUtils';
 
 const color = new THREE.Color();
@@ -17,11 +19,11 @@ const normal = new THREE.Vector3();
 function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   const matchingGeometries: MatchingGeometries = {
     count: 0,
-    geometries: [],
+    geometries: []
   };
 
   geometries.forEach(geometry => {
-    if (geometry.type === 'sphere' || geometry.type === 'sphericalSegment') {
+    if (geometry.type === 'sphere' || geometry.type === 'sphericalSegment') {
       matchingGeometries.geometries.push(geometry);
       matchingGeometries.count += 1;
     }
@@ -32,11 +34,12 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 
 function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
   if (
-    primitiveGroupMap.SphericalSegment.group.data.count + minimumRequiredCapacity
-    > primitiveGroupMap.SphericalSegment.group.capacity) {
-      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.SphericalSegment.capacity);
-      primitiveGroupMap.SphericalSegment.group = new SphericalSegmentGroup(capacity);
-      return true;
+    primitiveGroupMap.SphericalSegment.group.data.count + minimumRequiredCapacity >
+    primitiveGroupMap.SphericalSegment.group.capacity
+  ) {
+    const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.SphericalSegment.capacity);
+    primitiveGroupMap.SphericalSegment.group = new SphericalSegmentGroup(capacity);
+    return true;
   }
   return false;
 }

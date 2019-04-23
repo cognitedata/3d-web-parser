@@ -35,7 +35,7 @@ export default class EccentricConeGroup extends PrimitiveGroup {
     radiusA: number,
     radiusB: number,
     normal: THREE.Vector3,
-    filterOptions?: FilterOptions,
+    filterOptions?: FilterOptions
   ): boolean {
     this.setTreeIndex(treeIndex, this.data.count);
     this.data.add({
@@ -44,7 +44,7 @@ export default class EccentricConeGroup extends PrimitiveGroup {
       centerB,
       radiusA,
       radiusB,
-      normal,
+      normal
     });
 
     return this.filterLastObject(nodeId, filterOptions);
@@ -59,7 +59,10 @@ export default class EccentricConeGroup extends PrimitiveGroup {
     const scaling = matrix.getMaxScaleOnAxis();
 
     box.makeEmpty();
-    globalNormal.copy(this.data.getVector3('normal', globalNormal, index)).applyMatrix3(globalNormalMatrix).normalize();
+    globalNormal
+      .copy(this.data.getVector3('normal', globalNormal, index))
+      .applyMatrix3(globalNormalMatrix)
+      .normalize();
 
     // A
     globalCenter.copy(this.data.getVector3('centerA', globalCenterA, index)).applyMatrix4(matrix);

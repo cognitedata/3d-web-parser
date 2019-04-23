@@ -3,11 +3,13 @@
 import * as THREE from 'three';
 import NutGroup from '../../geometry/NutGroup';
 import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
-import { MatchingGeometries,
-         parsePrimitiveColor,
-         parsePrimitiveNodeId,
-         parsePrimitiveTreeIndex,
-         getPrimitiveType} from './protobufUtils';
+import {
+  MatchingGeometries,
+  parsePrimitiveColor,
+  parsePrimitiveNodeId,
+  parsePrimitiveTreeIndex,
+  getPrimitiveType
+} from './protobufUtils';
 import { ParseData } from '../parseUtils';
 const color = new THREE.Color();
 const centerA = new THREE.Vector3();
@@ -16,7 +18,7 @@ const centerB = new THREE.Vector3();
 function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   const matchingGeometries: MatchingGeometries = {
     count: 0,
-    geometries: [],
+    geometries: []
   };
 
   geometries.forEach(geometry => {
@@ -31,9 +33,9 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 
 function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
   if (primitiveGroupMap.Nut.group.data.count + minimumRequiredCapacity > primitiveGroupMap.Nut.group.capacity) {
-      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Nut.capacity);
-      primitiveGroupMap.Nut.group = new NutGroup(capacity);
-      return true;
+    const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Nut.capacity);
+    primitiveGroupMap.Nut.group = new NutGroup(capacity);
+    return true;
   }
   return false;
 }
@@ -60,15 +62,7 @@ export default function parse(args: ParseData): boolean {
 
     const size = Math.sqrt((2 * radius) ** 2 + centerA.distanceTo(centerB) ** 2);
 
-    const added = group.add(
-      nodeId,
-      treeIndex,
-      size,
-      centerA,
-      centerB,
-      radius,
-      rotationAngle,
-      filterOptions);
+    const added = group.add(nodeId, treeIndex, size, centerA, centerB, radius, rotationAngle, filterOptions);
 
     if (added) {
       treeIndexNodeIdMap[treeIndex] = nodeId;

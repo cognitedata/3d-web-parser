@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import GeometryGroupData from './GeometryGroupData';
 import { GeometryType } from './Types';
 export interface GeometryNode {
-  groupIndex: {collectionIndex?: number, mappingIndex: number};
+  groupIndex: { collectionIndex?: number; mappingIndex: number };
   treeIndex: number;
   nodeId: number;
   color?: THREE.Color;
@@ -33,7 +33,7 @@ export abstract class GeometryGroup {
         usage.byProperty[key] += this[key].byteLength;
         // @ts-ignore
         usage.total += this[key].byteLength;
-      // @ts-ignore
+        // @ts-ignore
       } else if (this[key] instanceof GeometryGroupData) {
         // @ts-ignore
         this[key].memoryUsage(usage);

@@ -15,7 +15,7 @@ describe('SphericalSegmentGroup', () => {
     const group = new SphericalSegmentGroup(2);
 
     const center = new THREE.Vector3(1.1, 2.1, 3.1);
-    group.data.setVector3('center',  center, 0);
+    group.data.setVector3('center', center, 0);
 
     expectVector3Equal(group.data.getVector3('center', new THREE.Vector3(), 0), center);
   });

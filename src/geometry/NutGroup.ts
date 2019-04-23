@@ -38,7 +38,7 @@ export default class NutGroup extends PrimitiveGroup {
     centerB: THREE.Vector3,
     radius: number,
     rotationAngle: number,
-    filterOptions?: FilterOptions,
+    filterOptions?: FilterOptions
   ): boolean {
     this.setTreeIndex(treeIndex, this.data.count);
     this.data.add({
@@ -46,7 +46,7 @@ export default class NutGroup extends PrimitiveGroup {
       centerA,
       centerB,
       radiusA: radius,
-      rotationAngle,
+      rotationAngle
     });
 
     return this.filterLastObject(nodeId, filterOptions);
@@ -66,7 +66,7 @@ export default class NutGroup extends PrimitiveGroup {
     return outputMatrix.compose(
       globalCenter,
       secondRotation.multiply(firstRotation),
-      globalScale,
+      globalScale
     );
   }
 

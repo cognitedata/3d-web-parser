@@ -11,7 +11,7 @@ let hasWarnedAboutMissingColor = false;
 function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   const matchingGeometries: MatchingGeometries = {
     count: 0,
-    geometries: [],
+    geometries: []
   };
 
   geometries.forEach(geometry => {
@@ -40,9 +40,10 @@ export default function parse(data: ParseData): MergedMeshGroup {
       const { treeIndex } = node.properties[0];
       if (node.properties[0].color == null && !hasWarnedAboutMissingColor) {
         hasWarnedAboutMissingColor = true;
+        // tslint:disable-next-line:no-console
         console.warn(
           '3d-web-parser encountered node with missing color while loading',
-          '(using #ff00ff to highlight objects with missing color).',
+          '(using #ff00ff to highlight objects with missing color).'
         );
       }
       const color = node.properties[0].color != null ? node.properties[0].color : { rgb: 0xff00ff };

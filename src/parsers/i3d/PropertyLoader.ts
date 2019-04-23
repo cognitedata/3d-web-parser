@@ -37,61 +37,63 @@ export default class PropertyLoader {
   public scale = new THREE.Vector3();
   private values: UncompressedValues;
 
-  private parameterToDataLoadingFunction: { [parameter: string]: Function } = {
-    'treeIndex': (indices: FibonacciDecoder) => { this.treeIndex =               indices.nextValue(); },
-    'color': (indices: FibonacciDecoder) => {
+  private parameterToDataLoadingFunction: { [parameter: string]: (indices: FibonacciDecoder) => void } = {
+    // tslint:disable:prettier
+    treeIndex: indices => { this.treeIndex =               indices.nextValue(); },
+    color: indices => {
       const index = indices.nextValue();
       if (index === 0) {
         this.color                              = DEFAULT_COLOR;
       } else {
         this.color                              = this.values.color![index - 1];
       }},
-    'center': (indices: FibonacciDecoder) => {
+    center: indices => {
       const centerX                             = this.values.centerX![indices.nextValue()];
       const centerY                             = this.values.centerY![indices.nextValue()];
       const centerZ                             = this.values.centerZ![indices.nextValue()];
       this.center.set(centerX, centerY, centerZ); },
-    'normal': (indices: FibonacciDecoder) => { this.normal  = this.values.normal! [indices.nextValue()]; },
-    'delta':  (indices: FibonacciDecoder) => {
+    normal: indices => { this.normal  = this.values.normal! [indices.nextValue()]; },
+    delta:  indices => {
       const deltaX                              = this.values.delta!  [indices.nextValue()];
       const deltaY                              = this.values.delta!  [indices.nextValue()];
       const deltaZ                              = this.values.delta!  [indices.nextValue()];
       this.delta.set(deltaX, deltaY, deltaZ);
     },
-    'height':        (indices: FibonacciDecoder) => { this.height        = this.values.height![indices.nextValue()]; },
-    'radiusA':       (indices: FibonacciDecoder) => { this.radiusA       = this.values.radius![indices.nextValue()]; },
-    'radiusB':       (indices: FibonacciDecoder) => { this.radiusB       = this.values.radius![indices.nextValue()]; },
-    'capNormal':     (indices: FibonacciDecoder) => { this.capNormal     = this.values.normal![indices.nextValue()]; },
-    'arcAngle':      (indices: FibonacciDecoder) => { this.arcAngle      = this.values.angle! [indices.nextValue()]; },
-    'rotationAngle': (indices: FibonacciDecoder) => { this.rotationAngle = this.values.angle! [indices.nextValue()]; },
-    'slopeA':        (indices: FibonacciDecoder) => { this.slopeA        = this.values.angle! [indices.nextValue()]; },
-    'slopeB':        (indices: FibonacciDecoder) => { this.slopeB        = this.values.angle! [indices.nextValue()]; },
-    'zAngleA':       (indices: FibonacciDecoder) => { this.zAngleA       = this.values.angle! [indices.nextValue()]; },
-    'zAngleB':       (indices: FibonacciDecoder) => { this.zAngleB       = this.values.angle! [indices.nextValue()]; },
-    'rotation3': (indices: FibonacciDecoder) => {
+    height:        indices => { this.height        = this.values.height![indices.nextValue()]; },
+    radiusA:       indices => { this.radiusA       = this.values.radius![indices.nextValue()]; },
+    radiusB:       indices => { this.radiusB       = this.values.radius![indices.nextValue()]; },
+    capNormal:     indices => { this.capNormal     = this.values.normal![indices.nextValue()]; },
+    arcAngle:      indices => { this.arcAngle      = this.values.angle! [indices.nextValue()]; },
+    rotationAngle: indices => { this.rotationAngle = this.values.angle! [indices.nextValue()]; },
+    slopeA:        indices => { this.slopeA        = this.values.angle! [indices.nextValue()]; },
+    slopeB:        indices => { this.slopeB        = this.values.angle! [indices.nextValue()]; },
+    zAngleA:       indices => { this.zAngleA       = this.values.angle! [indices.nextValue()]; },
+    zAngleB:       indices => { this.zAngleB       = this.values.angle! [indices.nextValue()]; },
+    rotation3: indices => {
       const rotationX                           = this.values.angle!  [indices.nextValue()];
       const rotationY                           = this.values.angle!  [indices.nextValue()];
       const rotationZ                           = this.values.angle!  [indices.nextValue()];
       this.rotation3.set(rotationX, rotationY, rotationZ);
     },
-    'translation': (indices: FibonacciDecoder) => {
+    translation: indices => {
       const translationX                        = this.values.translationX![indices.nextValue()];
       const translationY                        = this.values.translationY![indices.nextValue()];
       const translationZ                        = this.values.translationZ![indices.nextValue()];
       this.translation.set(translationX, translationY, translationZ);
     },
-    'scale': (indices: FibonacciDecoder) => {
+    scale: indices => {
       const scaleX                              = this.values.scaleX![indices.nextValue()];
       const scaleY                              = this.values.scaleY![indices.nextValue()];
       const scaleZ                              = this.values.scaleZ![indices.nextValue()];
       this.scale.set(scaleX, scaleY, scaleZ);
     },
-    'triangleOffset': (indices: FibonacciDecoder) => { this.triangleOffset               = indices.nextValue() ; },
-    'triangleCount':  (indices: FibonacciDecoder) => { this.triangleCount                = indices.nextValue() ; },
-    'thickness':      (indices: FibonacciDecoder) => { this.thickness = this.values.radius![indices.nextValue()]; },
-    'fileId':         (indices: FibonacciDecoder) => { this.fileId    = this.values.fileId![indices.nextValue()]; },
-    'size':   (indices: FibonacciDecoder) => {
+    triangleOffset: indices => { this.triangleOffset               = indices.nextValue() ; },
+    triangleCount:  indices => { this.triangleCount                = indices.nextValue() ; },
+    thickness:      indices => { this.thickness = this.values.radius![indices.nextValue()]; },
+    fileId:         indices => { this.fileId    = this.values.fileId![indices.nextValue()]; },
+    size:   indices => {
       this.size = this.values.size![indices.nextValue()]; },
+    // tslint:enable:prettier
   };
 
   constructor(uncompressedValues: UncompressedValues) {
@@ -99,7 +101,7 @@ export default class PropertyLoader {
   }
 
   loadData(geometryInfo: CompressedGeometryData) {
-    this.nodeId =    geometryInfo.nodeIds.nextNodeId();
+    this.nodeId = geometryInfo.nodeIds.nextNodeId();
     fileGeometryProperties[geometryInfo.type].forEach(property => {
       this.parameterToDataLoadingFunction[property].call(this, geometryInfo.indices);
     });

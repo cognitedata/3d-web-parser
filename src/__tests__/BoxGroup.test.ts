@@ -85,7 +85,8 @@ describe('BoxGroup', () => {
     group.computeModelMatrix(matrix, 0);
 
     const expectedMatrix = new THREE.Matrix4();
-    expectedMatrix.set(-0.02579228502181974,
+    expectedMatrix.set(
+      -0.02579228502181974,
       0.1338527461954474,
       -0.9906655340574289,
       0,
@@ -100,7 +101,8 @@ describe('BoxGroup', () => {
       1,
       2,
       3,
-      1);
+      1
+    );
     expectedMatrix.transpose(); // See https://threejs.org/docs/#api/en/math/Matrix4
     for (let i = 0; i < 16; i++) {
       expect(matrix.elements[i]).toBeCloseTo(expectedMatrix.elements[i]);

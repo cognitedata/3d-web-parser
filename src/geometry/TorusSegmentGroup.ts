@@ -41,7 +41,7 @@ export default class TorusSegmentGroup extends PrimitiveGroup {
     tubeRadius: number,
     angle: number,
     arcAngle: number,
-    filterOptions?: FilterOptions,
+    filterOptions?: FilterOptions
   ): boolean {
     this.setTreeIndex(treeIndex, this.data.count);
     this.data.add({
@@ -51,21 +51,21 @@ export default class TorusSegmentGroup extends PrimitiveGroup {
       radius,
       tubeRadius,
       angle,
-      arcAngle,
+      arcAngle
     });
 
     return this.filterLastObject(nodeId, filterOptions);
   }
 
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
-    firstRotation.setFromAxisAngle(zAxis, this.data.getNumber('angle',  index));
+    firstRotation.setFromAxisAngle(zAxis, this.data.getNumber('angle', index));
     secondRotation.setFromUnitVectors(zAxis, this.data.getVector3('normal', vector1, index));
     scale.set(1, 1, 1);
 
     return outputMatrix.compose(
       this.data.getVector3('center', vector2, index),
       secondRotation.multiply(firstRotation), // A.multiply(B) === A*B
-      scale,
+      scale
     );
   }
 
@@ -76,8 +76,8 @@ export default class TorusSegmentGroup extends PrimitiveGroup {
     secondRotation.setFromUnitVectors(zAxis, this.data.getVector3('normal', vector1, index));
 
     const radialSegmentAngle = twoPI / 24;
-    const angle = this.data.getNumber('angle',  index);
-    const arcAngle = this.data.getNumber('arcAngle',  index);
+    const angle = this.data.getNumber('angle', index);
+    const arcAngle = this.data.getNumber('arcAngle', index);
     const radius = this.data.getNumber('radius', index);
 
     const iterations = Math.ceil(arcAngle / radialSegmentAngle) + 1;
@@ -95,12 +95,7 @@ export default class TorusSegmentGroup extends PrimitiveGroup {
         .applyQuaternion(secondRotation)
         .applyMatrix3(normalMatrix);
       box.union(
-        computeCircleBoundingBox(
-          tubeCenter,
-          tubeNormal,
-          this.data.getNumber('tubeRadius', index),
-          reusableBox,
-        ),
+        computeCircleBoundingBox(tubeCenter, tubeNormal, this.data.getNumber('tubeRadius', index), reusableBox)
       );
     }
 

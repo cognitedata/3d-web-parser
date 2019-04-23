@@ -38,7 +38,7 @@ export default class ConeGroup extends PrimitiveGroup {
     radiusB: number,
     angle: number,
     arcAngle: number,
-    filterOptions?: FilterOptions,
+    filterOptions?: FilterOptions
   ): boolean {
     this.setTreeIndex(treeIndex, this.data.count);
     normal.subVectors(centerA, centerB).normalize();
@@ -53,7 +53,7 @@ export default class ConeGroup extends PrimitiveGroup {
       radiusB,
       angle,
       arcAngle,
-      localXAxis,
+      localXAxis
     });
 
     return this.filterLastObject(nodeId, filterOptions);
