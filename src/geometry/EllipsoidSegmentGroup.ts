@@ -5,6 +5,7 @@ import PrimitiveGroup from './PrimitiveGroup';
 import { computeCircleBoundingBox } from './CircleGroup';
 import { zAxis } from './../constants';
 import { FilterOptions } from '../parsers/parseUtils';
+import { GeometryType } from './Types';
 import GeometryGroupData from './GeometryGroupData';
 
 // reusable variables
@@ -15,7 +16,7 @@ SI.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1);
 const M = new THREE.Matrix4();
 const MT = new THREE.Matrix4();
 const boundingBoxCenter = new THREE.Vector3();
-const size = new THREE.Vector3();
+const sizeVector = new THREE.Vector3();
 const arr = new Array(16);
 
 // reusable variables
@@ -36,14 +37,14 @@ export function computeEllipsoidBoundingBox(
   yRadius: number,
   zRadius: number,
   matrix: THREE.Matrix4,
-  box: THREE.Box3,
+  box: THREE.Box3
 ): THREE.Box3 {
   rotation.setFromUnitVectors(zAxis, normal);
   scale.set(2 * xRadius, 2 * yRadius, 2 * zRadius);
   M.compose(
     center,
     rotation,
-    scale,
+    scale
   ).premultiply(matrix);
 
   MT.copy(M).transpose();
@@ -59,17 +60,18 @@ export function computeEllipsoidBoundingBox(
   const r34 = arr[11];
   const r44 = arr[15];
   boundingBoxCenter.set(r14 / r44, r24 / r44, r34 / r44);
-  size.set(
+  sizeVector.set(
     Math.abs(Math.sqrt(r14 * r14 - r44 * r11) / r44),
     Math.abs(Math.sqrt(r24 * r24 - r44 * r22) / r44),
-    Math.abs(Math.sqrt(r34 * r34 - r44 * r33) / r44),
+    Math.abs(Math.sqrt(r34 * r34 - r44 * r33) / r44)
   );
-  box.setFromCenterAndSize(boundingBoxCenter, size);
+  box.setFromCenterAndSize(boundingBoxCenter, sizeVector);
 
   return box;
 }
 
 export default class EllipsoidSegmentGroup extends PrimitiveGroup {
+  public type: GeometryType;
   public data: GeometryGroupData;
 
   constructor(capacity: number) {
@@ -79,24 +81,25 @@ export default class EllipsoidSegmentGroup extends PrimitiveGroup {
     this.data = new GeometryGroupData('EllipsoidSegment', capacity, this.attributes);
   }
 
-  // @ts-ignore
   add(
     nodeId: number,
     treeIndex: number,
+    size: number,
     center: THREE.Vector3,
     normal: THREE.Vector3,
     horizontalRadius: number,
     verticalRadius: number,
     height: number,
-    filterOptions?: FilterOptions,
+    filterOptions?: FilterOptions
   ): boolean {
     this.setTreeIndex(treeIndex, this.data.count);
     this.data.add({
+      size,
       center,
       normal,
       hRadius: horizontalRadius,
       vRadius: verticalRadius,
-      height,
+      height
     });
 
     return this.filterLastObject(nodeId, filterOptions);
@@ -124,22 +127,21 @@ export default class EllipsoidSegmentGroup extends PrimitiveGroup {
     const segments = 16;
     const step = hRadius / segments;
     for (let z = vRadius - height; z < vRadius; z += step) {
-      const circleRadius = Math.sqrt(vRadius * vRadius - z * z) * hRadius / vRadius;
-      globalCircleCenter.copy(globalTransformedNormal).multiplyScalar(z).add(globalTransformedCenter);
+      const circleRadius = (Math.sqrt(vRadius * vRadius - z * z) * hRadius) / vRadius;
+      globalCircleCenter
+        .copy(globalTransformedNormal)
+        .multiplyScalar(z)
+        .add(globalTransformedCenter);
 
-      box.union(
-        computeCircleBoundingBox(
-          globalCircleCenter,
-          globalTransformedNormal,
-          circleRadius,
-          globalReusableBox,
-        ),
-      );
+      box.union(computeCircleBoundingBox(globalCircleCenter, globalTransformedNormal, circleRadius, globalReusableBox));
     }
 
     // union the point which maximizes z
     box.expandByPoint(
-      globalCircleCenter.copy(globalTransformedNormal).multiplyScalar(vRadius).add(globalTransformedCenter),
+      globalCircleCenter
+        .copy(globalTransformedNormal)
+        .multiplyScalar(vRadius)
+        .add(globalTransformedCenter)
     );
 
     return box;

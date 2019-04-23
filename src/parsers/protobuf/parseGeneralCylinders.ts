@@ -1,13 +1,17 @@
+// Copyright 2019 Cognite AS
+
 import * as THREE from 'three';
 import GeneralCylinderGroup from '../../geometry/GeneralCylinderGroup';
 import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
-import { MatchingGeometries,
+import {
+  MatchingGeometries,
   parsePrimitiveColor,
   parsePrimitiveNodeId,
   parsePrimitiveTreeIndex,
   getPrimitiveType,
   isPrimitive,
-  normalizeRadians } from './protobufUtils';
+  normalizeRadians
+} from './protobufUtils';
 import { ParseData } from '../parseUtils';
 import { zAxis } from '../../constants';
 
@@ -29,7 +33,7 @@ const lineEnd = new THREE.Vector3();
 function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   const matchingGeometries: MatchingGeometries = {
     count: 0,
-    geometries: [],
+    geometries: []
   };
 
   geometries.forEach(geometry => {
@@ -54,11 +58,12 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 
 function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
   if (
-    primitiveGroupMap.GeneralCylinder.group.data.count + minimumRequiredCapacity
-    > primitiveGroupMap.GeneralCylinder.group.capacity) {
-      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.GeneralCylinder.capacity);
-      primitiveGroupMap.GeneralCylinder.group = new GeneralCylinderGroup(capacity);
-      return true;
+    primitiveGroupMap.GeneralCylinder.group.data.count + minimumRequiredCapacity >
+    primitiveGroupMap.GeneralCylinder.group.capacity
+  ) {
+    const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.GeneralCylinder.capacity);
+    primitiveGroupMap.GeneralCylinder.group = new GeneralCylinderGroup(capacity);
+    return true;
   }
   return false;
 }
@@ -91,7 +96,7 @@ export default function parse(args: ParseData): boolean {
       slopeB = 0,
       zAngleA = 0,
       zAngleB = 0,
-      isClosed = false,
+      isClosed = false
     } = primitiveInfo;
 
     let { angle = 0 } = primitiveInfo;
@@ -108,23 +113,54 @@ export default function parse(args: ParseData): boolean {
     const heightA = distFromBToExtB + distFromBToA;
     const heightB = distFromBToExtB;
 
-    extA.copy(globalAxis)
+    extA
+      .copy(globalAxis)
       .multiplyScalar(distFromAToExtA)
       .add(centerA);
-    extB.copy(globalAxis)
+    extB
+      .copy(globalAxis)
       .multiplyScalar(-distFromBToExtB)
       .add(centerB);
 
-    added = group.add(nodeId, treeIndex, extA, extB,
-              radiusA, heightA,
-              heightB, slopeA, slopeB, zAngleA, zAngleB,
-              angle, arcAngle, filterOptions);
+    const size = Math.sqrt((2 * radiusA) ** 2 + centerA.distanceTo(centerB) ** 2);
+
+    added = group.add(
+      nodeId,
+      treeIndex,
+      size,
+      extA,
+      extB,
+      radiusA,
+      heightA,
+      heightB,
+      slopeA,
+      slopeB,
+      zAngleA,
+      zAngleB,
+      angle,
+      arcAngle,
+      filterOptions
+    );
     if (thickness > 0) {
       if (thickness !== radiusA) {
-        added = group.add(nodeId, treeIndex, extA, extB,
-                  radiusA - thickness, heightA,
-                  heightB, slopeA, slopeB, zAngleA, zAngleB,
-                  angle, arcAngle, filterOptions) || added;
+        added =
+          group.add(
+            nodeId,
+            treeIndex,
+            size,
+            extA,
+            extB,
+            radiusA - thickness,
+            heightA,
+            heightB,
+            slopeA,
+            slopeB,
+            zAngleA,
+            zAngleB,
+            angle,
+            arcAngle,
+            filterOptions
+          ) || added;
       }
     }
 

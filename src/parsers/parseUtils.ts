@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import * as THREE from 'three';
 
 import GeometryGroup from '../geometry/GeometryGroup';
@@ -27,7 +29,7 @@ export interface DataMaps {
   treeIndexNodeIdMap: TreeIndexNodeIdMap;
   colorMap: ColorMap;
   nodeIdTreeIndexMap: Map<number, number>;
-  idToSectorMap: {[name: string]: Sector};
+  idToSectorMap: { [name: string]: Sector };
 }
 
 export interface ParseData {
@@ -42,7 +44,7 @@ export interface ParseData {
 
 export interface ParseReturn {
   rootSector: Sector;
-  sectors: {[name: string]: Sector};
+  sectors: { [name: string]: Sector };
   sceneStats: SceneStats;
   maps: DataMaps;
 }

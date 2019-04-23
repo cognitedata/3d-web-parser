@@ -1,15 +1,19 @@
+// Copyright 2019 Cognite AS
+
 import * as THREE from 'three';
 import GeneralRingGroup from '../../geometry/GeneralRingGroup';
 import GeneralCylinderGroup from '../../geometry/GeneralCylinderGroup';
 import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
-import { MatchingGeometries,
-         parsePrimitiveColor,
-         parsePrimitiveNodeId,
-         parsePrimitiveTreeIndex,
-         getPrimitiveType,
-         isPrimitive,
-         angleBetweenVector3s,
-         normalizeRadians} from './protobufUtils';
+import {
+  MatchingGeometries,
+  parsePrimitiveColor,
+  parsePrimitiveNodeId,
+  parsePrimitiveTreeIndex,
+  getPrimitiveType,
+  isPrimitive,
+  angleBetweenVector3s,
+  normalizeRadians
+} from './protobufUtils';
 import { ParseData, FilterOptions } from '../parseUtils';
 import { xAxis, yAxis, zAxis } from '../../constants';
 
@@ -35,7 +39,7 @@ const globalLineEnd = new THREE.Vector3();
 function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   const matchingGeometries: MatchingGeometries = {
     count: 0,
-    geometries: [],
+    geometries: []
   };
 
   geometries.forEach(geometry => {
@@ -50,10 +54,12 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
     if (geometry.type === 'ring') {
       matchingGeometries.geometries.push(geometry);
       matchingGeometries.count += 1;
-    } else if (geometry.type === 'extrudedRing'
-            || geometry.type === 'extrudedRingSegment'
-            || geometry.type === 'generalCylinder'
-            || geometry.type === 'cone' && thickness > 0) {
+    } else if (
+      geometry.type === 'extrudedRing' ||
+      geometry.type === 'extrudedRingSegment' ||
+      geometry.type === 'generalCylinder' ||
+      (geometry.type === 'cone' && thickness > 0)
+    ) {
       matchingGeometries.geometries.push(geometry);
       matchingGeometries.count += 2;
     }
@@ -62,12 +68,13 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-function parseRing(primitiveInfo: any,
-                   nodeId: number,
-                   treeIndex: number,
-                   group: GeneralRingGroup,
-                   filterOptions?: FilterOptions): boolean {
-
+function parseRing(
+  primitiveInfo: any,
+  nodeId: number,
+  treeIndex: number,
+  group: GeneralRingGroup,
+  filterOptions?: FilterOptions
+): boolean {
   let { x = 0, y = 0, z = 0 } = primitiveInfo.center;
   globalCenter.set(x, y, z);
 
@@ -76,25 +83,32 @@ function parseRing(primitiveInfo: any,
   const { innerRadius, outerRadius } = primitiveInfo;
 
   globalLocalXAxis.copy(xAxis).applyQuaternion(globalRotation.setFromUnitVectors(zAxis, globalNormal));
-  return group.add(nodeId,
-            treeIndex,
-            globalCenter,
-            globalNormal,
-            globalLocalXAxis,
-            outerRadius,
-            outerRadius,
-            outerRadius - innerRadius,
-            0,
-            2 * Math.PI,
-            filterOptions,
-            );
+
+  const size = Math.sqrt((2 * outerRadius) ** 2 + globalCenterA.distanceTo(globalCenterB) ** 2);
+
+  return group.add(
+    nodeId,
+    treeIndex,
+    size,
+    globalCenter,
+    globalNormal,
+    globalLocalXAxis,
+    outerRadius,
+    outerRadius,
+    outerRadius - innerRadius,
+    0,
+    2 * Math.PI,
+    filterOptions
+  );
 }
 
-function parseCone(primitiveInfo: any,
-                   nodeId: number,
-                   treeIndex: number,
-                   group: GeneralRingGroup,
-                   filterOptions?: FilterOptions): boolean {
+function parseCone(
+  primitiveInfo: any,
+  nodeId: number,
+  treeIndex: number,
+  group: GeneralRingGroup,
+  filterOptions?: FilterOptions
+): boolean {
   let { x = 0, y = 0, z = 0 } = primitiveInfo.centerA;
   globalCenterA.set(x, y, z);
 
@@ -104,35 +118,52 @@ function parseCone(primitiveInfo: any,
   globalCapZAxis.copy(globalCenterA).sub(globalCenterB);
   globalRotation.setFromUnitVectors(zAxis, globalCapZAxis.normalize());
   globalCapXAxis.copy(xAxis).applyQuaternion(globalRotation);
-  const {
-    angle = 0,
-    arcAngle = 2 * Math.PI,
-    radiusA,
-    radiusB,
-    thickness = 0,
-  } = primitiveInfo;
+  const { angle = 0, arcAngle = 2 * Math.PI, radiusA, radiusB, thickness = 0 } = primitiveInfo;
 
-  let added = group.add(nodeId, treeIndex, globalCenterA,
-            globalCapZAxis, globalCapXAxis, radiusA,
-            radiusA, thickness, angle, arcAngle, filterOptions);
-  added = group.add(nodeId, treeIndex, globalCenterB,
-            globalCapZAxis, globalCapXAxis, radiusB,
-            radiusB, thickness, angle, arcAngle, filterOptions) || added;
+  const radius = Math.max(radiusA, radiusB);
+  const size = Math.sqrt((2 * radius) ** 2 + globalCenterA.distanceTo(globalCenterB) ** 2);
+
+  let added = group.add(
+    nodeId,
+    treeIndex,
+    size,
+    globalCenterA,
+    globalCapZAxis,
+    globalCapXAxis,
+    radiusA,
+    radiusA,
+    thickness,
+    angle,
+    arcAngle,
+    filterOptions
+  );
+  added =
+    group.add(
+      nodeId,
+      treeIndex,
+      size,
+      globalCenterB,
+      globalCapZAxis,
+      globalCapXAxis,
+      radiusB,
+      radiusB,
+      thickness,
+      angle,
+      arcAngle,
+      filterOptions
+    ) || added;
 
   return added;
 }
 
-function parseExtrudedRing(primitiveInfo: any,
-                           nodeId: number,
-                           treeIndex: number,
-                           group: GeneralRingGroup,
-                           filterOptions?: FilterOptions): boolean {
-  const {
-    angle = 0,
-    arcAngle = 2 * Math.PI,
-    innerRadius,
-    outerRadius,
-  } = primitiveInfo;
+function parseExtrudedRing(
+  primitiveInfo: any,
+  nodeId: number,
+  treeIndex: number,
+  group: GeneralRingGroup,
+  filterOptions?: FilterOptions
+): boolean {
+  const { angle = 0, arcAngle = 2 * Math.PI, innerRadius, outerRadius } = primitiveInfo;
 
   let { x = 0, y = 0, z = 0 } = primitiveInfo.centerA;
   globalCenterA.set(x, y, z);
@@ -140,40 +171,54 @@ function parseExtrudedRing(primitiveInfo: any,
   ({ x = 0, y = 0, z = 0 } = primitiveInfo.centerB);
   globalCenterB.set(x, y, z);
 
-  globalNormal.copy(globalCenterA).sub(globalCenterB).normalize();
+  globalNormal
+    .copy(globalCenterA)
+    .sub(globalCenterB)
+    .normalize();
   globalRotation.setFromUnitVectors(zAxis, globalNormal);
   globalCapXAxis.copy(xAxis).applyQuaternion(globalRotation);
 
-  let added = group.add(nodeId,
-            treeIndex,
-            globalCenterA,
-            globalNormal,
-            globalCapXAxis,
-            outerRadius,
-            outerRadius,
-            outerRadius - innerRadius,
-            angle,
-            arcAngle,
-            filterOptions);
-  added = group.add(nodeId,
-              treeIndex,
-              globalCenterB,
-              globalNormal,
-              globalCapXAxis,
-              outerRadius,
-              outerRadius,
-              outerRadius - innerRadius,
-              angle,
-              arcAngle,
-              filterOptions) || added;
+  const size = Math.sqrt((2 * outerRadius) ** 2 + globalCenterA.distanceTo(globalCenterB) ** 2);
+
+  let added = group.add(
+    nodeId,
+    treeIndex,
+    size,
+    globalCenterA,
+    globalNormal,
+    globalCapXAxis,
+    outerRadius,
+    outerRadius,
+    outerRadius - innerRadius,
+    angle,
+    arcAngle,
+    filterOptions
+  );
+  added =
+    group.add(
+      nodeId,
+      treeIndex,
+      size,
+      globalCenterB,
+      globalNormal,
+      globalCapXAxis,
+      outerRadius,
+      outerRadius,
+      outerRadius - innerRadius,
+      angle,
+      arcAngle,
+      filterOptions
+    ) || added;
   return added;
 }
 
-function parseGeneralCylinder(primitiveInfo: any,
-                              nodeId: number,
-                              treeIndex: number,
-                              group: GeneralRingGroup,
-                              filterOptions?: FilterOptions): boolean {
+function parseGeneralCylinder(
+  primitiveInfo: any,
+  nodeId: number,
+  treeIndex: number,
+  group: GeneralRingGroup,
+  filterOptions?: FilterOptions
+): boolean {
   //
   const {
     radiusA,
@@ -184,7 +229,7 @@ function parseGeneralCylinder(primitiveInfo: any,
     slopeB = 0,
     zAngleA = 0,
     zAngleB = 0,
-    isClosed = false,
+    isClosed = false
   } = primitiveInfo;
   const thickness = primitiveInfo.thickness || (isClosed ? radiusA : 0);
   let added = false;
@@ -204,12 +249,14 @@ function parseGeneralCylinder(primitiveInfo: any,
   const heightA = distFromBToExtB + distFromBToA;
   const heightB = distFromBToExtB;
 
-  globalExtA.copy(globalAxis)
-      .multiplyScalar(distFromAToExtA)
-      .add(globalCenterA);
-  globalExtB.copy(globalAxis)
-      .multiplyScalar(-distFromBToExtB)
-      .add(globalCenterB);
+  globalExtA
+    .copy(globalAxis)
+    .multiplyScalar(distFromAToExtA)
+    .add(globalCenterA);
+  globalExtB
+    .copy(globalAxis)
+    .multiplyScalar(-distFromBToExtB)
+    .add(globalCenterB);
 
   [true, false].forEach(isA => {
     const center = isA ? globalCenterA : globalCenterB;
@@ -220,13 +267,13 @@ function parseGeneralCylinder(primitiveInfo: any,
 
     const invertNormal = !isA;
     GeneralCylinderGroup.slicingPlane(globalSlicingPlane, slope, zAngle, height, invertNormal);
-    if (invertNormal) { globalSlicingPlane.negate(); }
+    if (invertNormal) {
+      globalSlicingPlane.negate();
+    }
 
-    const normal = new THREE.Vector3(
-      globalSlicingPlane.x,
-      globalSlicingPlane.y,
-      globalSlicingPlane.z,
-    ).applyQuaternion(globalRotation);
+    const normal = new THREE.Vector3(globalSlicingPlane.x, globalSlicingPlane.y, globalSlicingPlane.z).applyQuaternion(
+      globalRotation
+    );
 
     const plane = globalPlanes[Number(Boolean(isA))];
     plane.setFromNormalAndCoplanarPoint(normal, center);
@@ -260,10 +307,24 @@ function parseGeneralCylinder(primitiveInfo: any,
     const capAngleAxis = globalVertex.sub(center).normalize();
     const capAngle = angleBetweenVector3s(capAngleAxis, capXAxis, normal);
 
+    const size = Math.sqrt((2 * radius) ** 2 + globalCenterA.distanceTo(globalCenterB) ** 2);
+
     if (thickness > 0) {
-      added = group.add(nodeId, treeIndex, center, normal,
-                capXAxis, radius / Math.abs(Math.cos(slope)),
-                radius, thickness, normalizeRadians(capAngle), arcAngle, filterOptions) || added;
+      added =
+        group.add(
+          nodeId,
+          treeIndex,
+          size,
+          center,
+          normal,
+          capXAxis,
+          radius / Math.abs(Math.cos(slope)),
+          radius,
+          thickness,
+          normalizeRadians(capAngle),
+          arcAngle,
+          filterOptions
+        ) || added;
     }
   });
 
@@ -272,11 +333,12 @@ function parseGeneralCylinder(primitiveInfo: any,
 
 function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
   if (
-    primitiveGroupMap.GeneralRing.group.data.count + minimumRequiredCapacity
-    > primitiveGroupMap.GeneralRing.group.capacity) {
-      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.GeneralRing.capacity);
-      primitiveGroupMap.GeneralRing.group = new GeneralRingGroup(capacity);
-      return true;
+    primitiveGroupMap.GeneralRing.group.data.count + minimumRequiredCapacity >
+    primitiveGroupMap.GeneralRing.group.capacity
+  ) {
+    const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.GeneralRing.capacity);
+    primitiveGroupMap.GeneralRing.group = new GeneralRingGroup(capacity);
+    return true;
   }
   return false;
 }

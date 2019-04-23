@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import PrimitiveGroup from './PrimitiveGroup';
 import { zAxis } from '../constants';
 import { FilterOptions } from '../parsers/parseUtils';
+import { GeometryType } from './Types';
 import GeometryGroupData from './GeometryGroupData';
 
 // reusable variables
@@ -20,7 +21,7 @@ export function computeCircleBoundingBox(
   center: THREE.Vector3,
   normal: THREE.Vector3,
   radius: number,
-  box: THREE.Box3,
+  box: THREE.Box3
 ) {
   normal.normalize();
   globalDot.multiplyVectors(normal, normal);
@@ -28,13 +29,14 @@ export function computeCircleBoundingBox(
   const size = globalDot.set(
     twoRadius * Math.sqrt(1 - globalDot.x),
     twoRadius * Math.sqrt(1 - globalDot.y),
-    twoRadius * Math.sqrt(1 - globalDot.z),
+    twoRadius * Math.sqrt(1 - globalDot.z)
   );
 
   return box.setFromCenterAndSize(center, size);
 }
 
 export default class CircleGroup extends PrimitiveGroup {
+  public type: GeometryType;
   public data: GeometryGroupData;
   constructor(capacity: number) {
     super(capacity);
@@ -45,16 +47,18 @@ export default class CircleGroup extends PrimitiveGroup {
   add(
     nodeId: number,
     treeIndex: number,
+    size: number,
     center: THREE.Vector3,
     normal: THREE.Vector3,
     radius: number,
-    filterOptions?: FilterOptions,
+    filterOptions?: FilterOptions
   ): boolean {
     this.setTreeIndex(treeIndex, this.data.count);
     this.data.add({
+      size,
       center,
       normal,
-      radiusA: radius,
+      radiusA: radius
     });
 
     return this.filterLastObject(nodeId, filterOptions);
@@ -67,7 +71,7 @@ export default class CircleGroup extends PrimitiveGroup {
     return outputMatrix.compose(
       this.data.getVector3('center', globalCenter, index),
       globalQuaternion, // Rotation
-      globalScale, // Scale
+      globalScale // Scale
     );
   }
 
@@ -78,11 +82,6 @@ export default class CircleGroup extends PrimitiveGroup {
     const scaling = matrix.getMaxScaleOnAxis();
     const radius = scaling * this.data.getNumber('radiusA', index);
 
-    return computeCircleBoundingBox(
-      globalTransformedCenter,
-      globalTransformedNormal,
-      radius,
-      box,
-    );
+    return computeCircleBoundingBox(globalTransformedCenter, globalTransformedNormal, radius, box);
   }
 }

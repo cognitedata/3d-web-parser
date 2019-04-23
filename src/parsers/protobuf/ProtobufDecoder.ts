@@ -1,5 +1,7 @@
 // Copyright 2019 Cognite AS
 
+// tslint:disable:no-bitwise
+
 import { Root, Reader } from 'protobufjs';
 import * as WebSceneProto from './proto/web_scene.json';
 
@@ -10,7 +12,7 @@ function makeReader(dataArray: Uint8Array) {
 export default class ProtobufDecoder {
   static Types = {
     WEB_SCENE: 'cognite.data.threed.web.WebScene',
-    WEB_NODE: 'cognite.data.threed.web.WebNode',
+    WEB_NODE: 'cognite.data.threed.web.WebNode'
   };
 
   private readonly root: Root;

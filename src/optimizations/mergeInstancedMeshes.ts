@@ -1,58 +1,62 @@
+// Copyright 2019 Cognite AS
+
 import Sector from '../Sector';
-import { MergedMesh, MergedMeshMappings } from '../geometry/MergedMeshGroup';
+import { MergedMesh } from '../geometry/MergedMeshGroup';
 import * as THREE from 'three';
-import { InstancedMeshCollection } from '../geometry/InstancedMeshGroup';
 import SceneStats from '../SceneStats';
-import { TreeIndexNodeIdMap } from '../parsers/parseUtils';
 
 const globalMatrix = new THREE.Matrix4();
-const globalColor = new THREE.Color();
 
-function countMappingsToMerge(collections: InstancedMeshCollection[], triangleCountLimit: number) {
-  let numMappings = 0;
-  collections.forEach(collection => {
-    const triangleCount = (collection.mappings.count - 1) * collection.triangleCount;
-    if (triangleCount < triangleCountLimit) {
-      numMappings += collection.mappings.count;
-    }
-  });
-  return numMappings;
-}
+const TRIANGLE_COUNT_LIMIT = 10000;
+type MappingInfo = { collectionIndex: number; mappingIndex: number; size: number };
 
-export default function mergeInstancedMeshes(
-  sector: Sector,
-  triangleCountLimit: number,
-  sceneStats: SceneStats,
-  treeIndexNodeIdMap: TreeIndexNodeIdMap) {
-  sector.instancedMeshGroup.meshes.forEach(instancedMesh => {
-    const mergedMesh = new MergedMesh(
-      countMappingsToMerge(instancedMesh.collections, triangleCountLimit),
-      instancedMesh.fileId,
-      true,
-    );
-
-    for (let index = instancedMesh.collections.length - 1; index >= 0; index--) {
-      const collection = instancedMesh.collections[index];
-      const triangleCount = (collection.mappings.count - 1) * collection.triangleCount;
-      if (triangleCount < triangleCountLimit) {
-        for (let i = 0; i < collection.mappings.count; i++) {
-          const treeIndex = collection.mappings.getTreeIndex(i);
-          const nodeId = treeIndexNodeIdMap[treeIndex];
-          collection.mappings.getTransformMatrix(globalMatrix, i);
-
-          mergedMesh.mappings.add(
-            collection.triangleOffset,
-            collection.triangleCount,
-            nodeId,
-            treeIndex,
-            globalMatrix,
-          );
+export default function mergeInstancedMeshes(rootSector: Sector, sceneStats: SceneStats) {
+  for (const sector of rootSector.traverseSectorsBreadthFirst()) {
+    // for each instanced mesh object with a given fileId
+    sector.instancedMeshGroup.meshes.forEach(instancedMesh => {
+      // Get all small instanced mesh collections, sorted by size
+      const smallCollections = instancedMesh.collections.filter(
+        collection => collection.mappings.count * collection.triangleCount <= TRIANGLE_COUNT_LIMIT
+      );
+      const mappingsSortedBySize: MappingInfo[] = [];
+      smallCollections.forEach((collection, collectionIndex) => {
+        for (let mappingIndex = 0; mappingIndex < collection.mappings.count; mappingIndex++) {
+          mappingsSortedBySize.push({
+            collectionIndex,
+            mappingIndex,
+            size: collection.mappings.getSize(mappingIndex)
+          });
         }
+      });
+      mappingsSortedBySize.sort((a: MappingInfo, b: MappingInfo) => b.size - a.size);
 
-        instancedMesh.collections.splice(index, 1);
+      // Create a new merged mesh
+      const smallCollectionsTriangleCount = smallCollections.reduce(
+        (acc, collection) => acc + collection.mappings.count,
+        0
+      );
+      const mergedMesh = new MergedMesh(smallCollectionsTriangleCount, instancedMesh.fileId, true);
+
+      // Move the instanced meshes into one merged mesh, sorted by size
+      mappingsSortedBySize.forEach(mappingInfo => {
+        const { collectionIndex, mappingIndex } = mappingInfo;
+        const collection = smallCollections[collectionIndex];
+        const treeIndex = collection.mappings.getTreeIndex(mappingIndex);
+        const size = collection.mappings.getSize(mappingIndex);
+        collection.mappings.getTransformMatrix(globalMatrix, mappingIndex);
+        mergedMesh.mappings.add(collection.triangleOffset, collection.triangleCount, treeIndex, size, globalMatrix);
+      });
+      smallCollections.forEach(collection => {
+        instancedMesh.collections.splice(instancedMesh.collections.indexOf(collection), 1);
+      });
+      sceneStats.geometryCount.MergedMesh += 1;
+      sector.mergedMeshGroup.addMesh(mergedMesh);
+    });
+
+    for (let i = sector.instancedMeshGroup.meshes.length - 1; i >= 0; i--) {
+      if (sector.instancedMeshGroup.meshes[i].collections.length === 0) {
+        sector.instancedMeshGroup.meshes.splice(i, 1);
       }
     }
-    sceneStats.numMergedMeshes += 1;
-    sector.mergedMeshGroup.addMesh(mergedMesh);
-  });
+  }
 }

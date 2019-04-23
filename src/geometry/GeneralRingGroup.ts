@@ -6,6 +6,7 @@ import { computeEllipsoidBoundingBox } from './EllipsoidSegmentGroup';
 import { FilterOptions } from '../parsers/parseUtils';
 import GeometryGroupData from './GeometryGroupData';
 import { angleBetweenVector3s } from '../parsers/protobuf/protobufUtils';
+import { GeometryType } from './Types';
 import { normalize } from 'path';
 
 // reusable variables
@@ -19,6 +20,7 @@ const globalLocalXAxis = new THREE.Vector3();
 const globalCenter = new THREE.Vector3();
 
 export default class GeneralRingGroup extends PrimitiveGroup {
+  public type: GeometryType;
   public data: GeometryGroupData;
 
   constructor(capacity: number) {
@@ -31,6 +33,7 @@ export default class GeneralRingGroup extends PrimitiveGroup {
   add(
     nodeId: number,
     treeIndex: number,
+    size: number,
     center: THREE.Vector3,
     normal: THREE.Vector3,
     localXAxis: THREE.Vector3,
@@ -39,10 +42,11 @@ export default class GeneralRingGroup extends PrimitiveGroup {
     thickness: number,
     angle: number,
     arcAngle: number,
-    filterOptions?: FilterOptions,
+    filterOptions?: FilterOptions
   ): boolean {
     this.setTreeIndex(treeIndex, this.data.count);
     this.data.add({
+      size,
       center,
       normal,
       localXAxis,
@@ -50,7 +54,7 @@ export default class GeneralRingGroup extends PrimitiveGroup {
       radiusB: yRadius,
       thickness: thickness / yRadius,
       angle,
-      arcAngle,
+      arcAngle
     });
 
     return this.filterLastObject(nodeId, filterOptions);
@@ -59,13 +63,27 @@ export default class GeneralRingGroup extends PrimitiveGroup {
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
     this.data.getVector3('normal', globalNormal, index);
     this.data.getVector3('localXAxis', globalLocalXAxis, index);
-    localYAxis.crossVectors(this.data.getVector3('normal', globalNormal, index),
-      this.data.getVector3('localXAxis', globalLocalXAxis, index));
+    localYAxis.crossVectors(
+      this.data.getVector3('normal', globalNormal, index),
+      this.data.getVector3('localXAxis', globalLocalXAxis, index)
+    );
     rotationMatrix.set(
-      globalLocalXAxis.x, localYAxis.x, globalNormal.x, 0,
-      globalLocalXAxis.y, localYAxis.y, globalNormal.y, 0,
-      globalLocalXAxis.z, localYAxis.z, globalNormal.z, 0,
-                 0,            0,        0, 1,
+      globalLocalXAxis.x,
+      localYAxis.x,
+      globalNormal.x,
+      0,
+      globalLocalXAxis.y,
+      localYAxis.y,
+      globalNormal.y,
+      0,
+      globalLocalXAxis.z,
+      localYAxis.z,
+      globalNormal.z,
+      0,
+      0,
+      0,
+      0,
+      1
     );
 
     rotation.setFromRotationMatrix(rotationMatrix);
@@ -73,7 +91,7 @@ export default class GeneralRingGroup extends PrimitiveGroup {
     return outputMatrix.compose(
       this.data.getVector3('center', globalCenter, index),
       rotation,
-      scale,
+      scale
     );
   }
 
@@ -85,7 +103,7 @@ export default class GeneralRingGroup extends PrimitiveGroup {
       this.data.getNumber('radiusB', index),
       0,
       matrix,
-      box,
+      box
     );
   }
 }

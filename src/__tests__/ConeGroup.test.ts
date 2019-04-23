@@ -38,8 +38,9 @@ describe('ConeGroup', () => {
     const radiusB = 150.0;
     const angle = 1.33;
     const arcAngle = 2.33;
+    const size = Math.sqrt((2 * radiusB) ** 2 + centerA.distanceTo(centerB) ** 2);
 
-    group.add(nodeId, treeIndex, centerA, centerB, radiusA, radiusB, angle, arcAngle);
+    group.add(nodeId, treeIndex, size, centerA, centerB, radiusA, radiusB, angle, arcAngle);
     const targetVector = new THREE.Vector3();
     const targetColor = new THREE.Color();
 

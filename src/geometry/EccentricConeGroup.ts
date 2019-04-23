@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import PrimitiveGroup from './PrimitiveGroup';
 import { computeCircleBoundingBox } from './CircleGroup';
 import { FilterOptions } from '../parsers/parseUtils';
+import { GeometryType } from './Types';
 import GeometryGroupData from './GeometryGroupData';
 
 // reusable variables
@@ -15,6 +16,7 @@ const globalCenterA = new THREE.Vector3();
 const globalCenterB = new THREE.Vector3();
 
 export default class EccentricConeGroup extends PrimitiveGroup {
+  public type: GeometryType;
   public data: GeometryGroupData;
 
   constructor(capacity: number) {
@@ -27,20 +29,22 @@ export default class EccentricConeGroup extends PrimitiveGroup {
   add(
     nodeId: number,
     treeIndex: number,
+    size: number,
     centerA: THREE.Vector3,
     centerB: THREE.Vector3,
     radiusA: number,
     radiusB: number,
     normal: THREE.Vector3,
-    filterOptions?: FilterOptions,
+    filterOptions?: FilterOptions
   ): boolean {
     this.setTreeIndex(treeIndex, this.data.count);
     this.data.add({
+      size,
       centerA,
       centerB,
       radiusA,
       radiusB,
-      normal,
+      normal
     });
 
     return this.filterLastObject(nodeId, filterOptions);
@@ -55,7 +59,10 @@ export default class EccentricConeGroup extends PrimitiveGroup {
     const scaling = matrix.getMaxScaleOnAxis();
 
     box.makeEmpty();
-    globalNormal.copy(this.data.getVector3('normal', globalNormal, index)).applyMatrix3(globalNormalMatrix).normalize();
+    globalNormal
+      .copy(this.data.getVector3('normal', globalNormal, index))
+      .applyMatrix3(globalNormalMatrix)
+      .normalize();
 
     // A
     globalCenter.copy(this.data.getVector3('centerA', globalCenterA, index)).applyMatrix4(matrix);

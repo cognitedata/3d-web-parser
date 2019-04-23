@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import { UncompressedValues, PerSectorCompressedData } from '../sharedFileParserTypes';
 import PropertyLoader from '../PropertyLoader';
 import { MergedMeshGroup, MergedMesh } from '../../../geometry/MergedMeshGroup';
@@ -10,7 +12,7 @@ export default function unpackMergedMeshes(
   uncompressedValues: UncompressedValues,
   compressedData: PerSectorCompressedData,
   maps: DataMaps,
-  sceneStats: SceneStats,
+  sceneStats: SceneStats
 ) {
   const data = new PropertyLoader(uncompressedValues);
 
@@ -19,7 +21,7 @@ export default function unpackMergedMeshes(
     const geometryInfo = compressedData[sector.path].mergedMesh;
     if (geometryInfo !== undefined) {
       // count meshes per file Id
-      const meshCounts: {[fileId: string]: number} = {};
+      const meshCounts: { [fileId: string]: number } = {};
       for (let i = 0; i < geometryInfo.count; i++) {
         data.loadData(geometryInfo);
         meshCounts[data.fileId] = meshCounts[data.fileId] ? meshCounts[data.fileId] : 0;
@@ -29,7 +31,7 @@ export default function unpackMergedMeshes(
       geometryInfo.nodeIds.rewind();
 
       // create merged meshes
-      const mergedMeshes: {[fileId: string]: MergedMesh} = {};
+      const mergedMeshes: { [fileId: string]: MergedMesh } = {};
       Object.keys(meshCounts).forEach(fileId => {
         if (meshCounts[fileId] !== 0) {
           mergedMeshes[fileId] = new MergedMesh(meshCounts[fileId], parseInt(fileId, 10));
@@ -37,7 +39,7 @@ export default function unpackMergedMeshes(
       });
 
       // create mappings while calculating running triangle offsets
-      const triangleOffsets: {[fileId: string]: number} = {};
+      const triangleOffsets: { [fileId: string]: number } = {};
       for (let i = 0; i < geometryInfo.count; i++) {
         data.loadData(geometryInfo);
         maps.treeIndexNodeIdMap[data.treeIndex] = data.nodeId;
@@ -45,14 +47,18 @@ export default function unpackMergedMeshes(
 
         triangleOffsets[data.fileId] = triangleOffsets[data.fileId] ? triangleOffsets[data.fileId] : 0;
         mergedMeshes[data.fileId].mappings.add(
-          triangleOffsets[data.fileId], data.triangleCount, data.nodeId, data.treeIndex);
+          triangleOffsets[data.fileId],
+          data.triangleCount,
+          data.treeIndex,
+          data.size
+        );
         triangleOffsets[data.fileId] += data.triangleCount;
       }
 
       // add meshes to groups
       Object.keys(mergedMeshes).forEach(fileId => {
         sector.mergedMeshGroup.addMesh(mergedMeshes[fileId]);
-        sceneStats.numMergedMeshes += 1;
+        sceneStats.geometryCount.MergedMesh += 1;
       });
     }
   }

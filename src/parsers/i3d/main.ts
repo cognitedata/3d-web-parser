@@ -1,8 +1,10 @@
+// Copyright 2019 Cognite AS
+
 import { unpackInstancedMeshes, unpackMergedMeshes, unpackPrimitives } from './unpackGeometry/main';
 import Sector from '../../Sector';
 import CustomFileReader from './CustomFileReader';
-import SceneStats from '../../SceneStats';
 import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
+import { SceneStats, createSceneStats } from '../../SceneStats';
 import { PerSectorCompressedData, UncompressedValues } from './sharedFileParserTypes';
 import { DataMaps, FilterOptions, ParseReturn } from '../parseUtils';
 
@@ -15,14 +17,14 @@ function preloadMeshFiles(meshLoader: any, fileIds: number[]) {
 export function parseFullCustomFile(
   fileBuffer: ArrayBuffer,
   meshLoader: any,
-  filterOptions?: FilterOptions,
-  ): ParseReturn {
+  filterOptions?: FilterOptions
+): ParseReturn {
   const fileReader = new CustomFileReader(fileBuffer);
   const maps: DataMaps = {
     treeIndexNodeIdMap: [],
     colorMap: [],
     nodeIdTreeIndexMap: new Map(),
-    idToSectorMap: {},
+    idToSectorMap: {}
   };
   const compressedData: PerSectorCompressedData = {};
 
@@ -46,7 +48,9 @@ export function parseFullCustomFile(
     if (parentSector !== undefined) {
       parentSector.addChild(sector);
       parentSector.object3d.add(sector.object3d);
-    } else { throw Error('Parent sector not found'); }
+    } else {
+      throw Error('Parent sector not found');
+    }
     compressedData[sector.path] = fileReader.readCompressedGeometryData(sectorStartLocation + sectorByteLength);
   }
 
@@ -56,13 +60,13 @@ export function parseFullCustomFile(
 export function parseMultipleCustomFiles(
   sectorBuffers: ArrayBuffer[],
   meshLoader: any,
-  filterOptions?: FilterOptions,
+  filterOptions?: FilterOptions
 ): ParseReturn {
   const maps: DataMaps = {
     treeIndexNodeIdMap: [],
     colorMap: [],
     nodeIdTreeIndexMap: new Map(),
-    idToSectorMap: {},
+    idToSectorMap: {}
   };
   const compressedData: PerSectorCompressedData = {};
   let uncompressedValues: undefined | UncompressedValues;
@@ -75,15 +79,17 @@ export function parseMultipleCustomFiles(
     const sector = new Sector(sectorMetadata.sectorBBoxMin, sectorMetadata.sectorBBoxMax);
     maps.idToSectorMap[sectorMetadata.sectorId] = sector;
 
-    if (sectorMetadata.arrayCount > 0) { // Is root sector
+    if (sectorMetadata.arrayCount > 0) {
+      // Is root sector
       rootSector = sector;
       uncompressedValues = fileReader.readUncompressedValues();
     } else {
       const parentSector = maps.idToSectorMap[sectorMetadata.parentSectorId];
       if (parentSector !== undefined) {
         parentSector.addChild(sector);
-        parentSector.object3d.add(sector.object3d);
-      } else { throw Error('Did not find parent sector'); }
+      } else {
+        throw Error('Did not find parent sector');
+      }
     }
 
     compressedData[sector.path] = fileReader.readCompressedGeometryData(sectorByteLength);
@@ -101,20 +107,23 @@ function unpackData(
   uncompressedValues: UncompressedValues,
   compressedData: PerSectorCompressedData,
   maps: DataMaps,
-  filterOptions?: FilterOptions,
-  ): ParseReturn {
-  const sceneStats: SceneStats = {
-    numInstancedMeshes: 0,
-    numMergedMeshes: 0,
-  };
+  filterOptions?: FilterOptions
+): ParseReturn {
+  const sceneStats = createSceneStats();
   unpackPrimitives(rootSector, uncompressedValues, compressedData, maps, filterOptions);
   unpackMergedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
   unpackInstancedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
+  mergeInstancedMeshes(rootSector, sceneStats);
   for (const sector of rootSector.traverseSectors()) {
-    mergeInstancedMeshes(sector, 2500, sceneStats, maps.treeIndexNodeIdMap);
     sector.mergedMeshGroup.createTreeIndexMap();
     sector.instancedMeshGroup.createTreeIndexMap();
+
+    sceneStats.numSectors++;
+    sector.primitiveGroups.forEach(primitiveGroup => {
+      sceneStats.geometryCount[primitiveGroup.type] += primitiveGroup.data.count;
+    });
   }
+  sceneStats.numNodes = maps.treeIndexNodeIdMap.length;
 
   const sectors = maps.idToSectorMap;
   for (let treeIndex = 0; treeIndex < maps.treeIndexNodeIdMap.length; treeIndex++) {

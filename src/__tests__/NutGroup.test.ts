@@ -36,8 +36,9 @@ describe('NutGroup', () => {
     const centerB = new THREE.Vector3(4, 5, 6);
     const radius = 100.0;
     const rotationAngle = 1.2345;
+    const size = Math.sqrt((2 * radius) ** 2 + centerA.distanceTo(centerB) ** 2);
 
-    group.add(nodeId, treeIndex, centerA, centerB, radius, rotationAngle);
+    group.add(nodeId, treeIndex, size, centerA, centerB, radius, rotationAngle);
     const targetVector = new THREE.Vector3();
 
     expect(group.data.count).toBe(1);

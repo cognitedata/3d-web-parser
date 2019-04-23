@@ -1,6 +1,6 @@
 {
   "name": "@cognite/3d-web-parser",
-  "version": "0.8.8",
+  "version": "0.9.3",
   "description": "Parser for Cognite 3D viewer",
   "browser": "dist/main.js",
   "contributors": [
@@ -27,13 +27,14 @@
     "prepublishOnly": "yarn build",
     "test": "jest --config=jest.config.js",
     "lint": "tslint -c tslint.json -p tsconfig.json",
-    "lint:fix": "prettier \"src/**/*.ts\" --write && tslint -c tslint.json -p tsconfig.json --fix",
+    "lint:fix": "tslint -c tslint.json -p tsconfig.json --fix",
     "build": "yarn clean && rollup -c && yarn esCheck",
     "watch": "rollup -cw",
     "prepush": "yarn lint && yarn test",
     "esCheck": "es-check es5 './dist/index.js'"
   },
   "devDependencies": {
+    "@cognite/tslint-config-cognite-3d": "^1.0.3",
     "@types/jest": "^23.3.12",
     "@types/node": "^10.12.12",
     "@types/three": "^0.93.28",
@@ -47,8 +48,8 @@
     "ts-jest": "^23.10.5",
     "ts-loader": "^5.3.0",
     "tslint": "^5.11.0",
-    "tslint-config-prettier": "^1.16.0",
-    "tslint-eslint-rules": "^5.4.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-plugin-prettier": "^2.0.1",
     "typescript": "^3.1.6",
     "webpack": "^4.26.0",
     "webpack-cli": "^3.1.2",

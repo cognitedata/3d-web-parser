@@ -5,18 +5,12 @@ import PrimitiveGroup from './PrimitiveGroup';
 import { computeCircleBoundingBox } from './CircleGroup';
 import { FilterOptions } from '../parsers/parseUtils';
 import GeometryGroupData from './GeometryGroupData';
+import { GeometryType } from './Types';
 import { colorProperties } from './GeometryGroupDataParameters';
 
 // constants
 type triplet = [number, number, number];
-const points: triplet[] = [
-  [1, 0, 0],
-  [-1, 0, 0],
-  [0, 1, 0],
-  [0, -1, 0],
-  [0, 0, 1],
-  [0, 0, -1],
-];
+const points: triplet[] = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]];
 
 // reusable variables
 const transformedCenter = new THREE.Vector3();
@@ -29,6 +23,7 @@ const globalCenter = new THREE.Vector3();
 const globalNormal = new THREE.Vector3();
 
 export default class SphericalSegmentGroup extends PrimitiveGroup {
+  public type: GeometryType;
   public data: GeometryGroupData;
 
   constructor(capacity: number) {
@@ -39,26 +34,27 @@ export default class SphericalSegmentGroup extends PrimitiveGroup {
     this.attributes.push({
       name: 'a_vRadius',
       array: this.data.arrays.hRadius,
-      itemSize: 1,
+      itemSize: 1
     });
   }
 
-  // @ts-ignore
   add(
     nodeId: number,
     treeIndex: number,
+    size: number,
     center: THREE.Vector3,
     normal: THREE.Vector3,
     radius: number,
     height: number,
-    filterOptions?: FilterOptions,
+    filterOptions?: FilterOptions
   ): boolean {
     this.setTreeIndex(treeIndex, this.data.count);
     this.data.add({
+      size,
       center,
       normal,
       hRadius: radius,
-      height,
+      height
     });
 
     return this.filterLastObject(nodeId, filterOptions);
@@ -80,14 +76,12 @@ export default class SphericalSegmentGroup extends PrimitiveGroup {
     const height = scaling * this.data.getNumber('height', index);
 
     sphereCenter.copy(this.data.getVector3('center', globalCenter, index)).applyMatrix4(matrix);
-    transformedCenter
-      .copy(sphereCenter)
-      .add(direction.copy(transformedNormal).multiplyScalar(radius - height));
+    transformedCenter.copy(sphereCenter).add(direction.copy(transformedNormal).multiplyScalar(radius - height));
     box = computeCircleBoundingBox(
       transformedCenter,
       transformedNormal,
       Math.sqrt(radius * radius - (radius - height) * (radius - height)),
-      box,
+      box
     );
 
     points.forEach(p => {
@@ -103,7 +97,7 @@ export default class SphericalSegmentGroup extends PrimitiveGroup {
           point
             .set(p[0], p[1], p[2])
             .multiplyScalar(radius)
-            .add(sphereCenter),
+            .add(sphereCenter)
         );
       }
     });

@@ -1,11 +1,16 @@
+// Copyright 2019 Cognite AS
+
 import * as THREE from 'three';
 import GeometryGroup from './GeometryGroup';
 import { TypedArray, MeshNormalMaterial } from 'three';
+import { GeometryType } from './Types';
 import { computeBoundingBox } from './GeometryUtils';
 
 const globalMatrix = new THREE.Matrix4();
 const globalBox = new THREE.Box3();
-interface IndexMap { [s: number]: boolean; }
+interface IndexMap {
+  [s: number]: boolean;
+}
 
 export class InstancedMeshMappings {
   public count: number;
@@ -16,6 +21,7 @@ export class InstancedMeshMappings {
   public transform1: Float32Array;
   public transform2: Float32Array;
   public transform3: Float32Array;
+  public size: Float32Array;
 
   constructor(capacity: number) {
     this.count = 0;
@@ -27,6 +33,7 @@ export class InstancedMeshMappings {
     this.transform1 = new Float32Array(3 * this.capacity);
     this.transform2 = new Float32Array(3 * this.capacity);
     this.transform3 = new Float32Array(3 * this.capacity);
+    this.size = new Float32Array(this.capacity);
   }
 
   public removeIndices(indicesToRemove: IndexMap) {
@@ -57,20 +64,21 @@ export class InstancedMeshMappings {
     this.count = newIndex;
   }
 
-  public add(
-    nodeId: number,
-    treeIndex: number,
-    transformMatrix?: THREE.Matrix4,
-  ) {
+  public add(nodeId: number, treeIndex: number, size: number, transformMatrix?: THREE.Matrix4) {
     this.setTreeIndex(treeIndex, this.count);
     if (transformMatrix !== undefined) {
       this.setTransform(transformMatrix, this.count);
     }
+    this.setSize(size, this.count);
     this.count += 1;
   }
 
   public getTreeIndex(index: number): number {
     return this.treeIndex[index];
+  }
+
+  public getSize(index: number) {
+    return this.size[index];
   }
 
   public getTransformMatrix(target: THREE.Matrix4, index: number) {
@@ -95,13 +103,17 @@ export class InstancedMeshMappings {
     // TODO(anders.hafreager) Create proper helper functions to simplify/automate constructor and resize
 
     if (capacity < this.count) {
-      throw 'Error, tried to resize InstancedMeshMappings to smaller value than current count.';
+      throw new Error('Error, tried to resize InstancedMeshMappings to smaller value than current count.');
     }
 
     let tmp: TypedArray;
     tmp = this.treeIndex;
     this.treeIndex = new Float32Array(capacity);
     this.treeIndex.set(tmp.subarray(0, this.count), 0);
+
+    tmp = this.size;
+    this.size = new Float32Array(capacity);
+    this.size.set(tmp.subarray(0, this.count), 0);
 
     tmp = this.transform0;
     this.transform0 = new Float32Array(3 * capacity);
@@ -128,11 +140,16 @@ export class InstancedMeshMappings {
     this.resize(newCapacity);
 
     this.treeIndex.set(otherMappings.treeIndex.subarray(0, otherMappings.count), this.count);
+    this.size.set(otherMappings.size.subarray(0, otherMappings.count), this.count);
     this.transform0.set(otherMappings.transform0.subarray(0, 3 * otherMappings.count), 3 * this.count);
     this.transform1.set(otherMappings.transform1.subarray(0, 3 * otherMappings.count), 3 * this.count);
     this.transform2.set(otherMappings.transform2.subarray(0, 3 * otherMappings.count), 3 * this.count);
     this.transform3.set(otherMappings.transform3.subarray(0, 3 * otherMappings.count), 3 * this.count);
     this.count = newCapacity;
+  }
+
+  public setSize(value: number, index: number) {
+    this.size[index] = value;
   }
 
   private setTreeIndex(value: number, index: number) {
@@ -163,18 +180,16 @@ export class InstancedMeshCollection {
     this.mappings = new InstancedMeshMappings(capacity);
   }
 
-  addMapping(nodeId: number,
-             treeIndex: number,
-             transformMatrix?: THREE.Matrix4) {
-    this.mappings.add(nodeId, treeIndex, transformMatrix);
+  addMapping(nodeId: number, treeIndex: number, size: number, transformMatrix?: THREE.Matrix4) {
+    this.mappings.add(nodeId, treeIndex, size, transformMatrix);
   }
 }
 
 export class InstancedMesh {
   collections: InstancedMeshCollection[];
   fileId: number;
-  treeIndexMap: { [s: number]: number; };
-  collectionByTriangleOffset: { [s: number]: InstancedMeshCollection; };
+  treeIndexMap: { [s: number]: number };
+  collectionByTriangleOffset: { [s: number]: InstancedMeshCollection };
   constructor(fileId: number) {
     this.collections = [];
     this.fileId = fileId;
@@ -207,8 +222,9 @@ interface TreeIndexMap {
 }
 
 export class InstancedMeshGroup extends GeometryGroup {
-  meshes: InstancedMesh[];
-  treeIndexMap: TreeIndexMap;
+  public type: GeometryType;
+  public meshes: InstancedMesh[];
+  public treeIndexMap: TreeIndexMap;
   constructor() {
     super();
     this.meshes = [];
@@ -220,7 +236,7 @@ export class InstancedMeshGroup extends GeometryGroup {
     this.treeIndexMap = {};
 
     this.meshes.forEach((instancedMesh, meshIndex) => {
-      instancedMesh.collections.forEach( (collection, collectionIndex) => {
+      instancedMesh.collections.forEach((collection, collectionIndex) => {
         for (let mappingIndex = 0; mappingIndex < collection.mappings.count; mappingIndex++) {
           const treeIndex = collection.mappings.getTreeIndex(mappingIndex);
           if (this.treeIndexMap[treeIndex] === undefined) {
@@ -229,7 +245,7 @@ export class InstancedMeshGroup extends GeometryGroup {
           this.treeIndexMap[treeIndex].push({
             meshIndex,
             collectionIndex,
-            mappingIndex,
+            mappingIndex
           });
         }
       });
@@ -252,10 +268,12 @@ export class InstancedMeshGroup extends GeometryGroup {
     this.createTreeIndexMap();
   }
 
-  computeBoundingBox(matrix: THREE.Matrix4,
-                     box: THREE.Box3,
-                     treeIndex: number,
-                     geometry?: THREE.BufferGeometry): THREE.Box3 {
+  computeBoundingBox(
+    matrix: THREE.Matrix4,
+    box: THREE.Box3,
+    treeIndex: number,
+    geometry?: THREE.BufferGeometry
+  ): THREE.Box3 {
     box.makeEmpty();
 
     this.treeIndexMap[treeIndex].forEach(mesh => {

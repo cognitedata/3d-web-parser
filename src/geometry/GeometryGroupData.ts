@@ -1,10 +1,20 @@
-import { float64Properties, float32Properties, vector3Properties, matrix4Properties,
-  primitiveName, primitiveProperties, propertyName, colorProperties, vector4Properties,
-  primitiveAttributeProperties }
-  from './GeometryGroupDataParameters';
+// Copyright 2019 Cognite AS
+
+import {
+  float64Properties,
+  float32Properties,
+  vector3Properties,
+  matrix4Properties,
+  RenderedPrimitiveNameType,
+  primitiveProperties,
+  RenderedPropertyNameType,
+  colorProperties,
+  vector4Properties,
+  primitiveAttributes
+} from './GeometryGroupDataParameters';
 import * as THREE from 'three';
 
-function getAttributeItemSize(property: propertyName): number {
+function getAttributeItemSize(property: RenderedPropertyNameType): number {
   if (float32Properties.indexOf(property) !== -1) {
     return 1;
   } else if (vector3Properties.indexOf(property) !== -1) {
@@ -19,12 +29,12 @@ function getAttributeItemSize(property: propertyName): number {
 }
 
 export default class GeometryGroupData {
-  type: primitiveName;
+  type: RenderedPrimitiveNameType;
   count: number;
   capacity: number;
-  public arrays: {[name: string]: Float64Array | Float32Array };
+  public arrays: { [name: string]: Float64Array | Float32Array };
 
-  constructor(type: primitiveName, capacity: number, attributesPointer: any) {
+  constructor(type: RenderedPrimitiveNameType, capacity: number, attributesPointer: any) {
     this.type = type;
     this.count = 0;
     this.capacity = capacity;
@@ -44,11 +54,11 @@ export default class GeometryGroupData {
       }
     });
 
-    primitiveAttributeProperties[this.type].forEach(property => {
+    primitiveAttributes[this.type].forEach(property => {
       attributesPointer.push({
         name: 'a_' + property,
         array: this.arrays[property],
-        itemSize: getAttributeItemSize(property),
+        itemSize: getAttributeItemSize(property)
       });
 
       if (this.arrays[property] === undefined) {
@@ -59,35 +69,35 @@ export default class GeometryGroupData {
     this.sort();
   }
 
-  setNumber(property: propertyName, value: number, index: number) {
+  setNumber(property: RenderedPropertyNameType, value: number, index: number) {
     this.arrays[property][index] = value;
   }
 
-  setVector3(property: propertyName, value: THREE.Vector3, index: number) {
+  setVector3(property: RenderedPropertyNameType, value: THREE.Vector3, index: number) {
     this.arrays[property][3 * index] = value.x;
     this.arrays[property][3 * index + 1] = value.y;
     this.arrays[property][3 * index + 2] = value.z;
   }
 
-  setVector4(property: propertyName, value: THREE.Vector4, index: number) {
+  setVector4(property: RenderedPropertyNameType, value: THREE.Vector4, index: number) {
     this.arrays[property][4 * index] = value.x;
     this.arrays[property][4 * index + 1] = value.y;
     this.arrays[property][4 * index + 2] = value.z;
     this.arrays[property][4 * index + 3] = value.w;
   }
 
-  getNumber(property: propertyName, index: number): number {
+  getNumber(property: RenderedPropertyNameType, index: number): number {
     return this.arrays[property][index];
   }
 
-  getVector3(property: propertyName, target: THREE.Vector3, index: number): THREE.Vector3 {
+  getVector3(property: RenderedPropertyNameType, target: THREE.Vector3, index: number): THREE.Vector3 {
     target.x = this.arrays[property][3 * index];
     target.y = this.arrays[property][3 * index + 1];
     target.z = this.arrays[property][3 * index + 2];
     return target;
   }
 
-  getVector4(property: propertyName, target: THREE.Vector4, index: number): THREE.Vector4 {
+  getVector4(property: RenderedPropertyNameType, target: THREE.Vector4, index: number): THREE.Vector4 {
     target.x = this.arrays[property][4 * index];
     target.y = this.arrays[property][4 * index + 1];
     target.z = this.arrays[property][4 * index + 2];
@@ -97,15 +107,24 @@ export default class GeometryGroupData {
 
   add(properties: any) {
     Object.keys(properties).forEach(property => {
-      const name = property as propertyName;
-      if (float64Properties.indexOf(name) !== -1 || float32Properties.indexOf(name) !== -1)  {
+      if (this.arrays[property] === undefined) {
+        throw Error(
+          'Property ' +
+            (property as string) +
+            ' is not present on groups with type ' +
+            (this.type as string) +
+            '. See primitiveProperties in GeometryGroupDataParameters.ts'
+        );
+      }
+      const name = property as RenderedPropertyNameType;
+      if (float64Properties.indexOf(name) !== -1 || float32Properties.indexOf(name) !== -1) {
         this.setNumber(name, properties[property], this.count);
       } else if (vector3Properties.indexOf(name) !== -1) {
         this.setVector3(name, properties[property], this.count);
       } else if (vector4Properties.indexOf(name) !== -1) {
         this.setVector4(name, properties[property], this.count);
       } else {
-        throw Error('Property ' + name + ' does not have an associated memory structure');
+        throw Error('Property ' + property + ' does not have an associated type. See GeometryGroupDataParameters.ts');
       }
     });
 
@@ -127,15 +146,15 @@ export default class GeometryGroupData {
   }
 
   getPropertiesAsObject(index: number) {
-    const data: {[name: string]: any} = {};
+    const data: { [name: string]: any } = {};
     Object.keys(this.arrays).forEach(property => {
-      const name = property as propertyName;
-      if (float64Properties.indexOf(name) !== -1 || float32Properties.indexOf(name) !== -1)  {
+      const name = property as RenderedPropertyNameType;
+      if (float64Properties.indexOf(name) !== -1 || float32Properties.indexOf(name) !== -1) {
         data[property] = this.getNumber(name, index);
       } else if (vector3Properties.indexOf(name) !== -1) {
         data[property] = this.getVector3(name, new THREE.Vector3(), index);
       } else if (vector4Properties.indexOf(name) !== -1) {
-        data[property] = this.getVector4(name, new THREE.Vector4(),  index);
+        data[property] = this.getVector4(name, new THREE.Vector4(), index);
       } else {
         throw Error('Property ' + name + ' does not have an associated memory structure');
       }

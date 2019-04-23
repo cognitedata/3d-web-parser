@@ -3,6 +3,7 @@
 import * as THREE from 'three';
 import PrimitiveGroup from './PrimitiveGroup';
 import { FilterOptions } from '../parsers/parseUtils';
+import { GeometryType } from './Types';
 import GeometryGroupData from './GeometryGroupData';
 
 // reusable variables
@@ -21,6 +22,7 @@ const globalVertex4 = new THREE.Vector3();
 const point = new THREE.Vector3();
 
 export default class QuadGroup extends PrimitiveGroup {
+  public type: GeometryType;
   public data: GeometryGroupData;
   constructor(capacity: number) {
     super(capacity);
@@ -31,16 +33,18 @@ export default class QuadGroup extends PrimitiveGroup {
   add(
     nodeId: number,
     treeIndex: number,
+    size: number,
     vertex1: THREE.Vector3,
     vertex2: THREE.Vector3,
     vertex3: THREE.Vector3,
-    filterOptions?: FilterOptions,
+    filterOptions?: FilterOptions
   ): boolean {
     this.setTreeIndex(treeIndex, this.data.count);
     this.data.add({
+      size,
       vertex1,
       vertex2,
-      vertex3,
+      vertex3
     });
 
     return this.filterLastObject(nodeId, filterOptions);
@@ -58,28 +62,32 @@ export default class QuadGroup extends PrimitiveGroup {
     side1.normalize();
     side2.normalize();
 
+    // tslint:disable:prettier
     basis.set(
       side2.x, side1.x, normal.x, 0,
       side2.y, side1.y, normal.y, 0,
       side2.z, side1.z, normal.z, 0,
-            0,       0,        0, 1,
+            0,       0,        0, 1
     );
+    // tslint:enable:prettier
 
     outputMatrix = outputMatrix.identity().compose(
       center.set(0, 0, 0),
       rotation,
-      scale,
+      scale
     );
 
     outputMatrix.premultiply(basis);
 
     center.addVectors(globalVertex1, globalVertex2).multiplyScalar(0.5);
+    // tslint:disable:prettier
     basis.set(
       1, 0, 0, center.x,
       0, 1, 0, center.y,
       0, 0, 1, center.z,
-      0, 0, 0, 1,
+      0, 0, 0, 1
     );
+    // tslint:enable:prettier
 
     outputMatrix.premultiply(basis);
 

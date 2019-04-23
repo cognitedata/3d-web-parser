@@ -1,15 +1,16 @@
+// Copyright 2019 Cognite AS
+
 import * as THREE from 'three';
 import { CompressedGeometryData, UncompressedValues } from './sharedFileParserTypes';
 import { DEFAULT_COLOR, fileGeometryProperties } from './parserParameters';
+import FibonacciDecoder from '../FibonacciDecoder';
 
-type CGD = CompressedGeometryData;
-
-// tslint: disable
 export default class PropertyLoader {
   public nodeId = 0;
 
   public treeIndex = 0;
   public color = new THREE.Color();
+  public size = 0;
   public center = new THREE.Vector3();
   public normal = new THREE.Vector3();
   public delta = new THREE.Vector3();
@@ -36,59 +37,63 @@ export default class PropertyLoader {
   public scale = new THREE.Vector3();
   private values: UncompressedValues;
 
-  private parameterToDataLoadingFunction: { [parameter: string]: Function } = {
-    'treeIndex': (geometry: CGD) => { this.treeIndex =               geometry.indices.nextValue(); },
-    'color': (geometry: CGD) => {
-      const index = geometry.indices.nextValue();
+  private parameterToDataLoadingFunction: { [parameter: string]: (indices: FibonacciDecoder) => void } = {
+    // tslint:disable:prettier
+    treeIndex: indices => { this.treeIndex =               indices.nextValue(); },
+    color: indices => {
+      const index = indices.nextValue();
       if (index === 0) {
         this.color                              = DEFAULT_COLOR;
       } else {
         this.color                              = this.values.color![index - 1];
       }},
-    'center': (geometry: CGD) => {
-      const centerX                             = this.values.centerX![geometry.indices.nextValue()];
-      const centerY                             = this.values.centerY![geometry.indices.nextValue()];
-      const centerZ                             = this.values.centerZ![geometry.indices.nextValue()];
+    center: indices => {
+      const centerX                             = this.values.centerX![indices.nextValue()];
+      const centerY                             = this.values.centerY![indices.nextValue()];
+      const centerZ                             = this.values.centerZ![indices.nextValue()];
       this.center.set(centerX, centerY, centerZ); },
-    'normal': (geometry: CGD) => { this.normal  = this.values.normal! [geometry.indices.nextValue()]; },
-    'delta':  (geometry: CGD) => {
-      const deltaX                              = this.values.delta!  [geometry.indices.nextValue()];
-      const deltaY                              = this.values.delta!  [geometry.indices.nextValue()];
-      const deltaZ                              = this.values.delta!  [geometry.indices.nextValue()];
+    normal: indices => { this.normal  = this.values.normal! [indices.nextValue()]; },
+    delta:  indices => {
+      const deltaX                              = this.values.delta!  [indices.nextValue()];
+      const deltaY                              = this.values.delta!  [indices.nextValue()];
+      const deltaZ                              = this.values.delta!  [indices.nextValue()];
       this.delta.set(deltaX, deltaY, deltaZ);
     },
-    'height':        (geometry: CGD) => { this.height          = this.values.height![geometry.indices.nextValue()]; },
-    'radiusA':       (geometry: CGD) => { this.radiusA         = this.values.radius![geometry.indices.nextValue()]; },
-    'radiusB':       (geometry: CGD) => { this.radiusB         = this.values.radius![geometry.indices.nextValue()]; },
-    'capNormal':     (geometry: CGD) => { this.capNormal       = this.values.normal![geometry.indices.nextValue()]; },
-    'arcAngle':      (geometry: CGD) => { this.arcAngle        = this.values.angle! [geometry.indices.nextValue()]; },
-    'rotationAngle': (geometry: CGD) => { this.rotationAngle   = this.values.angle! [geometry.indices.nextValue()]; },
-    'slopeA':        (geometry: CGD) => { this.slopeA          = this.values.angle! [geometry.indices.nextValue()]; },
-    'slopeB':        (geometry: CGD) => { this.slopeB          = this.values.angle! [geometry.indices.nextValue()]; },
-    'zAngleA':       (geometry: CGD) => { this.zAngleA         = this.values.angle! [geometry.indices.nextValue()]; },
-    'zAngleB':       (geometry: CGD) => { this.zAngleB         = this.values.angle! [geometry.indices.nextValue()]; },
-    'rotation3': (geometry: CGD) => {
-      const rotationX                           = this.values.angle!  [geometry.indices.nextValue()];
-      const rotationY                           = this.values.angle!  [geometry.indices.nextValue()];
-      const rotationZ                           = this.values.angle!  [geometry.indices.nextValue()];
+    height:        indices => { this.height        = this.values.height![indices.nextValue()]; },
+    radiusA:       indices => { this.radiusA       = this.values.radius![indices.nextValue()]; },
+    radiusB:       indices => { this.radiusB       = this.values.radius![indices.nextValue()]; },
+    capNormal:     indices => { this.capNormal     = this.values.normal![indices.nextValue()]; },
+    arcAngle:      indices => { this.arcAngle      = this.values.angle! [indices.nextValue()]; },
+    rotationAngle: indices => { this.rotationAngle = this.values.angle! [indices.nextValue()]; },
+    slopeA:        indices => { this.slopeA        = this.values.angle! [indices.nextValue()]; },
+    slopeB:        indices => { this.slopeB        = this.values.angle! [indices.nextValue()]; },
+    zAngleA:       indices => { this.zAngleA       = this.values.angle! [indices.nextValue()]; },
+    zAngleB:       indices => { this.zAngleB       = this.values.angle! [indices.nextValue()]; },
+    rotation3: indices => {
+      const rotationX                           = this.values.angle!  [indices.nextValue()];
+      const rotationY                           = this.values.angle!  [indices.nextValue()];
+      const rotationZ                           = this.values.angle!  [indices.nextValue()];
       this.rotation3.set(rotationX, rotationY, rotationZ);
     },
-    'translation': (geometry: CGD) => {
-      const translationX                        = this.values.translationX![geometry.indices.nextValue()];
-      const translationY                        = this.values.translationY![geometry.indices.nextValue()];
-      const translationZ                        = this.values.translationZ![geometry.indices.nextValue()];
+    translation: indices => {
+      const translationX                        = this.values.translationX![indices.nextValue()];
+      const translationY                        = this.values.translationY![indices.nextValue()];
+      const translationZ                        = this.values.translationZ![indices.nextValue()];
       this.translation.set(translationX, translationY, translationZ);
     },
-    'scale': (geometry: CGD) => {
-      const scaleX                              = this.values.scaleX![geometry.indices.nextValue()];
-      const scaleY                              = this.values.scaleY![geometry.indices.nextValue()];
-      const scaleZ                              = this.values.scaleZ![geometry.indices.nextValue()];
+    scale: indices => {
+      const scaleX                              = this.values.scaleX![indices.nextValue()];
+      const scaleY                              = this.values.scaleY![indices.nextValue()];
+      const scaleZ                              = this.values.scaleZ![indices.nextValue()];
       this.scale.set(scaleX, scaleY, scaleZ);
     },
-    'triangleOffset': (geometry: CGD) => { this.triangleOffset               = geometry.indices.nextValue() ; },
-    'triangleCount':  (geometry: CGD) => { this.triangleCount                = geometry.indices.nextValue() ; },
-    'thickness':      (geometry: CGD) => { this.thickness = this.values.radius![geometry.indices.nextValue()]; },
-    'fileId':         (geometry: CGD) => { this.fileId    = this.values.fileId![geometry.indices.nextValue()]; },
+    triangleOffset: indices => { this.triangleOffset               = indices.nextValue() ; },
+    triangleCount:  indices => { this.triangleCount                = indices.nextValue() ; },
+    thickness:      indices => { this.thickness = this.values.radius![indices.nextValue()]; },
+    fileId:         indices => { this.fileId    = this.values.fileId![indices.nextValue()]; },
+    size:   indices => {
+      this.size = this.values.size![indices.nextValue()]; },
+    // tslint:enable:prettier
   };
 
   constructor(uncompressedValues: UncompressedValues) {
@@ -96,9 +101,9 @@ export default class PropertyLoader {
   }
 
   loadData(geometryInfo: CompressedGeometryData) {
-    this.nodeId =    geometryInfo.nodeIds.nextNodeId();
+    this.nodeId = geometryInfo.nodeIds.nextNodeId();
     fileGeometryProperties[geometryInfo.type].forEach(property => {
-      this.parameterToDataLoadingFunction[property].call(this, geometryInfo);
+      this.parameterToDataLoadingFunction[property].call(this, geometryInfo.indices);
     });
   }
 }

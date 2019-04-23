@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import * as THREE from 'three';
 
 let hasWarnedAboutMissingColor = false;
@@ -21,9 +23,10 @@ export function parsePrimitiveColor(data: any): any {
   }
   if (!hasWarnedAboutMissingColor) {
     hasWarnedAboutMissingColor = true;
+    // tslint:disable-next-line:no-console
     console.warn(
       '3d-web-parser encountered node with missing color while loading',
-      '(using #ff00ff to highlight objects with missing color).',
+      '(using #ff00ff to highlight objects with missing color).'
     );
   }
   return 0xff00ff;
@@ -42,7 +45,7 @@ export function isPrimitive(geometry: any): boolean {
   return geometry.primitiveInfo != null;
 }
 
-export function normalizeRadians (angle: number, lowerBound = -Math.PI, upperBound = Math.PI): number {
+export function normalizeRadians(angle: number, lowerBound = -Math.PI, upperBound = Math.PI): number {
   while (angle < lowerBound) {
     angle += 2 * Math.PI;
   }
@@ -66,37 +69,7 @@ export function parseInstancedMeshTransformMatrix(target: THREE.Matrix4, transfo
     return target;
   }
 
-  const [
-    n11,
-    n21,
-    n31,
-    n12,
-    n22,
-    n32,
-    n13,
-    n23,
-    n33,
-    n14,
-    n24,
-    n34,
-  ] = transformMatrix;
-  target.set(
-    n11,
-    n12,
-    n13,
-    n14,
-    n21,
-    n22,
-    n23,
-    n24,
-    n31,
-    n32,
-    n33,
-    n34,
-    0,
-    0,
-    0,
-    1,
-  );
+  const [n11, n21, n31, n12, n22, n32, n13, n23, n33, n14, n24, n34] = transformMatrix;
+  target.set(n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, 0, 0, 0, 1);
   return target;
 }

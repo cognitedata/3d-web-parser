@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import * as THREE from 'three';
 import { MergedMeshGroup, MergedMesh } from '../../geometry/MergedMeshGroup';
 import { MatchingGeometries } from './protobufUtils';
@@ -9,7 +11,7 @@ let hasWarnedAboutMissingColor = false;
 function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   const matchingGeometries: MatchingGeometries = {
     count: 0,
-    geometries: [],
+    geometries: []
   };
 
   geometries.forEach(geometry => {
@@ -38,23 +40,25 @@ export default function parse(data: ParseData): MergedMeshGroup {
       const { treeIndex } = node.properties[0];
       if (node.properties[0].color == null && !hasWarnedAboutMissingColor) {
         hasWarnedAboutMissingColor = true;
+        // tslint:disable-next-line:no-console
         console.warn(
           '3d-web-parser encountered node with missing color while loading',
-          '(using #ff00ff to highlight objects with missing color).',
+          '(using #ff00ff to highlight objects with missing color).'
         );
       }
       const color = node.properties[0].color != null ? node.properties[0].color : { rgb: 0xff00ff };
 
       const { triangleCount } = node;
       globalColor.setHex(color.rgb);
-      mergedMesh.mappings.add(triangleOffset, triangleCount, nodeId, treeIndex);
+      // size is calculated later
+      mergedMesh.mappings.add(triangleOffset, triangleCount, treeIndex, 0);
       triangleOffset += triangleCount;
 
       data.treeIndexNodeIdMap[treeIndex] = nodeId;
       data.colorMap[treeIndex] = globalColor.clone();
     });
 
-    data.sceneStats.numMergedMeshes += 1;
+    data.sceneStats.geometryCount.MergedMesh += 1;
     group.addMesh(mergedMesh);
   });
 

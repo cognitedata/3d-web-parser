@@ -17,7 +17,7 @@ describe('GeneralCylinderGroup', () => {
 
     const value = 1.0;
     group.data.setNumber('angle', value, 0);
-    expect(group.data.getNumber('angle',  0)).toBeCloseTo(value);
+    expect(group.data.getNumber('angle', 0)).toBeCloseTo(value);
   });
 
   test('(set/get)ArcAngle', () => {
@@ -25,7 +25,7 @@ describe('GeneralCylinderGroup', () => {
 
     const value = 1.0;
     group.data.setNumber('arcAngle', value, 0);
-    expect(group.data.getNumber('arcAngle',  0)).toBeCloseTo(value);
+    expect(group.data.getNumber('arcAngle', 0)).toBeCloseTo(value);
   });
 
   test('(set/get)HeightA', () => {
@@ -92,10 +92,12 @@ describe('GeneralCylinderGroup', () => {
     const zAngleB = 7.1;
     const angle = 1.3;
     const arcAngle = 1.05;
+    const size = Math.sqrt((2 * radius) ** 2 + centerA.distanceTo(centerB) ** 2);
 
     group.add(
       nodeId,
       treeIndex,
+      size,
       centerA,
       centerB,
       radius,
@@ -106,7 +108,8 @@ describe('GeneralCylinderGroup', () => {
       zAngleA,
       zAngleB,
       angle,
-      arcAngle);
+      arcAngle
+    );
     const targetVector = new THREE.Vector3();
     const targetColor = new THREE.Color();
 
@@ -127,7 +130,7 @@ describe('GeneralCylinderGroup', () => {
     expect(group.data.getNumber('slopeB', 0)).toBeCloseTo(slopeB);
     expect(group.data.getNumber('zAngleA', 0)).toBeCloseTo(zAngleA);
     expect(group.data.getNumber('zAngleB', 0)).toBeCloseTo(zAngleB);
-    expect(group.data.getNumber('angle',  0)).toBeCloseTo(angle);
-    expect(group.data.getNumber('arcAngle',  0)).toBeCloseTo(arcAngle);
+    expect(group.data.getNumber('angle', 0)).toBeCloseTo(angle);
+    expect(group.data.getNumber('arcAngle', 0)).toBeCloseTo(arcAngle);
   });
 });

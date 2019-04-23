@@ -5,6 +5,7 @@ import PrimitiveGroup from './PrimitiveGroup';
 import { computeCircleBoundingBox } from './CircleGroup';
 import { xAxis, zAxis } from '../constants';
 import { FilterOptions } from '../parsers/parseUtils';
+import { GeometryType } from './Types';
 import GeometryGroupData from './GeometryGroupData';
 
 // reusable variables
@@ -18,6 +19,7 @@ const localXAxis = new THREE.Vector3();
 const rotation = new THREE.Quaternion();
 
 export default class ConeGroup extends PrimitiveGroup {
+  public type: GeometryType;
   public data: GeometryGroupData;
   constructor(capacity: number) {
     super(capacity);
@@ -29,13 +31,14 @@ export default class ConeGroup extends PrimitiveGroup {
   add(
     nodeId: number,
     treeIndex: number,
+    size: number,
     centerA: THREE.Vector3,
     centerB: THREE.Vector3,
     radiusA: number,
     radiusB: number,
     angle: number,
     arcAngle: number,
-    filterOptions?: FilterOptions,
+    filterOptions?: FilterOptions
   ): boolean {
     this.setTreeIndex(treeIndex, this.data.count);
     normal.subVectors(centerA, centerB).normalize();
@@ -43,13 +46,14 @@ export default class ConeGroup extends PrimitiveGroup {
     localXAxis.copy(xAxis).applyQuaternion(rotation);
 
     this.data.add({
+      size,
       centerA,
       centerB,
       radiusA,
       radiusB,
       angle,
       arcAngle,
-      localXAxis,
+      localXAxis
     });
 
     return this.filterLastObject(nodeId, filterOptions);

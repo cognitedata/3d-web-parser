@@ -12,7 +12,8 @@ function createBoxGroup(): BoxGroup {
   const normal = new THREE.Vector3(4, 5, 6);
   const angle = 1.0;
   const delta = new THREE.Vector3(1, 1, 1);
-  group.add(nodeId, treeIndex, center, normal, angle, delta);
+  const size = Math.sqrt(delta.x ** 2 + delta.y ** 2 + delta.z ** 2);
+  group.add(nodeId, treeIndex, size, center, normal, angle, delta);
   return group;
 }
 
@@ -56,8 +57,9 @@ describe('BoxGroup', () => {
     const normal = new THREE.Vector3(4, 5, 6);
     const angle = 10.0;
     const delta = new THREE.Vector3(10, 10, 10);
+    const size = Math.sqrt(delta.x ** 2 + delta.y ** 2 + delta.z ** 2);
 
-    group.add(nodeId, treeIndex, center, normal, angle, delta);
+    group.add(nodeId, treeIndex, size, center, normal, angle, delta);
     const targetVector = new THREE.Vector3();
 
     expect(group.data.count).toBe(1);
@@ -83,7 +85,8 @@ describe('BoxGroup', () => {
     group.computeModelMatrix(matrix, 0);
 
     const expectedMatrix = new THREE.Matrix4();
-    expectedMatrix.set(-0.02579228502181974,
+    expectedMatrix.set(
+      -0.02579228502181974,
       0.1338527461954474,
       -0.9906655340574289,
       0,
@@ -98,7 +101,8 @@ describe('BoxGroup', () => {
       1,
       2,
       3,
-      1);
+      1
+    );
     expectedMatrix.transpose(); // See https://threejs.org/docs/#api/en/math/Matrix4
     for (let i = 0; i < 16; i++) {
       expect(matrix.elements[i]).toBeCloseTo(expectedMatrix.elements[i]);

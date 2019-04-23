@@ -59,38 +59,24 @@ describe('Sectors', () => {
       parent.max
         .clone()
         .sub(parent.min)
-        .length(),
+        .length()
     ).toBeGreaterThanOrEqual(
       child.max
         .clone()
         .sub(child.min)
-        .length(),
+        .length()
     );
   });
 
   test('traverse children', async () => {
     const rootSector = new Sector(new THREE.Vector3(), new THREE.Vector3());
-    const rootFirstSector = new Sector(
-      new THREE.Vector3(),
-      new THREE.Vector3(),
-    );
+    const rootFirstSector = new Sector(new THREE.Vector3(), new THREE.Vector3());
     rootSector.addChild(rootFirstSector);
-    const rootSecondSector = new Sector(
-      new THREE.Vector3(),
-      new THREE.Vector3(),
-    );
+    const rootSecondSector = new Sector(new THREE.Vector3(), new THREE.Vector3());
     rootSector.addChild(rootSecondSector);
-    const rootSecondFirstSector = new Sector(
-      new THREE.Vector3(),
-      new THREE.Vector3(),
-    );
+    const rootSecondFirstSector = new Sector(new THREE.Vector3(), new THREE.Vector3());
     rootSecondSector.addChild(rootSecondFirstSector);
-    const expected = [
-      rootSector,
-      rootFirstSector,
-      rootSecondSector,
-      rootSecondFirstSector,
-    ];
+    const expected = [rootSector, rootFirstSector, rootSecondSector, rootSecondFirstSector];
     let counter = 0;
     for (const sector of rootSector.traverseSectors()) {
       expect(sector).toBe(expected[counter++]);

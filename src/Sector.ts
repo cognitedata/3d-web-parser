@@ -73,7 +73,7 @@ export default class Sector {
       usage = {
         total: 0,
         byGeometry: {},
-        byProperty: {},
+        byProperty: {}
       };
     }
     this.primitiveGroups.forEach(geometryGroup => {

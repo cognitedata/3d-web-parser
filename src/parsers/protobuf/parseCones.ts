@@ -1,12 +1,16 @@
+// Copyright 2019 Cognite AS
+
 import * as THREE from 'three';
 import ConeGroup from '../../geometry/ConeGroup';
 import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
-import { MatchingGeometries,
+import {
+  MatchingGeometries,
   parsePrimitiveColor,
   parsePrimitiveNodeId,
   parsePrimitiveTreeIndex,
   getPrimitiveType,
-  isPrimitive } from './protobufUtils';
+  isPrimitive
+} from './protobufUtils';
 import { zAxis } from '../../constants';
 import { ParseData } from '../parseUtils';
 
@@ -18,7 +22,7 @@ const vector = new THREE.Vector3();
 function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   const matchingGeometries: MatchingGeometries = {
     count: 0,
-    geometries: [],
+    geometries: []
   };
 
   geometries.forEach(geometry => {
@@ -29,8 +33,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
     const { thickness = 0, radiusA, radiusB } = primitiveInfo;
 
-    if (geometry.type === 'cone'
-    || (geometry.type === 'generalCylinder' && radiusA !== radiusB)) {
+    if (geometry.type === 'cone' || (geometry.type === 'generalCylinder' && radiusA !== radiusB)) {
       matchingGeometries.geometries.push(geometry);
       if (thickness > 0) {
         matchingGeometries.count += 2;
@@ -51,9 +54,9 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 
 function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
   if (primitiveGroupMap.Cone.group.data.count + minimumRequiredCapacity > primitiveGroupMap.Cone.group.capacity) {
-      const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Cone.capacity);
-      primitiveGroupMap.Cone.group = new ConeGroup(capacity);
-      return true;
+    const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Cone.capacity);
+    primitiveGroupMap.Cone.group = new ConeGroup(capacity);
+    return true;
   }
   return false;
 }
@@ -80,68 +83,84 @@ export default function parse(args: ParseData): boolean {
 
     if (geometry.type === 'cylinder') {
       const { radius } = primitiveInfo;
+      const size = Math.sqrt((2 * radius) ** 2 + globalCenterA.distanceTo(globalCenterB) ** 2);
       added = group.add(
         nodeId,
         treeIndex,
+        size,
         globalCenterA,
         globalCenterB,
         radius,
         radius,
         0,
         2 * Math.PI,
-        filterOptions);
+        filterOptions
+      );
     } else if (geometry.type === 'cone' || geometry.type === 'generalCylinder') {
       let { radiusA, radiusB } = primitiveInfo;
-      const { angle = 0, arcAngle  = 2.0 * Math.PI, thickness = 0 } = primitiveInfo;
+      const { angle = 0, arcAngle = 2.0 * Math.PI, thickness = 0 } = primitiveInfo;
+      const radius = Math.max(radiusA, radiusB);
+      const size = Math.sqrt((2 * radius) ** 2 + globalCenterA.distanceTo(globalCenterB) ** 2);
       added = group.add(
         nodeId,
         treeIndex,
+        size,
         globalCenterA,
         globalCenterB,
         radiusA,
         radiusB,
         angle,
         arcAngle,
-        filterOptions);
+        filterOptions
+      );
 
       if (thickness > 0) {
         // Create the inner cone if it has a thickness
         radiusA -= thickness;
         radiusB -= thickness;
-        added = group.add(
-          nodeId,
-          treeIndex,
-          globalCenterA,
-          globalCenterB,
-          radiusA,
-          radiusB,
-          angle,
-          arcAngle,
-          filterOptions) || added;
+        added =
+          group.add(
+            nodeId,
+            treeIndex,
+            size,
+            globalCenterA,
+            globalCenterB,
+            radiusA,
+            radiusB,
+            angle,
+            arcAngle,
+            filterOptions
+          ) || added;
       }
     } else if (geometry.type === 'extrudedRing' || geometry.type === 'extrudedRingSegment') {
       const { innerRadius, outerRadius, angle = 0, arcAngle = 2.0 * Math.PI } = primitiveInfo;
+      const size = Math.sqrt((2 * outerRadius) ** 2 + globalCenterA.distanceTo(globalCenterB) ** 2);
       added = group.add(
         nodeId,
         treeIndex,
+        size,
         globalCenterA,
         globalCenterB,
         innerRadius,
         innerRadius,
         angle,
         arcAngle,
-        filterOptions);
+        filterOptions
+      );
 
-      added = group.add(
-        nodeId,
-        treeIndex,
-        globalCenterA,
-        globalCenterB,
-        outerRadius,
-        outerRadius,
-        angle,
-        arcAngle,
-        filterOptions) || added;
+      added =
+        group.add(
+          nodeId,
+          treeIndex,
+          size,
+          globalCenterA,
+          globalCenterB,
+          outerRadius,
+          outerRadius,
+          angle,
+          arcAngle,
+          filterOptions
+        ) || added;
     }
 
     if (added) {

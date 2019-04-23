@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import * as THREE from 'three';
 import { MergedMeshMappings } from '../geometry/MergedMeshGroup';
 
@@ -23,7 +25,7 @@ describe('MeshGroup', () => {
       const triangleCount = 1234;
       const nodeId = 123;
       const treeIndex = 456;
-      nodeMappings.add(triangleOffset, triangleCount, nodeId, treeIndex);
+      nodeMappings.add(triangleOffset, triangleCount, treeIndex, 0);
       expect(nodeMappings.count).toBe(index + 1);
       expect(nodeMappings.capacity).toBe(capacity);
 
@@ -39,17 +41,18 @@ describe('MeshGroup', () => {
     {
       const triangleOffset = 995;
       const triangleCount = 4322;
-      const nodeId = 11;
       const treeIndex = 10;
       const transformMatrix = new THREE.Matrix4();
+      // tslint:disable:prettier
       transformMatrix.set(
         11, 12, 13, 14,
         21, 22, 23, 24,
         31, 32, 33, 34,
-        0,  0,  0,  1,
+        0, 0, 0, 1
       );
+      // tslint:enable:prettier
 
-      nodeMappings.add(triangleOffset, triangleCount, nodeId, treeIndex, transformMatrix);
+      nodeMappings.add(triangleOffset, triangleCount, treeIndex, 0, transformMatrix);
       expect(nodeMappings.count).toBe(index + 1);
       expect(nodeMappings.capacity).toBe(capacity);
 

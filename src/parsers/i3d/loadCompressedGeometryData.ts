@@ -1,13 +1,22 @@
+// Copyright 2019 Cognite AS
+
 import CustomFileReader from './CustomFileReader';
 import { IdToFileGeometryName } from './parserParameters';
 import { CompressedGeometryData } from './sharedFileParserTypes';
 
-export default function loadGeometryIndices(file: CustomFileReader, sectorEndLocation: number):
-    CompressedGeometryData[] {
-
+export default function loadGeometryIndices(
+  file: CustomFileReader,
+  sectorEndLocation: number
+): CompressedGeometryData[] {
   const geometryIndices: CompressedGeometryData[] = [];
   while (file.location < sectorEndLocation) {
-    const type = IdToFileGeometryName[file.readUint8()];
+    const typeId = file.readUint8();
+    const type = IdToFileGeometryName[typeId];
+    if (type === undefined) {
+      // This will happen if file type 4 is used
+      // tslint:disable-next-line:no-console
+      console.warn('Unknown typeId ', typeId);
+    }
     const count = file.readUint32();
     const attributeCount = file.readUint8();
     const byteCount = file.readUint32();
@@ -20,7 +29,7 @@ export default function loadGeometryIndices(file: CustomFileReader, sectorEndLoc
       indices,
       count,
       byteCount,
-      attributeCount,
+      attributeCount
     };
 
     geometryIndices.push(newGeometry);

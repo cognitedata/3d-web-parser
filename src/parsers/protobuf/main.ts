@@ -11,42 +11,47 @@ import { MergedMesh } from '../../geometry/MergedMeshGroup';
 import PrimitiveGroup from '../../geometry/PrimitiveGroup';
 import GeometryGroup from '../../geometry/GeometryGroup';
 import { FilterOptions, InstancedMeshMap, ParseData } from '../parseUtils';
-import { parseBoxes,
-         parseCircles,
-         parseCones,
-         parseEccentricCones,
-         parseEllipsoidSegments,
-         parseGeneralCylinders,
-         parseGeneralRings,
-         parseNuts,
-         parseQuads,
-         parseSphericalSegments,
-         parseTorusSegments,
-         parseTrapeziums,
-         parseMergedMeshes,
-         parseInstancedMeshes } from './parsers';
+import {
+  parseBoxes,
+  parseCircles,
+  parseCones,
+  parseEccentricCones,
+  parseEllipsoidSegments,
+  parseGeneralCylinders,
+  parseGeneralRings,
+  parseNuts,
+  parseQuads,
+  parseSphericalSegments,
+  parseTorusSegments,
+  parseTrapeziums,
+  parseMergedMeshes,
+  parseInstancedMeshes
+} from './parsers';
 
-import { BoxGroup,
-         CircleGroup,
-         ConeGroup,
-         EccentricConeGroup,
-         EllipsoidSegmentGroup,
-         GeneralCylinderGroup,
-         GeneralRingGroup,
-         NutGroup,
-         QuadGroup,
-         SphericalSegmentGroup,
-         TorusSegmentGroup,
-         TrapeziumGroup } from '../../geometry/GeometryGroups';
+import {
+  BoxGroup,
+  CircleGroup,
+  ConeGroup,
+  EccentricConeGroup,
+  EllipsoidSegmentGroup,
+  GeneralCylinderGroup,
+  GeneralRingGroup,
+  NutGroup,
+  QuadGroup,
+  SphericalSegmentGroup,
+  TorusSegmentGroup,
+  TrapeziumGroup
+} from '../../geometry/GeometryGroups';
 
-import SceneStats from '../../SceneStats';
+import { SceneStats, createSceneStats } from '../../SceneStats';
 
 import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
-import { MergedMeshGroup } from '../../geometry/MergedMeshGroup';
 import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
 import { TreeIndexNodeIdMap, ColorMap } from '../parseUtils';
+import { GeometryType } from '../../geometry/Types';
+type PrimitiveParserMap = { type: GeometryType; parser: (data: ParseData) => boolean };
 
-const primitiveParsers = [
+const primitiveParsers: PrimitiveParserMap[] = [
   { type: 'Box', parser: parseBoxes },
   { type: 'Circle', parser: parseCircles },
   { type: 'Cone', parser: parseCones },
@@ -58,17 +63,16 @@ const primitiveParsers = [
   { type: 'Quad', parser: parseQuads },
   { type: 'SphericalSegment', parser: parseSphericalSegments },
   { type: 'TorusSegment', parser: parseTorusSegments },
-  { type: 'Trapezium', parser: parseTrapeziums },
+  { type: 'Trapezium', parser: parseTrapeziums }
 ];
 
 function parseGeometries(data: ParseData) {
   const primitiveGroups: PrimitiveGroup[] = [];
   primitiveParsers.forEach(({ type, parser }) => {
+    const count = data.primitiveGroupMap[type].group.data.count;
     const didCreateNewGroup = parser(data);
 
     if (didCreateNewGroup) {
-      // TODO(anders.hafreager) Learn TypeScript and fix this
-      // @ts-ignore
       primitiveGroups.push(data.primitiveGroupMap[type].group);
     }
   });
@@ -82,16 +86,13 @@ function parseGeometries(data: ParseData) {
 export default async function parseProtobuf(
   protobufData?: Uint8Array,
   protobufDataList?: Uint8Array[],
-  filterOptions?: FilterOptions,
+  filterOptions?: FilterOptions
 ) {
   const protobufDecoder = new ProtobufDecoder();
 
-  const sectors: { [path: string]: Sector } = { };
+  const sectors: { [path: string]: Sector } = {};
   const instancedMeshMap: { [key: number]: InstancedMesh } = {};
-  const sceneStats: SceneStats = {
-    numInstancedMeshes: 0,
-    numMergedMeshes: 0,
-  };
+  const sceneStats = createSceneStats();
   // Create map since we will reuse primitive groups until the count is above some threshold.
   // This reduces the number of draw calls.
   const primitiveGroupMap: PrimitiveGroupMap = {
@@ -106,14 +107,13 @@ export default async function parseProtobuf(
     Quad: { capacity: 5000, group: new QuadGroup(0) },
     SphericalSegment: { capacity: 5000, group: new SphericalSegmentGroup(0) },
     TorusSegment: { capacity: 5000, group: new TorusSegmentGroup(0) },
-    Trapezium: { capacity: 5000, group: new TrapeziumGroup(0) },
+    Trapezium: { capacity: 5000, group: new TrapeziumGroup(0) }
   };
 
   const mergedMeshMap: InstancedMeshMap = {};
   const treeIndexNodeIdMap: TreeIndexNodeIdMap = [];
   const colorMap: ColorMap = [];
 
-  let t0 = performance.now();
   const handleWebNode = (webNode: any) => {
     const { boundingBox, path } = webNode;
     const boundingBoxMin = new Vector3(boundingBox.min.x, boundingBox.min.y, boundingBox.min.z);
@@ -121,18 +121,14 @@ export default async function parseProtobuf(
     const sector = new Sector(boundingBoxMin, boundingBoxMax);
     sectors[path] = sector;
 
-    const {
-      primitiveGroups,
-      mergedMeshGroup,
-      instancedMeshGroup,
-    } = parseGeometries({
+    const { primitiveGroups, mergedMeshGroup, instancedMeshGroup } = parseGeometries({
       primitiveGroupMap,
       geometries: webNode.geometries,
       instancedMeshMap,
       sceneStats,
       treeIndexNodeIdMap,
       colorMap,
-      filterOptions,
+      filterOptions
     });
 
     sector.primitiveGroups = primitiveGroups;
@@ -153,28 +149,31 @@ export default async function parseProtobuf(
     }
   } else if (protobufDataList) {
     protobufDataList.forEach(data => {
-      const webNode = protobufDecoder.decode(
-        ProtobufDecoder.Types.WEB_NODE,
-        data,
-      );
+      const webNode = protobufDecoder.decode(ProtobufDecoder.Types.WEB_NODE, data);
       handleWebNode(webNode);
     });
   } else {
-    throw 'parseProtobuf did not get data to parse';
+    throw new Error('parseProtobuf did not get data to parse');
   }
 
-  t0 = performance.now();
   const rootSector = sectors['0/'];
+  mergeInstancedMeshes(rootSector, sceneStats);
   for (const sector of rootSector.traverseSectors()) {
-    mergeInstancedMeshes(sector, 2500, sceneStats, treeIndexNodeIdMap);
     sector.mergedMeshGroup.createTreeIndexMap();
     sector.instancedMeshGroup.createTreeIndexMap();
-  }
 
-  const nodeIdTreeIndexMap: {[s: number]: number} = {};
+    sceneStats.numSectors++;
+    sector.primitiveGroups.forEach(primitiveGroup => {
+      sceneStats.geometryCount[primitiveGroup.type] += primitiveGroup.data.count;
+    });
+  }
+  sceneStats.numNodes = treeIndexNodeIdMap.length;
+
+  const nodeIdTreeIndexMap: Map<number, number> = new Map();
   for (let treeIndex = 0; treeIndex < treeIndexNodeIdMap.length; treeIndex++) {
     const nodeId = treeIndexNodeIdMap[treeIndex];
-    nodeIdTreeIndexMap[nodeId] = treeIndex;
+    nodeIdTreeIndexMap.set(nodeId, treeIndex);
   }
+
   return { rootSector, sectors, sceneStats, maps: { colorMap, treeIndexNodeIdMap, nodeIdTreeIndexMap } };
 }

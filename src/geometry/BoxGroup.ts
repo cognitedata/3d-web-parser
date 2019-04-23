@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import PrimitiveGroup from './PrimitiveGroup';
 import { zAxis } from '../constants';
 import { FilterOptions } from '../parsers/parseUtils';
+import { GeometryType } from './Types';
 import GeometryGroupData from './GeometryGroupData';
 
 // reusable variables
@@ -16,6 +17,7 @@ const globalCenter = new THREE.Vector3();
 const globalPoint = new THREE.Vector3();
 
 export default class BoxGroup extends PrimitiveGroup {
+  public type: GeometryType;
   public data: GeometryGroupData;
   constructor(capacity: number) {
     super(capacity);
@@ -27,18 +29,20 @@ export default class BoxGroup extends PrimitiveGroup {
   add(
     nodeId: number,
     treeIndex: number,
+    size: number,
     center: THREE.Vector3,
     normal: THREE.Vector3,
     angle: number,
     delta: THREE.Vector3,
-    filterOptions?: FilterOptions,
+    filterOptions?: FilterOptions
   ): boolean {
     this.setTreeIndex(treeIndex, this.data.count);
     this.data.add({
+      size,
       center,
       normal,
       angle,
-      delta,
+      delta
     });
 
     return this.filterLastObject(nodeId, filterOptions);
@@ -51,7 +55,7 @@ export default class BoxGroup extends PrimitiveGroup {
     return outputMatrix.compose(
       this.data.getVector3('center', globalCenter, index),
       secondRotation.multiply(firstRotation), // A.multiply(B) === A*B
-      scale,
+      scale
     );
   }
 
@@ -60,11 +64,7 @@ export default class BoxGroup extends PrimitiveGroup {
     this.computeModelMatrix(fullMatrix, index).premultiply(matrix);
     const coords = [-0.5, 0.5];
     coords.forEach(x =>
-      coords.forEach(y =>
-        coords.forEach(z =>
-          box.expandByPoint(globalPoint.set(x, y, z).applyMatrix4(fullMatrix)),
-        ),
-      ),
+      coords.forEach(y => coords.forEach(z => box.expandByPoint(globalPoint.set(x, y, z).applyMatrix4(fullMatrix))))
     );
 
     return box;
