@@ -1,4 +1,4 @@
-export type GeometryType =
+export type RenderedPrimitiveNameType =
   | 'InstancedMesh'
   | 'MergedMesh'
   | 'Box'

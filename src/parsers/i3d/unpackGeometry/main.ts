@@ -16,7 +16,7 @@ import { DataMaps, FilterOptions } from '../../parseUtils';
 
 export { unpackInstancedMeshes, unpackMergedMeshes };
 
-type PrimitivesPerSectorAndChildren = { [path: string]: { [renderedPrimitive: string]: number } };
+type PrimitivesPerSector = { [path: string]: { [renderedPrimitive: string]: number } };
 
 export function unpackPrimitives(
   rootSector: Sector,
@@ -25,8 +25,7 @@ export function unpackPrimitives(
   maps: DataMaps,
   filterOptions?: FilterOptions
 ) {
-  const primitiveCounts: PrimitivesPerSectorAndChildren = {};
-  countRenderedPrimitivesPerSectorAndChildren(rootSector, compressedData, primitiveCounts);
+  const primitivesPerSector = countRenderedPrimitivesPerSector(rootSector, compressedData);
 
   for (const sector of rootSector.traverseSectorsBreadthFirst()) {
     compressedData[sector.path].primitives.forEach(primitiveCompressedData => {
@@ -35,41 +34,32 @@ export function unpackPrimitives(
         primitiveCompressedData,
         uncompressedValues,
         maps,
-        primitiveCounts,
+        primitivesPerSector,
         filterOptions
       );
     });
   }
 }
 
-function countRenderedPrimitivesPerSectorAndChildren(
-  sector: Sector,
+function countRenderedPrimitivesPerSector(
+  rootSector: Sector,
   compressedData: PerSectorCompressedData,
-  primitiveCounts: PrimitivesPerSectorAndChildren
 ) {
-  // Count rendered primitives in sector
-  primitiveCounts[sector.path] = {};
-  RenderedPrimitiveNames.forEach(renderedPrimitive => {
-    primitiveCounts[sector.path][renderedPrimitive] = 0;
-  });
-
-  compressedData[sector.path].primitives.forEach(fileGeometryData => {
-    renderedPrimitivesPerFilePrimitive[fileGeometryData.type].forEach(renderedPrimitiveInfo => {
-      primitiveCounts[sector.path][renderedPrimitiveInfo.name] +=
-        renderedPrimitiveInfo.count * fileGeometryData.count;
-    });
-  });
-
-  // Add rendered primitives from children
-  sector.children.forEach(childSector => {
-    if (primitiveCounts[childSector.path] === undefined) {
-      countRenderedPrimitivesPerSectorAndChildren(childSector, compressedData, primitiveCounts);
-    }
+  const primitivesPerSector: PrimitivesPerSector = {};
+  for (const sector of rootSector.traverseSectors()) {
+    primitivesPerSector[sector.path] = {};
     RenderedPrimitiveNames.forEach(renderedPrimitive => {
-      primitiveCounts[sector.path][renderedPrimitive] +=
-        primitiveCounts[childSector.path][renderedPrimitive];
+      primitivesPerSector[sector.path][renderedPrimitive] = 0;
     });
-  });
+  
+    compressedData[sector.path].primitives.forEach(fileGeometryData => {
+      renderedPrimitivesPerFilePrimitive[fileGeometryData.type].forEach(renderedPrimitiveInfo => {
+        primitivesPerSector[sector.path][renderedPrimitiveInfo.name] +=
+          renderedPrimitiveInfo.count * fileGeometryData.count;
+      });
+    });
+  }
+  return primitivesPerSector;
 }
 
 function unpackFilePrimitive(
@@ -77,7 +67,7 @@ function unpackFilePrimitive(
   primitiveCompressedData: CompressedGeometryData,
   uncompressedValues: UncompressedValues,
   maps: DataMaps,
-  primitiveCounts: PrimitivesPerSectorAndChildren,
+  primitivesPerSector: PrimitivesPerSector,
   filterOptions?: FilterOptions
 ) {
   const destinationPrimitiveGroups: { [name: string]: PrimitiveGroup } = {};
@@ -88,7 +78,7 @@ function unpackFilePrimitive(
       currentSector,
       primitiveCompressedData,
       j,
-      primitiveCounts
+      primitivesPerSector
     );
     data.loadData(primitiveCompressedData);
     maps.treeIndexNodeIdMap[data.treeIndex] = data.nodeId;
@@ -109,7 +99,7 @@ function updateDestinationGroups(
   currentSector: Sector,
   primitiveCompressedData: CompressedGeometryData,
   numberOfGeometriesAlreadyRendered: number,
-  primitiveCounts: PrimitivesPerSectorAndChildren
+  primitivesPerSector: PrimitivesPerSector
 ) {
   renderedPrimitivesPerFilePrimitive[primitiveCompressedData.type].forEach(renderedPrimitiveInfo => {
     const destinationGroup = destinationPrimitiveGroups[renderedPrimitiveInfo.name];
@@ -121,7 +111,7 @@ function updateDestinationGroups(
         currentSector,
         renderedPrimitiveInfo,
         numberOfGeometriesAlreadyRendered,
-        primitiveCounts
+        primitivesPerSector
       );
     }
   });
@@ -131,7 +121,7 @@ function findOrCreateDestinationGroup(
   originalSector: Sector,
   renderedPrimitiveInfo: { name: string; count: number },
   numberOfGeometriesAlreadyRendered: number,
-  primitiveCounts: PrimitivesPerSectorAndChildren
+  primitivesPerSector: PrimitivesPerSector
 ) {
   let searchSector: Sector | undefined = originalSector;
   let destinationGroup: PrimitiveGroup | undefined;
@@ -151,9 +141,13 @@ function findOrCreateDestinationGroup(
   if (destinationGroup !== undefined) {
     return destinationGroup;
   } else {
+    let primitivesPerSectorAndChildren = 0;
+    for (const sector of originalSector.traverseSectors()) {
+      primitivesPerSectorAndChildren += primitivesPerSector[sector.path][renderedPrimitiveInfo.name];
+    }
     const capacity = Math.min(
       5000,
-      primitiveCounts[originalSector.path][renderedPrimitiveInfo.name] -
+      primitivesPerSectorAndChildren -
         numberOfGeometriesAlreadyRendered * renderedPrimitiveInfo.count
     );
     // @ts-ignore

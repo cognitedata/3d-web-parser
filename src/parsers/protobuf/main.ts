@@ -48,8 +48,8 @@ import { SceneStats, createSceneStats } from '../../SceneStats';
 import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
 import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
 import { TreeIndexNodeIdMap, ColorMap } from '../parseUtils';
-import { GeometryType } from '../../geometry/Types';
-type PrimitiveParserMap = { type: GeometryType; parser: (data: ParseData) => boolean };
+import { RenderedPrimitiveNameType } from '../../geometry/Types';
+type PrimitiveParserMap = { type: RenderedPrimitiveNameType; parser: (data: ParseData) => boolean };
 
 const primitiveParsers: PrimitiveParserMap[] = [
   { type: 'Box', parser: parseBoxes },

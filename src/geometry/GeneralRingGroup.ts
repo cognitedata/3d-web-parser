@@ -6,7 +6,7 @@ import { computeEllipsoidBoundingBox } from './EllipsoidSegmentGroup';
 import { FilterOptions } from '../parsers/parseUtils';
 import GeometryGroupData from './GeometryGroupData';
 import { angleBetweenVector3s } from '../parsers/protobuf/protobufUtils';
-import { GeometryType } from './Types';
+import { RenderedPrimitiveNameType } from './GeometryGroupDataParameters';
 import { normalize } from 'path';
 
 // reusable variables
@@ -20,7 +20,7 @@ const globalLocalXAxis = new THREE.Vector3();
 const globalCenter = new THREE.Vector3();
 
 export default class GeneralRingGroup extends PrimitiveGroup {
-  public type: GeometryType;
+  public type: RenderedPrimitiveNameType;
   public data: GeometryGroupData;
 
   constructor(capacity: number) {

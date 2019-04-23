@@ -3,9 +3,9 @@
 import * as THREE from 'three';
 import PrimitiveGroup from '../geometry/PrimitiveGroup';
 import { expectColorEqual } from '../TestUtils';
-import { GeometryType } from '../geometry/Types';
+import { RenderedPrimitiveNameType } from '../geometry/Types';
 class NonAbstractPrimitiveGroup extends PrimitiveGroup {
-  public type: GeometryType;
+  public type: RenderedPrimitiveNameType;
   constructor(capacity: number) {
     super(capacity);
     this.type = 'Box'; // Any valid type

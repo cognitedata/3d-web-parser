@@ -1,11 +1,11 @@
 // Copyright 2019 Cognite AS
 
-import { GeometryType } from './geometry/Types';
+import { RenderedPrimitiveNameType } from './geometry/Types';
 
 export default interface SceneStats {
   numNodes: number;
   numSectors: number;
-  geometryCount: { [s in GeometryType]: number };
+  geometryCount: { [s in RenderedPrimitiveNameType]: number };
 }
 
 function createSceneStats(): SceneStats {

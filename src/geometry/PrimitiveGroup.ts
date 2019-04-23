@@ -18,7 +18,7 @@ import TrapeziumGroup from './TrapeziumGroup';
 import { FilterOptions } from '../parsers/parseUtils';
 import { identityMatrix4 } from '../constants';
 import GeometryGroupData from './GeometryGroupData';
-import { GeometryType } from './Types';
+import { RenderedPrimitiveNameType } from './GeometryGroupDataParameters';
 
 const matrix = new THREE.Matrix4();
 const globalBox = new THREE.Box3();
@@ -53,11 +53,12 @@ interface TreeIndexMap {
 }
 
 export default abstract class PrimitiveGroup extends GeometryGroup {
-  public abstract type: GeometryType;
+  public abstract type: RenderedPrimitiveNameType;
   public capacity: number;
   public treeIndex: Float32Array;
   public treeIndexMap: TreeIndexMap;
   public data: GeometryGroupData;
+  public sorted: boolean;
 
   // The transformX arrays contain contain transformation matrix
   public transform0: Float32Array;
@@ -79,6 +80,7 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     this.attributes = [{ name: 'treeIndex', array: this.treeIndex, itemSize: 1 }];
     this.hasCustomTransformAttributes = false;
     this.data = new GeometryGroupData('Primitive', 0, this.attributes); // Placeholder, overwritten in children classes
+    this.sorted = false;
   }
 
   abstract computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4;
@@ -116,6 +118,9 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
   }
 
   computeTransformAttributes() {
+    if (!this.sorted) {
+      throw Error('Computing transform attributes before sorting geometries by size');
+    }
     if (this.hasCustomTransformAttributes) {
       return;
     }
@@ -168,5 +173,14 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
       array: this.transform3,
       itemSize: 3
     });
+  }
+
+  sort() {
+    const newData = new GeometryGroupData(this.type, this.capacity, null);
+
+
+
+    this.sorted = true;
+
   }
 }

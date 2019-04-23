@@ -3,7 +3,7 @@
 import * as THREE from 'three';
 import GeometryGroup from './GeometryGroup';
 import { TypedArray, MeshNormalMaterial } from 'three';
-import { GeometryType } from './Types';
+import { RenderedPrimitiveNameType } from './GeometryGroupDataParameters';
 import { computeBoundingBox } from './GeometryUtils';
 
 const globalMatrix = new THREE.Matrix4();
@@ -222,7 +222,7 @@ interface TreeIndexMap {
 }
 
 export class InstancedMeshGroup extends GeometryGroup {
-  public type: GeometryType;
+  public type: RenderedPrimitiveNameType;
   public meshes: InstancedMesh[];
   public treeIndexMap: TreeIndexMap;
   constructor() {

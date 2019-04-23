@@ -5,7 +5,7 @@ import PrimitiveGroup from './PrimitiveGroup';
 import { computeCircleBoundingBox } from './CircleGroup';
 import { xAxis, zAxis } from '../constants';
 import { FilterOptions } from '../parsers/parseUtils';
-import { GeometryType } from './Types';
+import { RenderedPrimitiveNameType } from './GeometryGroupDataParameters';
 import GeometryGroupData from './GeometryGroupData';
 
 // reusable variables
@@ -19,7 +19,7 @@ const localXAxis = new THREE.Vector3();
 const rotation = new THREE.Quaternion();
 
 export default class ConeGroup extends PrimitiveGroup {
-  public type: GeometryType;
+  public type: RenderedPrimitiveNameType;
   public data: GeometryGroupData;
   constructor(capacity: number) {
     super(capacity);
