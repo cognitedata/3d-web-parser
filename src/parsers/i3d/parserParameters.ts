@@ -26,7 +26,7 @@ type primitiveNameType = 'Box' | 'Circle' | 'ClosedCone' | 'ClosedCylinder' | 'C
 type meshNameType = 'MergedMesh' | 'InstancedMesh';
 export type geometryNameType = primitiveNameType | meshNameType;
 
-export const filePrimitiveNames: geometryNameType[] = ['Box', 'Circle', 'ClosedCone', 'ClosedCylinder',
+export const FilePrimitiveNames: geometryNameType[] = ['Box', 'Circle', 'ClosedCone', 'ClosedCylinder',
   'ClosedEccentricCone', 'ClosedEllipsoidSegment', 'ClosedExtrudedRingSegment', 'ClosedGeneralCylinder',
   'ClosedSphericalSegment', 'ClosedTorusSegment', 'Ellipsoid', 'ExtrudedRing', 'Nut', 'OpenCone',
   'OpenCylinder', 'OpenEccentricCone', 'OpenEllipsoidSegment', 'OpenExtrudedRingSegment',
