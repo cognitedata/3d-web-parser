@@ -8,24 +8,11 @@ import {
   RenderedPropertyNameType,
   colorProperties,
   vector4Properties,
-  primitiveAttributes,
 } from './PrimitiveGroupDataParameters';
 import * as THREE from 'three';
 import { RenderedPrimitiveNameType } from './Types';
 
-function getAttributeItemSize(property: RenderedPropertyNameType): number {
-  if (float32Properties.has(property)) {
-    return 1;
-  } else if (vector3Properties.has(property)) {
-    return 3;
-  } else if (vector4Properties.has(property)) {
-    return 4;
-  } else if (colorProperties.has(property)) {
-    return 3;
-  } else {
-    throw Error('Unknown attribute size for property ' + property);
-  }
-}
+
 let t1 = 0;
 let t2 = 0;
 let t3 = 0;
@@ -38,7 +25,7 @@ export default class PrimitiveGroupData {
   capacity: number;
   public arrays: { [name: string]: Float64Array | Float32Array };
 
-  constructor(type: RenderedPrimitiveNameType, capacity: number, attributesPointer?: any) {
+  constructor(type: RenderedPrimitiveNameType, capacity: number) {
     this.type = type;
     this.count = 0;
     this.capacity = capacity;
@@ -57,20 +44,6 @@ export default class PrimitiveGroupData {
         throw Error('Property ' + property + ' does not have an associated memory structure');
       }
     });
-
-    if (attributesPointer !== undefined) {
-      primitiveAttributes[this.type].forEach(property => {
-        attributesPointer.push({
-          name: 'a_' + property,
-          array: this.arrays[property],
-          itemSize: getAttributeItemSize(property)
-        });
-  
-        if (this.arrays[property] === undefined) {
-          throw Error('Primitive attributes issue. Property: ' + property + ', type: ' + this.type);
-        }
-      });
-    }
   }
 
   setNumber(property: RenderedPropertyNameType, value: number, index: number) {

@@ -42,7 +42,7 @@ export type RenderedPropertyNameType =
   | 'zAngleA'
   | 'zAngleB'
   | 'localXAxis'
-  | 'thickness'
+  | 'thickness'     
   | 'transformMatrix'
   | 'triangleOffset'
   | 'rotationAngle'
@@ -147,3 +147,15 @@ export const vector3Properties: Set<RenderedPropertyNameType> = new Set([
 export const vector4Properties: Set<RenderedPropertyNameType> = new Set(['planeA', 'planeB'] as Array<RenderedPropertyNameType>);
 export const colorProperties: Set<RenderedPropertyNameType> = new Set(['color'] as Array<RenderedPropertyNameType>);
 export const matrix4Properties: Set<RenderedPropertyNameType> = new Set(['transformMatrix'] as Array<RenderedPropertyNameType>);
+
+export function getAttributeItemSize(property: RenderedPropertyNameType): number {
+  if (float32Properties.has(property)) {
+    return 1;
+  } else if (vector3Properties.has(property)) {
+    return 3;
+  } else if (vector4Properties.has(property)) {
+    return 4;
+  } else {
+    throw Error('Unknown attribute size for property ' + property);
+  }
+}

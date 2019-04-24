@@ -19,6 +19,7 @@ import { FilterOptions } from '../parsers/parseUtils';
 import { identityMatrix4 } from '../constants';
 import PrimitiveGroupData from './PrimitiveGroupData';
 import { RenderedPrimitiveNameType } from './Types';
+import { primitiveAttributes, getAttributeItemSize } from './PrimitiveGroupDataParameters';
 
 const matrix = new THREE.Matrix4();
 const globalBox = new THREE.Box3();
@@ -77,13 +78,28 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     this.transform1 = new Float32Array(0);
     this.transform2 = new Float32Array(0);
     this.transform3 = new Float32Array(0);
-    this.attributes = [{ name: 'treeIndex', array: this.treeIndex, itemSize: 1 }];
+    this.attributes = [];
     this.hasCustomTransformAttributes = false;
     this.sorted = false;
   }
 
   abstract computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4;
   abstract computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3;
+  
+  setupAttributes() {
+    this.attributes.push({ name: 'treeIndex', array: this.treeIndex, itemSize: 1 });
+    primitiveAttributes[this.type].forEach(property => {
+      this.attributes.push({
+        name: 'a_' + property,
+        array: this.data.arrays[property],
+        itemSize: getAttributeItemSize(property)
+      });
+
+      if (this.data.arrays[property] === undefined) {
+        throw Error('Primitive attributes issue. Property: ' + property + ', type: ' + this.type);
+      }
+    });
+  }
 
   filterLastObject(nodeId: number, filterOptions?: FilterOptions) {
     if (!filterOptions) {
@@ -180,12 +196,13 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     console.log(newIndexes);
 
     this.treeIndexMap = {};
-    const oldTreeIndexes = this.treeIndex.slice();
+    const oldTreeIndexes = this.treeIndex;
+    this.treeIndex = new Float32Array(20);
     newIndexes.forEach((index, i) => {
       this.setTreeIndex(oldTreeIndexes[i], index)
     });
 
-   console.log(this);
+   this.setupAttributes();
     this.sorted = true;
   }
 }

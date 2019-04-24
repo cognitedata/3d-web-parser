@@ -39,6 +39,14 @@ export function unpackPrimitives(
       );
     });
   }
+
+  console.log('Sorting primitives');
+  for (const sector of rootSector.traverseSectorsBreadthFirst()) {
+    for (const primitiveGroup of sector.traversePrimitiveGroups()) {
+      primitiveGroup.sort();
+    }
+  }
+  console.log('Done sorting primitives');
 }
 
 function countRenderedPrimitivesPerSector(
