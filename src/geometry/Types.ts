@@ -1,6 +1,4 @@
 export type RenderedPrimitiveNameType =
-  | 'InstancedMesh'
-  | 'MergedMesh'
   | 'Box'
   | 'Circle'
   | 'Cone'
@@ -13,3 +11,9 @@ export type RenderedPrimitiveNameType =
   | 'SphericalSegment'
   | 'TorusSegment'
   | 'Trapezium';
+
+export type RenderedMeshNameType = 
+  | 'MergedMesh'
+  | 'InstancedMesh';
+
+export type RenderedGeometryNameType = RenderedPrimitiveNameType | RenderedMeshNameType;

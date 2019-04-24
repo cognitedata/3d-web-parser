@@ -5,8 +5,8 @@ import PrimitiveGroup from './PrimitiveGroup';
 import { computeCircleBoundingBox } from './CircleGroup';
 import { zAxis } from './../constants';
 import { FilterOptions } from '../parsers/parseUtils';
-import { RenderedPrimitiveNameType } from './GeometryGroupDataParameters';
-import GeometryGroupData from './GeometryGroupData';
+import { RenderedPrimitiveNameType } from './Types';
+import PrimitiveGroupData from './PrimitiveGroupData';
 
 // reusable variables
 const rotation = new THREE.Quaternion();
@@ -72,13 +72,13 @@ export function computeEllipsoidBoundingBox(
 
 export default class EllipsoidSegmentGroup extends PrimitiveGroup {
   public type: RenderedPrimitiveNameType;
-  public data: GeometryGroupData;
+  public data: PrimitiveGroupData;
 
   constructor(capacity: number) {
     super(capacity);
     this.type = 'EllipsoidSegment';
     this.hasCustomTransformAttributes = true;
-    this.data = new GeometryGroupData('EllipsoidSegment', capacity, this.attributes);
+    this.data = new PrimitiveGroupData('EllipsoidSegment', capacity, this.attributes);
   }
 
   add(

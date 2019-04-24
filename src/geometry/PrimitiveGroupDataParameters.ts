@@ -1,19 +1,7 @@
 // Copyright 2019 Cognite AS
 
-export type RenderedPrimitiveNameType =
-  | 'Primitive'
-  | 'Box'
-  | 'Circle'
-  | 'Cone'
-  | 'EccentricCone'
-  | 'EllipsoidSegment'
-  | 'GeneralCylinder'
-  | 'GeneralRing'
-  | 'Nut'
-  | 'Quad'
-  | 'SphericalSegment'
-  | 'TorusSegment'
-  | 'Trapezium';
+import { RenderedPrimitiveNameType } from './Types';
+
 export const RenderedPrimitiveNames: RenderedPrimitiveNameType[] = [
   'Box',
   'Circle',
@@ -71,7 +59,6 @@ export type RenderedPropertyNameType =
   | 'tubeRadius';
 
 export const primitiveProperties: { [name in RenderedPrimitiveNameType]: RenderedPropertyNameType[] } = {
-  Primitive: [],
   Box: ['size', 'center', 'normal', 'angle', 'delta'],
   Circle: ['size', 'center', 'normal', 'radiusA'],
   Cone: ['size', 'centerA', 'centerB', 'radiusA', 'radiusB', 'angle', 'arcAngle', 'localXAxis'],
@@ -105,7 +92,6 @@ export const primitiveProperties: { [name in RenderedPrimitiveNameType]: Rendere
 };
 
 export const primitiveAttributes: { [name in RenderedPrimitiveNameType]: RenderedPropertyNameType[] } = {
-  Primitive: [],
   Box: [],
   Circle: [],
   Cone: ['centerA', 'centerB', 'radiusA', 'radiusB', 'localXAxis', 'angle', 'arcAngle'],
@@ -120,8 +106,8 @@ export const primitiveAttributes: { [name in RenderedPrimitiveNameType]: Rendere
   Trapezium: ['vertex1', 'vertex2', 'vertex3', 'vertex4']
 };
 
-export const float64Properties: RenderedPropertyNameType[] = ['nodeId'];
-export const float32Properties: RenderedPropertyNameType[] = [
+export const float64Properties: Set<RenderedPropertyNameType> = new Set(['nodeId'] as Array<RenderedPropertyNameType>);
+export const float32Properties: Set<RenderedPropertyNameType> = new Set([
   'treeIndex',
   'radiusA',
   'radiusB',
@@ -143,8 +129,8 @@ export const float32Properties: RenderedPropertyNameType[] = [
   'vRadius',
   'hRadius',
   'size'
-];
-export const vector3Properties: RenderedPropertyNameType[] = [
+] as Array<RenderedPropertyNameType>);
+export const vector3Properties: Set<RenderedPropertyNameType> = new Set([
   'centerA',
   'centerB',
   'normal',
@@ -157,7 +143,7 @@ export const vector3Properties: RenderedPropertyNameType[] = [
   'capNormalA',
   'capNormalB',
   'center'
-];
-export const vector4Properties: RenderedPropertyNameType[] = ['planeA', 'planeB'];
-export const colorProperties: RenderedPropertyNameType[] = ['color'];
-export const matrix4Properties: RenderedPropertyNameType[] = ['transformMatrix'];
+] as Array<RenderedPropertyNameType>);
+export const vector4Properties: Set<RenderedPropertyNameType> = new Set(['planeA', 'planeB'] as Array<RenderedPropertyNameType>);
+export const colorProperties: Set<RenderedPropertyNameType> = new Set(['color'] as Array<RenderedPropertyNameType>);
+export const matrix4Properties: Set<RenderedPropertyNameType> = new Set(['transformMatrix'] as Array<RenderedPropertyNameType>);

@@ -1,7 +1,7 @@
 // Copyright 2019 Cognite AS
 import * as THREE from 'three';
-import GeometryGroupData from './GeometryGroupData';
-import { RenderedPrimitiveNameType } from './GeometryGroupDataParameters';
+import PrimitiveGroupData from './PrimitiveGroupData';
+import { RenderedGeometryNameType } from './Types';
 export interface GeometryNode {
   groupIndex: { collectionIndex?: number; mappingIndex: number };
   treeIndex: number;
@@ -15,7 +15,7 @@ export interface GeometryMap {
 }
 
 export abstract class GeometryGroup {
-  public abstract type: RenderedPrimitiveNameType;
+  public abstract type: RenderedGeometryNameType;
 
   memoryUsage(usage: any) {
     Object.keys(this).forEach(key => {
@@ -34,7 +34,7 @@ export abstract class GeometryGroup {
         // @ts-ignore
         usage.total += this[key].byteLength;
         // @ts-ignore
-      } else if (this[key] instanceof GeometryGroupData) {
+      } else if (this[key] instanceof PrimitiveGroupData) {
         // @ts-ignore
         this[key].memoryUsage(usage);
       }

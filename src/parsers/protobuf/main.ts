@@ -164,6 +164,7 @@ export default async function parseProtobuf(
 
     sceneStats.numSectors++;
     sector.primitiveGroups.forEach(primitiveGroup => {
+      // @ts-ignore
       sceneStats.geometryCount[primitiveGroup.type] += primitiveGroup.data.count;
     });
   }

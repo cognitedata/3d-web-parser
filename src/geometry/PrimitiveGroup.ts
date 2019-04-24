@@ -17,8 +17,8 @@ import TorusSegmentGroup from './TorusSegmentGroup';
 import TrapeziumGroup from './TrapeziumGroup';
 import { FilterOptions } from '../parsers/parseUtils';
 import { identityMatrix4 } from '../constants';
-import GeometryGroupData from './GeometryGroupData';
-import { RenderedPrimitiveNameType } from './GeometryGroupDataParameters';
+import PrimitiveGroupData from './PrimitiveGroupData';
+import { RenderedPrimitiveNameType } from './Types';
 
 const matrix = new THREE.Matrix4();
 const globalBox = new THREE.Box3();
@@ -57,7 +57,7 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
   public capacity: number;
   public treeIndex: Float32Array;
   public treeIndexMap: TreeIndexMap;
-  public data: GeometryGroupData;
+  public abstract data: PrimitiveGroupData;
   public sorted: boolean;
 
   // The transformX arrays contain contain transformation matrix
@@ -79,7 +79,6 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     this.transform3 = new Float32Array(0);
     this.attributes = [{ name: 'treeIndex', array: this.treeIndex, itemSize: 1 }];
     this.hasCustomTransformAttributes = false;
-    this.data = new GeometryGroupData('Primitive', 0, this.attributes); // Placeholder, overwritten in children classes
     this.sorted = false;
   }
 
@@ -176,11 +175,17 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
   }
 
   sort() {
-    const newData = new GeometryGroupData(this.type, this.capacity, null);
+    const newIndexes = this.data.sort();
+    this.capacity = this.data.count ;
+    console.log(newIndexes);
 
+    this.treeIndexMap = {};
+    const oldTreeIndexes = this.treeIndex.slice();
+    newIndexes.forEach((index, i) => {
+      this.setTreeIndex(oldTreeIndexes[i], index)
+    });
 
-
+   console.log(this);
     this.sorted = true;
-
   }
 }
