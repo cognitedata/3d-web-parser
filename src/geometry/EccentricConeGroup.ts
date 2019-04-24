@@ -23,7 +23,7 @@ export default class EccentricConeGroup extends PrimitiveGroup {
     super(capacity);
     this.type = 'EccentricCone';
     this.hasCustomTransformAttributes = true;
-    this.data = new PrimitiveGroupData('EccentricCone', capacity, this.attributes);
+    this.data = new PrimitiveGroupData('EccentricCone', capacity);
   }
 
   add(

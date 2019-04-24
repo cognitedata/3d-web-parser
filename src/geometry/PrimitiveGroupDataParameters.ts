@@ -42,7 +42,7 @@ export type RenderedPropertyNameType =
   | 'zAngleA'
   | 'zAngleB'
   | 'localXAxis'
-  | 'thickness'     
+  | 'thickness'
   | 'transformMatrix'
   | 'triangleOffset'
   | 'rotationAngle'
@@ -106,7 +106,7 @@ export const primitiveAttributes: { [name in RenderedPrimitiveNameType]: Rendere
   Trapezium: ['vertex1', 'vertex2', 'vertex3', 'vertex4']
 };
 
-export const float64Properties: Set<RenderedPropertyNameType> = new Set(['nodeId'] as Array<RenderedPropertyNameType>);
+export const float64Properties: Set<RenderedPropertyNameType> = new Set(['nodeId'] as RenderedPropertyNameType[]);
 export const float32Properties: Set<RenderedPropertyNameType> = new Set([
   'treeIndex',
   'radiusA',
@@ -129,7 +129,7 @@ export const float32Properties: Set<RenderedPropertyNameType> = new Set([
   'vRadius',
   'hRadius',
   'size'
-] as Array<RenderedPropertyNameType>);
+] as RenderedPropertyNameType[]);
 export const vector3Properties: Set<RenderedPropertyNameType> = new Set([
   'centerA',
   'centerB',
@@ -143,10 +143,15 @@ export const vector3Properties: Set<RenderedPropertyNameType> = new Set([
   'capNormalA',
   'capNormalB',
   'center'
-] as Array<RenderedPropertyNameType>);
-export const vector4Properties: Set<RenderedPropertyNameType> = new Set(['planeA', 'planeB'] as Array<RenderedPropertyNameType>);
-export const colorProperties: Set<RenderedPropertyNameType> = new Set(['color'] as Array<RenderedPropertyNameType>);
-export const matrix4Properties: Set<RenderedPropertyNameType> = new Set(['transformMatrix'] as Array<RenderedPropertyNameType>);
+] as RenderedPropertyNameType[]);
+export const vector4Properties: Set<RenderedPropertyNameType> = new Set([
+  'planeA',
+  'planeB'
+] as RenderedPropertyNameType[]);
+export const colorProperties: Set<RenderedPropertyNameType> = new Set(['color'] as RenderedPropertyNameType[]);
+export const matrix4Properties: Set<RenderedPropertyNameType> = new Set([
+  'transformMatrix'
+] as RenderedPropertyNameType[]);
 
 export function getAttributeItemSize(property: RenderedPropertyNameType): number {
   if (float32Properties.has(property)) {

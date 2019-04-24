@@ -30,7 +30,7 @@ export default class SphericalSegmentGroup extends PrimitiveGroup {
     super(capacity);
     this.type = 'SphericalSegment';
     this.hasCustomTransformAttributes = true;
-    this.data = new PrimitiveGroupData('SphericalSegment', capacity, this.attributes);
+    this.data = new PrimitiveGroupData('SphericalSegment', capacity);
     this.attributes.push({
       name: 'a_vRadius',
       array: this.data.arrays.hRadius,

@@ -85,7 +85,7 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
 
   abstract computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4;
   abstract computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3;
-  
+
   setupAttributes() {
     this.attributes.push({ name: 'treeIndex', array: this.treeIndex, itemSize: 1 });
     primitiveAttributes[this.type].forEach(property => {
@@ -119,13 +119,20 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
   }
 
   setTreeIndex(value: number, index: number) {
-    if (this.treeIndexMap[value] == null) {
-      this.treeIndexMap[value] = [index];
-    } else {
-      this.treeIndexMap[value].push(index);
-    }
-
     this.treeIndex[index] = value;
+  }
+
+  buildTreeIndexMap() {
+    this.treeIndexMap = {};
+    this.treeIndex.forEach((treeIndex, index) => {
+      if (index < this.data.count) {
+        if (this.treeIndexMap[treeIndex] === undefined) {
+          this.treeIndexMap[treeIndex] = [index];
+        } else {
+          this.treeIndexMap[treeIndex].push(index);
+        }
+      }
+    });
   }
 
   getTreeIndex(index: number): number {
@@ -192,17 +199,16 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
 
   sort() {
     const newIndexes = this.data.sort();
-    this.capacity = this.data.count ;
-    console.log(newIndexes);
+    this.capacity = this.data.count;
 
-    this.treeIndexMap = {};
-    const oldTreeIndexes = this.treeIndex;
-    this.treeIndex = new Float32Array(20);
+    const newTreeIndexes = new Float32Array(this.capacity);
     newIndexes.forEach((index, i) => {
-      this.setTreeIndex(oldTreeIndexes[i], index)
+      newTreeIndexes[i] = this.treeIndex[index];
     });
+    this.treeIndex = newTreeIndexes;
+    this.buildTreeIndexMap();
 
-   this.setupAttributes();
+    this.setupAttributes();
     this.sorted = true;
   }
 }

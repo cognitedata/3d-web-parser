@@ -25,7 +25,7 @@ export default class ConeGroup extends PrimitiveGroup {
     super(capacity);
     this.type = 'Cone';
     this.hasCustomTransformAttributes = true;
-    this.data = new PrimitiveGroupData('Cone', capacity, this.attributes);
+    this.data = new PrimitiveGroupData('Cone', capacity);
   }
 
   add(

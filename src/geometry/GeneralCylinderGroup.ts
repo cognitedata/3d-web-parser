@@ -45,7 +45,7 @@ export default class GeneralCylinderGroup extends PrimitiveGroup {
     super(capacity);
     this.type = 'GeneralCylinder';
     this.hasCustomTransformAttributes = true;
-    this.data = new PrimitiveGroupData('GeneralCylinder', capacity, this.attributes);
+    this.data = new PrimitiveGroupData('GeneralCylinder', capacity);
   }
 
   add(

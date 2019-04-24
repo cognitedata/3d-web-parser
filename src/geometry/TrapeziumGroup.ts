@@ -18,7 +18,7 @@ export default class TrapeziumGroup extends PrimitiveGroup {
     super(capacity);
     this.type = 'Trapezium';
     this.hasCustomTransformAttributes = true;
-    this.data = new PrimitiveGroupData('Trapezium', capacity, this.attributes);
+    this.data = new PrimitiveGroupData('Trapezium', capacity);
   }
 
   add(

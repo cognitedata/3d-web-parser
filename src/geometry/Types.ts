@@ -12,8 +12,6 @@ export type RenderedPrimitiveNameType =
   | 'TorusSegment'
   | 'Trapezium';
 
-export type RenderedMeshNameType = 
-  | 'MergedMesh'
-  | 'InstancedMesh';
+export type RenderedMeshNameType = 'MergedMesh' | 'InstancedMesh';
 
 export type RenderedGeometryNameType = RenderedPrimitiveNameType | RenderedMeshNameType;

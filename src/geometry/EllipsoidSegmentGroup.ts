@@ -78,7 +78,7 @@ export default class EllipsoidSegmentGroup extends PrimitiveGroup {
     super(capacity);
     this.type = 'EllipsoidSegment';
     this.hasCustomTransformAttributes = true;
-    this.data = new PrimitiveGroupData('EllipsoidSegment', capacity, this.attributes);
+    this.data = new PrimitiveGroupData('EllipsoidSegment', capacity);
   }
 
   add(

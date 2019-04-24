@@ -6,18 +6,10 @@ import {
   vector3Properties,
   primitiveProperties,
   RenderedPropertyNameType,
-  colorProperties,
-  vector4Properties,
+  vector4Properties
 } from './PrimitiveGroupDataParameters';
 import * as THREE from 'three';
 import { RenderedPrimitiveNameType } from './Types';
-
-
-let t1 = 0;
-let t2 = 0;
-let t3 = 0;
-let t4 = 0;
-let t5 = 0;
 
 export default class PrimitiveGroupData {
   type: RenderedPrimitiveNameType;
@@ -121,8 +113,8 @@ export default class PrimitiveGroupData {
     return usage;
   }
 
-  getPropertiesAsObject(index: number, reusableObject?: {[name: string]: any}) {
-    const data = (reusableObject !== undefined) ? reusableObject : {}; 
+  getPropertiesAsObject(index: number, reusableObject?: { [name: string]: any }) {
+    const data = reusableObject !== undefined ? reusableObject : {};
     Object.keys(this.arrays).forEach(name => {
       const property = name as RenderedPropertyNameType;
       if (float64Properties.has(property) || float32Properties.has(property)) {
@@ -140,28 +132,16 @@ export default class PrimitiveGroupData {
   }
 
   sort() {
-    // For ivar aasen:
-    // 2.5 seconds total to create Array.from()
-    // 0.5 seconds to create number[][]
-    // 5.5 seonds to sort
-    // 2 seconds to get index
-    // 7 seconds to create new arrays
     const sizeAndIndex: [number, number][] = [];
-    let start = Date.now();
-    (this.arrays.size as Float32Array).forEach((size: number, index: number, array: Float32Array) => {(index)
-      if (index < this.count) { sizeAndIndex.push([size, index]) };
+    (this.arrays.size as Float32Array).forEach((size, index) => {
+      if (index < this.count) {
+        sizeAndIndex.push([size, index]);
+      }
     });
-    t2 += Date.now() - start;
-    start = Date.now();
-    const three = sizeAndIndex.sort(([size1], [size2]) => size2 - size1);
-    t3 += Date.now() - start;
-    start = Date.now();
-    const sortedIndexes = three.map(([, index]) => index);
-    t4 += Date.now() - start;
-    start = Date.now();
-    const newArrays: any = {};
+    const sortedIndexes = sizeAndIndex.sort(([size1], [size2]) => size2 - size1).map(([, index]) => index);
+    const newArrays: { [propertyName: string]: Float32Array | Float64Array } = {};
     Object.keys(this.arrays).forEach(name => {
-      let newArray;
+      let newArray: Float32Array | Float64Array;
       const property = name as RenderedPropertyNameType;
       if (float64Properties.has(property)) {
         newArray = new Float64Array(this.count);
@@ -193,13 +173,9 @@ export default class PrimitiveGroupData {
       }
       newArrays[name] = newArray;
     });
-    
-    console.log(sortedIndexes);
-    t5 += Date.now() - start;
-    console.log(t1, t2, t3, t4, t5);
+
     this.arrays = newArrays;
     this.capacity = this.count;
-
     return sortedIndexes;
   }
 }

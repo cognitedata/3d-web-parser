@@ -27,7 +27,7 @@ export default class NutGroup extends PrimitiveGroup {
   constructor(capacity: number) {
     super(capacity);
     this.type = 'Nut';
-    this.data = new PrimitiveGroupData('Nut', capacity, this.attributes);
+    this.data = new PrimitiveGroupData('Nut', capacity);
   }
 
   add(

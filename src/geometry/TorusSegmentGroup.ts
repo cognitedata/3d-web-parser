@@ -28,7 +28,7 @@ export default class TorusSegmentGroup extends PrimitiveGroup {
   constructor(capacity: number) {
     super(capacity);
     this.type = 'TorusSegment';
-    this.data = new PrimitiveGroupData('TorusSegment', capacity, this.attributes);
+    this.data = new PrimitiveGroupData('TorusSegment', capacity);
   }
 
   add(

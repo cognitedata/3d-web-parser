@@ -27,7 +27,7 @@ export default class QuadGroup extends PrimitiveGroup {
   constructor(capacity: number) {
     super(capacity);
     this.type = 'Quad';
-    this.data = new PrimitiveGroupData('Quad', capacity, this.attributes);
+    this.data = new PrimitiveGroupData('Quad', capacity);
   }
 
   add(

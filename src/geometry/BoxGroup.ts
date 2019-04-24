@@ -23,7 +23,7 @@ export default class BoxGroup extends PrimitiveGroup {
     super(capacity);
     this.type = 'Box';
     this.hasCustomTransformAttributes = false;
-    this.data = new PrimitiveGroupData('Box', capacity, this.attributes);
+    this.data = new PrimitiveGroupData('Box', capacity);
   }
 
   add(

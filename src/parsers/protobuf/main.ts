@@ -157,11 +157,8 @@ export default async function parseProtobuf(
   }
 
   const rootSector = sectors['0/'];
-  console.log(rootSector);
-  for (const sector of rootSector.traverseSectors()) {
-    for (const primitiveGroup of sector.traversePrimitiveGroups()) {
-      primitiveGroup.sort();
-    }
+  for (const primitiveGroup of rootSector.traversePrimitiveGroups()) {
+    primitiveGroup.sort();
   }
 
   mergeInstancedMeshes(rootSector, sceneStats);

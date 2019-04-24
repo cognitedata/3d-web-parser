@@ -27,7 +27,7 @@ export default class GeneralRingGroup extends PrimitiveGroup {
     super(capacity);
     this.type = 'GeneralRing';
     this.hasCustomTransformAttributes = false;
-    this.data = new PrimitiveGroupData('GeneralRing', capacity, this.attributes);
+    this.data = new PrimitiveGroupData('GeneralRing', capacity);
   }
 
   add(

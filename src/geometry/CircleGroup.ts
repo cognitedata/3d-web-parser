@@ -41,7 +41,7 @@ export default class CircleGroup extends PrimitiveGroup {
   constructor(capacity: number) {
     super(capacity);
     this.type = 'Circle';
-    this.data = new PrimitiveGroupData('Circle', capacity, this.attributes);
+    this.data = new PrimitiveGroupData('Circle', capacity);
   }
 
   add(
