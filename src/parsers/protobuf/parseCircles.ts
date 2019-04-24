@@ -88,11 +88,10 @@ function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup, fil
   ({ x = 0, y = 0, z = 0 } = primitiveInfo.centerB);
   centerB.set(x, y, z);
 
-  const size = 2 * primitiveInfo.radius;
-
   // @ts-ignore
   if (geometry.type === 'cylinder') {
     const { radius = 0 } = primitiveInfo;
+    const size = 2 * radius;
     normal
       .copy(centerA)
       .sub(centerB)
@@ -102,6 +101,7 @@ function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup, fil
     // @ts-ignore
   } else if (geometry.type === 'cone') {
     const { radiusA = 0, radiusB = 0 } = primitiveInfo;
+    const size = radiusA + radiusB;
 
     normal
       .copy(centerA)
@@ -113,6 +113,7 @@ function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup, fil
     // @ts-ignore
   } else if (geometry.type === 'eccentricCone') {
     const { radiusA, radiusB } = primitiveInfo;
+    const size = radiusA + radiusB;
 
     ({ x = 0, y = 0, z = 0 } = primitiveInfo.normalA);
     normal.set(x, y, z);
@@ -155,19 +156,16 @@ export default function parse(args: ParseData): boolean {
     if (['cylinder', 'cone', 'eccentricCone'].indexOf(geometry.type) !== -1) {
       added = parseConeEccentricConeCylinder(geometry, group, filterOptions);
     } else {
-      const { radius } = primitiveInfo;
-
       let { x = 0, y = 0, z = 0 } = primitiveInfo.normal;
       normal.set(x, y, z);
 
       ({ x = 0, y = 0, z = 0 } = primitiveInfo.center);
       center.set(x, y, z);
 
-      const size = 2 * radius;
-
       if (geometry.type === 'sphericalSegment') {
-        const { height } = primitiveInfo;
+        const { radius, height } = primitiveInfo;
         const circleRadius = Math.sqrt(height * (2 * radius - height));
+        const size = 2 * circleRadius;
         center.add(vector.copy(normal).multiplyScalar(radius - height));
         added = group.add(nodeId, treeIndex, size, center, normal, circleRadius, filterOptions);
       } else if (geometry.type === 'ellipsoidSegment') {
@@ -175,6 +173,7 @@ export default function parse(args: ParseData): boolean {
         const length = verticalRadius - height;
         const circleRadius =
           (Math.sqrt(verticalRadius * verticalRadius - length * length) * horizontalRadius) / verticalRadius;
+        const size = 2 * circleRadius;
         center.add(
           vector
             .copy(normal)
@@ -184,6 +183,8 @@ export default function parse(args: ParseData): boolean {
         added = group.add(nodeId, treeIndex, size, center, normal, circleRadius, filterOptions);
       } else {
         // Regular circles
+        const { radius } = primitiveInfo;
+        const size = 2 * radius;
         added = group.add(nodeId, treeIndex, size, center, normal, radius, filterOptions);
       }
     }
