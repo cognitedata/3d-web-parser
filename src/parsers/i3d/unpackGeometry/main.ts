@@ -73,7 +73,13 @@ function unpackFilePrimitive(
   const destinationPrimitiveGroups: { [name: string]: PrimitiveGroup } = {};
   const data = new PropertyLoader(uncompressedValues);
   for (let j = 0; j < primitiveCompressedData.count; j++) {
-    updateDestinationGroups(destinationPrimitiveGroups, currentSector, primitiveCompressedData, j, numberOfPrimitivesPerSector);
+    updateDestinationGroups(
+      destinationPrimitiveGroups,
+      currentSector,
+      primitiveCompressedData,
+      j,
+      numberOfPrimitivesPerSector
+    );
     data.loadData(primitiveCompressedData);
     maps.treeIndexNodeIdMap[data.treeIndex] = data.nodeId;
     maps.colorMap[data.treeIndex] = data.color;

@@ -114,7 +114,7 @@ function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup, fil
     // @ts-ignore
   } else if (geometry.type === 'eccentricCone') {
     const { radiusA, radiusB } = primitiveInfo;
-    const sizeA = 2 * radiusA; 
+    const sizeA = 2 * radiusA;
     const sizeB = 2 * radiusB;
 
     ({ x = 0, y = 0, z = 0 } = primitiveInfo.normalA);
