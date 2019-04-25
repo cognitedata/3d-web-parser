@@ -108,7 +108,8 @@ export default function parse(args: ParseData): boolean {
         .multiplyScalar(innerRadius)
         .add(centerB);
 
-      const size = (vertex.distanceTo(vertex2) + vertex1.distanceTo(vertex3)) / 2;
+      const size = vertex1.distanceTo(vertex2);
+
       if (isSecondQuad) {
         // swap the order of vertex1 and vertex2 to flip the normal
         added = group.add(nodeId, treeIndex, size, vertex2, vertex1, vertex3, filterOptions) || added;
