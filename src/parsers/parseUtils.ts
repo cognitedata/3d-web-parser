@@ -44,7 +44,6 @@ export interface ParseData {
 
 export interface ParseReturn {
   rootSector: Sector;
-  sectors: { [name: string]: Sector };
   sceneStats: SceneStats;
   maps: DataMaps;
 }

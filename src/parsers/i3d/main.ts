@@ -125,11 +125,10 @@ function unpackData(
   }
   sceneStats.numNodes = maps.treeIndexNodeIdMap.length;
 
-  const sectors = maps.idToSectorMap;
   for (let treeIndex = 0; treeIndex < maps.treeIndexNodeIdMap.length; treeIndex++) {
     const nodeId = maps.treeIndexNodeIdMap[treeIndex];
     maps.nodeIdTreeIndexMap.set(nodeId, treeIndex);
   }
 
-  return { rootSector, sectors, sceneStats, maps };
+  return { rootSector, sceneStats, maps };
 }
