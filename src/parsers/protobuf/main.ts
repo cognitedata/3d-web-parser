@@ -10,7 +10,7 @@ import { InstancedMesh, InstancedMeshGroup } from '../../geometry/InstancedMeshG
 import { MergedMesh } from '../../geometry/MergedMeshGroup';
 import PrimitiveGroup from '../../geometry/PrimitiveGroup';
 import GeometryGroup from '../../geometry/GeometryGroup';
-import { FilterOptions, InstancedMeshMap, ParseData, ParseReturn } from '../parseUtils';
+import { FilterOptions, InstancedMeshMap, ParseData, ParseReturn, IdToSectorMap } from '../parseUtils';
 import {
   parseBoxes,
   parseCircles,
@@ -90,7 +90,7 @@ export default async function parseProtobuf(
 ): Promise<ParseReturn> {
   const protobufDecoder = new ProtobufDecoder();
 
-  const idToSectorMap: { [path: string]: Sector } = {};
+  const sectors: IdToSectorMap = {};
   const instancedMeshMap: { [key: number]: InstancedMesh } = {};
   const sceneStats = createSceneStats();
   // Create map since we will reuse primitive groups until the count is above some threshold.
@@ -119,7 +119,7 @@ export default async function parseProtobuf(
     const boundingBoxMin = new Vector3(boundingBox.min.x, boundingBox.min.y, boundingBox.min.z);
     const boundingBoxMax = new Vector3(boundingBox.max.x, boundingBox.max.y, boundingBox.max.z);
     const sector = new Sector(boundingBoxMin, boundingBoxMax);
-    idToSectorMap[path] = sector;
+    sectors[path] = sector;
 
     const { primitiveGroups, mergedMeshGroup, instancedMeshGroup } = parseGeometries({
       primitiveGroupMap,
@@ -138,8 +138,8 @@ export default async function parseProtobuf(
     // attach to parent
     const parentPath = getParentPath(path);
     if (parentPath !== undefined) {
-      idToSectorMap[parentPath].addChild(sector);
-      idToSectorMap[parentPath].object3d.add(sector.object3d);
+      sectors[parentPath].addChild(sector);
+      sectors[parentPath].object3d.add(sector.object3d);
     }
   };
 
@@ -156,7 +156,7 @@ export default async function parseProtobuf(
     throw new Error('parseProtobuf did not get data to parse');
   }
 
-  const rootSector = idToSectorMap['0/'];
+  const rootSector = sectors['0/'];
   for (const primitiveGroup of rootSector.traversePrimitiveGroups()) {
     primitiveGroup.sort();
   }
@@ -179,5 +179,5 @@ export default async function parseProtobuf(
     nodeIdTreeIndexMap.set(nodeId, treeIndex);
   }
 
-  return { rootSector, sceneStats, maps: { colorMap, treeIndexNodeIdMap, nodeIdTreeIndexMap, idToSectorMap } };
+  return { rootSector, sceneStats, maps: { colorMap, treeIndexNodeIdMap, nodeIdTreeIndexMap, sectors } };
 }

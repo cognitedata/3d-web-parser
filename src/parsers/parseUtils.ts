@@ -21,15 +21,15 @@ export interface InstancedMeshMap {
   [key: number]: InstancedMesh;
 }
 
-export interface NodeIdTreeIndexMap {
-  [nodeId: number]: number;
+export interface IdToSectorMap {
+  [name: string]: Sector;
 }
 
 export interface DataMaps {
   treeIndexNodeIdMap: TreeIndexNodeIdMap;
   colorMap: ColorMap;
   nodeIdTreeIndexMap: Map<number, number>;
-  idToSectorMap: { [name: string]: Sector };
+  sectors: IdToSectorMap;
 }
 
 export interface ParseData {
