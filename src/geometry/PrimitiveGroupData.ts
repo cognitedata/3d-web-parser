@@ -138,31 +138,31 @@ export default class PrimitiveGroupData {
         sizeAndIndex.push([size, index]);
       }
     });
-    const sortedIndexes = sizeAndIndex.sort(([size1], [size2]) => size2 - size1).map(([, index]) => index);
+    const sortedIndices = sizeAndIndex.sort(([size1], [size2]) => size2 - size1).map(([, index]) => index);
     const newArrays: { [propertyName: string]: Float32Array | Float64Array } = {};
     Object.keys(this.arrays).forEach(name => {
       let newArray: Float32Array | Float64Array;
       const property = name as RenderedPropertyNameType;
       if (float64Properties.has(property)) {
         newArray = new Float64Array(this.count);
-        sortedIndexes.forEach((index, i) => {
+        sortedIndices.forEach((index, i) => {
           newArray[i] = this.arrays[name][index];
         });
       } else if (float32Properties.has(property)) {
         newArray = new Float32Array(this.count);
-        sortedIndexes.forEach((index, i) => {
+        sortedIndices.forEach((index, i) => {
           newArray[i] = this.arrays[name][index];
         });
       } else if (vector3Properties.has(property)) {
         newArray = new Float32Array(this.count * 3);
-        sortedIndexes.forEach((index, i) => {
+        sortedIndices.forEach((index, i) => {
           newArray[i * 3] = this.arrays[name][index * 3];
           newArray[i * 3 + 1] = this.arrays[name][index * 3 + 1];
           newArray[i * 3 + 2] = this.arrays[name][index * 3 + 2];
         });
       } else if (vector4Properties.has(property)) {
         newArray = new Float32Array(this.count * 4);
-        sortedIndexes.forEach((index, i) => {
+        sortedIndices.forEach((index, i) => {
           newArray[i * 4] = this.arrays[name][index * 4];
           newArray[i * 4 + 1] = this.arrays[name][index * 4 + 1];
           newArray[i * 4 + 2] = this.arrays[name][index * 4 + 2];
@@ -176,6 +176,6 @@ export default class PrimitiveGroupData {
 
     this.arrays = newArrays;
     this.capacity = this.count;
-    return sortedIndexes;
+    return sortedIndices;
   }
 }

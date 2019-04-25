@@ -124,15 +124,14 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
 
   buildTreeIndexMap() {
     this.treeIndexMap = {};
-    this.treeIndex.forEach((treeIndex, index) => {
-      if (index < this.data.count) {
-        if (this.treeIndexMap[treeIndex] === undefined) {
-          this.treeIndexMap[treeIndex] = [index];
-        } else {
-          this.treeIndexMap[treeIndex].push(index);
-        }
+    for (let i = 0; i < this.data.count; i++) {
+      const treeIndex = this.treeIndex[i];
+      if (this.treeIndexMap[treeIndex] === undefined) {
+        this.treeIndexMap[treeIndex] = [i];
+      } else {
+        this.treeIndexMap[treeIndex].push(i);
       }
-    });
+    }
   }
 
   getTreeIndex(index: number): number {
@@ -198,14 +197,14 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
   }
 
   sort() {
-    const newIndexes = this.data.sort();
+    const newIndices = this.data.sort();
     this.capacity = this.data.count;
 
-    const newTreeIndexes = new Float32Array(this.capacity);
-    newIndexes.forEach((index, i) => {
-      newTreeIndexes[i] = this.treeIndex[index];
+    const newTreeIndices = new Float32Array(this.capacity);
+    newIndices.forEach((index, i) => {
+      newTreeIndices[i] = this.treeIndex[index];
     });
-    this.treeIndex = newTreeIndexes;
+    this.treeIndex = newTreeIndices;
     this.buildTreeIndexMap();
 
     this.setupAttributes();
