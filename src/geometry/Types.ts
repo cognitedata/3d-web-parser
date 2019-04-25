@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 export type RenderedPrimitiveNameType =
   | 'Box'
   | 'Circle'
