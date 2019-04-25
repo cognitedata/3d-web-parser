@@ -113,7 +113,8 @@ function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup, fil
     // @ts-ignore
   } else if (geometry.type === 'eccentricCone') {
     const { radiusA, radiusB } = primitiveInfo;
-    const size = Math.max(2 * radiusA, 2 * radiusB);
+    const sizeA = 2 * radiusA; 
+    const sizeB = 2 * radiusB;
 
     ({ x = 0, y = 0, z = 0 } = primitiveInfo.normalA);
     normal.set(x, y, z);
@@ -122,8 +123,8 @@ function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup, fil
     if (dotProduct > 0) {
       normal.negate();
     }
-    added = group.add(nodeId, treeIndex, size, centerA, normal, radiusA, filterOptions);
-    added = group.add(nodeId, treeIndex, size, centerB, normal, radiusB, filterOptions) || added;
+    added = group.add(nodeId, treeIndex, sizeA, centerA, normal, radiusA, filterOptions);
+    added = group.add(nodeId, treeIndex, sizeB, centerB, normal, radiusB, filterOptions) || added;
   }
 
   return added;
