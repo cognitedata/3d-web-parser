@@ -101,7 +101,7 @@ function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup, fil
     // @ts-ignore
   } else if (geometry.type === 'cone') {
     const { radiusA = 0, radiusB = 0 } = primitiveInfo;
-    const size = radiusA + radiusB;
+    const size = Math.max(2 * radiusA, 2 * radiusB);
 
     normal
       .copy(centerA)
@@ -113,7 +113,7 @@ function parseConeEccentricConeCylinder(geometry: any[], group: CircleGroup, fil
     // @ts-ignore
   } else if (geometry.type === 'eccentricCone') {
     const { radiusA, radiusB } = primitiveInfo;
-    const size = radiusA + radiusB;
+    const size = Math.max(2 * radiusA, 2 * radiusB);
 
     ({ x = 0, y = 0, z = 0 } = primitiveInfo.normalA);
     normal.set(x, y, z);
