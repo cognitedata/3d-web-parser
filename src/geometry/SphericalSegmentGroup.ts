@@ -4,9 +4,9 @@ import * as THREE from 'three';
 import PrimitiveGroup from './PrimitiveGroup';
 import { computeCircleBoundingBox } from './CircleGroup';
 import { FilterOptions } from '../parsers/parseUtils';
-import GeometryGroupData from './GeometryGroupData';
-import { GeometryType } from './Types';
-import { colorProperties } from './GeometryGroupDataParameters';
+import PrimitiveGroupData from './PrimitiveGroupData';
+import { RenderedPrimitiveNameType } from './Types';
+import { colorProperties } from './PrimitiveGroupDataParameters';
 
 // constants
 type triplet = [number, number, number];
@@ -23,14 +23,14 @@ const globalCenter = new THREE.Vector3();
 const globalNormal = new THREE.Vector3();
 
 export default class SphericalSegmentGroup extends PrimitiveGroup {
-  public type: GeometryType;
-  public data: GeometryGroupData;
+  public type: RenderedPrimitiveNameType;
+  public data: PrimitiveGroupData;
 
   constructor(capacity: number) {
     super(capacity);
     this.type = 'SphericalSegment';
     this.hasCustomTransformAttributes = true;
-    this.data = new GeometryGroupData('SphericalSegment', capacity, this.attributes);
+    this.data = new PrimitiveGroupData('SphericalSegment', capacity);
     this.attributes.push({
       name: 'a_vRadius',
       array: this.data.arrays.hRadius,

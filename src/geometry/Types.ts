@@ -1,6 +1,6 @@
-export type GeometryType =
-  | 'InstancedMesh'
-  | 'MergedMesh'
+// Copyright 2019 Cognite AS
+
+export type RenderedPrimitiveNameType =
   | 'Box'
   | 'Circle'
   | 'Cone'
@@ -13,3 +13,7 @@ export type GeometryType =
   | 'SphericalSegment'
   | 'TorusSegment'
   | 'Trapezium';
+
+export type RenderedMeshNameType = 'MergedMesh' | 'InstancedMesh';
+
+export type RenderedGeometryNameType = RenderedPrimitiveNameType | RenderedMeshNameType;

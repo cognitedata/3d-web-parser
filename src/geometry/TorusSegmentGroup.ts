@@ -5,10 +5,10 @@ import PrimitiveGroup from './PrimitiveGroup';
 import { computeCircleBoundingBox } from './CircleGroup';
 import { zAxis, twoPI } from './../constants';
 import { FilterOptions } from '../parsers/parseUtils';
-import GeometryGroupData from './GeometryGroupData';
-import { colorProperties } from './GeometryGroupDataParameters';
+import PrimitiveGroupData from './PrimitiveGroupData';
+import { colorProperties } from './PrimitiveGroupDataParameters';
 import { Geometry } from 'three';
-import { GeometryType } from './Types';
+import { RenderedPrimitiveNameType } from './Types';
 
 // reusable variables
 const firstRotation = new THREE.Quaternion();
@@ -23,12 +23,12 @@ const vector1 = new THREE.Vector3();
 const vector2 = new THREE.Vector3();
 
 export default class TorusSegmentGroup extends PrimitiveGroup {
-  public type: GeometryType;
-  public data: GeometryGroupData;
+  public type: RenderedPrimitiveNameType;
+  public data: PrimitiveGroupData;
   constructor(capacity: number) {
     super(capacity);
     this.type = 'TorusSegment';
-    this.data = new GeometryGroupData('TorusSegment', capacity, this.attributes);
+    this.data = new PrimitiveGroupData('TorusSegment', capacity);
   }
 
   add(

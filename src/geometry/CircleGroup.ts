@@ -4,8 +4,8 @@ import * as THREE from 'three';
 import PrimitiveGroup from './PrimitiveGroup';
 import { zAxis } from '../constants';
 import { FilterOptions } from '../parsers/parseUtils';
-import { GeometryType } from './Types';
-import GeometryGroupData from './GeometryGroupData';
+import { RenderedPrimitiveNameType } from './Types';
+import PrimitiveGroupData from './PrimitiveGroupData';
 
 // reusable variables
 const globalDot = new THREE.Vector3();
@@ -36,12 +36,12 @@ export function computeCircleBoundingBox(
 }
 
 export default class CircleGroup extends PrimitiveGroup {
-  public type: GeometryType;
-  public data: GeometryGroupData;
+  public type: RenderedPrimitiveNameType;
+  public data: PrimitiveGroupData;
   constructor(capacity: number) {
     super(capacity);
     this.type = 'Circle';
-    this.data = new GeometryGroupData('Circle', capacity, this.attributes);
+    this.data = new PrimitiveGroupData('Circle', capacity);
   }
 
   add(

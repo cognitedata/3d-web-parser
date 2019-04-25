@@ -4,8 +4,8 @@ import * as THREE from 'three';
 import PrimitiveGroup from './PrimitiveGroup';
 import { computeCircleBoundingBox } from './CircleGroup';
 import { FilterOptions } from '../parsers/parseUtils';
-import { GeometryType } from './Types';
-import GeometryGroupData from './GeometryGroupData';
+import { RenderedPrimitiveNameType } from './Types';
+import PrimitiveGroupData from './PrimitiveGroupData';
 
 // reusable variables
 const globalNormalMatrix = new THREE.Matrix3();
@@ -16,14 +16,14 @@ const globalCenterA = new THREE.Vector3();
 const globalCenterB = new THREE.Vector3();
 
 export default class EccentricConeGroup extends PrimitiveGroup {
-  public type: GeometryType;
-  public data: GeometryGroupData;
+  public type: RenderedPrimitiveNameType;
+  public data: PrimitiveGroupData;
 
   constructor(capacity: number) {
     super(capacity);
     this.type = 'EccentricCone';
     this.hasCustomTransformAttributes = true;
-    this.data = new GeometryGroupData('EccentricCone', capacity, this.attributes);
+    this.data = new PrimitiveGroupData('EccentricCone', capacity);
   }
 
   add(

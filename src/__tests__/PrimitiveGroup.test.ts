@@ -3,12 +3,15 @@
 import * as THREE from 'three';
 import PrimitiveGroup from '../geometry/PrimitiveGroup';
 import { expectColorEqual } from '../TestUtils';
-import { GeometryType } from '../geometry/Types';
+import { RenderedPrimitiveNameType } from '../geometry/Types';
+import PrimitiveGroupData from '../geometry/PrimitiveGroupData';
 class NonAbstractPrimitiveGroup extends PrimitiveGroup {
-  public type: GeometryType;
+  public type: RenderedPrimitiveNameType;
+  public data: PrimitiveGroupData;
   constructor(capacity: number) {
     super(capacity);
     this.type = 'Box'; // Any valid type
+    this.data = new PrimitiveGroupData('Box', capacity);
   }
   computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4 {
     return new THREE.Matrix4();

@@ -4,10 +4,10 @@ import * as THREE from 'three';
 import PrimitiveGroup from './PrimitiveGroup';
 import { xAxis, yAxis, zAxis } from '../constants';
 import { FilterOptions } from '../parsers/parseUtils';
-import GeometryGroupData from './GeometryGroupData';
+import PrimitiveGroupData from './PrimitiveGroupData';
 import { computeEllipsoidBoundingBox } from './EllipsoidSegmentGroup';
-import { colorProperties } from './GeometryGroupDataParameters';
-import { GeometryType } from './Types';
+import { colorProperties } from './PrimitiveGroupDataParameters';
+import { RenderedPrimitiveNameType } from './Types';
 import { angleBetweenVector3s } from '../parsers/protobuf/protobufUtils';
 
 const globalBox = new THREE.Box3();
@@ -38,14 +38,14 @@ export default class GeneralCylinderGroup extends PrimitiveGroup {
     target.set(globalSlicingPlaneNormal.x, globalSlicingPlaneNormal.y, globalSlicingPlaneNormal.z, height);
   }
 
-  public type: GeometryType;
-  public data: GeometryGroupData;
+  public type: RenderedPrimitiveNameType;
+  public data: PrimitiveGroupData;
 
   constructor(capacity: number) {
     super(capacity);
     this.type = 'GeneralCylinder';
     this.hasCustomTransformAttributes = true;
-    this.data = new GeometryGroupData('GeneralCylinder', capacity, this.attributes);
+    this.data = new PrimitiveGroupData('GeneralCylinder', capacity);
   }
 
   add(

@@ -7,7 +7,7 @@ import {
   renderedPrimitivesPerFilePrimitive,
   renderedPrimitiveToGroup
 } from '../parserParameters';
-import { RenderedPrimitiveNames } from '../../../geometry/GeometryGroupDataParameters';
+import { RenderedPrimitiveNames } from '../../../geometry/PrimitiveGroupDataParameters';
 import unpackInstancedMeshes from './InstancedMesh';
 import unpackMergedMeshes from './MergedMesh';
 import { PrimitiveGroup } from '../../../geometry/GeometryGroups';
@@ -16,7 +16,7 @@ import { DataMaps, FilterOptions } from '../../parseUtils';
 
 export { unpackInstancedMeshes, unpackMergedMeshes };
 
-type PrimitivesPerSectorAndChildren = { [path: string]: { [renderedPrimitive: string]: number } };
+type NumberOfPrimitivesPerSector = { [path: string]: { [renderedPrimitive: string]: number } };
 
 export function unpackPrimitives(
   rootSector: Sector,
@@ -25,8 +25,7 @@ export function unpackPrimitives(
   maps: DataMaps,
   filterOptions?: FilterOptions
 ) {
-  const primitivesPerSectorAndChildren: PrimitivesPerSectorAndChildren = {};
-  countRenderedPrimitivesPerSectorAndChildren(rootSector, compressedData, primitivesPerSectorAndChildren);
+  const numberOfPrimitivesPerSector = countRenderedNumberOfPrimitivesPerSector(rootSector, compressedData);
 
   for (const sector of rootSector.traverseSectorsBreadthFirst()) {
     compressedData[sector.path].primitives.forEach(primitiveCompressedData => {
@@ -35,41 +34,32 @@ export function unpackPrimitives(
         primitiveCompressedData,
         uncompressedValues,
         maps,
-        primitivesPerSectorAndChildren,
+        numberOfPrimitivesPerSector,
         filterOptions
       );
     });
   }
+  for (const primitiveGroup of rootSector.traversePrimitiveGroups()) {
+    primitiveGroup.sort();
+  }
 }
 
-function countRenderedPrimitivesPerSectorAndChildren(
-  sector: Sector,
-  compressedData: PerSectorCompressedData,
-  primitivesPerSectorAndChildren: PrimitivesPerSectorAndChildren
-) {
-  // Count rendered primitives in sector
-  primitivesPerSectorAndChildren[sector.path] = {};
-  RenderedPrimitiveNames.forEach(renderedPrimitive => {
-    primitivesPerSectorAndChildren[sector.path][renderedPrimitive] = 0;
-  });
-
-  compressedData[sector.path].primitives.forEach(fileGeometryData => {
-    renderedPrimitivesPerFilePrimitive[fileGeometryData.type].forEach(renderedPrimitiveInfo => {
-      primitivesPerSectorAndChildren[sector.path][renderedPrimitiveInfo.name] +=
-        renderedPrimitiveInfo.count * fileGeometryData.count;
-    });
-  });
-
-  // Add rendered primitives from children
-  sector.children.forEach(childSector => {
-    if (primitivesPerSectorAndChildren[childSector.path] === undefined) {
-      countRenderedPrimitivesPerSectorAndChildren(childSector, compressedData, primitivesPerSectorAndChildren);
-    }
+function countRenderedNumberOfPrimitivesPerSector(rootSector: Sector, compressedData: PerSectorCompressedData) {
+  const numberOfPrimitivesPerSector: NumberOfPrimitivesPerSector = {};
+  for (const sector of rootSector.traverseSectors()) {
+    numberOfPrimitivesPerSector[sector.path] = {};
     RenderedPrimitiveNames.forEach(renderedPrimitive => {
-      primitivesPerSectorAndChildren[sector.path][renderedPrimitive] +=
-        primitivesPerSectorAndChildren[childSector.path][renderedPrimitive];
+      numberOfPrimitivesPerSector[sector.path][renderedPrimitive] = 0;
     });
-  });
+
+    compressedData[sector.path].primitives.forEach(fileGeometryData => {
+      renderedPrimitivesPerFilePrimitive[fileGeometryData.type].forEach(renderedPrimitiveInfo => {
+        numberOfPrimitivesPerSector[sector.path][renderedPrimitiveInfo.name] +=
+          renderedPrimitiveInfo.count * fileGeometryData.count;
+      });
+    });
+  }
+  return numberOfPrimitivesPerSector;
 }
 
 function unpackFilePrimitive(
@@ -77,7 +67,7 @@ function unpackFilePrimitive(
   primitiveCompressedData: CompressedGeometryData,
   uncompressedValues: UncompressedValues,
   maps: DataMaps,
-  primitivesPerSectorAndChildren: PrimitivesPerSectorAndChildren,
+  numberOfPrimitivesPerSector: NumberOfPrimitivesPerSector,
   filterOptions?: FilterOptions
 ) {
   const destinationPrimitiveGroups: { [name: string]: PrimitiveGroup } = {};
@@ -88,7 +78,7 @@ function unpackFilePrimitive(
       currentSector,
       primitiveCompressedData,
       j,
-      primitivesPerSectorAndChildren
+      numberOfPrimitivesPerSector
     );
     data.loadData(primitiveCompressedData);
     maps.treeIndexNodeIdMap[data.treeIndex] = data.nodeId;
@@ -109,7 +99,7 @@ function updateDestinationGroups(
   currentSector: Sector,
   primitiveCompressedData: CompressedGeometryData,
   numberOfGeometriesAlreadyRendered: number,
-  primitivesPerSectorAndChildren: PrimitivesPerSectorAndChildren
+  numberOfPrimitivesPerSector: NumberOfPrimitivesPerSector
 ) {
   renderedPrimitivesPerFilePrimitive[primitiveCompressedData.type].forEach(renderedPrimitiveInfo => {
     const destinationGroup = destinationPrimitiveGroups[renderedPrimitiveInfo.name];
@@ -121,7 +111,7 @@ function updateDestinationGroups(
         currentSector,
         renderedPrimitiveInfo,
         numberOfGeometriesAlreadyRendered,
-        primitivesPerSectorAndChildren
+        numberOfPrimitivesPerSector
       );
     }
   });
@@ -131,7 +121,7 @@ function findOrCreateDestinationGroup(
   originalSector: Sector,
   renderedPrimitiveInfo: { name: string; count: number },
   numberOfGeometriesAlreadyRendered: number,
-  primitivesPerSectorAndChildren: PrimitivesPerSectorAndChildren
+  numberOfPrimitivesPerSector: NumberOfPrimitivesPerSector
 ) {
   let searchSector: Sector | undefined = originalSector;
   let destinationGroup: PrimitiveGroup | undefined;
@@ -151,10 +141,13 @@ function findOrCreateDestinationGroup(
   if (destinationGroup !== undefined) {
     return destinationGroup;
   } else {
+    let numberOfPrimitivesPerSectorAndChildren = 0;
+    for (const sector of originalSector.traverseSectors()) {
+      numberOfPrimitivesPerSectorAndChildren += numberOfPrimitivesPerSector[sector.path][renderedPrimitiveInfo.name];
+    }
     const capacity = Math.min(
       5000,
-      primitivesPerSectorAndChildren[originalSector.path][renderedPrimitiveInfo.name] -
-        numberOfGeometriesAlreadyRendered * renderedPrimitiveInfo.count
+      numberOfPrimitivesPerSectorAndChildren - numberOfGeometriesAlreadyRendered * renderedPrimitiveInfo.count
     );
     // @ts-ignore
     const createdGroup = new renderedPrimitiveToGroup[renderedPrimitiveInfo.name](capacity);

@@ -3,8 +3,8 @@
 import * as THREE from 'three';
 import PrimitiveGroup from './PrimitiveGroup';
 import { FilterOptions } from '../parsers/parseUtils';
-import { GeometryType } from './Types';
-import GeometryGroupData from './GeometryGroupData';
+import { RenderedPrimitiveNameType } from './Types';
+import PrimitiveGroupData from './PrimitiveGroupData';
 
 // reusable variables
 const basis = new THREE.Matrix4();
@@ -22,12 +22,12 @@ const globalVertex4 = new THREE.Vector3();
 const point = new THREE.Vector3();
 
 export default class QuadGroup extends PrimitiveGroup {
-  public type: GeometryType;
-  public data: GeometryGroupData;
+  public type: RenderedPrimitiveNameType;
+  public data: PrimitiveGroupData;
   constructor(capacity: number) {
     super(capacity);
     this.type = 'Quad';
-    this.data = new GeometryGroupData('Quad', capacity, this.attributes);
+    this.data = new PrimitiveGroupData('Quad', capacity);
   }
 
   add(

@@ -17,8 +17,9 @@ import TorusSegmentGroup from './TorusSegmentGroup';
 import TrapeziumGroup from './TrapeziumGroup';
 import { FilterOptions } from '../parsers/parseUtils';
 import { identityMatrix4 } from '../constants';
-import GeometryGroupData from './GeometryGroupData';
-import { GeometryType } from './Types';
+import PrimitiveGroupData from './PrimitiveGroupData';
+import { RenderedPrimitiveNameType } from './Types';
+import { primitiveAttributes, getAttributeItemSize } from './PrimitiveGroupDataParameters';
 
 const matrix = new THREE.Matrix4();
 const globalBox = new THREE.Box3();
@@ -53,11 +54,12 @@ interface TreeIndexMap {
 }
 
 export default abstract class PrimitiveGroup extends GeometryGroup {
-  public abstract type: GeometryType;
+  public abstract type: RenderedPrimitiveNameType;
   public capacity: number;
   public treeIndex: Float32Array;
   public treeIndexMap: TreeIndexMap;
-  public data: GeometryGroupData;
+  public abstract data: PrimitiveGroupData;
+  public sorted: boolean;
 
   // The transformX arrays contain contain transformation matrix
   public transform0: Float32Array;
@@ -76,13 +78,28 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     this.transform1 = new Float32Array(0);
     this.transform2 = new Float32Array(0);
     this.transform3 = new Float32Array(0);
-    this.attributes = [{ name: 'treeIndex', array: this.treeIndex, itemSize: 1 }];
+    this.attributes = [];
     this.hasCustomTransformAttributes = false;
-    this.data = new GeometryGroupData('Primitive', 0, this.attributes); // Placeholder, overwritten in children classes
+    this.sorted = false;
   }
 
   abstract computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4;
   abstract computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3;
+
+  setupAttributes() {
+    this.attributes.push({ name: 'treeIndex', array: this.treeIndex, itemSize: 1 });
+    primitiveAttributes[this.type].forEach(property => {
+      this.attributes.push({
+        name: 'a_' + property,
+        array: this.data.arrays[property],
+        itemSize: getAttributeItemSize(property)
+      });
+
+      if (this.data.arrays[property] === undefined) {
+        throw Error('Primitive attributes issue. Property: ' + property + ', type: ' + this.type);
+      }
+    });
+  }
 
   filterLastObject(nodeId: number, filterOptions?: FilterOptions) {
     if (!filterOptions) {
@@ -102,13 +119,19 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
   }
 
   setTreeIndex(value: number, index: number) {
-    if (this.treeIndexMap[value] == null) {
-      this.treeIndexMap[value] = [index];
-    } else {
-      this.treeIndexMap[value].push(index);
-    }
-
     this.treeIndex[index] = value;
+  }
+
+  buildTreeIndexMap() {
+    this.treeIndexMap = {};
+    for (let i = 0; i < this.data.count; i++) {
+      const treeIndex = this.treeIndex[i];
+      if (this.treeIndexMap[treeIndex] === undefined) {
+        this.treeIndexMap[treeIndex] = [i];
+      } else {
+        this.treeIndexMap[treeIndex].push(i);
+      }
+    }
   }
 
   getTreeIndex(index: number): number {
@@ -116,6 +139,9 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
   }
 
   computeTransformAttributes() {
+    if (!this.sorted) {
+      throw Error('Computing transform attributes before sorting geometries by size');
+    }
     if (this.hasCustomTransformAttributes) {
       return;
     }
@@ -168,5 +194,20 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
       array: this.transform3,
       itemSize: 3
     });
+  }
+
+  sort() {
+    const newIndices = this.data.sort();
+    this.capacity = this.data.count;
+
+    const newTreeIndices = new Float32Array(this.capacity);
+    newIndices.forEach((index, i) => {
+      newTreeIndices[i] = this.treeIndex[index];
+    });
+    this.treeIndex = newTreeIndices;
+    this.buildTreeIndexMap();
+
+    this.setupAttributes();
+    this.sorted = true;
   }
 }

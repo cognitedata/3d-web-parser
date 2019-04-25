@@ -4,8 +4,8 @@ import * as THREE from 'three';
 import PrimitiveGroup from './PrimitiveGroup';
 import { zAxis } from '../constants';
 import { FilterOptions } from '../parsers/parseUtils';
-import { GeometryType } from './Types';
-import GeometryGroupData from './GeometryGroupData';
+import { RenderedPrimitiveNameType } from './Types';
+import PrimitiveGroupData from './PrimitiveGroupData';
 
 // reusable variables
 const firstRotation = new THREE.Quaternion();
@@ -17,13 +17,13 @@ const globalCenter = new THREE.Vector3();
 const globalPoint = new THREE.Vector3();
 
 export default class BoxGroup extends PrimitiveGroup {
-  public type: GeometryType;
-  public data: GeometryGroupData;
+  public type: RenderedPrimitiveNameType;
+  public data: PrimitiveGroupData;
   constructor(capacity: number) {
     super(capacity);
     this.type = 'Box';
     this.hasCustomTransformAttributes = false;
-    this.data = new GeometryGroupData('Box', capacity, this.attributes);
+    this.data = new PrimitiveGroupData('Box', capacity);
   }
 
   add(

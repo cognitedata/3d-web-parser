@@ -4,7 +4,7 @@
 import * as THREE from 'three';
 
 import PrimitiveGroup from '../../geometry/PrimitiveGroup';
-import { RenderedPrimitiveNameType } from '../../geometry/GeometryGroupDataParameters';
+import { RenderedPrimitiveNameType } from '../../geometry/Types';
 import {
   BoxGroup,
   CircleGroup,
