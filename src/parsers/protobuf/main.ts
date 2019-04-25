@@ -83,11 +83,11 @@ function parseGeometries(data: ParseData) {
   return { primitiveGroups, mergedMeshGroup, instancedMeshGroup };
 }
 
-export default async function parseProtobuf(
+export default function parseProtobuf(
   protobufData?: Uint8Array,
   protobufDataList?: Uint8Array[],
   filterOptions?: FilterOptions
-): Promise<ParseReturn> {
+): ParseReturn {
   const protobufDecoder = new ProtobufDecoder();
 
   const sectors: SectorMap = {};
