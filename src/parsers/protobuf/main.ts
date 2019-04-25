@@ -10,7 +10,7 @@ import { InstancedMesh, InstancedMeshGroup } from '../../geometry/InstancedMeshG
 import { MergedMesh } from '../../geometry/MergedMeshGroup';
 import PrimitiveGroup from '../../geometry/PrimitiveGroup';
 import GeometryGroup from '../../geometry/GeometryGroup';
-import { FilterOptions, InstancedMeshMap, ParseData, ParseReturn, IdToSectorMap } from '../parseUtils';
+import { FilterOptions, InstancedMeshMap, ParseData, ParseReturn, SectorMap } from '../parseUtils';
 import {
   parseBoxes,
   parseCircles,
@@ -90,7 +90,7 @@ export default async function parseProtobuf(
 ): Promise<ParseReturn> {
   const protobufDecoder = new ProtobufDecoder();
 
-  const sectors: IdToSectorMap = {};
+  const sectors: SectorMap = {};
   const instancedMeshMap: { [key: number]: InstancedMesh } = {};
   const sceneStats = createSceneStats();
   // Create map since we will reuse primitive groups until the count is above some threshold.

@@ -21,7 +21,7 @@ export interface InstancedMeshMap {
   [key: number]: InstancedMesh;
 }
 
-export interface IdToSectorMap {
+export interface SectorMap {
   [name: string]: Sector;
 }
 
@@ -29,7 +29,7 @@ export interface DataMaps {
   treeIndexNodeIdMap: TreeIndexNodeIdMap;
   colorMap: ColorMap;
   nodeIdTreeIndexMap: Map<number, number>;
-  sectors: IdToSectorMap;
+  sectors: SectorMap;
 }
 
 export interface ParseData {
