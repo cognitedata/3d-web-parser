@@ -99,9 +99,8 @@ describe('customFileIntegrationTest', () => {
 
   test('read multi-sector file', async () => {
     const fileBuffer = fileToArrayBuffer(multiSectorFilePath);
-    const { rootSector, sectors, sceneStats } = await parseFullCustomFile(fileBuffer, new FakeMeshLoader());
-    Object.keys(sectors).forEach(sectorId => {
-      const sector = sectors[sectorId];
+    const { rootSector, maps, sceneStats } = await parseFullCustomFile(fileBuffer, new FakeMeshLoader());
+    Object.values(maps.sectors).forEach(sector => {
       sector.primitiveGroups.forEach(primitiveGroup => {
         expect(primitiveGroup.type).toBeDefined();
         expect(primitiveGroup.data.count).toBeDefined();
