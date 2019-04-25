@@ -23,5 +23,5 @@ export { default as TorusSegmentGroup } from './geometry/TorusSegmentGroup';
 export { default as TrapeziumGroup } from './geometry/TrapeziumGroup';
 export { Attribute } from './geometry/PrimitiveGroup';
 export { computeBoundingBox } from './geometry/GeometryUtils';
-export { TreeIndexNodeIdMap, ColorMap, DataMaps, ParseReturn } from './parsers/parseUtils';
+export { TreeIndexNodeIdMap, ColorMap, SectorMap, DataMaps, ParseReturn } from './parsers/parseUtils';
 export { default as SceneStats } from './SceneStats';

@@ -24,7 +24,7 @@ export function parseFullCustomFile(
     treeIndexNodeIdMap: [],
     colorMap: [],
     nodeIdTreeIndexMap: new Map(),
-    idToSectorMap: {}
+    sectors: {}
   };
   const compressedData: PerSectorCompressedData = {};
 
@@ -32,7 +32,7 @@ export function parseFullCustomFile(
   const rootSectorLength = fileReader.readUint32();
   const rootSectorMetadata = fileReader.readSectorMetadata();
   const rootSector = new Sector(rootSectorMetadata.sectorBBoxMin, rootSectorMetadata.sectorBBoxMax);
-  maps.idToSectorMap[rootSectorMetadata.sectorId] = rootSector;
+  maps.sectors[rootSectorMetadata.sectorId] = rootSector;
   const uncompressedValues = fileReader.readUncompressedValues();
   compressedData[rootSector.path] = fileReader.readCompressedGeometryData(rootSectorLength);
 
@@ -42,9 +42,9 @@ export function parseFullCustomFile(
     const sectorByteLength = fileReader.readUint32();
     const sectorMetadata = fileReader.readSectorMetadata();
     const sector = new Sector(sectorMetadata.sectorBBoxMin, sectorMetadata.sectorBBoxMax);
-    maps.idToSectorMap[sectorMetadata.sectorId] = sector;
+    maps.sectors[sectorMetadata.sectorId] = sector;
 
-    const parentSector = maps.idToSectorMap[sectorMetadata.parentSectorId];
+    const parentSector = maps.sectors[sectorMetadata.parentSectorId];
     if (parentSector !== undefined) {
       parentSector.addChild(sector);
       parentSector.object3d.add(sector.object3d);
@@ -66,7 +66,7 @@ export function parseMultipleCustomFiles(
     treeIndexNodeIdMap: [],
     colorMap: [],
     nodeIdTreeIndexMap: new Map(),
-    idToSectorMap: {}
+    sectors: {}
   };
   const compressedData: PerSectorCompressedData = {};
   let uncompressedValues: undefined | UncompressedValues;
@@ -77,14 +77,14 @@ export function parseMultipleCustomFiles(
     const sectorByteLength = fileReader.readUint32();
     const sectorMetadata = fileReader.readSectorMetadata();
     const sector = new Sector(sectorMetadata.sectorBBoxMin, sectorMetadata.sectorBBoxMax);
-    maps.idToSectorMap[sectorMetadata.sectorId] = sector;
+    maps.sectors[sectorMetadata.sectorId] = sector;
 
     if (sectorMetadata.arrayCount > 0) {
       // Is root sector
       rootSector = sector;
       uncompressedValues = fileReader.readUncompressedValues();
     } else {
-      const parentSector = maps.idToSectorMap[sectorMetadata.parentSectorId];
+      const parentSector = maps.sectors[sectorMetadata.parentSectorId];
       if (parentSector !== undefined) {
         parentSector.addChild(sector);
       } else {
@@ -125,11 +125,10 @@ function unpackData(
   }
   sceneStats.numNodes = maps.treeIndexNodeIdMap.length;
 
-  const sectors = maps.idToSectorMap;
   for (let treeIndex = 0; treeIndex < maps.treeIndexNodeIdMap.length; treeIndex++) {
     const nodeId = maps.treeIndexNodeIdMap[treeIndex];
     maps.nodeIdTreeIndexMap.set(nodeId, treeIndex);
   }
 
-  return { rootSector, sectors, sceneStats, maps };
+  return { rootSector, sceneStats, maps };
 }
