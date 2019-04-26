@@ -27,7 +27,7 @@ export function unpackPrimitives(
 ) {
   const numberOfPrimitivesPerSector = countRenderedNumberOfPrimitivesPerSector(rootSector, compressedData);
 
-  for (const sector of rootSector.traverseSectorsBreadthFirst()) {
+  for (const sector of rootSector.traverseSectors()) {
     compressedData[sector.path].primitives.forEach(primitiveCompressedData => {
       unpackFilePrimitive(
         sector,
