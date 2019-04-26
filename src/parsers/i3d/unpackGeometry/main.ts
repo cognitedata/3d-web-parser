@@ -27,7 +27,7 @@ export function unpackPrimitives(
 ) {
   const numberOfPrimitivesPerSector = countRenderedNumberOfPrimitivesPerSector(rootSector, compressedData);
 
-  for (const sector of rootSector.traverseSectorsBreadthFirst()) {
+  for (const sector of rootSector.traverseSectors()) {
     compressedData[sector.path].primitives.forEach(primitiveCompressedData => {
       unpackFilePrimitive(
         sector,
@@ -140,6 +140,12 @@ function findOrCreateDestinationGroup(
 
   if (destinationGroup !== undefined) {
     return destinationGroup;
+  } else if (renderedPrimitiveInfo.name === 'TorusSegment') {
+    const capacity = numberOfPrimitivesPerSector[originalSector.path].TorusSegment;
+    // @ts-ignore
+    const createdGroup = new renderedPrimitiveToGroup.TorusSegment(capacity);
+    originalSector.primitiveGroups.push(createdGroup);
+    return createdGroup;
   } else {
     let numberOfPrimitivesPerSectorAndChildren = 0;
     for (const sector of originalSector.traverseSectors()) {
