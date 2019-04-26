@@ -10,7 +10,7 @@ import { InstancedMesh, InstancedMeshGroup } from '../../geometry/InstancedMeshG
 import { MergedMesh } from '../../geometry/MergedMeshGroup';
 import PrimitiveGroup from '../../geometry/PrimitiveGroup';
 import GeometryGroup from '../../geometry/GeometryGroup';
-import { FilterOptions, InstancedMeshMap, ParseData } from '../parseUtils';
+import { FilterOptions, InstancedMeshMap, ParseData, ParseReturn, SectorMap } from '../parseUtils';
 import {
   parseBoxes,
   parseCircles,
@@ -83,14 +83,14 @@ function parseGeometries(data: ParseData) {
   return { primitiveGroups, mergedMeshGroup, instancedMeshGroup };
 }
 
-export default async function parseProtobuf(
+export default function parseProtobuf(
   protobufData?: Uint8Array,
   protobufDataList?: Uint8Array[],
   filterOptions?: FilterOptions
-) {
+): ParseReturn {
   const protobufDecoder = new ProtobufDecoder();
 
-  const sectors: { [path: string]: Sector } = {};
+  const sectors: SectorMap = {};
   const instancedMeshMap: { [key: number]: InstancedMesh } = {};
   const sceneStats = createSceneStats();
   // Create map since we will reuse primitive groups until the count is above some threshold.
@@ -179,5 +179,5 @@ export default async function parseProtobuf(
     nodeIdTreeIndexMap.set(nodeId, treeIndex);
   }
 
-  return { rootSector, sectors, sceneStats, maps: { colorMap, treeIndexNodeIdMap, nodeIdTreeIndexMap } };
+  return { rootSector, sceneStats, maps: { colorMap, treeIndexNodeIdMap, nodeIdTreeIndexMap, sectors } };
 }

@@ -33,7 +33,7 @@ class FakeMeshLoader {
 }
 
 describe('customFileIntegrationTest', () => {
-  test('read any sector metadata', async () => {
+  test('read any sector metadata', () => {
     const fileBuffer = fileToArrayBuffer(rootSectorFilePath);
     const fileReader = new CustomFileReader(fileBuffer);
     fileReader.readUint32(); // skip file length
@@ -52,7 +52,7 @@ describe('customFileIntegrationTest', () => {
     expect(sectorMetadata.sectorBBoxMax.z).toBeGreaterThan(sectorMetadata.sectorBBoxMin.z);
   });
 
-  test('read root-sector UncompressedValues', async () => {
+  test('read root-sector UncompressedValues', () => {
     const fileBuffer = fileToArrayBuffer(rootSectorFilePath);
     const fileReader = new CustomFileReader(fileBuffer);
     fileReader.readUint32(); // skip file length
@@ -77,7 +77,7 @@ describe('customFileIntegrationTest', () => {
     });
   });
 
-  test('read any sector geometry group index pointers', async () => {
+  test('read any sector geometry group index pointers', () => {
     const fileBuffer = fileToArrayBuffer(nonRootSectorFilePath);
     const fileReader = new CustomFileReader(fileBuffer);
     fileReader.readUint32(); // skip file length
@@ -97,11 +97,10 @@ describe('customFileIntegrationTest', () => {
     });
   });
 
-  test('read multi-sector file', async () => {
+  test('read multi-sector file', () => {
     const fileBuffer = fileToArrayBuffer(multiSectorFilePath);
-    const { rootSector, sectors, sceneStats } = await parseFullCustomFile(fileBuffer, new FakeMeshLoader());
-    Object.keys(sectors).forEach(sectorId => {
-      const sector = sectors[sectorId];
+    const { rootSector, maps, sceneStats } = parseFullCustomFile(fileBuffer, new FakeMeshLoader());
+    Object.values(maps.sectors).forEach(sector => {
       sector.primitiveGroups.forEach(primitiveGroup => {
         expect(primitiveGroup.type).toBeDefined();
         expect(primitiveGroup.data.count).toBeDefined();
