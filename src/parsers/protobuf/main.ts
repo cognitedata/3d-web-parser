@@ -118,10 +118,10 @@ export default function parseProtobuf(
   const colorMap: ColorMap = [];
 
   const handleWebNode = (webNode: any) => {
-    const { boundingBox, path } = webNode;
+    const { boundingBox, path, id } = webNode;
     const boundingBoxMin = new Vector3(boundingBox.min.x, boundingBox.min.y, boundingBox.min.z);
     const boundingBoxMax = new Vector3(boundingBox.max.x, boundingBox.max.y, boundingBox.max.z);
-    const sector = new Sector(boundingBoxMin, boundingBoxMax);
+    const sector = new Sector(id, boundingBoxMin, boundingBoxMax, path);
     sectors[path] = sector;
 
     const { primitiveGroups, mergedMeshGroup, instancedMeshGroup } = parseGeometries({

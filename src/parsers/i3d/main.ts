@@ -31,7 +31,12 @@ export function parseFullCustomFile(
   // Read root sector
   const rootSectorLength = fileReader.readUint32();
   const rootSectorMetadata = fileReader.readSectorMetadata();
-  const rootSector = new Sector(rootSectorMetadata.sectorBBoxMin, rootSectorMetadata.sectorBBoxMax);
+  const rootSector = new Sector(
+    rootSectorMetadata.sectorId,
+    rootSectorMetadata.sectorBBoxMin,
+    rootSectorMetadata.sectorBBoxMax,
+    '0/'
+  );
   maps.sectors[rootSectorMetadata.sectorId] = rootSector;
   const uncompressedValues = fileReader.readUncompressedValues();
   compressedData[rootSector.path] = fileReader.readCompressedGeometryData(rootSectorLength);
@@ -41,7 +46,7 @@ export function parseFullCustomFile(
     const sectorStartLocation = fileReader.location;
     const sectorByteLength = fileReader.readUint32();
     const sectorMetadata = fileReader.readSectorMetadata();
-    const sector = new Sector(sectorMetadata.sectorBBoxMin, sectorMetadata.sectorBBoxMax);
+    const sector = new Sector(rootSectorMetadata.sectorId, sectorMetadata.sectorBBoxMin, sectorMetadata.sectorBBoxMax);
     maps.sectors[sectorMetadata.sectorId] = sector;
 
     const parentSector = maps.sectors[sectorMetadata.parentSectorId];
@@ -76,7 +81,7 @@ export function parseMultipleCustomFiles(
     const fileReader = new CustomFileReader(sectorBuffer);
     const sectorByteLength = fileReader.readUint32();
     const sectorMetadata = fileReader.readSectorMetadata();
-    const sector = new Sector(sectorMetadata.sectorBBoxMin, sectorMetadata.sectorBBoxMax);
+    const sector = new Sector(sectorMetadata.sectorId, sectorMetadata.sectorBBoxMin, sectorMetadata.sectorBBoxMax);
     maps.sectors[sectorMetadata.sectorId] = sector;
 
     if (sectorMetadata.arrayCount > 0) {
