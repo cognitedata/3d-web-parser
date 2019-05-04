@@ -34,8 +34,7 @@ export function parseFullCustomFile(
   const rootSector = new Sector(
     rootSectorMetadata.sectorId,
     rootSectorMetadata.sectorBBoxMin,
-    rootSectorMetadata.sectorBBoxMax,
-    '0/'
+    rootSectorMetadata.sectorBBoxMax
   );
   maps.sectors[rootSectorMetadata.sectorId] = rootSector;
   const uncompressedValues = fileReader.readUncompressedValues();

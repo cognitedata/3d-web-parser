@@ -20,11 +20,11 @@ export default class Sector {
   public geometryMap: GeometryMap;
   public readonly object3d: THREE.Object3D;
 
-  constructor(id: number, min: THREE.Vector3, max: THREE.Vector3, path?: string) {
+  constructor(id: number, min: THREE.Vector3, max: THREE.Vector3) {
     this.id = id;
     this.min = min;
     this.max = max;
-    this.path = path !== undefined ? path : '';
+    this.path = '0/';
     this.primitiveGroups = [];
     this.mergedMeshGroup = new MergedMeshGroup();
     this.instancedMeshGroup = new InstancedMeshGroup();
@@ -37,11 +37,8 @@ export default class Sector {
 
   addChild(child: Sector) {
     child.parent = this;
-    if (child.path === '') {
-      // Only set child path if not already set
-      const childPath = this.path + this.children.length.toString() + '/';
-      child.path = childPath;
-    }
+    const childPath = this.path + this.children.length.toString() + '/';
+    child.path = childPath;
     this.children.push(child);
     child.depth = this.depth + 1;
     this.object3d.add(child.object3d);
