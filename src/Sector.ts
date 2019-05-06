@@ -7,6 +7,7 @@ import { MergedMeshGroup } from './geometry/MergedMeshGroup';
 import { InstancedMeshGroup } from './geometry/InstancedMeshGroup';
 
 export default class Sector {
+  public readonly id: number;
   public readonly min: THREE.Vector3;
   public readonly max: THREE.Vector3;
   public depth: number;
@@ -19,7 +20,8 @@ export default class Sector {
   public geometryMap: GeometryMap;
   public readonly object3d: THREE.Object3D;
 
-  constructor(min: THREE.Vector3, max: THREE.Vector3) {
+  constructor(id: number, min: THREE.Vector3, max: THREE.Vector3) {
+    this.id = id;
     this.min = min;
     this.max = max;
     this.path = '0/';
