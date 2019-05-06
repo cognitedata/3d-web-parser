@@ -2,7 +2,7 @@
 
 import * as THREE from 'three';
 import BoxGroup from '../../geometry/BoxGroup';
-import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
+
 import {
   MatchingGeometries,
   parsePrimitiveColor,
@@ -33,20 +33,11 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
-  if (primitiveGroupMap.Box.group.data.count + minimumRequiredCapacity > primitiveGroupMap.Box.group.capacity) {
-    const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Box.capacity);
-    primitiveGroupMap.Box.group = new BoxGroup(capacity);
-    return true;
-  }
-  return false;
-}
-
-export default function parse(args: ParseData): boolean {
-  const { geometries, primitiveGroupMap, filterOptions, treeIndexNodeIdMap, colorMap } = args;
+export default function parse(args: ParseData): BoxGroup {
+  const { geometries, filterOptions, treeIndexNodeIdMap, colorMap } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
-  const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
-  const group = primitiveGroupMap.Box.group;
+
+  const group = new BoxGroup(matchingGeometries.count);
 
   matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
@@ -72,5 +63,5 @@ export default function parse(args: ParseData): boolean {
       colorMap[treeIndex] = color.clone();
     }
   });
-  return didCreateNewGroup;
+  return group;
 }

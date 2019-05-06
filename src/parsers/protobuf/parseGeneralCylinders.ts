@@ -2,7 +2,7 @@
 
 import * as THREE from 'three';
 import GeneralCylinderGroup from '../../geometry/GeneralCylinderGroup';
-import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
+
 import {
   MatchingGeometries,
   parsePrimitiveColor,
@@ -56,23 +56,10 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
-  if (
-    primitiveGroupMap.GeneralCylinder.group.data.count + minimumRequiredCapacity >
-    primitiveGroupMap.GeneralCylinder.group.capacity
-  ) {
-    const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.GeneralCylinder.capacity);
-    primitiveGroupMap.GeneralCylinder.group = new GeneralCylinderGroup(capacity);
-    return true;
-  }
-  return false;
-}
-
-export default function parse(args: ParseData): boolean {
-  const { geometries, primitiveGroupMap, filterOptions, treeIndexNodeIdMap, colorMap } = args;
+export default function parse(args: ParseData): GeneralCylinderGroup {
+  const { geometries, filterOptions, treeIndexNodeIdMap, colorMap } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
-  const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
-  const group = primitiveGroupMap.GeneralCylinder.group;
+  const group = new GeneralCylinderGroup(matchingGeometries.count);
 
   matchingGeometries.geometries.forEach(geometry => {
     let added = false;
@@ -169,5 +156,5 @@ export default function parse(args: ParseData): boolean {
       colorMap[treeIndex] = color.clone();
     }
   });
-  return didCreateNewGroup;
+  return group;
 }

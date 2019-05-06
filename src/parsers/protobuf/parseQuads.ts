@@ -2,7 +2,7 @@
 
 import * as THREE from 'three';
 import QuadGroup from '../../geometry/QuadGroup';
-import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
+
 import {
   MatchingGeometries,
   parsePrimitiveColor,
@@ -51,20 +51,10 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
-  if (primitiveGroupMap.Quad.group.data.count + minimumRequiredCapacity > primitiveGroupMap.Quad.group.capacity) {
-    const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.Quad.capacity);
-    primitiveGroupMap.Quad.group = new QuadGroup(capacity);
-    return true;
-  }
-  return false;
-}
-
-export default function parse(args: ParseData): boolean {
-  const { geometries, primitiveGroupMap, filterOptions, treeIndexNodeIdMap, colorMap } = args;
+export default function parse(args: ParseData): QuadGroup {
+  const { geometries, filterOptions, treeIndexNodeIdMap, colorMap } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
-  const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
-  const group = primitiveGroupMap.Quad.group;
+  const group = new QuadGroup(matchingGeometries.count);
 
   matchingGeometries.geometries.forEach(geometry => {
     let added = false;
@@ -123,5 +113,5 @@ export default function parse(args: ParseData): boolean {
       colorMap[treeIndex] = globalColor.clone();
     }
   });
-  return didCreateNewGroup;
+  return group;
 }

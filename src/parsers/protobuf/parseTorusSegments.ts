@@ -2,7 +2,7 @@
 
 import * as THREE from 'three';
 import TorusSegmentGroup from '../../geometry/TorusSegmentGroup';
-import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
+
 import {
   MatchingGeometries,
   parsePrimitiveColor,
@@ -31,23 +31,10 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
-  if (
-    primitiveGroupMap.TorusSegment.group.data.count + minimumRequiredCapacity >
-    primitiveGroupMap.TorusSegment.group.capacity
-  ) {
-    const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.TorusSegment.capacity);
-    primitiveGroupMap.TorusSegment.group = new TorusSegmentGroup(capacity);
-    return true;
-  }
-  return false;
-}
-
-export default function parse(args: ParseData): boolean {
-  const { geometries, primitiveGroupMap, filterOptions, treeIndexNodeIdMap, colorMap } = args;
+export default function parse(args: ParseData): TorusSegmentGroup {
+  const { geometries, filterOptions, treeIndexNodeIdMap, colorMap } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
-  const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
-  const group = primitiveGroupMap.TorusSegment.group;
+  const group = new TorusSegmentGroup(matchingGeometries.count);
 
   matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
@@ -83,5 +70,5 @@ export default function parse(args: ParseData): boolean {
       colorMap[treeIndex] = globalColor.clone();
     }
   });
-  return didCreateNewGroup;
+  return group;
 }
