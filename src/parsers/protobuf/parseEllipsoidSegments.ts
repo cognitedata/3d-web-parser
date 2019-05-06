@@ -2,7 +2,7 @@
 
 import * as THREE from 'three';
 import EllipsoidSegmentGroup from '../../geometry/EllipsoidSegmentGroup';
-import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
+
 import {
   MatchingGeometries,
   parsePrimitiveColor,
@@ -32,23 +32,10 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
-  if (
-    primitiveGroupMap.EllipsoidSegment.group.data.count + minimumRequiredCapacity >
-    primitiveGroupMap.EllipsoidSegment.group.capacity
-  ) {
-    const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.EllipsoidSegment.capacity);
-    primitiveGroupMap.EllipsoidSegment.group = new EllipsoidSegmentGroup(capacity);
-    return true;
-  }
-  return false;
-}
-
-export default function parse(args: ParseData): boolean {
-  const { geometries, primitiveGroupMap, filterOptions, treeIndexNodeIdMap, colorMap } = args;
+export default function parse(args: ParseData): EllipsoidSegmentGroup {
+  const { geometries, filterOptions, treeIndexNodeIdMap, colorMap } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
-  const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
-  const group = primitiveGroupMap.EllipsoidSegment.group;
+  const group = new EllipsoidSegmentGroup(matchingGeometries.count);
 
   matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
@@ -88,5 +75,5 @@ export default function parse(args: ParseData): boolean {
       colorMap[treeIndex] = color.clone();
     }
   });
-  return didCreateNewGroup;
+  return group;
 }

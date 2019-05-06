@@ -3,7 +3,6 @@
 import * as THREE from 'three';
 
 import GeometryGroup from '../geometry/GeometryGroup';
-import { PrimitiveGroupMap } from '../geometry/PrimitiveGroup';
 import { InstancedMesh } from '../geometry/InstancedMeshGroup';
 import SceneStats from '../SceneStats';
 import Sector from './../Sector';
@@ -33,7 +32,6 @@ export interface DataMaps {
 }
 
 export interface ParseData {
-  primitiveGroupMap: PrimitiveGroupMap;
   geometries: GeometryGroup[];
   instancedMeshMap: InstancedMeshMap;
   sceneStats: SceneStats;

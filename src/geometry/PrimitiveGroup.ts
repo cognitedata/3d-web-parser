@@ -27,22 +27,6 @@ const globalBox = new THREE.Box3();
 type TypedArray = Float32Array | Float64Array;
 type THREEVector = THREE.Vector2 | THREE.Vector3 | THREE.Vector4;
 
-export interface PrimitiveGroupMap {
-  Box: { capacity: number; group: BoxGroup };
-  Circle: { capacity: number; group: CircleGroup };
-  Cone: { capacity: number; group: ConeGroup };
-  EccentricCone: { capacity: number; group: EccentricConeGroup };
-  EllipsoidSegment: { capacity: number; group: EllipsoidSegmentGroup };
-  GeneralCylinder: { capacity: number; group: GeneralCylinderGroup };
-  GeneralRing: { capacity: number; group: GeneralRingGroup };
-  Nut: { capacity: number; group: NutGroup };
-  Quad: { capacity: number; group: QuadGroup };
-  SphericalSegment: { capacity: number; group: SphericalSegmentGroup };
-  TorusSegment: { capacity: number; group: TorusSegmentGroup };
-  Trapezium: { capacity: number; group: TrapeziumGroup };
-  [s: string]: { capacity: number; group: PrimitiveGroup };
-}
-
 export interface Attribute {
   name: string;
   array: TypedArray;

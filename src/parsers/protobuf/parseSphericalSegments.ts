@@ -2,7 +2,7 @@
 
 import * as THREE from 'three';
 import SphericalSegmentGroup from '../../geometry/SphericalSegmentGroup';
-import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
+
 import {
   MatchingGeometries,
   parsePrimitiveColor,
@@ -32,23 +32,10 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
   return matchingGeometries;
 }
 
-function createNewGroupIfNeeded(primitiveGroupMap: PrimitiveGroupMap, minimumRequiredCapacity: number) {
-  if (
-    primitiveGroupMap.SphericalSegment.group.data.count + minimumRequiredCapacity >
-    primitiveGroupMap.SphericalSegment.group.capacity
-  ) {
-    const capacity = Math.max(minimumRequiredCapacity, primitiveGroupMap.SphericalSegment.capacity);
-    primitiveGroupMap.SphericalSegment.group = new SphericalSegmentGroup(capacity);
-    return true;
-  }
-  return false;
-}
-
-export default function parse(args: ParseData): boolean {
-  const { geometries, primitiveGroupMap, filterOptions, treeIndexNodeIdMap, colorMap } = args;
+export default function parse(args: ParseData): SphericalSegmentGroup {
+  const { geometries, filterOptions, treeIndexNodeIdMap, colorMap } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
-  const didCreateNewGroup = createNewGroupIfNeeded(primitiveGroupMap, matchingGeometries.count);
-  const group = primitiveGroupMap.SphericalSegment.group;
+  const group = new SphericalSegmentGroup(matchingGeometries.count);
 
   matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];
@@ -78,5 +65,5 @@ export default function parse(args: ParseData): boolean {
       colorMap[treeIndex] = color.clone();
     }
   });
-  return didCreateNewGroup;
+  return group;
 }

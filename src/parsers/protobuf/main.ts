@@ -46,10 +46,9 @@ import {
 import { SceneStats, createSceneStats } from '../../SceneStats';
 
 import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
-import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroup';
 import { TreeIndexNodeIdMap, ColorMap } from '../parseUtils';
 import { RenderedPrimitiveNameType } from '../../geometry/Types';
-type PrimitiveParserMap = { type: RenderedPrimitiveNameType; parser: (data: ParseData) => boolean };
+type PrimitiveParserMap = { type: RenderedPrimitiveNameType; parser: (data: ParseData) => PrimitiveGroup };
 
 const primitiveParsers: PrimitiveParserMap[] = [
   { type: 'Box', parser: parseBoxes },
@@ -69,12 +68,8 @@ const primitiveParsers: PrimitiveParserMap[] = [
 function parseGeometries(data: ParseData) {
   const primitiveGroups: PrimitiveGroup[] = [];
   primitiveParsers.forEach(({ type, parser }) => {
-    const count = data.primitiveGroupMap[type].group.data.count;
-    const didCreateNewGroup = parser(data);
-
-    if (didCreateNewGroup) {
-      primitiveGroups.push(data.primitiveGroupMap[type].group);
-    }
+    const group = parser(data);
+    primitiveGroups.push(group);
   });
 
   const mergedMeshGroup = parseMergedMeshes(data);
@@ -94,25 +89,6 @@ export default function parseProtobuf(
   const instancedMeshMap: { [key: number]: InstancedMesh } = {};
   const sceneStats = createSceneStats();
 
-  // Create map since we will reuse primitive groups until the count is above some threshold.
-  // This reduces the number of draw calls.
-  // The values are currently set to 0 as the current implementation does not place groups in correct sectors
-  // if they are reused. As protobuf is dying, we don't need to fix it.
-  const primitiveGroupMap: PrimitiveGroupMap = {
-    Box: { capacity: 0, group: new BoxGroup(0) },
-    Circle: { capacity: 0, group: new CircleGroup(0) },
-    Cone: { capacity: 0, group: new ConeGroup(0) },
-    EccentricCone: { capacity: 0, group: new EccentricConeGroup(0) },
-    EllipsoidSegment: { capacity: 0, group: new EllipsoidSegmentGroup(0) },
-    GeneralCylinder: { capacity: 0, group: new GeneralCylinderGroup(0) },
-    GeneralRing: { capacity: 0, group: new GeneralRingGroup(0) },
-    Nut: { capacity: 0, group: new NutGroup(0) },
-    Quad: { capacity: 0, group: new QuadGroup(0) },
-    SphericalSegment: { capacity: 0, group: new SphericalSegmentGroup(0) },
-    TorusSegment: { capacity: 0, group: new TorusSegmentGroup(0) },
-    Trapezium: { capacity: 0, group: new TrapeziumGroup(0) }
-  };
-
   const mergedMeshMap: InstancedMeshMap = {};
   const treeIndexNodeIdMap: TreeIndexNodeIdMap = [];
   const colorMap: ColorMap = [];
@@ -125,7 +101,6 @@ export default function parseProtobuf(
     sectors[path] = sector;
 
     const { primitiveGroups, mergedMeshGroup, instancedMeshGroup } = parseGeometries({
-      primitiveGroupMap,
       geometries: webNode.geometries,
       instancedMeshMap,
       sceneStats,
