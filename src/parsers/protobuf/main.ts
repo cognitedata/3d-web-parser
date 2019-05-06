@@ -69,7 +69,9 @@ function parseGeometries(data: ParseData) {
   const primitiveGroups: PrimitiveGroup[] = [];
   primitiveParsers.forEach(({ type, parser }) => {
     const group = parser(data);
-    primitiveGroups.push(group);
+    if (group.capacity > 0) {
+      primitiveGroups.push(group);
+    }
   });
 
   const mergedMeshGroup = parseMergedMeshes(data);
