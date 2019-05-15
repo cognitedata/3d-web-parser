@@ -7,6 +7,10 @@ import { InstancedMesh } from '../geometry/InstancedMeshGroup';
 import SceneStats from '../SceneStats';
 import Sector from './../Sector';
 
+export function sleep(timeout: number) {
+  return new Promise(resolve => setTimeout(resolve, timeout));
+}
+
 export interface FilterOptions {
   boundingBoxFilter?: THREE.Box3;
   nodeIdFilter?: number[];
