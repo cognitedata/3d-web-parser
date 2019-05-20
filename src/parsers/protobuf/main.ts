@@ -10,7 +10,7 @@ import { InstancedMesh, InstancedMeshGroup } from '../../geometry/InstancedMeshG
 import { MergedMesh } from '../../geometry/MergedMeshGroup';
 import PrimitiveGroup from '../../geometry/PrimitiveGroup';
 import GeometryGroup from '../../geometry/GeometryGroup';
-import { FilterOptions, InstancedMeshMap, ParseData, ParseReturn, SectorMap } from '../parseUtils';
+import { FilterOptions, InstancedMeshMap, ParseData, ParseReturn, SectorMap, sleep } from '../parseUtils';
 import {
   parseBoxes,
   parseCircles,
@@ -80,11 +80,10 @@ function parseGeometries(data: ParseData) {
   return { primitiveGroups, mergedMeshGroup, instancedMeshGroup };
 }
 
-export default function parseProtobuf(
-  protobufData?: Uint8Array,
-  protobufDataList?: Uint8Array[],
+export default async function parseProtobuf(
+  protobufData: Uint8Array | Uint8Array[],
   filterOptions?: FilterOptions
-): ParseReturn {
+): Promise<ParseReturn> {
   const protobufDecoder = new ProtobufDecoder();
 
   const sectors: SectorMap = {};
@@ -95,15 +94,17 @@ export default function parseProtobuf(
   const treeIndexNodeIdMap: TreeIndexNodeIdMap = [];
   const colorMap: ColorMap = [];
 
-  const handleWebNode = (webNode: any) => {
-    const { boundingBox, path, id } = webNode;
+  let count = 0;
+
+  const handleSector = async (rawSector: any) => {
+    const { boundingBox, path, id } = rawSector;
     const boundingBoxMin = new Vector3(boundingBox.min.x, boundingBox.min.y, boundingBox.min.z);
     const boundingBoxMax = new Vector3(boundingBox.max.x, boundingBox.max.y, boundingBox.max.z);
     const sector = new Sector(id, boundingBoxMin, boundingBoxMax);
     sectors[path] = sector;
 
     const { primitiveGroups, mergedMeshGroup, instancedMeshGroup } = parseGeometries({
-      geometries: webNode.geometries,
+      geometries: rawSector.geometries,
       instancedMeshMap,
       sceneStats,
       treeIndexNodeIdMap,
@@ -121,24 +122,31 @@ export default function parseProtobuf(
       sectors[parentPath].addChild(sector);
       sectors[parentPath].object3d.add(sector.object3d);
     }
+
+    // Sleep to avoid blocking thread
+    if (++count % 10 === 0) {
+      await sleep(1);
+    }
   };
 
-  if (protobufData) {
-    for (const webNode of protobufDecoder.decodeWebScene(protobufData)) {
-      handleWebNode(webNode);
-    }
-  } else if (protobufDataList) {
-    protobufDataList.forEach(data => {
+  if (protobufData instanceof Array) {
+    for (const data of protobufData) {
       const webNode = protobufDecoder.decode(ProtobufDecoder.Types.WEB_NODE, data);
-      handleWebNode(webNode);
-    });
+      await handleSector(webNode);
+    }
   } else {
-    throw new Error('parseProtobuf did not get data to parse');
+    for (const webNode of protobufDecoder.decodeWebScene(protobufData)) {
+      await handleSector(webNode);
+    }
   }
 
   const rootSector = sectors['0/'];
   for (const primitiveGroup of rootSector.traversePrimitiveGroups()) {
     primitiveGroup.sort();
+    // Sleep to avoid blocking thread
+    if (++count % 10 === 0) {
+      await sleep(1);
+    }
   }
 
   mergeInstancedMeshes(rootSector, sceneStats);
@@ -150,6 +158,10 @@ export default function parseProtobuf(
     sector.primitiveGroups.forEach(primitiveGroup => {
       sceneStats.geometryCount[primitiveGroup.type] += primitiveGroup.data.count;
     });
+    // Sleep to avoid blocking thread
+    if (++count % 10 === 0) {
+      await sleep(1);
+    }
   }
   sceneStats.numNodes = treeIndexNodeIdMap.length;
 
