@@ -257,17 +257,19 @@ export class InstancedMeshGroup extends GeometryGroup {
     this.meshes.push(mesh);
   }
 
-  removeTreeIndicesFromCollection(treeIndices: number[], collection: InstancedMeshCollection) {
+  removeTreeIndicesFromCollection = (treeIndices: number[], collection: InstancedMeshCollection) => {
     const indicesToRemove: IndexMap = {};
     treeIndices.forEach(treeIndex => {
       this.treeIndexMap[treeIndex].forEach(mesh => {
-        const { meshIndex, mappingIndex, collectionIndex } = mesh;
-        indicesToRemove[mappingIndex] = true;
+        const { mappingIndex, meshIndex, collectionIndex } = mesh;
+        if (this.meshes[meshIndex].collections[collectionIndex] === collection) {
+          indicesToRemove[mappingIndex] = true;
+        }
       });
     });
     collection.mappings.removeIndices(indicesToRemove);
     this.createTreeIndexMap();
-  }
+  };
 
   computeBoundingBox(
     matrix: THREE.Matrix4,
