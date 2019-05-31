@@ -62,6 +62,7 @@ export class InstancedMeshMappings {
     }
 
     this.count = newIndex;
+    this.resize(newIndex);
   }
 
   public add(nodeId: number, treeIndex: number, size: number, transformMatrix?: THREE.Matrix4) {
