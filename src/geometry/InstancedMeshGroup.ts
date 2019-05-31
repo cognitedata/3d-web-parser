@@ -53,15 +53,16 @@ export class InstancedMeshMappings {
         this.transform2[3 * newIndex + 1] = this.transform2[3 * i + 1];
         this.transform2[3 * newIndex + 2] = this.transform2[3 * i + 2];
 
-        this.transform3[3 * newIndex + 0] = this.transform1[3 * i + 0];
-        this.transform3[3 * newIndex + 1] = this.transform1[3 * i + 1];
-        this.transform3[3 * newIndex + 2] = this.transform1[3 * i + 2];
+        this.transform3[3 * newIndex + 0] = this.transform3[3 * i + 0];
+        this.transform3[3 * newIndex + 1] = this.transform3[3 * i + 1];
+        this.transform3[3 * newIndex + 2] = this.transform3[3 * i + 2];
 
         newIndex++;
       }
     }
 
     this.count = newIndex;
+    this.resize(newIndex);
   }
 
   public add(nodeId: number, treeIndex: number, size: number, transformMatrix?: THREE.Matrix4) {
@@ -256,17 +257,19 @@ export class InstancedMeshGroup extends GeometryGroup {
     this.meshes.push(mesh);
   }
 
-  removeTreeIndicesFromCollection(treeIndices: number[], collection: InstancedMeshCollection) {
+  removeTreeIndicesFromCollection = (treeIndices: number[], collection: InstancedMeshCollection) => {
     const indicesToRemove: IndexMap = {};
     treeIndices.forEach(treeIndex => {
       this.treeIndexMap[treeIndex].forEach(mesh => {
-        const { meshIndex, mappingIndex, collectionIndex } = mesh;
-        indicesToRemove[mappingIndex] = true;
+        const { mappingIndex, meshIndex, collectionIndex } = mesh;
+        if (this.meshes[meshIndex].collections[collectionIndex] === collection) {
+          indicesToRemove[mappingIndex] = true;
+        }
       });
     });
     collection.mappings.removeIndices(indicesToRemove);
     this.createTreeIndexMap();
-  }
+  };
 
   computeBoundingBox(
     matrix: THREE.Matrix4,
