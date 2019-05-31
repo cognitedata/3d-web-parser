@@ -53,9 +53,9 @@ export class InstancedMeshMappings {
         this.transform2[3 * newIndex + 1] = this.transform2[3 * i + 1];
         this.transform2[3 * newIndex + 2] = this.transform2[3 * i + 2];
 
-        this.transform3[3 * newIndex + 0] = this.transform1[3 * i + 0];
-        this.transform3[3 * newIndex + 1] = this.transform1[3 * i + 1];
-        this.transform3[3 * newIndex + 2] = this.transform1[3 * i + 2];
+        this.transform3[3 * newIndex + 0] = this.transform3[3 * i + 0];
+        this.transform3[3 * newIndex + 1] = this.transform3[3 * i + 1];
+        this.transform3[3 * newIndex + 2] = this.transform3[3 * i + 2];
 
         newIndex++;
       }
