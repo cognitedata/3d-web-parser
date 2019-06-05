@@ -12,7 +12,6 @@ import PrimitiveGroupData from './PrimitiveGroupData';
 const rotation = new THREE.Quaternion();
 const scale = new THREE.Vector3();
 const SI = new THREE.Matrix4();
-SI.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1);
 const M = new THREE.Matrix4();
 const MT = new THREE.Matrix4();
 const boundingBoxCenter = new THREE.Vector3();
@@ -39,6 +38,10 @@ export function computeEllipsoidBoundingBox(
   matrix: THREE.Matrix4,
   box: THREE.Box3
 ): THREE.Box3 {
+  // Always setting this because angular optimizations by mistake optimizes out this line
+  // if placed outside the function call.
+  SI.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1);
+
   rotation.setFromUnitVectors(zAxis, normal);
   scale.set(2 * xRadius, 2 * yRadius, 2 * zRadius);
   M.compose(
