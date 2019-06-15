@@ -6,9 +6,21 @@ import CustomFileReader from './CustomFileReader';
 import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
 import { SceneStats, createSceneStats } from '../../SceneStats';
 import { PerSectorCompressedData, UncompressedValues } from './sharedFileParserTypes';
-import { DataMaps, FilterOptions, ParseReturn } from '../parseUtils';
+import { DataMaps, FilterOptions, ParseReturn, SectorMap } from '../parseUtils';
 
-function preloadMeshFiles(meshLoader: any, fileIds: number[]) {
+function preloadMeshFiles(meshLoader: any, sectors: SectorMap) {
+  const fileIds = new Set<number>();
+  Object.keys(sectors).forEach(path => {
+    const sector = sectors[path];
+    sector.mergedMeshGroup.meshes.forEach(mesh => {
+      fileIds.add(mesh.fileId);
+    });
+
+    sector.instancedMeshGroup.meshes.forEach(mesh => {
+      fileIds.add(mesh.fileId);
+    });
+  });
+
   fileIds.forEach(fileId => {
     meshLoader.getGeometry(fileId);
   });
@@ -58,7 +70,11 @@ export function parseFullCustomFile(
     compressedData[sector.path] = fileReader.readCompressedGeometryData(sectorStartLocation + sectorByteLength);
   }
 
-  return unpackData(rootSector, uncompressedValues, compressedData, maps, filterOptions);
+  const data = unpackData(rootSector, uncompressedValues, compressedData, maps, filterOptions);
+
+  preloadMeshFiles(meshLoader, data.maps.sectors);
+
+  return data;
 }
 
 export function parseMultipleCustomFiles(
