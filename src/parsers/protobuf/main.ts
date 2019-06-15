@@ -80,8 +80,13 @@ function parseGeometries(data: ParseData) {
   return { primitiveGroups, mergedMeshGroup, instancedMeshGroup };
 }
 
+interface MeshLoader {
+  getGeometry(fileId: number): Promise<THREE.BufferGeometry>;
+}
+
 export default async function parseProtobuf(
   protobufData: Uint8Array | Uint8Array[],
+  meshLoader: MeshLoader,
   filterOptions?: FilterOptions
 ): Promise<ParseReturn> {
   const protobufDecoder = new ProtobufDecoder();
@@ -110,6 +115,14 @@ export default async function parseProtobuf(
       treeIndexNodeIdMap,
       colorMap,
       filterOptions
+    });
+
+    mergedMeshGroup.meshes.forEach(mesh => {
+      meshLoader.getGeometry(mesh.fileId);
+    });
+
+    instancedMeshGroup.meshes.forEach(mesh => {
+      meshLoader.getGeometry(mesh.fileId);
     });
 
     sector.primitiveGroups = primitiveGroups;
