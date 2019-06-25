@@ -28,7 +28,7 @@ function preloadMeshFiles(meshLoader: any, sectors: SectorMap) {
 
 export function parseFullCustomFile(
   fileBuffer: ArrayBuffer,
-  meshLoader: any,
+  meshLoader?: any,
   filterOptions?: FilterOptions
 ): ParseReturn {
   const fileReader = new CustomFileReader(fileBuffer);
@@ -72,7 +72,9 @@ export function parseFullCustomFile(
 
   const data = unpackData(rootSector, uncompressedValues, compressedData, maps, filterOptions);
 
-  preloadMeshFiles(meshLoader, data.maps.sectors);
+  if (meshLoader) {
+    preloadMeshFiles(meshLoader, data.maps.sectors);
+  }
 
   return data;
 }

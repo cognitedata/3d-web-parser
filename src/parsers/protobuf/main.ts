@@ -86,7 +86,7 @@ interface MeshLoader {
 
 export default async function parseProtobuf(
   protobufData: Uint8Array | Uint8Array[],
-  meshLoader: MeshLoader,
+  meshLoader?: MeshLoader,
   filterOptions?: FilterOptions
 ): Promise<ParseReturn> {
   const protobufDecoder = new ProtobufDecoder();
@@ -117,13 +117,16 @@ export default async function parseProtobuf(
       filterOptions
     });
 
-    mergedMeshGroup.meshes.forEach(mesh => {
-      meshLoader.getGeometry(mesh.fileId);
-    });
+    if (meshLoader) {
+      // If a mesh loader is given, prefetch the files
+      mergedMeshGroup.meshes.forEach(mesh => {
+        meshLoader.getGeometry(mesh.fileId);
+      });
 
-    instancedMeshGroup.meshes.forEach(mesh => {
-      meshLoader.getGeometry(mesh.fileId);
-    });
+      instancedMeshGroup.meshes.forEach(mesh => {
+        meshLoader.getGeometry(mesh.fileId);
+      });
+    }
 
     sector.primitiveGroups = primitiveGroups;
     sector.mergedMeshGroup = mergedMeshGroup;
