@@ -94,7 +94,9 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     const boundingBoxFilterResult =
       filterOptions.boundingBoxFilter && !filterOptions.boundingBoxFilter.intersectsBox(globalBox);
     const nodeIdFilterResult = filterOptions.nodeIdFilter && filterOptions.nodeIdFilter.indexOf(nodeId) === -1;
-    if (boundingBoxFilterResult || nodeIdFilterResult) {
+    const sizeFilterResult =
+      filterOptions.sizeThreshold && globalBox.max.distanceTo(globalBox.min) < filterOptions.sizeThreshold;
+    if (boundingBoxFilterResult || nodeIdFilterResult || sizeFilterResult) {
       // Reduce count, i.e. remove last geometry
       this.data.count -= 1;
       return false; // Did not add this geometry
