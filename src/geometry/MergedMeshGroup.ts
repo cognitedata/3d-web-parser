@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import GeometryGroup from './GeometryGroup';
 import { RenderedMeshNameType } from './Types';
 import { computeBoundingBox } from './GeometryUtils';
+import { TextureInfo } from '../parsers/i3d/sharedFileParserTypes';
 
 interface IndexMap {
   [s: number]: boolean;
@@ -158,11 +159,22 @@ export class MergedMesh {
   fileId: number;
   treeIndexMap: { [s: number]: number };
   createdByInstancedMesh: boolean;
-  constructor(capacity: number, fileId: number, createdByInstancedMesh: boolean = false) {
+  diffuseTexture?: TextureInfo;
+  normalTexture?: TextureInfo;
+  bumpTexture?: TextureInfo;
+  constructor(capacity: number, fileId: number, 
+    createdByInstancedMesh: boolean = false,
+    diffuseTexture?: TextureInfo,
+    normalTexture?: TextureInfo,
+    bumpTexture?: TextureInfo,
+  ) {
     this.mappings = new MergedMeshMappings(capacity);
     this.fileId = fileId;
     this.treeIndexMap = {};
     this.createdByInstancedMesh = createdByInstancedMesh;
+    this.diffuseTexture = diffuseTexture;
+    this.normalTexture = normalTexture;
+    this.bumpTexture = bumpTexture;
   }
 }
 

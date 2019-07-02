@@ -42,6 +42,12 @@ export default class CustomFileReader {
     return value;
   }
 
+  readUint16(): number {
+    const value = this.dataView.getUint16(this.location, this.flip);
+    this.location += 2;
+    return value;
+  }
+
   readUint32(): number {
     const value = this.dataView.getUint32(this.location, this.flip);
     this.location += 4;

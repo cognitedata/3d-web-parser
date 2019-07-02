@@ -1,7 +1,7 @@
 // Copyright 2019 Cognite AS
 
 import * as THREE from 'three';
-import { CompressedGeometryData, UncompressedValues } from './sharedFileParserTypes';
+import { CompressedGeometryData, TextureInfo, UncompressedValues } from './sharedFileParserTypes';
 import { DEFAULT_COLOR, fileGeometryProperties } from './parserParameters';
 import FibonacciDecoder from '../FibonacciDecoder';
 
@@ -35,6 +35,10 @@ export default class PropertyLoader {
   public translation = new THREE.Vector3();
   public rotation3 = new THREE.Vector3();
   public scale = new THREE.Vector3();
+  public diffuseTexture?: TextureInfo;
+  public normalTexture?: TextureInfo;
+  public bumpTexture?: TextureInfo;
+
   private values: UncompressedValues;
 
   private parameterToDataLoadingFunction: { [parameter: string]: (indices: FibonacciDecoder) => void } = {
@@ -93,6 +97,9 @@ export default class PropertyLoader {
     fileId:         indices => { this.fileId    = this.values.fileId![indices.nextValue()]; },
     size:   indices => {
       this.size = this.values.size![indices.nextValue()]; },
+    diffuseTexture:   indices => { this.diffuseTexture  = this.values.texture![indices.nextValue()]; },
+    normalTexture:    indices => { this.normalTexture   = this.values.texture![indices.nextValue()]; },
+    bumpTexture:      indices => { this.bumpTexture     = this.values.texture![indices.nextValue()]; },
     // tslint:enable:prettier
   };
 

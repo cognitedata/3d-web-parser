@@ -34,7 +34,8 @@ export default function unpackMergedMeshes(
       const mergedMeshes: { [fileId: string]: MergedMesh } = {};
       Object.keys(meshCounts).forEach(fileId => {
         if (meshCounts[fileId] !== 0) {
-          mergedMeshes[fileId] = new MergedMesh(meshCounts[fileId], parseInt(fileId, 10));
+          mergedMeshes[fileId] = new MergedMesh(meshCounts[fileId], parseInt(fileId, 10), false, data.diffuseTexture,
+          data.normalTexture, data.bumpTexture);
         }
       });
 

@@ -173,7 +173,8 @@ export type FilePropertyArrayNameType =
   | 'scaleX'
   | 'scaleY'
   | 'scaleZ'
-  | 'fileId';
+  | 'fileId'
+  | 'texture';
 export const FilePropertyArrayNames: FilePropertyArrayNameType[] = [
   'color',
   'size',
@@ -191,7 +192,8 @@ export const FilePropertyArrayNames: FilePropertyArrayNameType[] = [
   'scaleX',
   'scaleY',
   'scaleZ',
-  'fileId'
+  'fileId',
+  'texture',
 ];
 export type FilePropertyNames =
   | 'treeIndex'
@@ -216,7 +218,10 @@ export type FilePropertyNames =
   | 'rotation3'
   | 'scale'
   | 'triangleCount'
-  | 'size';
+  | 'size'
+  | 'diffuseTexture'
+  | 'normalTexture'
+  | 'bumpTexture';
 export const FileProperties: FilePropertyNames[] = [
   'treeIndex',
   'color',
@@ -235,7 +240,10 @@ export const FileProperties: FilePropertyNames[] = [
   'slopeB',
   'zAngleA',
   'zAngleB',
-  'fileId'
+  'fileId',
+  'diffuseTexture',
+  'normalTexture',
+  'bumpTexture',
 ];
 
 // If adding new parameters, also update PropergeometryNameType
@@ -304,10 +312,13 @@ export const fileGeometryProperties: { [name in FileGeometryNameType]: FilePrope
   Ring: ['treeIndex', 'color', 'size', 'center', 'normal', 'radiusA', 'radiusB'],
   Sphere: ['treeIndex', 'color', 'size', 'center', 'radiusA'],
   Torus: ['treeIndex', 'color', 'size', 'center', 'normal', 'radiusA', 'radiusB'],
-  MergedMesh: ['treeIndex', 'fileId', 'triangleCount', 'color', 'size'],
+  MergedMesh: ['treeIndex', 'fileId', 'diffuseTexture', 'normalTexture', 'bumpTexture', 'triangleCount', 'color', 'size'],
   InstancedMesh: [
     'treeIndex',
     'fileId',
+    'diffuseTexture',
+    'normalTexture',
+    'bumpTexture',
     'triangleOffset',
     'triangleCount',
     'color',
