@@ -159,6 +159,7 @@ export class MergedMesh {
   fileId: number;
   treeIndexMap: { [s: number]: number };
   createdByInstancedMesh: boolean;
+  geometry?: THREE.BufferGeometry;
   diffuseTexture?: TextureInfo;
   normalTexture?: TextureInfo;
   bumpTexture?: TextureInfo;
@@ -191,7 +192,6 @@ export class MergedMeshGroup extends GeometryGroup {
   public type: RenderedMeshNameType;
   meshes: MergedMesh[];
   treeIndexMap: TreeIndexMap;
-  geometry?: THREE.BufferGeometry;
 
   constructor() {
     super();
@@ -224,28 +224,22 @@ export class MergedMeshGroup extends GeometryGroup {
     matrix: THREE.Matrix4,
     box: THREE.Box3,
     treeIndex: number,
-    geometry?: THREE.BufferGeometry
   ): THREE.Box3 {
     box.makeEmpty();
 
     this.treeIndexMap[treeIndex].forEach(mesh => {
       const { meshIndex, mappingIndex } = mesh;
       const mergedMesh = this.meshes[meshIndex];
-
-      if (geometry == null) {
-        if (this.geometry == null) {
-          // Geometry may not be loaded yet, skip this geometry.
-          return;
-        }
-        geometry = this.geometry;
+      if (!mergedMesh.geometry) {
+        return;
       }
 
       const triangleCount = mergedMesh.mappings.getTriangleCount(mappingIndex);
       const triangleOffset = mergedMesh.mappings.getTriangleOffset(mappingIndex);
 
       // index and position buffer containing the merged mesh
-      const index = geometry!.getIndex();
-      const position = geometry!.getAttribute('position');
+      const index = mergedMesh.geometry.getIndex();
+      const position = mergedMesh.geometry.getAttribute('position');
 
       computeBoundingBox(globalBox, matrix, position, index, triangleOffset, triangleCount);
       box.union(globalBox);
