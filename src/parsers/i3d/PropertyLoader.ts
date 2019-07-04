@@ -97,9 +97,9 @@ export default class PropertyLoader {
     fileId:         indices => { this.fileId    = this.values.fileId![indices.nextValue()]; },
     size:   indices => {
       this.size = this.values.size![indices.nextValue()]; },
-    diffuseTexture:   indices => { this.diffuseTexture  = this.values.texture![indices.nextValue()]; },
-    normalTexture:    indices => { this.normalTexture   = this.values.texture![indices.nextValue()]; },
-    bumpTexture:      indices => { this.bumpTexture     = this.values.texture![indices.nextValue()]; },
+    diffuseTexture:   indices => { this.diffuseTexture  = this.values.texture![indices.nextValue() - 1]; },
+    normalTexture:    indices => { this.normalTexture   = this.values.texture![indices.nextValue() - 1]; },
+    bumpTexture:      indices => { this.bumpTexture     = this.values.texture![indices.nextValue() - 1]; },
     // tslint:enable:prettier
   };
 
