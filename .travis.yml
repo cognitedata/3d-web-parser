@@ -12,7 +12,7 @@ script:
 deploy:
   - provider: npm
     on:
-      branch: release
+      branch: master
     skip_cleanup: true
     email: cicd@cognite.com
     api_key:
