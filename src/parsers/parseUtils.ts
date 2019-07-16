@@ -14,7 +14,7 @@ export function sleep(timeout: number) {
 export interface FilterOptions {
   boundingBoxFilter?: THREE.Box3;
   sizeThreshold?: number;
-  nodeIdFilter?: number[];
+  includeNodeIds?: number[];
 }
 
 export type TreeIndexNodeIdMap = number[];
