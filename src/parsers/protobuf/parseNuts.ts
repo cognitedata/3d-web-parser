@@ -34,7 +34,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 export default function parse(args: ParseData): NutGroup {
   const { geometries, filterOptions, treeIndexNodeIdMap, colorMap } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
-  const group = new NutGroup(matchingGeometries.count);
+  const group = args.geometryGroup as NutGroup;
 
   matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];

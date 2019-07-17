@@ -37,7 +37,7 @@ export default function parse(args: ParseData): BoxGroup {
   const { geometries, filterOptions, treeIndexNodeIdMap, colorMap } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
 
-  const group = new BoxGroup(matchingGeometries.count);
+  const group = args.geometryGroup as BoxGroup;
 
   matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];

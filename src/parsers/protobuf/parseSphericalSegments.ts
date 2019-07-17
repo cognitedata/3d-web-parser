@@ -35,7 +35,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 export default function parse(args: ParseData): SphericalSegmentGroup {
   const { geometries, filterOptions, treeIndexNodeIdMap, colorMap } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
-  const group = new SphericalSegmentGroup(matchingGeometries.count);
+  const group = args.geometryGroup as SphericalSegmentGroup;
 
   matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];

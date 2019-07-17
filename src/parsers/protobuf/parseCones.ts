@@ -56,7 +56,7 @@ export default function parse(args: ParseData): ConeGroup {
   const { geometries, filterOptions, treeIndexNodeIdMap, colorMap } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
 
-  const group = new ConeGroup(matchingGeometries.count);
+  const group = args.geometryGroup as ConeGroup;
 
   matchingGeometries.geometries.forEach(geometry => {
     let added = false;

@@ -224,7 +224,7 @@ export default function parse(args: ParseData): TrapeziumGroup {
   const { geometries, filterOptions, treeIndexNodeIdMap, colorMap } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
 
-  const group = new TrapeziumGroup(matchingGeometries.count);
+  const group = args.geometryGroup as TrapeziumGroup;
 
   matchingGeometries.geometries.forEach(geometry => {
     let added = false;

@@ -35,7 +35,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 export default function parse(args: ParseData): EllipsoidSegmentGroup {
   const { geometries, filterOptions, treeIndexNodeIdMap, colorMap } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
-  const group = new EllipsoidSegmentGroup(matchingGeometries.count);
+  const group = args.geometryGroup as EllipsoidSegmentGroup;
 
   matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];

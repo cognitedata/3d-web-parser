@@ -38,6 +38,7 @@ export interface DataMaps {
 
 export interface ParseData {
   geometries: GeometryGroup[];
+  geometryGroup: GeometryGroup;
   instancedMeshMap: InstancedMeshMap;
   sceneStats: SceneStats;
   treeIndexNodeIdMap: TreeIndexNodeIdMap;

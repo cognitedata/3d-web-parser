@@ -39,7 +39,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 export default function parse(args: ParseData): EccentricConeGroup {
   const { geometries, filterOptions, treeIndexNodeIdMap, colorMap } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
-  const group = new EccentricConeGroup(matchingGeometries.count);
+  const group = args.geometryGroup as EccentricConeGroup;
 
   matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];

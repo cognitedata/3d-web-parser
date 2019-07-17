@@ -135,7 +135,7 @@ export default function parse(args: ParseData): CircleGroup {
   const { geometries, filterOptions, treeIndexNodeIdMap, colorMap } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
 
-  const group = new CircleGroup(matchingGeometries.count);
+  const group = args.geometryGroup as CircleGroup;
 
   matchingGeometries.geometries.forEach(geometry => {
     const primitiveInfo = geometry.primitiveInfo[getPrimitiveType(geometry.primitiveInfo)];

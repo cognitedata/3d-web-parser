@@ -334,7 +334,7 @@ function parseGeneralCylinder(
 export default function parse(args: ParseData): GeneralRingGroup {
   const { geometries, filterOptions, treeIndexNodeIdMap, colorMap } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
-  const group = new GeneralRingGroup(matchingGeometries.count);
+  const group = args.geometryGroup as GeneralRingGroup;
 
   matchingGeometries.geometries.forEach(geometry => {
     let added = false;

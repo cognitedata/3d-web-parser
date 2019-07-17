@@ -48,26 +48,31 @@ import { SceneStats, createSceneStats } from '../../SceneStats';
 import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
 import { TreeIndexNodeIdMap, ColorMap } from '../parseUtils';
 import { RenderedPrimitiveNameType } from '../../geometry/Types';
-type PrimitiveParserMap = { type: RenderedPrimitiveNameType; parser: (data: ParseData) => PrimitiveGroup };
+type PrimitiveParserMap = {
+  type: RenderedPrimitiveNameType;
+  parser: (data: ParseData) => PrimitiveGroup;
+  geometryGroup: PrimitiveGroup;
+};
 
 const primitiveParsers: PrimitiveParserMap[] = [
-  { type: 'Box', parser: parseBoxes },
-  { type: 'Circle', parser: parseCircles },
-  { type: 'Cone', parser: parseCones },
-  { type: 'EccentricCone', parser: parseEccentricCones },
-  { type: 'EllipsoidSegment', parser: parseEllipsoidSegments },
-  { type: 'GeneralCylinder', parser: parseGeneralCylinders },
-  { type: 'GeneralRing', parser: parseGeneralRings },
-  { type: 'Nut', parser: parseNuts },
-  { type: 'Quad', parser: parseQuads },
-  { type: 'SphericalSegment', parser: parseSphericalSegments },
-  { type: 'TorusSegment', parser: parseTorusSegments },
-  { type: 'Trapezium', parser: parseTrapeziums }
+  { type: 'Box', parser: parseBoxes, geometryGroup: new BoxGroup(500000) },
+  { type: 'Circle', parser: parseCircles, geometryGroup: new CircleGroup(500000) },
+  { type: 'Cone', parser: parseCones, geometryGroup: new ConeGroup(500000) },
+  { type: 'EccentricCone', parser: parseEccentricCones, geometryGroup: new EccentricConeGroup(500000) },
+  { type: 'EllipsoidSegment', parser: parseEllipsoidSegments, geometryGroup: new EllipsoidSegmentGroup(500000) },
+  { type: 'GeneralCylinder', parser: parseGeneralCylinders, geometryGroup: new GeneralCylinderGroup(500000) },
+  { type: 'GeneralRing', parser: parseGeneralRings, geometryGroup: new GeneralRingGroup(500000) },
+  { type: 'Nut', parser: parseNuts, geometryGroup: new NutGroup(500000) },
+  { type: 'Quad', parser: parseQuads, geometryGroup: new QuadGroup(500000) },
+  { type: 'SphericalSegment', parser: parseSphericalSegments, geometryGroup: new SphericalSegmentGroup(500000) },
+  { type: 'TorusSegment', parser: parseTorusSegments, geometryGroup: new TorusSegmentGroup(500000) },
+  { type: 'Trapezium', parser: parseTrapeziums, geometryGroup: new TrapeziumGroup(500000) }
 ];
 
 function parseGeometries(data: ParseData) {
   const primitiveGroups: PrimitiveGroup[] = [];
-  primitiveParsers.forEach(({ type, parser }) => {
+  primitiveParsers.forEach(({ type, parser, geometryGroup }) => {
+    data.geometryGroup = geometryGroup;
     const group = parser(data);
     if (group.capacity > 0) {
       primitiveGroups.push(group);
@@ -103,6 +108,7 @@ export default async function parseProtobuf(
     const sector = new Sector(id, boundingBoxMin, boundingBoxMax);
     sectors[path] = sector;
 
+    // @ts-ignore
     const { primitiveGroups, mergedMeshGroup, instancedMeshGroup } = parseGeometries({
       geometries: rawSector.geometries,
       instancedMeshMap,
@@ -112,7 +118,7 @@ export default async function parseProtobuf(
       filterOptions
     });
 
-    sector.primitiveGroups = primitiveGroups;
+    // sector.primitiveGroups = primitiveGroups;
     sector.mergedMeshGroup = mergedMeshGroup;
     sector.instancedMeshGroup = instancedMeshGroup;
 
@@ -121,6 +127,8 @@ export default async function parseProtobuf(
     if (parentPath !== undefined) {
       sectors[parentPath].addChild(sector);
       sectors[parentPath].object3d.add(sector.object3d);
+    } else {
+      sector.primitiveGroups = primitiveParsers.map(parser => parser.geometryGroup);
     }
 
     // Sleep to avoid blocking thread

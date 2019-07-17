@@ -59,7 +59,7 @@ function findMatchingGeometries(geometries: any[]): MatchingGeometries {
 export default function parse(args: ParseData): GeneralCylinderGroup {
   const { geometries, filterOptions, treeIndexNodeIdMap, colorMap } = args;
   const matchingGeometries = findMatchingGeometries(geometries);
-  const group = new GeneralCylinderGroup(matchingGeometries.count);
+  const group = args.geometryGroup as GeneralCylinderGroup;
 
   matchingGeometries.geometries.forEach(geometry => {
     let added = false;
