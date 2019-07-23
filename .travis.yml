@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - "11.10.1"
+  - '11.10.1'
 install:
   - yarn
   - npm install -g codecov
@@ -12,7 +12,7 @@ script:
 deploy:
   - provider: npm
     on:
-      branch: master
+      branch: release
     skip_cleanup: true
     email: cicd@cognite.com
     api_key:
