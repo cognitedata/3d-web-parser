@@ -31,3 +31,18 @@ We use `jest` to run tests, see [their documentation](https://github.com/faceboo
 ## Update protobuf schema
 
 - Run `yarn run pbjs -t json -o src/proto/web_scene.json {path to web_scene.proto}`
+
+## Release
+
+How to release a new version:
+
+1. Create a new branch
+2. Commit changes (if any)
+3. Run
+    ```bash
+    $ npm version [patch/minor/major]
+    # example: $ npm version patch
+    ```
+5. Push branch and push tags (`git push --tags`)
+6. Create a new pull requests
+7. A new version will be published when the PR is merged
