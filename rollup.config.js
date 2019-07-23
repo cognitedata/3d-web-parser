@@ -39,7 +39,7 @@ export default {
       compact: true, // Default: false
 
       // generate a named export for every property of the JSON object
-      namedExports: true, // Default: true
-    }),
+      namedExports: true // Default: true
+    })
   ],
 };
