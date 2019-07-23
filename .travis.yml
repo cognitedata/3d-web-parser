@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - '11.10.1'
+  - 11.10.1
 install:
   - yarn
   - npm install -g codecov
@@ -8,12 +8,12 @@ script:
   - yarn lint
   - yarn build
   - yarn test && codecov
-
 deploy:
-  - provider: npm
-    on:
-      branch: release
-    skip_cleanup: true
-    email: cicd@cognite.com
-    api_key:
-      secure: ZRfpzsn8Xgkrq706u+GWd+HcFztaFL+dyeCeU3aoperJ4/r8WHkJ4Kd/ZAOl8ZcOCKy71YQfCrxFBrR6qzm0Dxo96zFwM18xh/g0GmWyfesTNhEE05GKkVf1Jj4j66ZN4rZkt/TPkdrQbmEFABATY1kPljBxwstwHKAFBlGINd04X+wPRUl3kKWT1K3oEinRrzDLF78TcciIet7oa9atQb7JY8mhr/rtlzyVL7Yz9fwb5l+wxPJpqN4G8ZvknCVtO3bGybRQuE7xu+BJ8+CvKR67ui0zfuOIgyHZxUe31yxceADRnes+0kFtrOhnbpHJ+WtroA0HUlBEfZTamelTZUciyLic9z34An/yNyJvfcHA6vfz8dGrVwHMxtGNz9DPy16hajzoik5XJGKq5YFCNalb1go1t/M7HpHqG68MR117zpDvEX8dJQwGWdrctA9y7Q3TZa5Xw6wNlIbCX9/nc/WwnbO0tutXk8+yHQzxuylM4Gqm9SRxfuYXrsAqciMVGOMBGppq9pDzilWPQMmShacNa80iL86NU2nF7G6R7EAf/Z98XUPo5lNZcvaUNWwlPzXy30/vRHDHC+fjkqYkIkGcds9u/LGIPF+87zK1x+h0kW34C0/wDC52nExqBBTmoQ6tF62HvBwFaPmwIxNXhomv4FksizlLu+4Afe9R0gg=
+  provider: npm
+  email: cicd@cognite.com
+  api_key:
+    secure: mfYbtd4rUkEBzt+Beyk0RE3LwjHeyB4n70jDV4LuwpOm0JPU9IyW+aLnASae7DFrxYnP0WxddAEhkJKiQOKLLzw+ycxb1xhOl+8fDBThEUb0iMHeRcX3y21ocXHpjTrliMAZnXdJoWZ9EP3K6snjNbELXhxx6rJckxgEZJ+Q01nE2IIVnraQmDteMQayRugb0cOot5aUk4CwPp1moIoc+UN+XC68EC7QQ78OtY65umBp61KKQSJtIAH9Dh4nP/A42jhWpZ3nzYeN/AkFoCoyK9BK1q+v8MmHshGB2J2QzfBQXAlHQqKIq51CiLaTyhfWzz7EOzuZy029jgsRgYonQFJrnJH4cdFce/P6AEAJ62imPhnunPJgpRTptU84AAjmSidoJiY5/rJuGMPNxErowr/19wfR92KJXhwKPPD8Am40aeF8DpU2onrJvkzHrxdVIstVZ+FXbATlVHNYdpW3DLkTQAPTnnYahi/XE/38VNPz4xYZV9iBmMLldcl1eFOGMmti47AHuUvSPsEtfHm2xFGa+SLTq76TssGck1RA8+DeCYpJ+dsbBTppOKZjaNDOzKtLgb/hfKIysMDnQVPKF0M9X1EsAtLWZ0W/++JSPRsxQ1RFa2JO4zZwNDp61yhX+ObnJixRRuOGmhqIx3F5Jfi78H/ZCkR1MyhaT+unr7E=
+  on:
+    tags: true
+    repo: cognitedata/3d-web-parser
+    branch: release
