@@ -8,19 +8,26 @@ import {
   EccentricConeGroup,
   CircleGroup,
   GeneralRingGroup,
-  TrapeziumGroup
+  TrapeziumGroup,
+  QuadGroup
 } from '../../../geometry/GeometryGroups';
 import { FilterOptions } from '../../parseUtils';
 import { xAxis, zAxis } from '../../../constants';
 
 const globalCenterA = new THREE.Vector3();
 const globalCenterB = new THREE.Vector3();
+const globalCenterC = new THREE.Vector3();
+const globalCenterD = new THREE.Vector3();
 const globalAxisRotation = new THREE.Quaternion();
 const globalXAxis = new THREE.Vector3();
 const globalVertex = new THREE.Vector3();
+const globalVertex1 = new THREE.Vector3();
+const globalVertex2 = new THREE.Vector3();
+const globalVertex3 = new THREE.Vector3();
 const globalRotation = new THREE.Quaternion();
 const globalCapZAxis = new THREE.Vector3();
 const globalCapXAxis = new THREE.Vector3();
+const globalQuadNorm = new THREE.Vector3();
 
 export function addOpenCone(
   groups: { [name: string]: PrimitiveGroup },
@@ -257,4 +264,41 @@ export function addSolidClosedGeneralCone(
       filterOptions
     );
   });
+}
+
+export function addQuad(
+  groups: { [name: string]: PrimitiveGroup },
+  data: PropertyLoader,
+  filterOptions?: FilterOptions
+) {
+  globalCenterA
+    .set(data.deltaScalar, data.deltaScalar, 0.0);
+  globalCenterB
+    .set(data.deltaScalar, -data.deltaScalar, 0.0);
+  globalCenterC
+    .set(-data.deltaScalar, data.deltaScalar, 0.0);
+  globalCenterD
+    .set(data.deltaScalar, data.deltaScalar, 0.0);
+  globalVertex
+    .copy(data.center)
+    .add(globalCenterA);
+  globalVertex1
+    .copy(data.center)
+    .add(globalCenterB);
+  globalVertex2
+    .copy(data.center)
+    .add(globalCenterC);
+  globalVertex3
+    .copy(data.center)
+    .add(globalCenterD);
+
+  (groups.Quad as QuadGroup).add(
+    data.nodeId,
+    data.treeIndex,
+    data.size,
+    globalVertex1,
+    globalVertex2,
+    globalVertex3,
+    filterOptions
+  );
 }

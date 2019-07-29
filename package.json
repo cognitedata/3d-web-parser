@@ -31,7 +31,8 @@
     "build": "yarn clean && rollup -c && yarn esCheck",
     "watch": "rollup -cw",
     "prepush": "yarn lint && yarn test",
-    "esCheck": "es-check es5 './dist/index.js'"
+    "esCheck": "es-check es5 './dist/index.js'",
+    "prepare": "yarn build"
   },
   "devDependencies": {
     "@cognite/tslint-config-cognite-3d": "^1.0.3",

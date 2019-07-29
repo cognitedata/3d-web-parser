@@ -29,7 +29,8 @@ import {
   addOpenGeneralCone,
   addClosedGeneralCone,
   addSolidOpenGeneralCone,
-  addSolidClosedGeneralCone
+  addSolidClosedGeneralCone,
+  addQuad // TODO move to another file
 } from './unpackGeometry/Cone';
 import {
   addExtrudedRing,
@@ -42,7 +43,7 @@ import {
   addOpenGeneralCylinder,
   addClosedGeneralCylinder,
   addSolidOpenGeneralCylinder,
-  addSolidClosedGeneralCylinder
+  addSolidClosedGeneralCylinder,
 } from './unpackGeometry/Cylinder';
 import { addClosedEllipsoidSegment, addOpenEllipsoidSegment, addEllipsoid } from './unpackGeometry/Ellipsoid';
 import { addClosedTorusSegment, addOpenTorusSegment, addTorus } from './unpackGeometry/Torus';
@@ -80,7 +81,8 @@ export type FilePrimitiveNameType =
   | 'OpenGeneralCone'
   | 'ClosedGeneralCone'
   | 'SolidOpenGeneralCone'
-  | 'SolidClosedGeneralCone';
+  | 'SolidClosedGeneralCone'
+  | 'Quad';
 export type FileMeshNameType = 'MergedMesh' | 'InstancedMesh';
 export type FileGeometryNameType = FilePrimitiveNameType | FileMeshNameType;
 
@@ -114,7 +116,8 @@ export const FilePrimitiveNames: FilePrimitiveNameType[] = [
   'OpenGeneralCone',
   'ClosedGeneralCone',
   'SolidOpenGeneralCone',
-  'SolidClosedGeneralCone'
+  'SolidClosedGeneralCone',
+  'Quad'
 ];
 export const FileMeshNames: FileMeshNameType[] = ['MergedMesh', 'InstancedMesh'];
 
@@ -141,6 +144,7 @@ export const IdToFileGeometryName: { [id: number]: FileGeometryNameType } = {
   22: 'Ring',
   23: 'Sphere',
   24: 'Torus',
+  25: 'Quad',
   30: 'OpenGeneralCylinder',
   31: 'ClosedGeneralCylinder',
   32: 'SolidOpenGeneralCylinder',
@@ -216,7 +220,8 @@ export type FilePropertyNames =
   | 'rotation3'
   | 'scale'
   | 'triangleCount'
-  | 'size';
+  | 'size'
+  | 'deltaScalar';
 export const FileProperties: FilePropertyNames[] = [
   'treeIndex',
   'color',
@@ -443,7 +448,15 @@ export const fileGeometryProperties: { [name in FileGeometryNameType]: FilePrope
     'slopeB',
     'zAngleA',
     'zAngleB'
-  ]
+  ],
+  Quad: [
+    'treeIndex',
+    'normal',
+    'color',
+    'size',
+    'center',
+    'deltaScalar',
+  ],
 };
 
 export const renderedPrimitiveToAddFunction: {
@@ -482,7 +495,8 @@ export const renderedPrimitiveToAddFunction: {
   ClosedGeneralCone: addClosedGeneralCone,
   OpenGeneralCone: addOpenGeneralCone,
   SolidOpenGeneralCone: addSolidOpenGeneralCone,
-  SolidClosedGeneralCone: addSolidClosedGeneralCone
+  SolidClosedGeneralCone: addSolidClosedGeneralCone,
+  Quad: addQuad
 };
 
 export const renderedPrimitivesPerFilePrimitive: {
@@ -529,7 +543,8 @@ export const renderedPrimitivesPerFilePrimitive: {
     { name: 'Cone', count: 2 },
     { name: 'GeneralRing', count: 2 },
     { name: 'Trapezium', count: 2 }
-  ]
+  ],
+  Quad: [{ name: 'Quad', count: 1 }],
 };
 
 export const renderedPrimitiveToGroup: { [name: string]: typeof PrimitiveGroup } = {

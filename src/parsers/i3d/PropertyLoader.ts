@@ -14,6 +14,7 @@ export default class PropertyLoader {
   public center = new THREE.Vector3();
   public normal = new THREE.Vector3();
   public delta = new THREE.Vector3();
+  public deltaScalar = 0;
   public height = 0;
   public radiusA = 0;
   public radiusB = 0;
@@ -93,6 +94,7 @@ export default class PropertyLoader {
     fileId:         indices => { this.fileId    = this.values.fileId![indices.nextValue()]; },
     size:   indices => {
       this.size = this.values.size![indices.nextValue()]; },
+    deltaScalar:        indices => { this.deltaScalar        = this.values.delta![indices.nextValue()]; },
     // tslint:enable:prettier
   };
 
