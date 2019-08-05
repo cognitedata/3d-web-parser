@@ -93,7 +93,7 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     this.computeBoundingBox(identityMatrix4, globalBox, index);
     const boundingBoxFilterResult =
       filterOptions.boundingBoxFilter && !filterOptions.boundingBoxFilter.intersectsBox(globalBox);
-    const nodeIdFilterResult = filterOptions.nodeIdFilter && filterOptions.nodeIdFilter.indexOf(nodeId) === -1;
+    const nodeIdFilterResult = filterOptions.includeNodeIds && filterOptions.includeNodeIds.indexOf(nodeId) === -1;
     const sizeFilterResult =
       filterOptions.sizeThreshold && globalBox.max.distanceTo(globalBox.min) < filterOptions.sizeThreshold;
     if (boundingBoxFilterResult || nodeIdFilterResult || sizeFilterResult) {
