@@ -163,7 +163,7 @@ export class MergedMesh {
   diffuseTexture?: TextureInfo;
   normalTexture?: TextureInfo;
   bumpTexture?: TextureInfo;
-  constructor(capacity: number, fileId: number, 
+  constructor(capacity: number, fileId: number,
     createdByInstancedMesh: boolean = false,
     diffuseTexture?: TextureInfo,
     normalTexture?: TextureInfo,
