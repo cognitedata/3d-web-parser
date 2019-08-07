@@ -38,6 +38,15 @@ export default class PropertyLoader {
   public scale = new THREE.Vector3();
   private values: UncompressedValues;
 
+  private normals = [
+    new THREE.Vector3(1, 0, 0),
+    new THREE.Vector3(0, 1, 0),
+    new THREE.Vector3(0, 0, 1),
+    new THREE.Vector3(-1, 0, 0),
+    new THREE.Vector3(0, -1, 0),
+    new THREE.Vector3(0, 0, -1),
+  ];
+
   private parameterToDataLoadingFunction: { [parameter: string]: (indices: FibonacciDecoder) => void } = {
     // tslint:disable:prettier
     treeIndex: indices => { this.treeIndex =               indices.nextValue(); },
@@ -95,6 +104,7 @@ export default class PropertyLoader {
     size:   indices => {
       this.size = this.values.size![indices.nextValue()]; },
     deltaScalar:        indices => { this.deltaScalar        = this.values.delta![indices.nextValue()]; },
+    quadNormal:        indices => { this.normal = this.normals[indices.nextValue()]; }
     // tslint:enable:prettier
   };
 

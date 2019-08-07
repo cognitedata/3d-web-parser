@@ -272,25 +272,29 @@ export function addQuad(
   filterOptions?: FilterOptions
 ) {
   globalCenterA
-    .set(data.deltaScalar, data.deltaScalar, 0.0);
-  globalCenterB
-    .set(data.deltaScalar, -data.deltaScalar, 0.0);
-  globalCenterC
-    .set(-data.deltaScalar, data.deltaScalar, 0.0);
-  globalCenterD
-    .set(data.deltaScalar, data.deltaScalar, 0.0);
+    .copy(data.center);
+
+  globalAxisRotation.setFromUnitVectors(zAxis, data.normal);
+
+  const d = data.deltaScalar;
   globalVertex
-    .copy(data.center)
+    .set(d, d, 0)
+    .applyQuaternion(globalAxisRotation)
     .add(globalCenterA);
   globalVertex1
-    .copy(data.center)
-    .add(globalCenterB);
+    .set(d, -d, 0)
+    .applyQuaternion(globalAxisRotation)
+    .add(globalCenterA);
   globalVertex2
-    .copy(data.center)
-    .add(globalCenterC);
+    .set(-d, d, 0)
+    .applyQuaternion(globalAxisRotation)
+    .add(globalCenterA);
   globalVertex3
-    .copy(data.center)
-    .add(globalCenterD);
+    .set(d, d, 0)
+    .applyQuaternion(globalAxisRotation)
+    .add(globalCenterA);
+
+  console.log("Vertices", globalVertex, globalVertex1, globalVertex2, globalVertex3);
 
   (groups.Quad as QuadGroup).add(
     data.nodeId,

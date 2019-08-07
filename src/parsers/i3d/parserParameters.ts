@@ -221,7 +221,8 @@ export type FilePropertyNames =
   | 'scale'
   | 'triangleCount'
   | 'size'
-  | 'deltaScalar';
+  | 'deltaScalar'
+  | 'quadNormal';
 export const FileProperties: FilePropertyNames[] = [
   'treeIndex',
   'color',
@@ -240,7 +241,8 @@ export const FileProperties: FilePropertyNames[] = [
   'slopeB',
   'zAngleA',
   'zAngleB',
-  'fileId'
+  'fileId',
+  'quadNormal'
 ];
 
 // If adding new parameters, also update PropergeometryNameType
@@ -451,7 +453,7 @@ export const fileGeometryProperties: { [name in FileGeometryNameType]: FilePrope
   ],
   Quad: [
     'treeIndex',
-    'normal',
+    'quadNormal',
     'color',
     'size',
     'center',
