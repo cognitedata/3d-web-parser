@@ -276,7 +276,7 @@ export function addQuad(
 
   globalAxisRotation.setFromUnitVectors(zAxis, data.normal);
 
-  const d = data.deltaScalar;
+  const d = data.deltaScalar / 2;
   globalVertex
     .set(d, d, 0)
     .applyQuaternion(globalAxisRotation)
