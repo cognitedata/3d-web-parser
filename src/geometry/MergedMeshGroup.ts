@@ -161,11 +161,15 @@ export class MergedMesh {
   createdByInstancedMesh: boolean;
   geometry?: THREE.BufferGeometry;
   diffuseTexture?: TextureInfo;
+  specularTexture?: TextureInfo;
+  ambientTexture?: TextureInfo;
   normalTexture?: TextureInfo;
   bumpTexture?: TextureInfo;
   constructor(capacity: number, fileId: number,
     createdByInstancedMesh: boolean = false,
     diffuseTexture?: TextureInfo,
+    specularTexture?: TextureInfo,
+    ambientTexture?: TextureInfo,
     normalTexture?: TextureInfo,
     bumpTexture?: TextureInfo,
   ) {
@@ -174,6 +178,8 @@ export class MergedMesh {
     this.treeIndexMap = {};
     this.createdByInstancedMesh = createdByInstancedMesh;
     this.diffuseTexture = diffuseTexture;
+    this.specularTexture = specularTexture;
+    this.ambientTexture = ambientTexture;
     this.normalTexture = normalTexture;
     this.bumpTexture = bumpTexture;
   }

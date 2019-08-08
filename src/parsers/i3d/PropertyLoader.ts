@@ -36,6 +36,8 @@ export default class PropertyLoader {
   public rotation3 = new THREE.Vector3();
   public scale = new THREE.Vector3();
   public diffuseTexture?: TextureInfo;
+  public specularTexture?: TextureInfo;
+  public ambientTexture?: TextureInfo;
   public normalTexture?: TextureInfo;
   public bumpTexture?: TextureInfo;
 
@@ -98,6 +100,8 @@ export default class PropertyLoader {
     size:   indices => {
       this.size = this.values.size![indices.nextValue()]; },
     diffuseTexture:   indices => { this.diffuseTexture  = this.values.texture![indices.nextValue() - 1]; },
+    specularTexture:  indices => { this.specularTexture = this.values.texture![indices.nextValue() - 1]; },
+    ambientTexture:   indices => { this.ambientTexture  = this.values.texture![indices.nextValue() - 1]; },
     normalTexture:    indices => { this.normalTexture   = this.values.texture![indices.nextValue() - 1]; },
     bumpTexture:      indices => { this.bumpTexture     = this.values.texture![indices.nextValue() - 1]; },
     // tslint:enable:prettier

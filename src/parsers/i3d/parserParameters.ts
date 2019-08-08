@@ -220,6 +220,8 @@ export type FilePropertyNames =
   | 'triangleCount'
   | 'size'
   | 'diffuseTexture'
+  | 'specularTexture'
+  | 'ambientTexture'
   | 'normalTexture'
   | 'bumpTexture';
 export const FileProperties: FilePropertyNames[] = [
@@ -242,7 +244,9 @@ export const FileProperties: FilePropertyNames[] = [
   'zAngleB',
   'fileId',
   'diffuseTexture',
-  'normalTexture',
+  'specularTexture',
+  'ambientTexture',
+  'normalTexture' ,
   'bumpTexture',
 ];
 
@@ -312,12 +316,25 @@ export const fileGeometryProperties: { [name in FileGeometryNameType]: FilePrope
   Ring: ['treeIndex', 'color', 'size', 'center', 'normal', 'radiusA', 'radiusB'],
   Sphere: ['treeIndex', 'color', 'size', 'center', 'radiusA'],
   Torus: ['treeIndex', 'color', 'size', 'center', 'normal', 'radiusA', 'radiusB'],
-  MergedMesh: ['treeIndex', 'fileId', 'diffuseTexture', 'normalTexture', 'bumpTexture', 'triangleCount', 'color', 'size'],
+  MergedMesh: [
+    'treeIndex',
+    'fileId',
+    'diffuseTexture',
+    'specularTexture',
+    'ambientTexture',
+    'normalTexture',
+    'bumpTexture',
+    'triangleCount',
+    'color',
+    'size'
+  ],
   InstancedMesh: [
     'treeIndex',
     'fileId',
     'diffuseTexture',
     'normalTexture',
+    'specularTexture',
+    'ambientTexture',
     'bumpTexture',
     'triangleOffset',
     'triangleCount',
