@@ -57,7 +57,7 @@ export default function loadUncompressedValues(fileReader: CustomFileReader) {
           const width = fileReader.readUint16();
           const height = fileReader.readUint16();
           const _reserved = fileReader.readUint32();
-          uncompressedValues.texture!.push({fileId: fileId, width: width, height: height});
+          uncompressedValues.texture!.push({ fileId, width, height });
         }
         break;
       default:

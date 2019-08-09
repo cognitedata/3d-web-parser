@@ -165,13 +165,15 @@ export class MergedMesh {
   ambientTexture?: TextureInfo;
   normalTexture?: TextureInfo;
   bumpTexture?: TextureInfo;
-  constructor(capacity: number, fileId: number,
+  constructor(
+    capacity: number,
+    fileId: number,
     createdByInstancedMesh: boolean = false,
     diffuseTexture?: TextureInfo,
     specularTexture?: TextureInfo,
     ambientTexture?: TextureInfo,
     normalTexture?: TextureInfo,
-    bumpTexture?: TextureInfo,
+    bumpTexture?: TextureInfo
   ) {
     this.mappings = new MergedMeshMappings(capacity);
     this.fileId = fileId;
@@ -226,11 +228,7 @@ export class MergedMeshGroup extends GeometryGroup {
     this.meshes.push(mesh);
   }
 
-  computeBoundingBox(
-    matrix: THREE.Matrix4,
-    box: THREE.Box3,
-    treeIndex: number,
-  ): THREE.Box3 {
+  computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, treeIndex: number): THREE.Box3 {
     box.makeEmpty();
 
     this.treeIndexMap[treeIndex].forEach(mesh => {

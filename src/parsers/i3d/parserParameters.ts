@@ -193,7 +193,7 @@ export const FilePropertyArrayNames: FilePropertyArrayNameType[] = [
   'scaleY',
   'scaleZ',
   'fileId',
-  'texture',
+  'texture'
 ];
 export type FilePropertyNames =
   | 'treeIndex'
@@ -246,8 +246,8 @@ export const FileProperties: FilePropertyNames[] = [
   'diffuseTexture',
   'specularTexture',
   'ambientTexture',
-  'normalTexture' ,
-  'bumpTexture',
+  'normalTexture',
+  'bumpTexture'
 ];
 
 // If adding new parameters, also update PropergeometryNameType
