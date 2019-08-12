@@ -17,4 +17,5 @@ deploy:
     secure: mfYbtd4rUkEBzt+Beyk0RE3LwjHeyB4n70jDV4LuwpOm0JPU9IyW+aLnASae7DFrxYnP0WxddAEhkJKiQOKLLzw+ycxb1xhOl+8fDBThEUb0iMHeRcX3y21ocXHpjTrliMAZnXdJoWZ9EP3K6snjNbELXhxx6rJckxgEZJ+Q01nE2IIVnraQmDteMQayRugb0cOot5aUk4CwPp1moIoc+UN+XC68EC7QQ78OtY65umBp61KKQSJtIAH9Dh4nP/A42jhWpZ3nzYeN/AkFoCoyK9BK1q+v8MmHshGB2J2QzfBQXAlHQqKIq51CiLaTyhfWzz7EOzuZy029jgsRgYonQFJrnJH4cdFce/P6AEAJ62imPhnunPJgpRTptU84AAjmSidoJiY5/rJuGMPNxErowr/19wfR92KJXhwKPPD8Am40aeF8DpU2onrJvkzHrxdVIstVZ+FXbATlVHNYdpW3DLkTQAPTnnYahi/XE/38VNPz4xYZV9iBmMLldcl1eFOGMmti47AHuUvSPsEtfHm2xFGa+SLTq76TssGck1RA8+DeCYpJ+dsbBTppOKZjaNDOzKtLgb/hfKIysMDnQVPKF0M9X1EsAtLWZ0W/++JSPRsxQ1RFa2JO4zZwNDp61yhX+ObnJixRRuOGmhqIx3F5Jfi78H/ZCkR1MyhaT+unr7E=
   on:
     repo: cognitedata/3d-web-parser
-    branch: master
+    branch: /^release\/.+$/
+    tags: true
