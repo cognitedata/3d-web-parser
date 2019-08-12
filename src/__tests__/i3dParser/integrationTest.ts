@@ -12,9 +12,9 @@ import {
 
 const fs = require('fs');
 
-const rootSectorFilePath = './src/__tests__/fixtures/primitives/web_node_5_0.i3d';
-const nonRootSectorFilePath = './src/__tests__/fixtures/primitives/web_node_5_0.i3d';
-const multiSectorFilePath = './src/__tests__/fixtures/primitives/web_scene_5.i3d';
+const rootSectorFilePath = './src/__tests__/fixtures/primitives/web_node_7_0.i3d';
+const nonRootSectorFilePath = './src/__tests__/fixtures/primitives/web_node_7_0.i3d';
+const multiSectorFilePath = './src/__tests__/fixtures/primitives/web_scene_7.i3d';
 
 function fileToArrayBuffer(filePath: string) {
   const fileBuffer = fs.readFileSync(filePath, null);
