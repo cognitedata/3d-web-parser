@@ -4,6 +4,12 @@ import FibonacciDecoder from '../FibonacciDecoder';
 import { BYTES_PER_NODE_ID, FileGeometryNameType } from './parserParameters';
 import * as THREE from 'three';
 
+export interface TextureInfo {
+  fileId: number;
+  width: number;
+  height: number;
+}
+
 export interface SectorMetadata {
   magicBytes: number;
   formatVersion: number;
@@ -25,7 +31,7 @@ export interface CompressedGeometryData {
 }
 
 export interface UncompressedValues {
-  [propertyName: string]: THREE.Color[] | THREE.Vector3[] | number[] | undefined;
+  [propertyName: string]: THREE.Color[] | THREE.Vector3[] | number[] | TextureInfo[] | undefined;
   color?: THREE.Color[];
   size?: number[];
   normal?: THREE.Vector3[];
@@ -43,6 +49,7 @@ export interface UncompressedValues {
   scaleY?: number[];
   scaleZ?: number[];
   fileId?: number[];
+  texture?: TextureInfo[];
 }
 
 export type SectorCompressedData = {

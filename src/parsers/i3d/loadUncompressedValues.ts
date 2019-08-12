@@ -3,7 +3,7 @@
 import CustomFileReader from './CustomFileReader';
 import { FilePropertyArrayNames } from './parserParameters';
 import * as THREE from 'three';
-import { UncompressedValues } from './sharedFileParserTypes';
+import { TextureInfo, UncompressedValues } from './sharedFileParserTypes';
 
 // Debugging note: This function should never be called on a sector with arrayCount == 0.
 export default function loadUncompressedValues(fileReader: CustomFileReader) {
@@ -46,6 +46,18 @@ export default function loadUncompressedValues(fileReader: CustomFileReader) {
         }
         for (let j = 0; j < clusterCount; j++) {
           uncompressedValues.fileId!.push(fileReader.readUint64());
+        }
+        break;
+      case 'texture':
+        if (bytesForOneValue !== 16) {
+          throw Error('Reading incorrect number of bytes for fileId');
+        }
+        for (let j = 0; j < clusterCount; j++) {
+          const fileId = fileReader.readUint64();
+          const width = fileReader.readUint16();
+          const height = fileReader.readUint16();
+          const _reserved = fileReader.readUint32();
+          uncompressedValues.texture!.push({ fileId, width, height });
         }
         break;
       default:
