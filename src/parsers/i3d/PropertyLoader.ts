@@ -2,7 +2,7 @@
 
 import * as THREE from 'three';
 import { CompressedGeometryData, TextureInfo, UncompressedValues } from './sharedFileParserTypes';
-import { DEFAULT_COLOR, fileGeometryProperties } from './parserParameters';
+import { DEFAULT_COLOR, fileGeometryPropertiesV5, fileGeometryPropertiesV7 } from './parserParameters';
 import FibonacciDecoder from '../FibonacciDecoder';
 
 export default class PropertyLoader {
@@ -111,8 +111,18 @@ export default class PropertyLoader {
     this.values = uncompressedValues;
   }
 
-  loadData(geometryInfo: CompressedGeometryData) {
+  loadData(geometryInfo: CompressedGeometryData, formatVersion: Number) {
     this.nodeId = geometryInfo.nodeIds.nextNodeId();
+    const fileGeometryProperties = (() => {
+      switch (formatVersion) {
+        case 5:
+          return fileGeometryPropertiesV5;
+        case 7:
+          return fileGeometryPropertiesV7;
+        default:
+          throw Error(`I3DF format version ${formatVersion} is not supported`);
+      };
+    })();
     fileGeometryProperties[geometryInfo.type].forEach(property => {
       this.parameterToDataLoadingFunction[property].call(this, geometryInfo.indices);
     });

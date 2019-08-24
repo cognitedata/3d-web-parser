@@ -17,7 +17,8 @@ export default function unpackInstancedMeshes(
   uncompressedValues: UncompressedValues,
   compressedData: PerSectorCompressedData,
   maps: DataMaps,
-  sceneStats: SceneStats
+  sceneStats: SceneStats,
+  formatVersion: Number,
 ) {
   const data = new PropertyLoader(uncompressedValues);
 
@@ -29,7 +30,7 @@ export default function unpackInstancedMeshes(
     const geometryInfo = compressedData[sector.path].instancedMesh;
     if (geometryInfo !== undefined) {
       for (let i = 0; i < geometryInfo.count; i++) {
-        data.loadData(geometryInfo);
+        data.loadData(geometryInfo, formatVersion);
         meshCounts[data.fileId] = meshCounts[data.fileId] ? meshCounts[data.fileId] : {};
         meshCounts[data.fileId][data.triangleOffset] = meshCounts[data.fileId][data.triangleOffset]
           ? meshCounts[data.fileId][data.triangleOffset]
@@ -57,7 +58,7 @@ export default function unpackInstancedMeshes(
     // Fill mesh collections with matrix data
     if (geometryInfo !== undefined) {
       for (let i = 0; i < geometryInfo.count; i++) {
-        data.loadData(geometryInfo);
+        data.loadData(geometryInfo, formatVersion);
         maps.treeIndexNodeIdMap[data.treeIndex] = data.nodeId;
         maps.colorMap[data.treeIndex] = data.color;
         matrix.identity().setPosition(data.translation);

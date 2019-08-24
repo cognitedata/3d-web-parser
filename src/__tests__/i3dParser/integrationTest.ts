@@ -5,7 +5,7 @@ import CustomFileReader from '../../parsers/i3d/CustomFileReader';
 import { parseFullCustomFile } from '../../parsers/i3d/main';
 import {
   FilePrimitiveNames,
-  FilePropertyArrayNames,
+  FilePropertyArrayNamesV7,
   FilePropertyArrayNameType,
   FilePrimitiveNameType
 } from '../../parsers/i3d/parserParameters';
@@ -44,7 +44,7 @@ describe('customFileIntegrationTest', () => {
     expect(sectorMetadata.optimizerVersion).toBeDefined();
     expect(sectorMetadata.sectorId).toBeDefined();
     expect(sectorMetadata.parentSectorId).toBeDefined();
-    expect(sectorMetadata.arrayCount).toBe(FilePropertyArrayNames.length);
+    expect(sectorMetadata.arrayCount).toBe(FilePropertyArrayNamesV7.length);
     expect(sectorMetadata.sectorBBoxMin).toBeDefined();
     expect(sectorMetadata.sectorBBoxMax).toBeDefined();
     expect(sectorMetadata.sectorBBoxMax.x).toBeGreaterThan(sectorMetadata.sectorBBoxMin.x);
@@ -57,13 +57,13 @@ describe('customFileIntegrationTest', () => {
     const fileReader = new CustomFileReader(fileBuffer);
     fileReader.readUint32(); // skip file length
     const sectorMetadata = fileReader.readSectorMetadata();
-    expect(sectorMetadata.arrayCount).toBe(FilePropertyArrayNames.length);
+    expect(sectorMetadata.arrayCount).toBe(FilePropertyArrayNamesV7.length);
 
     const uncompressedValues = fileReader.readUncompressedValues();
 
-    expect(Object.keys(uncompressedValues).length).toBe(FilePropertyArrayNames.length);
+    expect(Object.keys(uncompressedValues).length).toBe(FilePropertyArrayNamesV7.length);
     Object.keys(uncompressedValues).forEach(parameterName => {
-      expect(FilePropertyArrayNames.indexOf(parameterName as FilePropertyArrayNameType)).not.toBe(-1);
+      expect(FilePropertyArrayNamesV7.indexOf(parameterName as FilePropertyArrayNameType)).not.toBe(-1);
       if (uncompressedValues[parameterName]!.length > 0) {
         if (parameterName === 'normal') {
           expect(uncompressedValues[parameterName]![0] instanceof THREE.Vector3);

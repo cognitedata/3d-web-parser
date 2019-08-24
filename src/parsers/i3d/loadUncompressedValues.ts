@@ -1,14 +1,27 @@
 // Copyright 2019 Cognite AS
 
 import CustomFileReader from './CustomFileReader';
-import { FilePropertyArrayNames } from './parserParameters';
+import { FilePropertyArrayNameType, FilePropertyArrayNamesV5, FilePropertyArrayNamesV7 } from './parserParameters';
 import * as THREE from 'three';
 import { TextureInfo, UncompressedValues } from './sharedFileParserTypes';
 
 // Debugging note: This function should never be called on a sector with arrayCount == 0.
 export default function loadUncompressedValues(fileReader: CustomFileReader) {
   const uncompressedValues: UncompressedValues = {};
-  FilePropertyArrayNames.forEach(property => {
+  if (fileReader.metadata === undefined) {
+    throw Error('Attempting to read uncompressed values before reading metadata');
+  }
+  const propertyArrayNames: FilePropertyArrayNameType[] = (() => {
+    switch (fileReader.metadata!.formatVersion) {
+      case 5:
+        return FilePropertyArrayNamesV5;
+      case 7:
+        return FilePropertyArrayNamesV7;
+      default:
+        throw Error(`I3DF file format ${fileReader.metadata!.formatVersion} is not supported`);
+    }
+  })();
+  propertyArrayNames.forEach(property => {
     uncompressedValues[property] = [];
     const clusterCount = fileReader.readUint32();
     const bytesForOneValue = fileReader.readUint8();

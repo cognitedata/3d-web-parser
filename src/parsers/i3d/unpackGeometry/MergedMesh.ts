@@ -12,7 +12,8 @@ export default function unpackMergedMeshes(
   uncompressedValues: UncompressedValues,
   compressedData: PerSectorCompressedData,
   maps: DataMaps,
-  sceneStats: SceneStats
+  sceneStats: SceneStats,
+  formatVersion: Number,
 ) {
   const data = new PropertyLoader(uncompressedValues);
 
@@ -23,7 +24,7 @@ export default function unpackMergedMeshes(
       // count meshes per file Id
       const meshCounts: { [fileId: string]: number } = {};
       for (let i = 0; i < geometryInfo.count; i++) {
-        data.loadData(geometryInfo);
+        data.loadData(geometryInfo, formatVersion);
         meshCounts[data.fileId] = meshCounts[data.fileId] ? meshCounts[data.fileId] : 0;
         meshCounts[data.fileId]++;
       }
@@ -50,7 +51,7 @@ export default function unpackMergedMeshes(
       // create mappings while calculating running triangle offsets
       const triangleOffsets: { [fileId: string]: number } = {};
       for (let i = 0; i < geometryInfo.count; i++) {
-        data.loadData(geometryInfo);
+        data.loadData(geometryInfo, formatVersion);
         maps.treeIndexNodeIdMap[data.treeIndex] = data.nodeId;
         maps.colorMap[data.treeIndex] = data.color;
 

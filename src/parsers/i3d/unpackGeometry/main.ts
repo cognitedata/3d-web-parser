@@ -23,6 +23,7 @@ export function unpackPrimitives(
   uncompressedValues: UncompressedValues,
   compressedData: PerSectorCompressedData,
   maps: DataMaps,
+  formatVersion: Number,
   filterOptions?: FilterOptions
 ) {
   const numberOfPrimitivesPerSector = countRenderedNumberOfPrimitivesPerSector(rootSector, compressedData);
@@ -35,6 +36,7 @@ export function unpackPrimitives(
         uncompressedValues,
         maps,
         numberOfPrimitivesPerSector,
+        formatVersion,
         filterOptions
       );
     });
@@ -68,6 +70,7 @@ function unpackFilePrimitive(
   uncompressedValues: UncompressedValues,
   maps: DataMaps,
   numberOfPrimitivesPerSector: NumberOfPrimitivesPerSector,
+  formatVersion: Number,
   filterOptions?: FilterOptions
 ) {
   const destinationPrimitiveGroups: { [name: string]: PrimitiveGroup } = {};
@@ -80,7 +83,7 @@ function unpackFilePrimitive(
       j,
       numberOfPrimitivesPerSector
     );
-    data.loadData(primitiveCompressedData);
+    data.loadData(primitiveCompressedData, formatVersion);
     maps.treeIndexNodeIdMap[data.treeIndex] = data.nodeId;
     maps.colorMap[data.treeIndex] = data.color;
     // @ts-ignore

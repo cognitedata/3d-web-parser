@@ -5,7 +5,7 @@ import Sector from '../../Sector';
 import CustomFileReader from './CustomFileReader';
 import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
 import { SceneStats, createSceneStats } from '../../SceneStats';
-import { PerSectorCompressedData, UncompressedValues } from './sharedFileParserTypes';
+import { PerSectorCompressedData, SectorMetadata, UncompressedValues } from './sharedFileParserTypes';
 import { DataMaps, FilterOptions, ParseReturn } from '../parseUtils';
 
 function preloadMeshFiles(meshLoader: any, fileIds: number[]) {
@@ -58,7 +58,7 @@ export function parseFullCustomFile(
     compressedData[sector.path] = fileReader.readCompressedGeometryData(sectorStartLocation + sectorByteLength);
   }
 
-  return unpackData(rootSector, uncompressedValues, compressedData, maps, filterOptions);
+  return unpackData(rootSector, uncompressedValues, compressedData, maps, rootSectorMetadata.formatVersion, filterOptions);
 }
 
 export function parseMultipleCustomFiles(
@@ -75,6 +75,7 @@ export function parseMultipleCustomFiles(
   const compressedData: PerSectorCompressedData = {};
   let uncompressedValues: undefined | UncompressedValues;
   let rootSector: undefined | Sector;
+  let rootSectorMetadata: undefined | SectorMetadata;
 
   sectorBuffers.forEach(sectorBuffer => {
     const fileReader = new CustomFileReader(sectorBuffer);
@@ -86,6 +87,7 @@ export function parseMultipleCustomFiles(
     if (sectorMetadata.arrayCount > 0) {
       // Is root sector
       rootSector = sector;
+      rootSectorMetadata = sectorMetadata;
       uncompressedValues = fileReader.readUncompressedValues();
     } else {
       const parentSector = maps.sectors[sectorMetadata.parentSectorId];
@@ -99,11 +101,11 @@ export function parseMultipleCustomFiles(
     compressedData[sector.path] = fileReader.readCompressedGeometryData(sectorByteLength);
   });
 
-  if (rootSector === undefined || uncompressedValues === undefined) {
+  if (rootSector === undefined || uncompressedValues === undefined || rootSectorMetadata === undefined) {
     throw Error('Did not find root sector');
   }
 
-  return unpackData(rootSector, uncompressedValues, compressedData, maps, filterOptions);
+  return unpackData(rootSector, uncompressedValues, compressedData, maps, rootSectorMetadata.formatVersion, filterOptions);
 }
 
 function unpackData(
@@ -111,12 +113,13 @@ function unpackData(
   uncompressedValues: UncompressedValues,
   compressedData: PerSectorCompressedData,
   maps: DataMaps,
-  filterOptions?: FilterOptions
+  formatVersion: Number,
+  filterOptions?: FilterOptions,
 ): ParseReturn {
   const sceneStats = createSceneStats();
-  unpackPrimitives(rootSector, uncompressedValues, compressedData, maps, filterOptions);
-  unpackMergedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
-  unpackInstancedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
+  unpackPrimitives(rootSector, uncompressedValues, compressedData, maps, formatVersion, filterOptions);
+  unpackMergedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats, formatVersion);
+  unpackInstancedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats, formatVersion);
   mergeInstancedMeshes(rootSector, sceneStats);
   for (const sector of rootSector.traverseSectors()) {
     sector.mergedMeshGroup.createTreeIndexMap();
