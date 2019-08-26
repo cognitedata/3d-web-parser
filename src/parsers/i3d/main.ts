@@ -7,11 +7,35 @@ import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
 import { SceneStats, createSceneStats } from '../../SceneStats';
 import { PerSectorCompressedData, UncompressedValues } from './sharedFileParserTypes';
 import { DataMaps, FilterOptions, ParseReturn } from '../parseUtils';
+//import * as reveal from 'reveal-utils';
+const revealModule = import('reveal-utils');
 
 function preloadMeshFiles(meshLoader: any, fileIds: number[]) {
   fileIds.forEach(fileId => {
     meshLoader.getGeometry(fileId);
   });
+}
+
+export async function parseSceneI3D(
+  fileBuffer: ArrayBuffer,
+  filterOptions?: FilterOptions, // TODO handle filterOptions
+): Promise<ParseReturn> {
+  const reveal = await revealModule;
+  const scene = reveal.load_i3df(fileBuffer);
+  const r = scene.root_sector;
+  const rootSector = new Sector(r.id, r.bbox_min, r.bbox_max);
+  const maps: DataMaps = {
+    treeIndexNodeIdMap: [],
+    colorMap: [],
+    nodeIdTreeIndexMap: new Map(),
+    sectors: {}
+  };
+  maps.sectors[rootSector.id] = rootSector;
+  return {
+    rootSector,
+    sceneStats: createSceneStats(),
+    maps,
+  };
 }
 
 export function parseFullCustomFile(

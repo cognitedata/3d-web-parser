@@ -2,7 +2,7 @@
 
 export { default as Sector } from './Sector';
 export { default as parseProtobuf } from './parsers/protobuf/main';
-export { parseFullCustomFile, parseMultipleCustomFiles } from './parsers/i3d/main';
+export { parseFullCustomFile, parseMultipleCustomFiles, parseSceneI3D } from './parsers/i3d/main';
 
 export { RenderedPrimitiveNameType as GeometryType } from './geometry/Types';
 export { default as BoxGroup } from './geometry/BoxGroup';
