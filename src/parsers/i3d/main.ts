@@ -21,7 +21,56 @@ export async function parseSceneI3D(
   filterOptions?: FilterOptions, // TODO handle filterOptions
 ): Promise<ParseReturn> {
   const reveal = await revealModule;
+
   const scene = reveal.load_i3df(fileBuffer);
+
+  for (const sector of scene.sectors) {
+    console.log("SECTOR", sector);
+    for (const [name, values] of sector.primitive_groups) {
+      switch (name) {
+        case 'color':
+          sector.primitive_groups[name] = new Uint8Array(values.buffer);
+          break;
+        case 'diagonal':
+          sector.primitive_groups[name] = new Float32Array(values.buffer);
+          break;
+      //- name: center_x
+        //type: f32
+      //- name: center_y
+        //type: f32
+      //- name: center_z
+        //type: f32
+      //- name: normal
+        //type: f32
+        //count: 3
+      //- name: delta
+        //type: f32
+      //- name: height
+        //type: f32
+      //- name: radius
+        //type: f32
+      //- name: angle
+        //type: f32
+      //- name: translation_x
+        //type: f32
+      //- name: translation_y
+        //type: f32
+      //- name: translation_z
+        //type: f32
+      //- name: scale_x
+        //type: f32
+      //- name: scale_y
+        //type: f32
+      //- name: scale_z
+        //type: f32
+      //- name: file_id
+        //type: u64
+            //- name: texture
+      }
+    }
+  }
+
+  console.log("SCENE", scene);
   const r = scene.root_sector;
   const rootSector = new Sector(r.id, r.bbox_min, r.bbox_max);
   const maps: DataMaps = {

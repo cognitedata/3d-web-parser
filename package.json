@@ -73,6 +73,6 @@
   "sideEffects": false,
   "dependencies": {
     "protobufjs": "^6.8.8",
-    "reveal-utils": "/home/svenni/projects/reveal-rs/master/examples/web/pkg/"
+    "reveal-utils": "/home/svenni/projects/reveal-rs/dragly/soa/examples/web/pkg/"
   }
 }
