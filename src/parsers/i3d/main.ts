@@ -16,6 +16,15 @@ function preloadMeshFiles(meshLoader: any, fileIds: number[]) {
   });
 }
 
+function convertBuffer(name: String, array: Uint8Array): (Uint8Array | Float32Array | Uint32Array ) {
+  switch (name) {
+    case 'color':
+      return array;
+    default:
+      return new Float32Array(array.buffer);
+  };
+};
+
 export async function parseSceneI3D(
   fileBuffer: ArrayBuffer,
   filterOptions?: FilterOptions, // TODO handle filterOptions
@@ -25,47 +34,12 @@ export async function parseSceneI3D(
   const scene = reveal.load_i3df(fileBuffer);
 
   for (const sector of scene.sectors) {
-    console.log("SECTOR", sector);
-    for (const [name, values] of sector.primitive_groups) {
-      switch (name) {
-        case 'color':
-          sector.primitive_groups[name] = new Uint8Array(values.buffer);
-          break;
-        case 'diagonal':
-          sector.primitive_groups[name] = new Float32Array(values.buffer);
-          break;
-      //- name: center_x
-        //type: f32
-      //- name: center_y
-        //type: f32
-      //- name: center_z
-        //type: f32
-      //- name: normal
-        //type: f32
-        //count: 3
-      //- name: delta
-        //type: f32
-      //- name: height
-        //type: f32
-      //- name: radius
-        //type: f32
-      //- name: angle
-        //type: f32
-      //- name: translation_x
-        //type: f32
-      //- name: translation_y
-        //type: f32
-      //- name: translation_z
-        //type: f32
-      //- name: scale_x
-        //type: f32
-      //- name: scale_y
-        //type: f32
-      //- name: scale_z
-        //type: f32
-      //- name: file_id
-        //type: u64
-            //- name: texture
+    for (const primitive_group_name in sector.primitive_groups) {
+      const primitive_group = sector.primitive_groups[primitive_group_name];
+      for (const attribute_name in primitive_group) {
+        if (primitive_group[attribute_name] instanceof Uint8Array) {
+          primitive_group[attribute_name] = convertBuffer(attribute_name, primitive_group[attribute_name]);
+        }
       }
     }
   }
