@@ -7,6 +7,7 @@ import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
 import { SceneStats, createSceneStats } from '../../SceneStats';
 import { PerSectorCompressedData, UncompressedValues } from './sharedFileParserTypes';
 import { DataMaps, FilterOptions, ParseReturn } from '../parseUtils';
+import THREE from 'three';
 //import * as reveal from 'reveal-utils';
 const revealModule = import('reveal-utils');
 
@@ -32,21 +33,23 @@ export async function parseSceneI3D(
   const reveal = await revealModule;
 
   const scene = reveal.load_i3df(fileBuffer);
+  console.log("SCENE HELLO", scene);
+  console.log("SCENE data?", scene.box_collection_center(0));
 
-  for (const sector of scene.sectors) {
-    for (const primitive_group_name in sector.primitive_groups) {
-      const primitive_group = sector.primitive_groups[primitive_group_name];
-      for (const attribute_name in primitive_group) {
-        if (primitive_group[attribute_name] instanceof Uint8Array) {
-          primitive_group[attribute_name] = convertBuffer(attribute_name, primitive_group[attribute_name]);
-        }
-      }
-    }
-  }
+  //for (const sector of scene.sectors) {
+    //for (const primitive_group_name in sector.primitive_groups) {
+      //const primitive_group = sector.primitive_groups[primitive_group_name];
+      //for (const attribute_name in primitive_group) {
+        //if (primitive_group[attribute_name] instanceof Uint8Array) {
+          //primitive_group[attribute_name] = convertBuffer(attribute_name, primitive_group[attribute_name]);
+        //}
+      //}
+    //}
+  //}
 
-  console.log("SCENE", scene);
-  const r = scene.root_sector;
-  const rootSector = new Sector(r.id, r.bbox_min, r.bbox_max);
+  //const r = scene.root_sector;
+  //const rootSector = new Sector(r.id, r.bbox_min, r.bbox_max);
+  const rootSector = new Sector(0, new THREE.Vector3(), new THREE.Vector3());
   const maps: DataMaps = {
     treeIndexNodeIdMap: [],
     colorMap: [],
