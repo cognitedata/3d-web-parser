@@ -28,7 +28,7 @@ function convertBuffer(name: String, array: Uint8Array): (Uint8Array | Float32Ar
 };
 
 // TODO should be Number[] and not Float32Array!
-function setupMaps(group: PrimitiveGroup, maps: DataMaps, colors: Uint8Array, nodeIds: Float32Array) {
+function setupMaps(group: PrimitiveGroup, maps: DataMaps, colors: Uint8Array, nodeIds: number[]) {
     for (let i = 0; i < group.treeIndex.length; i++) {
       const treeIndex = group.treeIndex[i];
       const nodeId = nodeIds[i];
