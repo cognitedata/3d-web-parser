@@ -7,7 +7,7 @@ import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
 import { SceneStats, createSceneStats } from '../../SceneStats';
 import { PerSectorCompressedData, UncompressedValues } from './sharedFileParserTypes';
 import { DataMaps, FilterOptions, ParseReturn } from '../parseUtils';
-import { BoxGroup, PrimitiveGroup } from '../../geometry/GeometryGroups';
+import { BoxGroup, CircleGroup, ConeGroup, PrimitiveGroup } from '../../geometry/GeometryGroups';
 import * as THREE from 'three';
 //import * as reveal from 'reveal-utils';
 const revealModule = import('reveal-utils');
@@ -26,6 +26,22 @@ function convertBuffer(name: String, array: Uint8Array): (Uint8Array | Float32Ar
       return new Float32Array(array.buffer);
   };
 };
+
+// TODO should be Number[] and not Float32Array!
+function setupMaps(group: PrimitiveGroup, maps: DataMaps, colors: Uint8Array, nodeIds: Float32Array) {
+    for (let i = 0; i < group.treeIndex.length; i++) {
+      const treeIndex = group.treeIndex[i];
+      const nodeId = nodeIds[i];
+      const r = colors[i * 4 + 0] / 255;
+      const g = colors[i * 4 + 1] / 255;
+      const b = colors[i * 4 + 2] / 255;
+      // ignoring a, it's not used by PrimitiveGroup.
+      maps.colorMap[treeIndex] = new THREE.Color(r, g, b);
+      // @ts-ignore
+      maps.nodeIdTreeIndexMap[nodeId] = treeIndex;
+      maps.treeIndexNodeIdMap[treeIndex] = nodeId;
+    }
+}
 
 export async function parseSceneI3D(
   fileBuffer: ArrayBuffer,
@@ -52,31 +68,61 @@ export async function parseSceneI3D(
     console.log("Bbox", bbox_min, bbox_max);
     const sector = new Sector(sector_id, new THREE.Vector3(bbox_min.x, bbox_min.y, bbox_min.z), new THREE.Vector3(bbox_max.x, bbox_max.y, bbox_max.z));
 
-    const boxGroup = new BoxGroup(0);
-    boxGroup.treeIndex = scene.box_collection_tree_index(i);
-    const nodeIds = scene.box_collection_node_id(i);
-    boxGroup.data.count = scene.box_collection_count(i);
-    boxGroup.data.arrays['center'] = scene.box_collection_center(i);
-    boxGroup.data.arrays['size'] = scene.box_collection_size(i);
-    boxGroup.data.arrays['normal'] = scene.box_collection_normal(i);
-    boxGroup.data.arrays['angle'] = scene.box_collection_rotation_angle(i);
-    boxGroup.data.arrays['delta'] = scene.box_collection_delta(i);
-    const colors = scene.box_collection_color(i);
-    for (let i = 0; i < boxGroup.treeIndex.length; i++) {
-      const treeIndex = boxGroup.treeIndex[i];
-      const nodeId = nodeIds[i];
-      const r = colors[i * 4 + 0] / 255;
-      const g = colors[i * 4 + 1] / 255;
-      const b = colors[i * 4 + 2] / 255;
-      // ignoring a, it's not used by PrimitiveGroup.
-      maps.colorMap[treeIndex] = new THREE.Color(r, g, b);
-      // @ts-ignore
-      maps.nodeIdTreeIndexMap[nodeId] = treeIndex;
-      maps.treeIndexNodeIdMap[treeIndex] = nodeId;
+    {
+      console.log("INDEX", scene.box_collection_tree_index(i));
+      console.log("IDs", scene.box_collection_node_id(i));
+      console.log("COLORS", scene.box_collection_color(i));
+      const group = new BoxGroup(0);
+      group.treeIndex = scene.box_collection_tree_index(i);
+      group.data.count = scene.box_collection_count(i);
+      group.data.arrays['center'] = scene.box_collection_center(i);
+      group.data.arrays['size'] = scene.box_collection_size(i);
+      group.data.arrays['normal'] = scene.box_collection_normal(i);
+      group.data.arrays['angle'] = scene.box_collection_rotation_angle(i);
+      group.data.arrays['delta'] = scene.box_collection_delta(i);
+
+      const nodeIds = scene.box_collection_node_id(i);
+      const colors = scene.box_collection_color(i);
+      setupMaps(group, maps, colors, nodeIds);
+
+      group.sort();
+      sector.primitiveGroups.push(group);
     }
-    boxGroup.sort();
-    sector.primitiveGroups.push(boxGroup);
-    console.log("COUNT", scene.box_collection_count(i));
+    //{
+      //const group = new CircleGroup(0);
+      //group.treeIndex = scene.circle_collection_tree_index(i);
+      //group.data.count = scene.circle_collection_count(i);
+      //group.data.arrays['size'] = scene.circle_collection_size(i);
+      //group.data.arrays['center'] = scene.circle_collection_center(i);
+      //group.data.arrays['normal'] = scene.circle_collection_normal(i);
+      //group.data.arrays['radius'] = scene.circle_collection_radius(i);
+
+      //const nodeIds = scene.circle_collection_node_id(i);
+      //const colors = scene.circle_collection_color(i);
+      //setupMaps(group, maps, colors, nodeIds);
+
+      //group.sort();
+      //sector.primitiveGroups.push(group);
+    //}
+    //{
+      //const group = new ConeGroup(0);
+      //group.treeIndex = scene.cone_collection_tree_index(i);
+      //group.data.count = scene.cone_collection_count(i);
+      //group.data.arrays['centerA'] = scene.cone_collection_center_a(i);
+      //group.data.arrays['centerB'] = scene.cone_collection_center_b(i);
+      //group.data.arrays['size'] = scene.cone_collection_size(i);
+      //group.data.arrays['radiusA'] = scene.cone_collection_radius_a(i);
+      //group.data.arrays['radiusB'] = scene.cone_collection_radius_b(i);
+      //group.data.arrays['angle'] = scene.cone_collection_angle(i);
+      //group.data.arrays['arcAngle'] = scene.cone_collection_arc_angle(i);
+
+      //const nodeIds = scene.cone_collection_node_id(i);
+      //const colors = scene.cone_collection_color(i);
+      //setupMaps(group, maps, colors, nodeIds);
+
+      //group.sort();
+      //sector.primitiveGroups.push(group);
+    //}
 
     if (parent_id !== undefined) {
       const parentSector = maps.sectors[parent_id];
