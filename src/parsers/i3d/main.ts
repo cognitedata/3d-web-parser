@@ -32,6 +32,8 @@ function setupMaps(group: PrimitiveGroup, maps: DataMaps, colors: Uint8Array, no
     for (let i = 0; i < group.treeIndex.length; i++) {
       const treeIndex = group.treeIndex[i];
       const nodeId = nodeIds[i];
+      console.log("TREE INDEX", treeIndex);
+      console.log("NODE ID", nodeId);
       const r = colors[i * 4 + 0] / 255;
       const g = colors[i * 4 + 1] / 255;
       const b = colors[i * 4 + 2] / 255;
@@ -88,41 +90,42 @@ export async function parseSceneI3D(
       group.sort();
       sector.primitiveGroups.push(group);
     }
-    //{
-      //const group = new CircleGroup(0);
-      //group.treeIndex = scene.circle_collection_tree_index(i);
-      //group.data.count = scene.circle_collection_count(i);
-      //group.data.arrays['size'] = scene.circle_collection_size(i);
-      //group.data.arrays['center'] = scene.circle_collection_center(i);
-      //group.data.arrays['normal'] = scene.circle_collection_normal(i);
-      //group.data.arrays['radius'] = scene.circle_collection_radius(i);
+    {
+      const group = new CircleGroup(0);
+      group.treeIndex = scene.circle_collection_tree_index(i);
+      group.data.count = scene.circle_collection_count(i);
+      group.data.arrays['size'] = scene.circle_collection_size(i);
+      group.data.arrays['center'] = scene.circle_collection_center(i);
+      group.data.arrays['normal'] = scene.circle_collection_normal(i);
+      group.data.arrays['radiusA'] = scene.circle_collection_radius(i);
 
-      //const nodeIds = scene.circle_collection_node_id(i);
-      //const colors = scene.circle_collection_color(i);
-      //setupMaps(group, maps, colors, nodeIds);
+      const nodeIds = scene.circle_collection_node_id(i);
+      const colors = scene.circle_collection_color(i);
+      setupMaps(group, maps, colors, nodeIds);
 
-      //group.sort();
-      //sector.primitiveGroups.push(group);
-    //}
-    //{
-      //const group = new ConeGroup(0);
-      //group.treeIndex = scene.cone_collection_tree_index(i);
-      //group.data.count = scene.cone_collection_count(i);
-      //group.data.arrays['centerA'] = scene.cone_collection_center_a(i);
-      //group.data.arrays['centerB'] = scene.cone_collection_center_b(i);
-      //group.data.arrays['size'] = scene.cone_collection_size(i);
-      //group.data.arrays['radiusA'] = scene.cone_collection_radius_a(i);
-      //group.data.arrays['radiusB'] = scene.cone_collection_radius_b(i);
-      //group.data.arrays['angle'] = scene.cone_collection_angle(i);
-      //group.data.arrays['arcAngle'] = scene.cone_collection_arc_angle(i);
+      group.sort();
+      sector.primitiveGroups.push(group);
+    }
+    {
+      const group = new ConeGroup(0);
+      group.treeIndex = scene.cone_collection_tree_index(i);
+      group.data.count = scene.cone_collection_count(i);
+      group.data.arrays['centerA'] = scene.cone_collection_center_a(i);
+      group.data.arrays['centerB'] = scene.cone_collection_center_b(i);
+      group.data.arrays['size'] = scene.cone_collection_size(i);
+      group.data.arrays['radiusA'] = scene.cone_collection_radius_a(i);
+      group.data.arrays['radiusB'] = scene.cone_collection_radius_b(i);
+      group.data.arrays['angle'] = scene.cone_collection_angle(i);
+      group.data.arrays['arcAngle'] = scene.cone_collection_arc_angle(i);
+      group.data.arrays['localXAxis'] = scene.cone_collection_local_x_axis(i);
 
-      //const nodeIds = scene.cone_collection_node_id(i);
-      //const colors = scene.cone_collection_color(i);
-      //setupMaps(group, maps, colors, nodeIds);
+      const nodeIds = scene.cone_collection_node_id(i);
+      const colors = scene.cone_collection_color(i);
+      setupMaps(group, maps, colors, nodeIds);
 
-      //group.sort();
-      //sector.primitiveGroups.push(group);
-    //}
+      group.sort();
+      sector.primitiveGroups.push(group);
+    }
 
     if (parent_id !== undefined) {
       const parentSector = maps.sectors[parent_id];
