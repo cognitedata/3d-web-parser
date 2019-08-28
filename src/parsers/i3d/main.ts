@@ -7,7 +7,8 @@ import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
 import { SceneStats, createSceneStats } from '../../SceneStats';
 import { PerSectorCompressedData, UncompressedValues } from './sharedFileParserTypes';
 import { DataMaps, FilterOptions, ParseReturn } from '../parseUtils';
-import THREE from 'three';
+import { BoxGroup, PrimitiveGroup } from '../../geometry/GeometryGroups';
+import * as THREE from 'three';
 //import * as reveal from 'reveal-utils';
 const revealModule = import('reveal-utils');
 
@@ -32,9 +33,64 @@ export async function parseSceneI3D(
 ): Promise<ParseReturn> {
   const reveal = await revealModule;
 
+  const maps: DataMaps = {
+    treeIndexNodeIdMap: [],
+    colorMap: [],
+    nodeIdTreeIndexMap: new Map(),
+    sectors: {}
+  };
+
   const scene = reveal.load_i3df(fileBuffer);
+  const sectorCount = scene.sector_count();
   console.log("SCENE HELLO", scene);
-  console.log("SCENE data?", scene.box_collection_center(0));
+  for (let i = 0; i < sectorCount; i++) {
+    console.log("Loading sector", i);
+    const sector_id = scene.sector_id(i);
+    const parent_id = scene.sector_parent_id(i);
+    const bbox_min = scene.sector_bbox_min(i);
+    const bbox_max = scene.sector_bbox_max(i);
+    console.log("Bbox", bbox_min, bbox_max);
+    const sector = new Sector(sector_id, new THREE.Vector3(bbox_min.x, bbox_min.y, bbox_min.z), new THREE.Vector3(bbox_max.x, bbox_max.y, bbox_max.z));
+
+    const boxGroup = new BoxGroup(0);
+    boxGroup.treeIndex = scene.box_collection_tree_index(i);
+    const nodeIds = scene.box_collection_node_id(i);
+    boxGroup.data.count = scene.box_collection_count(i);
+    boxGroup.data.arrays['center'] = scene.box_collection_center(i);
+    boxGroup.data.arrays['size'] = scene.box_collection_size(i);
+    boxGroup.data.arrays['normal'] = scene.box_collection_normal(i);
+    boxGroup.data.arrays['angle'] = scene.box_collection_rotation_angle(i);
+    boxGroup.data.arrays['delta'] = scene.box_collection_delta(i);
+    const colors = scene.box_collection_color(i);
+    for (let i = 0; i < boxGroup.treeIndex.length; i++) {
+      const treeIndex = boxGroup.treeIndex[i];
+      const nodeId = nodeIds[i];
+      const r = colors[i * 4 + 0] / 255;
+      const g = colors[i * 4 + 1] / 255;
+      const b = colors[i * 4 + 2] / 255;
+      // ignoring a, it's not used by PrimitiveGroup.
+      maps.colorMap[treeIndex] = new THREE.Color(r, g, b);
+      // @ts-ignore
+      maps.nodeIdTreeIndexMap[nodeId] = treeIndex;
+      maps.treeIndexNodeIdMap[treeIndex] = nodeId;
+    }
+    boxGroup.sort();
+    sector.primitiveGroups.push(boxGroup);
+    console.log("COUNT", scene.box_collection_count(i));
+
+    if (parent_id !== undefined) {
+      const parentSector = maps.sectors[parent_id];
+      if (parentSector !== undefined) {
+        parentSector.addChild(sector);
+        parentSector.object3d.add(sector.object3d);
+      } else {
+        throw Error('Parent sector not found');
+      }
+    }
+
+    maps.sectors[sector_id] = sector;
+  }
+  const rootSector = maps.sectors[scene.root_sector_id()];
 
   //for (const sector of scene.sectors) {
     //for (const primitive_group_name in sector.primitive_groups) {
@@ -49,14 +105,8 @@ export async function parseSceneI3D(
 
   //const r = scene.root_sector;
   //const rootSector = new Sector(r.id, r.bbox_min, r.bbox_max);
-  const rootSector = new Sector(0, new THREE.Vector3(), new THREE.Vector3());
-  const maps: DataMaps = {
-    treeIndexNodeIdMap: [],
-    colorMap: [],
-    nodeIdTreeIndexMap: new Map(),
-    sectors: {}
-  };
-  maps.sectors[rootSector.id] = rootSector;
+  //const rootSector = new Sector(0, new THREE.Vector3(), new THREE.Vector3());
+  //maps.sectors[rootSector.id] = rootSector;
   return {
     rootSector,
     sceneStats: createSceneStats(),

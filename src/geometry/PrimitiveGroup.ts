@@ -65,6 +65,7 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     this.attributes = [];
     this.hasCustomTransformAttributes = false;
     this.sorted = false;
+    console.log("HELLO");
   }
 
   abstract computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4;
@@ -73,6 +74,7 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
   setupAttributes() {
     this.attributes.push({ name: 'treeIndex', array: this.treeIndex, itemSize: 1 });
     primitiveAttributes[this.type].forEach(property => {
+      console.log("Setting up attribute for", property);
       this.attributes.push({
         name: 'a_' + property,
         array: this.data.arrays[property],
@@ -183,6 +185,7 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
   }
 
   sort() {
+    console.log("SORT");
     const newIndices = this.data.sort();
     this.capacity = this.data.count;
 
