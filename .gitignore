@@ -8,3 +8,5 @@ src/constants.js
 src/customParser.js
 .DS_Store
 .vscode
+rust/target
+rust/pkg
