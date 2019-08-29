@@ -69,22 +69,21 @@ export async function parseSceneI3D(
     const bbox_max = scene.sector_bbox_max(i);
     console.log("Bbox", bbox_min, bbox_max);
     const sector = new Sector(sector_id, new THREE.Vector3(bbox_min.x, bbox_min.y, bbox_min.z), new THREE.Vector3(bbox_max.x, bbox_max.y, bbox_max.z));
+    const fileSector = scene.sector(i);
 
     {
-      console.log("INDEX", scene.box_collection_tree_index(i));
-      console.log("IDs", scene.box_collection_node_id(i));
-      console.log("COLORS", scene.box_collection_color(i));
       const group = new BoxGroup(0);
-      group.treeIndex = scene.box_collection_tree_index(i);
-      group.data.count = scene.box_collection_count(i);
-      group.data.arrays['center'] = scene.box_collection_center(i);
-      group.data.arrays['size'] = scene.box_collection_size(i);
-      group.data.arrays['normal'] = scene.box_collection_normal(i);
-      group.data.arrays['angle'] = scene.box_collection_rotation_angle(i);
-      group.data.arrays['delta'] = scene.box_collection_delta(i);
+      const collection = fileSector.box_collection();
+      group.treeIndex = collection.tree_index();
+      group.data.count = group.treeIndex.length;
+      group.data.arrays['center'] = collection.center();
+      group.data.arrays['size'] = collection.size();
+      group.data.arrays['normal'] = collection.normal();
+      group.data.arrays['angle'] = collection.rotation_angle();
+      group.data.arrays['delta'] = collection.delta();
 
-      const nodeIds = scene.box_collection_node_id(i);
-      const colors = scene.box_collection_color(i);
+      const nodeIds = collection.node_id();
+      const colors = collection.color();
       setupMaps(group, maps, colors, nodeIds);
 
       group.sort();
@@ -92,15 +91,16 @@ export async function parseSceneI3D(
     }
     {
       const group = new CircleGroup(0);
-      group.treeIndex = scene.circle_collection_tree_index(i);
-      group.data.count = scene.circle_collection_count(i);
-      group.data.arrays['size'] = scene.circle_collection_size(i);
-      group.data.arrays['center'] = scene.circle_collection_center(i);
-      group.data.arrays['normal'] = scene.circle_collection_normal(i);
-      group.data.arrays['radiusA'] = scene.circle_collection_radius(i);
+      const collection = fileSector.circle_collection();
+      group.treeIndex = collection.tree_index();
+      group.data.count = group.treeIndex.length;
+      group.data.arrays['size'] = collection.size();
+      group.data.arrays['center'] = collection.center();
+      group.data.arrays['normal'] = collection.normal();
+      group.data.arrays['radiusA'] = collection.radius();
 
-      const nodeIds = scene.circle_collection_node_id(i);
-      const colors = scene.circle_collection_color(i);
+      const nodeIds = collection.node_id();
+      const colors = collection.color();
       setupMaps(group, maps, colors, nodeIds);
 
       group.sort();
@@ -108,19 +108,20 @@ export async function parseSceneI3D(
     }
     {
       const group = new ConeGroup(0);
-      group.treeIndex = scene.cone_collection_tree_index(i);
-      group.data.count = scene.cone_collection_count(i);
-      group.data.arrays['centerA'] = scene.cone_collection_center_a(i);
-      group.data.arrays['centerB'] = scene.cone_collection_center_b(i);
-      group.data.arrays['size'] = scene.cone_collection_size(i);
-      group.data.arrays['radiusA'] = scene.cone_collection_radius_a(i);
-      group.data.arrays['radiusB'] = scene.cone_collection_radius_b(i);
-      group.data.arrays['angle'] = scene.cone_collection_angle(i);
-      group.data.arrays['arcAngle'] = scene.cone_collection_arc_angle(i);
-      group.data.arrays['localXAxis'] = scene.cone_collection_local_x_axis(i);
+      const collection = fileSector.cone_collection();
+      group.treeIndex = collection.tree_index();
+      group.data.count = group.treeIndex.length;
+      group.data.arrays['centerA'] = collection.center_a();
+      group.data.arrays['centerB'] = collection.center_b();
+      group.data.arrays['size'] = collection.size();
+      group.data.arrays['radiusA'] = collection.radius_a();
+      group.data.arrays['radiusB'] = collection.radius_b();
+      group.data.arrays['angle'] = collection.angle();
+      group.data.arrays['arcAngle'] = collection.arc_angle();
+      group.data.arrays['localXAxis'] = collection.local_x_axis();
 
-      const nodeIds = scene.cone_collection_node_id(i);
-      const colors = scene.cone_collection_color(i);
+      const nodeIds = collection.node_id();
+      const colors = collection.color();
       setupMaps(group, maps, colors, nodeIds);
 
       group.sort();
@@ -139,7 +140,7 @@ export async function parseSceneI3D(
 
     maps.sectors[sector_id] = sector;
   }
-  const rootSector = maps.sectors[scene.root_sector_id()];
+  const rootSector = maps.sectors[scene.root_sector_id];
 
   //for (const sector of scene.sectors) {
     //for (const primitive_group_name in sector.primitive_groups) {
