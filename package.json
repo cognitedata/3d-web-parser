@@ -16,7 +16,8 @@
     "typescript"
   ],
   "files": [
-      "dist"
+      "dist",
+      "pkg"
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -26,7 +27,7 @@
     "test": "jest --config=jest.config.js",
     "lint": "tslint -c tslint.json -p tsconfig.json",
     "lint:fix": "tslint -c tslint.json -p tsconfig.json --fix",
-    "build": "yarn clean && tsc && yarn esCheck",
+    "build": "yarn clean && wasm-pack build && tsc && yarn esCheck",
     "prepush": "yarn lint && yarn test",
     "esCheck": "es-check --module es6 './dist/index.js'",
     "prepare": "yarn build"
@@ -36,6 +37,7 @@
     "@types/jest": "^23.3.12",
     "@types/node": "^10.12.12",
     "@types/three": "^0.93.28",
+    "@wasm-tool/wasm-pack-plugin": "1.0.1",
     "es-check": "^5.0.0",
     "jest": "^24.9.0",
     "prettier": "^1.15.2",

@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
-    "module": "es6",
+    "module": "esnext",
     "target": "es5",
     "declaration": true,
-    "declarationDir": "./dist/",
-    "outDir": "./dist/",
+    "declarationDir": "dist",
+    "outDir": "dist",
     "strict": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
