@@ -1,12 +1,14 @@
 // Copyright 2019 Cognite AS
 
-import { unpackInstancedMeshes, unpackMergedMeshes, unpackPrimitives } from './unpackGeometry/main';
 import Sector from '../../Sector';
 import CustomFileReader from './CustomFileReader';
 import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
-import { SceneStats, createSceneStats } from '../../SceneStats';
+import { createSceneStats } from '../../SceneStats';
 import { PerSectorCompressedData, UncompressedValues } from './sharedFileParserTypes';
 import { DataMaps, FilterOptions, ParseReturn } from '../parseUtils';
+import GeometryUnpacker from './unpackGeometry/GeometryUnpacker';
+import unpackMergedMeshes from './unpackGeometry/MergedMesh';
+import unpackInstancedMeshes from './unpackGeometry/InstancedMesh';
 
 function preloadMeshFiles(meshLoader: any, fileIds: number[]) {
   fileIds.forEach(fileId => {
@@ -31,13 +33,18 @@ export function parseFullCustomFile(
   // Read root sector
   const rootSectorLength = fileReader.readUint32();
   const rootSectorMetadata = fileReader.readSectorMetadata();
+  const uncompressedValues = fileReader.readUncompressedValues();
+
   const rootSector = new Sector(
     rootSectorMetadata.sectorId,
     rootSectorMetadata.sectorBBoxMin,
     rootSectorMetadata.sectorBBoxMax
   );
+
+  const unpacker = new GeometryUnpacker(maps, uncompressedValues, filterOptions);
+
   maps.sectors[rootSectorMetadata.sectorId] = rootSector;
-  const uncompressedValues = fileReader.readUncompressedValues();
+  rootSector.setGeometryLoadInformation(unpacker, fileReader, fileReader.location, rootSectorLength);
   compressedData[rootSector.path] = fileReader.readCompressedGeometryData(rootSectorLength);
 
   // Read remaining sectors
@@ -46,6 +53,7 @@ export function parseFullCustomFile(
     const sectorByteLength = fileReader.readUint32();
     const sectorMetadata = fileReader.readSectorMetadata();
     const sector = new Sector(rootSectorMetadata.sectorId, sectorMetadata.sectorBBoxMin, sectorMetadata.sectorBBoxMax);
+    // sector.setGeometryLoadInformation(fileReader, fileReader.location, sectorByteLength);
     maps.sectors[sectorMetadata.sectorId] = sector;
 
     const parentSector = maps.sectors[sectorMetadata.parentSectorId];
@@ -58,6 +66,9 @@ export function parseFullCustomFile(
     compressedData[sector.path] = fileReader.readCompressedGeometryData(sectorStartLocation + sectorByteLength);
   }
 
+  for (const sector of rootSector.traverseSectors()) {
+    sector.loadGeometry();
+  }
   return unpackData(rootSector, uncompressedValues, compressedData, maps, filterOptions);
 }
 
@@ -114,7 +125,6 @@ function unpackData(
   filterOptions?: FilterOptions
 ): ParseReturn {
   const sceneStats = createSceneStats();
-  unpackPrimitives(rootSector, uncompressedValues, compressedData, maps, filterOptions);
   unpackMergedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
   unpackInstancedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
   mergeInstancedMeshes(rootSector, sceneStats);

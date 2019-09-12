@@ -5,6 +5,9 @@ import { GeometryNode, GeometryMap, GeometryGroup } from './geometry/GeometryGro
 import PrimitiveGroup from './geometry/PrimitiveGroup';
 import { MergedMeshGroup } from './geometry/MergedMeshGroup';
 import { InstancedMeshGroup } from './geometry/InstancedMeshGroup';
+import CustomFileReader from './parsers/i3d/CustomFileReader';
+import { SectorCompressedData } from './parsers/i3d/sharedFileParserTypes';
+import GeometryUnpacker from './parsers/i3d/unpackGeometry/GeometryUnpacker';
 
 export default class Sector {
   public readonly id: number;
@@ -19,6 +22,11 @@ export default class Sector {
   public instancedMeshGroup: InstancedMeshGroup;
   public geometryMap: GeometryMap;
   public readonly object3d: THREE.Object3D;
+
+  private fileReader?: CustomFileReader;
+  private geometryOffset: number = -1;
+  private geometrySize: number = -1;
+  private geometryUnpacker?: GeometryUnpacker;
 
   constructor(id: number, min: THREE.Vector3, max: THREE.Vector3) {
     this.id = id;
@@ -35,6 +43,18 @@ export default class Sector {
     this.geometryMap = {};
   }
 
+  setGeometryLoadInformation(
+    unpacker: GeometryUnpacker,
+    reader: CustomFileReader,
+    fileOffset: number,
+    chunkByteSize: number
+  ) {
+    this.geometryUnpacker = unpacker;
+    this.fileReader = reader;
+    this.geometryOffset = fileOffset;
+    this.geometrySize = chunkByteSize;
+  }
+
   addChild(child: Sector) {
     child.parent = this;
     const childPath = this.path + this.children.length.toString() + '/';
@@ -42,6 +62,23 @@ export default class Sector {
     this.children.push(child);
     child.depth = this.depth + 1;
     this.object3d.add(child.object3d);
+  }
+
+  loadGeometry() {
+    // tslint:disable-next-line: no-console
+    console.error('loadGeometry');
+    if (!this.fileReader) {
+      throw new Error('No reader provided, please call setGeometryLoadInformation first');
+    }
+
+    this.fileReader.seek(this.geometryOffset);
+    const compressedData = this.fileReader.readCompressedGeometryData(this.geometrySize);
+    this._unpackGeometryData(compressedData);
+  }
+
+  _unpackGeometryData(compressedData: SectorCompressedData) {
+    const unpacker = this.geometryUnpacker!;
+    unpacker.unpackPrimitives(this, compressedData);
   }
 
   *traverseSectors(): IterableIterator<Sector> {

@@ -22,6 +22,10 @@ export default class CustomFileReader {
     this.flip = true;
   }
 
+  public seek(location: number) {
+    this.location = location;
+  }
+
   // Use for debugging
   dumpHex(numberOfValues: number) {
     for (let i = -numberOfValues; i < 0; i++) {
