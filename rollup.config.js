@@ -7,10 +7,12 @@ export default {
     {
       file: pkg.main,
       format: 'cjs',
+      sourcemap: true,
     },
     {
       file: pkg.module,
       format: 'es',
+      sourcemap: true,
     },
   ],
   external: [
@@ -19,6 +21,9 @@ export default {
   ],
   plugins: [
     typescript({
+      tsconfigDefaults: {
+        sourceMap: true
+      },
       typescript: require('typescript'),
     }),
     json({
