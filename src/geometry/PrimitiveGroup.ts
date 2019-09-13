@@ -3,29 +3,17 @@
 import * as THREE from 'three';
 import GeometryGroup from './GeometryGroup';
 
-import BoxGroup from './BoxGroup';
-import CircleGroup from './CircleGroup';
-import ConeGroup from './ConeGroup';
-import EccentricConeGroup from './EccentricConeGroup';
-import EllipsoidSegmentGroup from './EllipsoidSegmentGroup';
-import GeneralCylinderGroup from './GeneralCylinderGroup';
-import GeneralRingGroup from './GeneralRingGroup';
-import NutGroup from './NutGroup';
-import QuadGroup from './QuadGroup';
-import SphericalSegmentGroup from './SphericalSegmentGroup';
-import TorusSegmentGroup from './TorusSegmentGroup';
-import TrapeziumGroup from './TrapeziumGroup';
 import { FilterOptions } from '../parsers/parseUtils';
 import { identityMatrix4 } from '../constants';
 import PrimitiveGroupData from './PrimitiveGroupData';
 import { RenderedPrimitiveNameType } from './Types';
 import { primitiveAttributes, getAttributeItemSize } from './PrimitiveGroupDataParameters';
+import { suggestNewCapacity, ensureCapacityAtLeast32 } from '../utils/typedArrayUtils';
 
 const matrix = new THREE.Matrix4();
 const globalBox = new THREE.Box3();
 
 type TypedArray = Float32Array | Float64Array;
-type THREEVector = THREE.Vector2 | THREE.Vector3 | THREE.Vector4;
 
 export interface Attribute {
   name: string;
@@ -39,7 +27,6 @@ interface TreeIndexMap {
 
 export default abstract class PrimitiveGroup extends GeometryGroup {
   public abstract type: RenderedPrimitiveNameType;
-  public capacity: number;
   public treeIndex: Float32Array;
   public treeIndexMap: TreeIndexMap;
   public abstract data: PrimitiveGroupData;
@@ -52,12 +39,16 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
   public transform3: Float32Array;
   public hasCustomTransformAttributes: boolean;
   public attributes: Attribute[];
+
+  public get isEmpty(): boolean {
+    return this.treeIndex.length === 0;
+  }
+
   constructor(capacity: number) {
     super();
-    this.capacity = capacity;
     this.treeIndexMap = {};
 
-    this.treeIndex = new Float32Array(this.capacity);
+    this.treeIndex = new Float32Array(capacity);
     this.transform0 = new Float32Array(0);
     this.transform1 = new Float32Array(0);
     this.transform2 = new Float32Array(0);
@@ -105,6 +96,10 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
   }
 
   setTreeIndex(value: number, index: number) {
+    if (this.treeIndex.length <= index + 1) {
+      const newCapacity = suggestNewCapacity(this.treeIndex.length, this.treeIndex.length + 1);
+      this.treeIndex = ensureCapacityAtLeast32(this.treeIndex, newCapacity);
+    }
     this.treeIndex[index] = value;
   }
 
@@ -184,9 +179,8 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
 
   sort() {
     const newIndices = this.data.sort();
-    this.capacity = this.data.count;
 
-    const newTreeIndices = new Float32Array(this.capacity);
+    const newTreeIndices = new Float32Array(this.data.count);
     newIndices.forEach((index, i) => {
       newTreeIndices[i] = this.treeIndex[index];
     });

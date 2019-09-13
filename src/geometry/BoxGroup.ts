@@ -19,6 +19,7 @@ const globalPoint = new THREE.Vector3();
 export default class BoxGroup extends PrimitiveGroup {
   public type: RenderedPrimitiveNameType;
   public data: PrimitiveGroupData;
+
   constructor(capacity: number) {
     super(capacity);
     this.type = 'Box';

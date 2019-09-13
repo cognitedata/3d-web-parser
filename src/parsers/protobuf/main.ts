@@ -67,9 +67,9 @@ const primitiveParsers: PrimitiveParserMap[] = [
 
 function parseGeometries(data: ParseData) {
   const primitiveGroups: PrimitiveGroup[] = [];
-  primitiveParsers.forEach(({ type, parser }) => {
+  primitiveParsers.forEach(({ parser }) => {
     const group = parser(data);
-    if (group.capacity > 0) {
+    if (!group.isEmpty) {
       primitiveGroups.push(group);
     }
   });

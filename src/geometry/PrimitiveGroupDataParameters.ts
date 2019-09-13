@@ -106,6 +106,7 @@ export const primitiveAttributes: { [name in RenderedPrimitiveNameType]: Rendere
   Trapezium: ['vertex1', 'vertex2', 'vertex3', 'vertex4']
 };
 
+// TODO 20190912 larsmoa: Remove static definition of what data type different properties contain
 export const float64Properties: Set<RenderedPropertyNameType> = new Set(['nodeId'] as RenderedPropertyNameType[]);
 export const float32Properties: Set<RenderedPropertyNameType> = new Set([
   'treeIndex',

@@ -10,6 +10,8 @@ import {
 } from './PrimitiveGroupDataParameters';
 import * as THREE from 'three';
 import { RenderedPrimitiveNameType } from './Types';
+import { assert } from '../utils/assert';
+import { ensureCapacityAtLeast32, ensureCapacityAtLeast64, suggestNewCapacity } from '../utils/typedArrayUtils';
 
 export default class PrimitiveGroupData {
   type: RenderedPrimitiveNameType;
@@ -23,6 +25,8 @@ export default class PrimitiveGroupData {
     this.capacity = capacity;
     this.arrays = {};
 
+    // TODO 20190912 larsmoa: Type per property should be locally defined (by caller) and not by global
+    // map with magic constants
     primitiveProperties[this.type].forEach(property => {
       if (float64Properties.has(property)) {
         this.arrays[property] = new Float64Array(this.capacity);
@@ -39,16 +43,19 @@ export default class PrimitiveGroupData {
   }
 
   setNumber(property: RenderedPropertyNameType, value: number, index: number) {
+    this.ensureCapacity(index + 1);
     this.arrays[property][index] = value;
   }
 
   setVector3(property: RenderedPropertyNameType, value: THREE.Vector3, index: number) {
+    this.ensureCapacity(index + 3);
     this.arrays[property][3 * index] = value.x;
     this.arrays[property][3 * index + 1] = value.y;
     this.arrays[property][3 * index + 2] = value.z;
   }
 
   setVector4(property: RenderedPropertyNameType, value: THREE.Vector4, index: number) {
+    this.ensureCapacity(index + 4);
     this.arrays[property][4 * index] = value.x;
     this.arrays[property][4 * index + 1] = value.y;
     this.arrays[property][4 * index + 2] = value.z;
@@ -97,7 +104,7 @@ export default class PrimitiveGroupData {
       }
     });
 
-    this.count += 1;
+    this.count++;
   }
 
   memoryUsage(usage: any) {
@@ -143,6 +150,8 @@ export default class PrimitiveGroupData {
     Object.keys(this.arrays).forEach(name => {
       let newArray: Float32Array | Float64Array;
       const property = name as RenderedPropertyNameType;
+
+      // TODO 20190912 larsmoa: Replace iterator-copy below with TypedArray.set()
       if (float64Properties.has(property)) {
         newArray = new Float64Array(this.count);
         sortedIndices.forEach((index, i) => {
@@ -177,5 +186,29 @@ export default class PrimitiveGroupData {
     this.arrays = newArrays;
     this.capacity = this.count;
     return sortedIndices;
+  }
+
+  private ensureCapacity(minCapacity: number) {
+    if (this.capacity < minCapacity) {
+      const newCapacity = suggestNewCapacity(this.capacity, minCapacity);
+
+      for (const property of Object.keys(this.arrays)) {
+        const oldArray = this.arrays[property];
+        const countPerElement = oldArray.length / this.capacity; // 1, 2, 3 or 4
+        assert(
+          countPerElement >= 1 && countPerElement <= 4 && Number.isInteger(countPerElement),
+          `Expected 1-4 numbers per element, but got ${countPerElement}`
+        );
+
+        if (oldArray instanceof Float32Array) {
+          this.arrays[property] = ensureCapacityAtLeast32(oldArray, newCapacity * countPerElement);
+        } else if (oldArray instanceof Float64Array) {
+          this.arrays[property] = ensureCapacityAtLeast64(oldArray, newCapacity * countPerElement);
+        } else {
+          assert(false, `Unsupported array type '${typeof oldArray}`);
+        }
+      }
+      this.capacity = newCapacity;
+    }
   }
 }
