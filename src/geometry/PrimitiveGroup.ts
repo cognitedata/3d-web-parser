@@ -177,8 +177,8 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
     });
   }
 
-  sort() {
-    const newIndices = this.data.sort();
+  consolidateAndOrderBySize() {
+    const newIndices = this.data.consolidateAndOrderBySize();
 
     const newTreeIndices = new Float32Array(this.data.count);
     newIndices.forEach((index, i) => {

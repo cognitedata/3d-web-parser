@@ -142,7 +142,7 @@ export default async function parseProtobuf(
 
   const rootSector = sectors['0/'];
   for (const primitiveGroup of rootSector.traversePrimitiveGroups()) {
-    primitiveGroup.sort();
+    primitiveGroup.consolidateAndOrderBySize();
     // Sleep to avoid blocking thread
     if (++count % 10 === 0) {
       await sleep(1);

@@ -138,7 +138,7 @@ export default class PrimitiveGroupData {
     return data;
   }
 
-  sort() {
+  consolidateAndOrderBySize() {
     const sizeAndIndex: [number, number][] = [];
     (this.arrays.size as Float32Array).forEach((size, index) => {
       if (index < this.count) {

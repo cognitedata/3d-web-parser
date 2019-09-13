@@ -72,7 +72,7 @@ export default class GeometryUnpacker {
 
     sector.primitiveGroups = Object.values(primitiveGroupMap);
     for (const group of sector.primitiveGroups) {
-      group.sort();
+      group.consolidateAndOrderBySize();
     }
   }
 
