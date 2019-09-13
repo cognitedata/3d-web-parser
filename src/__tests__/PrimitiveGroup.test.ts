@@ -2,7 +2,6 @@
 
 import * as THREE from 'three';
 import PrimitiveGroup from '../geometry/PrimitiveGroup';
-import { expectColorEqual } from '../TestUtils';
 import { RenderedPrimitiveNameType } from '../geometry/Types';
 import PrimitiveGroupData from '../geometry/PrimitiveGroupData';
 class NonAbstractPrimitiveGroup extends PrimitiveGroup {
@@ -25,7 +24,7 @@ describe('PrimitiveGroup', () => {
   test('constructor', () => {
     const group = new NonAbstractPrimitiveGroup(2);
     expect(group.data.count).toBe(0);
-    expect(group.capacity).toBe(2);
+    expect(group.isEmpty).toBe(false);
     expect(group.treeIndex.length).toBe(2);
   });
 
