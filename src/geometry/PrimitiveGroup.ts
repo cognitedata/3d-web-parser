@@ -26,6 +26,9 @@ interface TreeIndexMap {
 }
 
 export default abstract class PrimitiveGroup extends GeometryGroup {
+  public get isEmpty(): boolean {
+    return this.treeIndex.length === 0;
+  }
   public abstract type: RenderedPrimitiveNameType;
   public treeIndex: Float32Array;
   public treeIndexMap: TreeIndexMap;
@@ -39,10 +42,6 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
   public transform3: Float32Array;
   public hasCustomTransformAttributes: boolean;
   public attributes: Attribute[];
-
-  public get isEmpty(): boolean {
-    return this.treeIndex.length === 0;
-  }
 
   constructor(capacity: number) {
     super();
@@ -60,21 +59,6 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
 
   abstract computeModelMatrix(outputMatrix: THREE.Matrix4, index: number): THREE.Matrix4;
   abstract computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, index: number): THREE.Box3;
-
-  setupAttributes() {
-    this.attributes.push({ name: 'treeIndex', array: this.treeIndex, itemSize: 1 });
-    primitiveAttributes[this.type].forEach(property => {
-      this.attributes.push({
-        name: 'a_' + property,
-        array: this.data.arrays[property],
-        itemSize: getAttributeItemSize(property)
-      });
-
-      if (this.data.arrays[property] === undefined) {
-        throw Error('Primitive attributes issue. Property: ' + property + ', type: ' + this.type);
-      }
-    });
-  }
 
   filterLastObject(nodeId: number, filterOptions?: FilterOptions) {
     if (!filterOptions) {
@@ -96,10 +80,7 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
   }
 
   setTreeIndex(value: number, index: number) {
-    if (this.treeIndex.length <= index + 1) {
-      const newCapacity = suggestNewCapacity(this.treeIndex.length, this.treeIndex.length + 1);
-      this.treeIndex = ensureCapacityAtLeast32(this.treeIndex, newCapacity);
-    }
+    this.ensureCapacity(index + 1);
     this.treeIndex[index] = value;
   }
 
@@ -189,5 +170,27 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
 
     this.setupAttributes();
     this.sorted = true;
+  }
+
+  protected setupAttributes() {
+    this.attributes.push({ name: 'treeIndex', array: this.treeIndex, itemSize: 1 });
+    primitiveAttributes[this.type].forEach(property => {
+      this.attributes.push({
+        name: 'a_' + property,
+        array: this.data.arrays[property],
+        itemSize: getAttributeItemSize(property)
+      });
+
+      if (this.data.arrays[property] === undefined) {
+        throw Error('Primitive attributes issue. Property: ' + property + ', type: ' + this.type);
+      }
+    });
+  }
+
+  protected ensureCapacity(count: number) {
+    if (this.treeIndex.length <= count) {
+      const newCapacity = suggestNewCapacity(this.treeIndex.length, count);
+      this.treeIndex = ensureCapacityAtLeast32(this.treeIndex, newCapacity);
+    }
   }
 }

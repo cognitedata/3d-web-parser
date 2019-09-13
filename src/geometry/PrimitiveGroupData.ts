@@ -83,15 +83,11 @@ export default class PrimitiveGroupData {
 
   add(properties: any) {
     Object.keys(properties).forEach(name => {
-      if (this.arrays[name] === undefined) {
-        throw Error(
-          'Property ' +
-            (name as string) +
-            ' is not present on groups with type ' +
-            (this.type as string) +
-            '. See primitiveProperties in PrimitiveGroupDataParameters.ts'
-        );
-      }
+      assert(
+        this.arrays[name] !== undefined,
+        `Property ${name as string} is not present on groups with type ` +
+          `${this.type as string}. See primitiveProperties in PrimitiveGroupDataParameters.ts`
+      );
       const property = name as RenderedPropertyNameType;
       if (float64Properties.has(property) || float32Properties.has(property)) {
         this.setNumber(property, properties[property], this.count);
@@ -191,7 +187,6 @@ export default class PrimitiveGroupData {
   private ensureCapacity(minCapacity: number) {
     if (this.capacity < minCapacity) {
       const newCapacity = suggestNewCapacity(this.capacity, minCapacity);
-
       for (const property of Object.keys(this.arrays)) {
         const oldArray = this.arrays[property];
         const countPerElement = oldArray.length / this.capacity; // 1, 2, 3 or 4

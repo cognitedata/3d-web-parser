@@ -6,7 +6,7 @@ import { computeCircleBoundingBox } from './CircleGroup';
 import { FilterOptions } from '../parsers/parseUtils';
 import PrimitiveGroupData from './PrimitiveGroupData';
 import { RenderedPrimitiveNameType } from './Types';
-import { colorProperties } from './PrimitiveGroupDataParameters';
+import { assert } from '../utils/assert';
 
 // constants
 type triplet = [number, number, number];
@@ -56,7 +56,7 @@ export default class SphericalSegmentGroup extends PrimitiveGroup {
       hRadius: radius,
       height
     });
-
+    this.updateRadiusAttribute();
     return this.filterLastObject(nodeId, filterOptions);
   }
 
@@ -103,5 +103,11 @@ export default class SphericalSegmentGroup extends PrimitiveGroup {
     });
 
     return box;
+  }
+
+  private updateRadiusAttribute() {
+    const vRadiusAttribute = this.attributes.find(x => x.name === 'a_vRadius');
+    assert(vRadiusAttribute !== undefined, "Could not find attribute 'a_vRadius'");
+    vRadiusAttribute!.array = this.data.arrays.hRadius;
   }
 }

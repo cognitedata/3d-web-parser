@@ -34,7 +34,7 @@ export function ensureCapacityAtLeast64(array: Float64Array, newCapacity: number
  * @param minCapacity               The minimum capacity after buffer has been grown (optional).
  * @param growMultiplier            How much to increase the capacity with relative to current capacity (optional).
  */
-export function suggestNewCapacity(currentCapacity: number, minCapacity = -1, growMultiplier = 2): number {
+export function suggestNewCapacity(currentCapacity: number, minCapacity = 1, growMultiplier = 2): number {
   const newCapacity = Math.trunc(Math.max(minCapacity, growMultiplier * currentCapacity));
   return newCapacity;
 }

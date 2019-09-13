@@ -11,6 +11,7 @@ import {
   FileGeometryNameType
 } from '../parserParameters';
 import PropertyLoader from '../PropertyLoader';
+import { assert } from '../../../utils/assert';
 
 type PrimitiveGroupMap = { [name: string]: PrimitiveGroup };
 type NumberOfPrimitives = { [renderedPrimitive: string]: number };
@@ -46,30 +47,7 @@ export default class GeometryUnpacker {
       this.unpackFilePrimitive(data, numberOfPrimitives, primitiveGroupMap);
     });
 
-    // // Sort all groups to enable combination next
-    // for (const primtiveGroupMap of primitives) {
-    //   for (const type of Object.keys(primtiveGroupMap)) {
-    //     const group = primtiveGroupMap[type];
-    //     group.sort();
-    //   }
-    // }
-
-    // // Combine individual primitive maps
-    // const combinedPrimitives = primitives.reduce((allPrimitives, primitivesMap) => {
-    //   const types = Object.keys(primitivesMap);
-    //   for (const type of types) {
-    //     const group = primitivesMap[type];
-    //     if (!allPrimitives[type]) {
-    //       allPrimitives[type] = group;
-    //     } else {
-    //       allPrimitives[type].combineWith(group);
-    //       // console.log(`Combine ${group}`);
-    //       // allPrimitives[type]
-    //     }
-    //   }
-    //   return allPrimitives;
-    // }, {});
-
+    // Order by size and shrink buffers to save memory
     sector.primitiveGroups = Object.values(primitiveGroupMap);
     for (const group of sector.primitiveGroups) {
       group.consolidateAndOrderBySize();
@@ -90,21 +68,7 @@ export default class GeometryUnpacker {
       this.dataMaps.colorMap[treeIndex] = color;
 
       const primitiveType = primitiveCompressedData.type;
-      // const compositeTypeMap = renderedPrimitivesPerFilePrimitive[primitiveType]; // Some primitives are composite of others
-      // const primitiveCount = numberOfPrimitives[primitiveType];
-      // for (const part of compositeTypeMap) {
-      //   // TODO 20190912 larsmoa: Be smart about how many we need of each subtype here
-      //   const capacity = numberOfPrimitives[part.name] * primitiveCount;
-      //   const primitiveGroup = primitivesByType[part.name] || createPrimitiveGroupOfType(part.name, capacity);
-      //   primitivesByType[part.name] = primitiveGroup;
-      // }
       ensurePrimitiveMapContainsType(primitiveGroupMap, primitiveType, numberOfPrimitives);
-      // updateDestinationGroups(
-      //   destinationPrimitiveGroups,
-      //   currentSector,
-      //   primitiveCompressedData.type,
-      //   numberOfPrimitives
-      // );
       // @ts-ignore
       renderedPrimitiveToAddFunction[primitiveType].call(this, primitiveGroupMap, this.dataLoader, this.filterOptions);
     }
@@ -138,66 +102,6 @@ function countPrimitiveRenderCount(compressedData: SectorCompressedData) {
 
 // TODO 20190912 larsmoa: A lot of WTFs in the code below (https://mk0osnewswb2dmu4h0a.kinstacdn.com/images/comics/wtfm.jpg)
 
-// function updateDestinationGroups(
-//   destinationPrimitiveGroups: { [name: string]: PrimitiveGroup },
-//   sector: Sector,
-//   geometryType: FileGeometryNameType,
-//   numberOfPrimitives: NumberOfPrimitives
-// ) {
-//   renderedPrimitivesPerFilePrimitive[geometryType].forEach(renderedPrimitiveInfo => {
-//     const destinationGroup = destinationPrimitiveGroups[renderedPrimitiveInfo.name];
-//     if (
-//       destinationGroup === undefined ||
-//       destinationGroup.capacity < destinationGroup.data.count + renderedPrimitiveInfo.count
-//     ) {
-//       destinationPrimitiveGroups[renderedPrimitiveInfo.name] = findOrCreateDestinationGroup(
-//         sector,
-//         renderedPrimitiveInfo,
-//         numberOfPrimitives
-//       );
-//     }
-//   });
-// }
-
-// function findOrCreateDestinationGroup(
-//   originalSector: Sector,
-//   renderedPrimitiveInfo: { name: string; count: number },
-//   numberOfPrimitives: NumberOfPrimitives
-// ) {
-//   let searchSector: Sector | undefined = originalSector;
-//   let destinationGroup: PrimitiveGroup | undefined;
-
-//   while (searchSector !== undefined && destinationGroup === undefined) {
-//     searchSector.primitiveGroups.forEach(primitiveGroup => {
-//       if (primitiveGroup.type === renderedPrimitiveInfo.name) {
-//         if (primitiveGroup.capacity >= primitiveGroup.data.count + renderedPrimitiveInfo.count) {
-//           destinationGroup = primitiveGroup;
-//         }
-//       }
-//     });
-
-//     searchSector = searchSector.parent;
-//   }
-
-//   if (destinationGroup !== undefined) {
-//     return destinationGroup;
-//   } else if (renderedPrimitiveInfo.name === 'TorusSegment') {
-//     const capacity = numberOfPrimitives.TorusSegment;
-//     // TODO 20190912 larsmoa: Get rid of this non-typesafe voodoo
-//     // @ts-ignore
-//     const createdGroup = new renderedPrimitiveToGroup.TorusSegment(capacity);
-//     originalSector.primitiveGroups.push(createdGroup);
-//     return createdGroup;
-//   } else {
-//     // TODO 20190912 larsmoa: Estimate, verify if ok or if old approach (in main.ts) is    // better/necessary
-//     const capacity = Math.min(numberOfPrimitives[renderedPrimitiveInfo.name], 5000);
-//     // @ts-ignore
-//     const createdGroup = new renderedPrimitiveToGroup[renderedPrimitiveInfo.name](capacity);
-//     originalSector.primitiveGroups.push(createdGroup);
-//     return createdGroup;
-//   }
-// }
-
 /**
  * Helper function to initialize a PrimitiveGroupMap with entries for a given primitive type.
  * This handles composite types (e.g. that a ClosedCylinder-primitive expands to <Cylinder, Circle, Circle>).
@@ -211,11 +115,13 @@ function ensurePrimitiveMapContainsType(
   numberOfPrimitives: NumberOfPrimitives
 ) {
   const compositeTypeMap = renderedPrimitivesPerFilePrimitive[primitiveType];
-  // const primitiveCount = numberOfPrimitives[primitiveType];
-  const primitiveCount = 64; // TODO 20190912 larsmoa: Count actual
+  const primitiveCount = numberOfPrimitives[primitiveType] || 1;
+  assert(
+    Number.isFinite(primitiveCount),
+    `Encountered ${primitiveCount} when looking up number of primtives for '${primitiveType}'`
+  );
   for (const part of compositeTypeMap) {
     if (!groupMap[part.name]) {
-      // TODO 20190912 larsmoa: Be smarter, or don't be smart at all
       const capacity = part.count * primitiveCount;
       const primitiveGroup = createPrimitiveGroupOfType(part.name, capacity);
       groupMap[part.name] = primitiveGroup;
