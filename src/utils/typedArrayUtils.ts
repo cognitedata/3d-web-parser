@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 /**
  * Ensures that the capacity of an array it at least the provided amount. If the capacity is lower,
  * a new array is allocated and returned.
