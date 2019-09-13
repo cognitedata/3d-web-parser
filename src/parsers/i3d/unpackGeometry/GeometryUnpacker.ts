@@ -7,10 +7,9 @@ import { RenderedPrimitiveNames } from '../../../geometry/PrimitiveGroupDataPara
 import {
   addPrimitiveToGroup,
   renderedPrimitivesPerFilePrimitive,
-  renderedPrimitiveToGroup,
   FileGeometryNameType,
   FilePrimitiveNameType,
-  FilePrimitiveNames
+  createPrimitiveGroupOfType
 } from '../parserParameters';
 import PropertyLoader from '../PropertyLoader';
 import { assert } from '../../../utils/assert';
@@ -75,13 +74,6 @@ export default class GeometryUnpacker {
       addPrimitiveToGroup(primitiveType, primitiveGroupMap, this.dataLoader, this.filterOptions);
     }
   }
-}
-
-function createPrimitiveGroupOfType(typeName: string, capacity: number): PrimitiveGroup {
-  // TODO 20190912 larsmoa: Get rid of this non-typesafe voodoo
-  // @ts-ignore
-  const group = new renderedPrimitiveToGroup[typeName](capacity);
-  return group;
 }
 
 /**

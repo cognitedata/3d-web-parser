@@ -573,17 +573,22 @@ export const renderedPrimitivesPerFilePrimitive: {
   ]
 };
 
-export const renderedPrimitiveToGroup: { [name: string]: typeof PrimitiveGroup } = {
-  Box: BoxGroup,
-  Circle: CircleGroup,
-  Cone: ConeGroup,
-  EccentricCone: EccentricConeGroup,
-  EllipsoidSegment: EllipsoidSegmentGroup,
-  GeneralCylinder: GeneralCylinderGroup,
-  GeneralRing: GeneralRingGroup,
-  Nut: NutGroup,
-  Quad: QuadGroup,
-  SphericalSegment: SphericalSegmentGroup,
-  TorusSegment: TorusSegmentGroup,
-  Trapezium: TrapeziumGroup
+const renderedPrimitiveToGroup: { [name: string]: (capacity: number) => PrimitiveGroup } = {
+  Box: capacity => new BoxGroup(capacity),
+  Circle: capacity => new CircleGroup(capacity),
+  Cone: capacity => new ConeGroup(capacity),
+  EccentricCone: capacity => new EccentricConeGroup(capacity),
+  EllipsoidSegment: capacity => new EllipsoidSegmentGroup(capacity),
+  GeneralCylinder: capacity => new GeneralCylinderGroup(capacity),
+  GeneralRing: capacity => new GeneralRingGroup(capacity),
+  Nut: capacity => new NutGroup(capacity),
+  Quad: capacity => new QuadGroup(capacity),
+  SphericalSegment: capacity => new SphericalSegmentGroup(capacity),
+  TorusSegment: capacity => new TorusSegmentGroup(capacity),
+  Trapezium: capacity => new TrapeziumGroup(capacity)
 };
+
+export function createPrimitiveGroupOfType(primitiveType: string, capacity: number): PrimitiveGroup {
+  const factoryDelegate = renderedPrimitiveToGroup[primitiveType];
+  return factoryDelegate(capacity);
+}
