@@ -1,19 +1,22 @@
 // Copyright 2019 Cognite AS
 
-import { Sector, DataMaps, PrimitiveGroup } from '../../..';
+import { Sector, DataMaps } from '../../..';
 import { UncompressedValues, SectorCompressedData, CompressedGeometryData } from '../sharedFileParserTypes';
 import { FilterOptions } from '../../parseUtils';
 import { RenderedPrimitiveNames } from '../../../geometry/PrimitiveGroupDataParameters';
 import {
+  addPrimitiveToGroup,
   renderedPrimitivesPerFilePrimitive,
   renderedPrimitiveToGroup,
-  renderedPrimitiveToAddFunction,
-  FileGeometryNameType
+  FileGeometryNameType,
+  FilePrimitiveNameType,
+  FilePrimitiveNames
 } from '../parserParameters';
 import PropertyLoader from '../PropertyLoader';
 import { assert } from '../../../utils/assert';
+import PrimitiveGroup from '../../../geometry/PrimitiveGroup';
+import { PrimitiveGroupMap } from '../../../geometry/PrimitiveGroupMap';
 
-type PrimitiveGroupMap = { [name: string]: PrimitiveGroup };
 type NumberOfPrimitives = { [renderedPrimitive: string]: number };
 
 export default class GeometryUnpacker {
@@ -67,10 +70,9 @@ export default class GeometryUnpacker {
       this.dataMaps.treeIndexNodeIdMap[treeIndex] = nodeId;
       this.dataMaps.colorMap[treeIndex] = color;
 
-      const primitiveType = primitiveCompressedData.type;
+      const primitiveType = primitiveCompressedData.type as FilePrimitiveNameType;
       ensurePrimitiveMapContainsType(primitiveGroupMap, primitiveType, numberOfPrimitives);
-      // @ts-ignore
-      renderedPrimitiveToAddFunction[primitiveType].call(this, primitiveGroupMap, this.dataLoader, this.filterOptions);
+      addPrimitiveToGroup(primitiveType, primitiveGroupMap, this.dataLoader, this.filterOptions);
     }
   }
 }

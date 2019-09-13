@@ -1,7 +1,7 @@
 // Copyright 2019 Cognite AS
 
 import * as THREE from 'three';
-import { GeometryNode, GeometryMap, GeometryGroup } from './geometry/GeometryGroup';
+import { GeometryMap } from './geometry/GeometryGroup';
 import PrimitiveGroup from './geometry/PrimitiveGroup';
 import { MergedMeshGroup } from './geometry/MergedMeshGroup';
 import { InstancedMeshGroup } from './geometry/InstancedMeshGroup';

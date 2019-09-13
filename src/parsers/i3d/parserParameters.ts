@@ -4,6 +4,7 @@
 import * as THREE from 'three';
 
 import PrimitiveGroup from '../../geometry/PrimitiveGroup';
+import { PrimitiveGroupMap } from '../../geometry/PrimitiveGroupMap';
 import { RenderedPrimitiveNameType } from '../../geometry/Types';
 import {
   BoxGroup,
@@ -49,6 +50,8 @@ import { addClosedTorusSegment, addOpenTorusSegment, addTorus } from './unpackGe
 import { addClosedSphericalSegment, addOpenSphericalSegment } from './unpackGeometry/SphericalSegment';
 import PropertyLoader from './PropertyLoader';
 import { FilterOptions } from '../parseUtils';
+import PrimitiveGroupData from '../../geometry/PrimitiveGroupData';
+import { assert } from '../../utils/assert';
 
 export type FilePrimitiveNameType =
   | 'Box'
@@ -474,13 +477,12 @@ export const fileGeometryProperties: { [name in FileGeometryNameType]: FilePrope
   ]
 };
 
-export const renderedPrimitiveToAddFunction: {
-  [name in FilePrimitiveNameType]: (
-    groups: { [name: string]: PrimitiveGroup },
-    data: PropertyLoader,
-    filterOptions?: FilterOptions
-  ) => void
-} = {
+type AddPrimitiveToGroupDelegate = (
+  groups: PrimitiveGroupMap,
+  data: PropertyLoader,
+  filterOptions?: FilterOptions
+) => void;
+const renderedPrimitiveToAddFunction: { [name in FilePrimitiveNameType]: AddPrimitiveToGroupDelegate } = {
   Box: addBox,
   Circle: addCircle,
   ClosedCone: addClosedCone,
@@ -512,6 +514,17 @@ export const renderedPrimitiveToAddFunction: {
   SolidOpenGeneralCone: addSolidOpenGeneralCone,
   SolidClosedGeneralCone: addSolidClosedGeneralCone
 };
+
+export function addPrimitiveToGroup(
+  primitiveType: FilePrimitiveNameType,
+  groups: PrimitiveGroupMap,
+  dataLoader: PropertyLoader,
+  filterOptions?: FilterOptions
+) {
+  const addDelegate = renderedPrimitiveToAddFunction[primitiveType];
+  assert(!!addDelegate, `Could not find a delegate for type '${primitiveType}'`);
+  addDelegate(groups, dataLoader, filterOptions);
+}
 
 export const renderedPrimitivesPerFilePrimitive: {
   [name: string]: { name: RenderedPrimitiveNameType; count: number }[];
