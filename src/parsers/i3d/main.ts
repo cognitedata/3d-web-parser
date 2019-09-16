@@ -7,7 +7,6 @@ import { createSceneStats } from '../../SceneStats';
 import { PerSectorCompressedData, UncompressedValues } from './sharedFileParserTypes';
 import { DataMaps, FilterOptions, ParseReturn } from '../parseUtils';
 import GeometryUnpacker from './unpackGeometry/GeometryUnpacker';
-import unpackMergedMeshes from './unpackGeometry/MergedMesh';
 import unpackInstancedMeshes from './unpackGeometry/InstancedMesh';
 
 function preloadMeshFiles(meshLoader: any, fileIds: number[]) {
@@ -69,7 +68,7 @@ export function parseFullCustomFile(
   for (const sector of rootSector.traverseSectors()) {
     sector.loadGeometry();
   }
-  return unpackData(rootSector, uncompressedValues, compressedData, maps, filterOptions);
+  return unpackData(rootSector, uncompressedValues, compressedData, maps);
 }
 
 export function parseMultipleCustomFiles(
@@ -114,18 +113,16 @@ export function parseMultipleCustomFiles(
     throw Error('Did not find root sector');
   }
 
-  return unpackData(rootSector, uncompressedValues, compressedData, maps, filterOptions);
+  return unpackData(rootSector, uncompressedValues, compressedData, maps);
 }
 
 function unpackData(
   rootSector: Sector,
   uncompressedValues: UncompressedValues,
   compressedData: PerSectorCompressedData,
-  maps: DataMaps,
-  filterOptions?: FilterOptions
+  maps: DataMaps
 ): ParseReturn {
   const sceneStats = createSceneStats();
-  unpackMergedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
   unpackInstancedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
   mergeInstancedMeshes(rootSector, sceneStats);
   for (const sector of rootSector.traverseSectors()) {

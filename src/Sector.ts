@@ -78,7 +78,8 @@ export default class Sector {
 
   _unpackGeometryData(compressedData: SectorCompressedData) {
     const unpacker = this.geometryUnpacker!;
-    unpacker.unpackPrimitives(this, compressedData);
+    this.primitiveGroups = unpacker.unpackPrimitives(compressedData);
+    this.mergedMeshGroup = unpacker.unpackMergedMeshes(compressedData);
   }
 
   *traverseSectors(): IterableIterator<Sector> {

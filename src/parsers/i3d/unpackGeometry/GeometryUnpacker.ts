@@ -1,7 +1,12 @@
 // Copyright 2019 Cognite AS
 
-import { Sector, DataMaps } from '../../..';
-import { UncompressedValues, SectorCompressedData, CompressedGeometryData } from '../sharedFileParserTypes';
+import { Sector, DataMaps, SceneStats, MergedMesh, MergedMeshGroup } from '../../..';
+import {
+  UncompressedValues,
+  SectorCompressedData,
+  CompressedGeometryData,
+  PerSectorCompressedData
+} from '../sharedFileParserTypes';
 import { FilterOptions } from '../../parseUtils';
 import { RenderedPrimitiveNames } from '../../../geometry/PrimitiveGroupDataParameters';
 import {
@@ -30,7 +35,7 @@ export default class GeometryUnpacker {
     this.dataLoader = new PropertyLoader(uncompressedValues);
   }
 
-  public unpackPrimitives(sector: Sector, compressedData: SectorCompressedData) {
+  public unpackPrimitives(compressedData: SectorCompressedData): PrimitiveGroup[] {
     // TODO 20190912 larsmo: Remove sector argument and return primitiveGroups rather than
     // updating the instance.
 
@@ -38,9 +43,6 @@ export default class GeometryUnpacker {
     // think this is a good idea as it introduces a lot of complexities and runtime overhead.
     // Managing this in a streaming-solution will be a mess, so I would rather move the
     // responsibility to the optimizer
-
-    // TODO 20190912 larsmoa: I think we are counting primitives for the sole purpose
-    // of better estimating the 'complexity' of torus segments in findOrCreateDestinationGroup
     const numberOfPrimitives = countPrimitiveRenderCount(compressedData);
 
     // Create primitives for each data chunk
@@ -50,10 +52,71 @@ export default class GeometryUnpacker {
     });
 
     // Order by size and shrink buffers to save memory
-    sector.primitiveGroups = Object.values(primitiveGroupMap);
-    for (const group of sector.primitiveGroups) {
+    const primitives = Object.values(primitiveGroupMap);
+    for (const group of primitives) {
       group.consolidateAndOrderBySize();
     }
+    return primitives;
+  }
+
+  public unpackMergedMeshes(compressedData: SectorCompressedData): MergedMeshGroup {
+    const mergedMeshGroup = new MergedMeshGroup();
+    const geometryInfo = compressedData.mergedMesh;
+    if (geometryInfo) {
+      // count meshes per file Id
+      const meshCounts: { [fileId: string]: number } = {};
+      for (let i = 0; i < geometryInfo.count; i++) {
+        this.dataLoader.loadData(geometryInfo);
+        meshCounts[this.dataLoader.fileId] = meshCounts[this.dataLoader.fileId]
+          ? meshCounts[this.dataLoader.fileId]
+          : 0;
+        meshCounts[this.dataLoader.fileId]++;
+      }
+      geometryInfo.indices.rewind();
+      geometryInfo.nodeIds.rewind();
+
+      // create merged meshes
+      const mergedMeshes: { [fileId: string]: MergedMesh } = {};
+      Object.keys(meshCounts).forEach(fileId => {
+        if (meshCounts[fileId] !== 0) {
+          mergedMeshes[fileId] = new MergedMesh(
+            meshCounts[fileId],
+            parseInt(fileId, 10),
+            false,
+            this.dataLoader.diffuseTexture,
+            this.dataLoader.specularTexture,
+            this.dataLoader.ambientTexture,
+            this.dataLoader.normalTexture,
+            this.dataLoader.bumpTexture
+          );
+        }
+      });
+
+      // create mappings while calculating running triangle offsets
+      const triangleOffsets: { [fileId: string]: number } = {};
+      for (let i = 0; i < geometryInfo.count; i++) {
+        this.dataLoader.loadData(geometryInfo);
+        this.dataMaps.treeIndexNodeIdMap[this.dataLoader.treeIndex] = this.dataLoader.nodeId;
+        this.dataMaps.colorMap[this.dataLoader.treeIndex] = this.dataLoader.color;
+
+        triangleOffsets[this.dataLoader.fileId] = triangleOffsets[this.dataLoader.fileId]
+          ? triangleOffsets[this.dataLoader.fileId]
+          : 0;
+        mergedMeshes[this.dataLoader.fileId].mappings.add(
+          triangleOffsets[this.dataLoader.fileId],
+          this.dataLoader.triangleCount,
+          this.dataLoader.treeIndex,
+          this.dataLoader.size
+        );
+        triangleOffsets[this.dataLoader.fileId] += this.dataLoader.triangleCount;
+      }
+
+      // add meshes to groups
+      Object.keys(mergedMeshes).forEach(fileId => {
+        mergedMeshGroup.addMesh(mergedMeshes[fileId]);
+      });
+    }
+    return mergedMeshGroup;
   }
 
   private unpackFilePrimitive(
