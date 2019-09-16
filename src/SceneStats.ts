@@ -30,5 +30,7 @@ function createSceneStats(): SceneStats {
     }
   };
 }
+// TODO 20190916 larsmoa: Generating stats on load does not make sense with streaming.
+// Replace with collectStats(Sector) or something.
 
 export { SceneStats, createSceneStats };
