@@ -1,16 +1,12 @@
 // Copyright 2019 Cognite AS
 
 import ProtobufDecoder from './ProtobufDecoder';
-import * as WebSceneProto from './proto/web_scene.json';
-import * as THREE from 'three';
 import Sector from '../../Sector';
-import { Vector3, Group } from 'three';
+import { Vector3 } from 'three';
 import { getParentPath } from '../../PathExtractor';
-import { InstancedMesh, InstancedMeshGroup } from '../../geometry/InstancedMeshGroup';
-import { MergedMesh } from '../../geometry/MergedMeshGroup';
+import { InstancedMesh } from '../../geometry/InstancedMeshGroup';
 import PrimitiveGroup from '../../geometry/PrimitiveGroup';
-import GeometryGroup from '../../geometry/GeometryGroup';
-import { FilterOptions, InstancedMeshMap, ParseData, ParseReturn, SectorMap, sleep } from '../parseUtils';
+import { FilterOptions, ParseData, ParseReturn, SectorMap, sleep } from '../parseUtils';
 import {
   parseBoxes,
   parseCircles,
@@ -28,26 +24,11 @@ import {
   parseInstancedMeshes
 } from './parsers';
 
-import {
-  BoxGroup,
-  CircleGroup,
-  ConeGroup,
-  EccentricConeGroup,
-  EllipsoidSegmentGroup,
-  GeneralCylinderGroup,
-  GeneralRingGroup,
-  NutGroup,
-  QuadGroup,
-  SphericalSegmentGroup,
-  TorusSegmentGroup,
-  TrapeziumGroup
-} from '../../geometry/GeometryGroups';
+import { createSceneStats } from '../../SceneStats';
 
-import { SceneStats, createSceneStats } from '../../SceneStats';
-
-import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
 import { TreeIndexNodeIdMap, ColorMap } from '../parseUtils';
 import { RenderedPrimitiveNameType } from '../../geometry/Types';
+import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
 type PrimitiveParserMap = { type: RenderedPrimitiveNameType; parser: (data: ParseData) => PrimitiveGroup };
 
 const primitiveParsers: PrimitiveParserMap[] = [
@@ -90,7 +71,6 @@ export default async function parseProtobuf(
   const instancedMeshMap: { [key: number]: InstancedMesh } = {};
   const sceneStats = createSceneStats();
 
-  const mergedMeshMap: InstancedMeshMap = {};
   const treeIndexNodeIdMap: TreeIndexNodeIdMap = [];
   const colorMap: ColorMap = [];
 
@@ -149,7 +129,9 @@ export default async function parseProtobuf(
     }
   }
 
-  mergeInstancedMeshes(rootSector, sceneStats);
+  for (const sector of rootSector.traverseSectorsBreadthFirst()) {
+    mergeInstancedMeshes(sector, sceneStats);
+  }
   for (const sector of rootSector.traverseSectors()) {
     sector.mergedMeshGroup.createTreeIndexMap();
     sector.instancedMeshGroup.createTreeIndexMap();

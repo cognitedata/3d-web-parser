@@ -123,8 +123,8 @@ function unpackData(
 ): ParseReturn {
   const sceneStats = createSceneStats();
   // unpackInstancedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
-  mergeInstancedMeshes(rootSector, sceneStats);
   for (const sector of rootSector.traverseSectors()) {
+    mergeInstancedMeshes(sector, sceneStats);
     sector.mergedMeshGroup.createTreeIndexMap();
     sector.instancedMeshGroup.createTreeIndexMap();
 
