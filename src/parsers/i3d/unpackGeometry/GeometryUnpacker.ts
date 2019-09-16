@@ -1,13 +1,15 @@
 // Copyright 2019 Cognite AS
 
 import { DataMaps, MergedMeshGroup } from '../../..';
-import { UncompressedValues, SectorCompressedData } from '../sharedFileParserTypes';
+import { UncompressedValues, SectorCompressedData, CompressedGeometryData } from '../sharedFileParserTypes';
 import { FilterOptions } from '../../parseUtils';
 import PropertyLoader from '../PropertyLoader';
 import PrimitiveGroup from '../../../geometry/PrimitiveGroup';
 import { PrimitiveGroupMap } from '../../../geometry/PrimitiveGroupMap';
 import { unpackMergedMeshes } from './unpackMergedMeshes';
 import { unpackFilePrimitive, countPrimitiveRenderCount } from './unpackFilePrimitive';
+import { InstancedMeshGroup } from '../../../geometry/InstancedMeshGroup';
+import { unpackInstancedMeshes } from './unpackInstanceMeshes';
 
 export default class GeometryUnpacker {
   private readonly dataMaps: DataMaps;
@@ -58,5 +60,12 @@ export default class GeometryUnpacker {
     }
     return unpackMergedMeshes(this.dataLoader, this.dataMaps, compressedData.mergedMesh);
   }
-}
 
+  public unpackInstancedMesh(compressedData: SectorCompressedData): InstancedMeshGroup {
+    const geometryInfo = compressedData.instancedMesh;
+    if (!geometryInfo) {
+      return new InstancedMeshGroup();
+    }
+    return unpackInstancedMeshes(this.dataLoader, this.dataMaps, geometryInfo);
+  }
+}

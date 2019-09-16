@@ -7,7 +7,6 @@ import { createSceneStats } from '../../SceneStats';
 import { PerSectorCompressedData, UncompressedValues } from './sharedFileParserTypes';
 import { DataMaps, FilterOptions, ParseReturn } from '../parseUtils';
 import GeometryUnpacker from './unpackGeometry/GeometryUnpacker';
-import unpackInstancedMeshes from './unpackGeometry/InstancedMesh';
 
 function preloadMeshFiles(meshLoader: any, fileIds: number[]) {
   fileIds.forEach(fileId => {
@@ -123,7 +122,7 @@ function unpackData(
   maps: DataMaps
 ): ParseReturn {
   const sceneStats = createSceneStats();
-  unpackInstancedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
+  // unpackInstancedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
   mergeInstancedMeshes(rootSector, sceneStats);
   for (const sector of rootSector.traverseSectors()) {
     sector.mergedMeshGroup.createTreeIndexMap();

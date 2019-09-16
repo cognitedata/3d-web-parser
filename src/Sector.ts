@@ -72,14 +72,15 @@ export default class Sector {
     }
 
     this.fileReader.seek(this.geometryOffset);
-    const compressedData = this.fileReader.readCompressedGeometryData(this.geometrySize);
-    this._unpackGeometryData(compressedData);
+    const data = this.fileReader.readCompressedGeometryData(this.geometrySize);
+    this._unpackGeometryData(data);
   }
 
-  _unpackGeometryData(compressedData: SectorCompressedData) {
+  _unpackGeometryData(data: SectorCompressedData) {
     const unpacker = this.geometryUnpacker!;
-    this.primitiveGroups = unpacker.unpackPrimitives(compressedData);
-    this.mergedMeshGroup = unpacker.unpackMergedMeshes(compressedData);
+    this.primitiveGroups = unpacker.unpackPrimitives(data);
+    this.mergedMeshGroup = unpacker.unpackMergedMeshes(data);
+    this.instancedMeshGroup = unpacker.unpackInstancedMesh(data);
   }
 
   *traverseSectors(): IterableIterator<Sector> {
