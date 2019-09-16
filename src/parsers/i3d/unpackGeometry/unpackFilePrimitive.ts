@@ -75,16 +75,15 @@ function ensurePrimitiveMapContainsType(
   numberOfPrimitives: NumberOfPrimitives
 ) {
   const compositeTypeMap = renderedPrimitivesPerFilePrimitive[primitiveType];
-  const primitiveCount = numberOfPrimitives[primitiveType] || 1;
+  const primitiveCount = numberOfPrimitives[primitiveType] || 16;
   assert(
     Number.isFinite(primitiveCount),
     `Encountered ${primitiveCount} when looking up number of primtives for '${primitiveType}'`
   );
-  for (const part of compositeTypeMap) {
-    if (!groupMap[part.name]) {
-      const capacity = part.count * primitiveCount;
-      const primitiveGroup = createPrimitiveGroupOfType(part.name, capacity);
-      groupMap[part.name] = primitiveGroup;
-    }
+  // Add new types to groupMap
+  for (const part of compositeTypeMap.filter(x => !groupMap[x.name])) {
+    const capacity = part.count * primitiveCount;
+    const primitiveGroup = createPrimitiveGroupOfType(part.name, capacity);
+    groupMap[part.name] = primitiveGroup;
   }
 }
