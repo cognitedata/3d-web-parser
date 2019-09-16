@@ -1,12 +1,7 @@
 // Copyright 2019 Cognite AS
 
-import { Sector, DataMaps, SceneStats, MergedMesh, MergedMeshGroup } from '../../..';
-import {
-  UncompressedValues,
-  SectorCompressedData,
-  CompressedGeometryData,
-  PerSectorCompressedData
-} from '../sharedFileParserTypes';
+import { DataMaps, MergedMesh, MergedMeshGroup } from '../../..';
+import { UncompressedValues, SectorCompressedData, CompressedGeometryData } from '../sharedFileParserTypes';
 import { FilterOptions } from '../../parseUtils';
 import { RenderedPrimitiveNames } from '../../../geometry/PrimitiveGroupDataParameters';
 import {
@@ -48,7 +43,7 @@ export default class GeometryUnpacker {
     // Create primitives for each data chunk
     const primitiveGroupMap: PrimitiveGroupMap = {};
     compressedData.primitives.forEach(data => {
-      this.unpackFilePrimitive(data, numberOfPrimitives, primitiveGroupMap);
+      this._unpackFilePrimitive(data, numberOfPrimitives, primitiveGroupMap);
     });
 
     // Order by size and shrink buffers to save memory
@@ -60,66 +55,66 @@ export default class GeometryUnpacker {
   }
 
   public unpackMergedMeshes(compressedData: SectorCompressedData): MergedMeshGroup {
-    const mergedMeshGroup = new MergedMeshGroup();
-    const geometryInfo = compressedData.mergedMesh;
-    if (geometryInfo) {
-      // count meshes per file Id
-      const meshCounts: { [fileId: string]: number } = {};
-      for (let i = 0; i < geometryInfo.count; i++) {
-        this.dataLoader.loadData(geometryInfo);
-        meshCounts[this.dataLoader.fileId] = meshCounts[this.dataLoader.fileId]
-          ? meshCounts[this.dataLoader.fileId]
-          : 0;
-        meshCounts[this.dataLoader.fileId]++;
-      }
-      geometryInfo.indices.rewind();
-      geometryInfo.nodeIds.rewind();
-
-      // create merged meshes
-      const mergedMeshes: { [fileId: string]: MergedMesh } = {};
-      Object.keys(meshCounts).forEach(fileId => {
-        if (meshCounts[fileId] !== 0) {
-          mergedMeshes[fileId] = new MergedMesh(
-            meshCounts[fileId],
-            parseInt(fileId, 10),
-            false,
-            this.dataLoader.diffuseTexture,
-            this.dataLoader.specularTexture,
-            this.dataLoader.ambientTexture,
-            this.dataLoader.normalTexture,
-            this.dataLoader.bumpTexture
-          );
-        }
-      });
-
-      // create mappings while calculating running triangle offsets
-      const triangleOffsets: { [fileId: string]: number } = {};
-      for (let i = 0; i < geometryInfo.count; i++) {
-        this.dataLoader.loadData(geometryInfo);
-        this.dataMaps.treeIndexNodeIdMap[this.dataLoader.treeIndex] = this.dataLoader.nodeId;
-        this.dataMaps.colorMap[this.dataLoader.treeIndex] = this.dataLoader.color;
-
-        triangleOffsets[this.dataLoader.fileId] = triangleOffsets[this.dataLoader.fileId]
-          ? triangleOffsets[this.dataLoader.fileId]
-          : 0;
-        mergedMeshes[this.dataLoader.fileId].mappings.add(
-          triangleOffsets[this.dataLoader.fileId],
-          this.dataLoader.triangleCount,
-          this.dataLoader.treeIndex,
-          this.dataLoader.size
-        );
-        triangleOffsets[this.dataLoader.fileId] += this.dataLoader.triangleCount;
-      }
-
-      // add meshes to groups
-      Object.keys(mergedMeshes).forEach(fileId => {
-        mergedMeshGroup.addMesh(mergedMeshes[fileId]);
-      });
+    if (!compressedData.mergedMesh) {
+      return new MergedMeshGroup();
     }
+    return this._unpackMergedMeshes(compressedData.mergedMesh);
+  }
+
+  private _unpackMergedMeshes(geometryInfo: CompressedGeometryData): MergedMeshGroup {
+    const mergedMeshGroup = new MergedMeshGroup();
+    // count meshes per file Id
+    const meshCounts: { [fileId: string]: number } = {};
+    for (let i = 0; i < geometryInfo.count; i++) {
+      this.dataLoader.loadData(geometryInfo);
+      meshCounts[this.dataLoader.fileId] = meshCounts[this.dataLoader.fileId] || 0;
+      meshCounts[this.dataLoader.fileId]++;
+    }
+    geometryInfo.indices.rewind();
+    geometryInfo.nodeIds.rewind();
+
+    // create merged meshes
+    const mergedMeshes: { [fileId: string]: MergedMesh } = {};
+    Object.keys(meshCounts).forEach(fileId => {
+      if (meshCounts[fileId] !== 0) {
+        mergedMeshes[fileId] = new MergedMesh(
+          meshCounts[fileId],
+          parseInt(fileId, 10),
+          false,
+          this.dataLoader.diffuseTexture,
+          this.dataLoader.specularTexture,
+          this.dataLoader.ambientTexture,
+          this.dataLoader.normalTexture,
+          this.dataLoader.bumpTexture
+        );
+      }
+    });
+
+    // create mappings while calculating running triangle offsets
+    const triangleOffsets: { [fileId: string]: number } = {};
+    for (let i = 0; i < geometryInfo.count; i++) {
+      this.dataLoader.loadData(geometryInfo);
+      this.dataMaps.treeIndexNodeIdMap[this.dataLoader.treeIndex] = this.dataLoader.nodeId;
+      this.dataMaps.colorMap[this.dataLoader.treeIndex] = this.dataLoader.color;
+
+      triangleOffsets[this.dataLoader.fileId] = triangleOffsets[this.dataLoader.fileId] || 0;
+      mergedMeshes[this.dataLoader.fileId].mappings.add(
+        triangleOffsets[this.dataLoader.fileId],
+        this.dataLoader.triangleCount,
+        this.dataLoader.treeIndex,
+        this.dataLoader.size
+      );
+      triangleOffsets[this.dataLoader.fileId] += this.dataLoader.triangleCount;
+    }
+
+    // add meshes to groups
+    Object.keys(mergedMeshes).forEach(fileId => {
+      mergedMeshGroup.addMesh(mergedMeshes[fileId]);
+    });
     return mergedMeshGroup;
   }
 
-  private unpackFilePrimitive(
+  private _unpackFilePrimitive(
     primitiveCompressedData: CompressedGeometryData,
     numberOfPrimitives: NumberOfPrimitives,
     primitiveGroupMap: PrimitiveGroupMap
