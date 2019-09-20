@@ -8,6 +8,15 @@ import { InstancedMeshGroup } from './geometry/InstancedMeshGroup';
 import CustomFileReader from './parsers/i3d/CustomFileReader';
 import { SectorCompressedData } from './parsers/i3d/sharedFileParserTypes';
 import GeometryUnpacker from './parsers/i3d/unpackGeometry/GeometryUnpacker';
+import { createSceneStats } from './SceneStats';
+import mergeInstancedMeshes from './optimizations/mergeInstancedMeshes';
+
+enum LoadStatus {
+  NotLoaded,
+  Loading,
+  Loaded,
+  LoadedWithError
+}
 
 export default class Sector {
   public readonly id: number;
@@ -27,6 +36,7 @@ export default class Sector {
   private geometryOffset: number = -1;
   private geometrySize: number = -1;
   private geometryUnpacker?: GeometryUnpacker;
+  private loadStatus: LoadStatus = LoadStatus.NotLoaded;
 
   constructor(id: number, min: THREE.Vector3, max: THREE.Vector3) {
     this.id = id;
@@ -65,6 +75,14 @@ export default class Sector {
   }
 
   loadGeometry() {
+    debugger;
+    switch (this.loadStatus) {
+      case LoadStatus.Loaded:
+      case LoadStatus.Loading:
+        return;
+
+      default:
+    }
     // tslint:disable-next-line: no-console
     console.error('loadGeometry');
     if (!this.fileReader) {
@@ -81,6 +99,7 @@ export default class Sector {
     this.primitiveGroups = unpacker.unpackPrimitives(data);
     this.mergedMeshGroup = unpacker.unpackMergedMeshes(data);
     this.instancedMeshGroup = unpacker.unpackInstancedMesh(data);
+    mergeInstancedMeshes(this, createSceneStats());
   }
 
   *traverseSectors(): IterableIterator<Sector> {

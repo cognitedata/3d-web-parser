@@ -30,9 +30,12 @@ export interface SectorMap {
 }
 
 export interface DataMaps {
+  // TODO 20190916 larsmoa: Replace the two maps below with a single
+  // datastructure for two-way map
   treeIndexNodeIdMap: TreeIndexNodeIdMap;
-  colorMap: ColorMap;
   nodeIdTreeIndexMap: Map<number, number>;
+
+  colorMap: ColorMap;
   sectors: SectorMap;
 }
 

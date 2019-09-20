@@ -24,9 +24,6 @@ export default class GeometryUnpacker {
   }
 
   public unpackPrimitives(compressedData: SectorCompressedData): PrimitiveGroup[] {
-    // TODO 20190912 larsmo: Remove sector argument and return primitiveGroups rather than
-    // updating the instance.
-
     // TODO 20190912 larsmoa: Original code "bubbled up" primitives to parent. I do not
     // think this is a good idea as it introduces a lot of complexities and runtime overhead.
     // Managing this in a streaming-solution will be a mess, so I would rather move the

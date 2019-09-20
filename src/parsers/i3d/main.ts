@@ -2,23 +2,12 @@
 
 import Sector from '../../Sector';
 import CustomFileReader from './CustomFileReader';
-import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
 import { createSceneStats } from '../../SceneStats';
 import { PerSectorCompressedData, UncompressedValues } from './sharedFileParserTypes';
 import { DataMaps, FilterOptions, ParseReturn } from '../parseUtils';
 import GeometryUnpacker from './unpackGeometry/GeometryUnpacker';
 
-function preloadMeshFiles(meshLoader: any, fileIds: number[]) {
-  fileIds.forEach(fileId => {
-    meshLoader.getGeometry(fileId);
-  });
-}
-
-export function parseFullCustomFile(
-  fileBuffer: ArrayBuffer,
-  meshLoader: any,
-  filterOptions?: FilterOptions
-): ParseReturn {
+export function parseFullCustomFile(fileBuffer: ArrayBuffer, filterOptions?: FilterOptions): ParseReturn {
   const fileReader = new CustomFileReader(fileBuffer);
   const maps: DataMaps = {
     treeIndexNodeIdMap: [],
@@ -26,10 +15,8 @@ export function parseFullCustomFile(
     nodeIdTreeIndexMap: new Map(),
     sectors: {}
   };
-  const compressedData: PerSectorCompressedData = {};
-
   // Read root sector
-  const rootSectorLength = fileReader.readUint32();
+  const rootSectorEnd = fileReader.readUint32();
   const rootSectorMetadata = fileReader.readSectorMetadata();
   const uncompressedValues = fileReader.readUncompressedValues();
 
@@ -42,16 +29,19 @@ export function parseFullCustomFile(
   const unpacker = new GeometryUnpacker(maps, uncompressedValues, filterOptions);
 
   maps.sectors[rootSectorMetadata.sectorId] = rootSector;
-  rootSector.setGeometryLoadInformation(unpacker, fileReader, fileReader.location, rootSectorLength);
-  compressedData[rootSector.path] = fileReader.readCompressedGeometryData(rootSectorLength);
+  rootSector.setGeometryLoadInformation(unpacker, fileReader, fileReader.location, rootSectorEnd);
+  // TODO 20190916 larsmoa: For some reason readCompressedGeometryData reads _past_ rootSectorEnd,
+  // hence seek() does not work. Fix this bug.
+  fileReader.readCompressedGeometryData(rootSectorEnd);
+  // fileReader.seek(rootSectorEnd);
 
   // Read remaining sectors
   while (fileReader.location < fileBuffer.byteLength) {
     const sectorStartLocation = fileReader.location;
-    const sectorByteLength = fileReader.readUint32();
+    const sectorEnd = fileReader.readUint32();
     const sectorMetadata = fileReader.readSectorMetadata();
     const sector = new Sector(rootSectorMetadata.sectorId, sectorMetadata.sectorBBoxMin, sectorMetadata.sectorBBoxMax);
-    // sector.setGeometryLoadInformation(fileReader, fileReader.location, sectorByteLength);
+    sector.setGeometryLoadInformation(unpacker, fileReader, sectorStartLocation, sectorEnd);
     maps.sectors[sectorMetadata.sectorId] = sector;
 
     const parentSector = maps.sectors[sectorMetadata.parentSectorId];
@@ -61,20 +51,27 @@ export function parseFullCustomFile(
     } else {
       throw Error('Parent sector not found');
     }
-    compressedData[sector.path] = fileReader.readCompressedGeometryData(sectorStartLocation + sectorByteLength);
+    // TODO 20190916 larsmoa: See TODO above.
+    fileReader.readCompressedGeometryData(rootSectorEnd);
+    // fileReader.seek(sectorEnd);
   }
 
-  for (const sector of rootSector.traverseSectors()) {
-    sector.loadGeometry();
-  }
-  return unpackData(rootSector, uncompressedValues, compressedData, maps);
+  // for (const sector of rootSector.traverseSectors()) {
+  //   console.log(`Load ${sector.path}...`);
+  //   sector.loadGeometry();
+  // }
+  return unpackData(rootSector, maps);
 }
 
+// TODO 20190917 larsmoa: parseMultipleCustomFiles() is used for "partial loads" which
+// will be depracated (?) when streaming is in place (or maybe a simple filter)
 export function parseMultipleCustomFiles(
   sectorBuffers: ArrayBuffer[],
   meshLoader: any,
   filterOptions?: FilterOptions
 ): ParseReturn {
+  // TODO 20190916 larsmoa: Re-implement parseMultipleCustomFiles()
+
   const maps: DataMaps = {
     treeIndexNodeIdMap: [],
     colorMap: [],
@@ -112,21 +109,15 @@ export function parseMultipleCustomFiles(
     throw Error('Did not find root sector');
   }
 
-  return unpackData(rootSector, uncompressedValues, compressedData, maps);
+  return unpackData(rootSector, maps);
 }
 
-function unpackData(
-  rootSector: Sector,
-  uncompressedValues: UncompressedValues,
-  compressedData: PerSectorCompressedData,
-  maps: DataMaps
-): ParseReturn {
+function unpackData(rootSector: Sector, maps: DataMaps): ParseReturn {
   const sceneStats = createSceneStats();
-  // unpackInstancedMeshes(rootSector, uncompressedValues, compressedData, maps, sceneStats);
+
   for (const sector of rootSector.traverseSectors()) {
-    mergeInstancedMeshes(sector, sceneStats);
-    sector.mergedMeshGroup.createTreeIndexMap();
-    sector.instancedMeshGroup.createTreeIndexMap();
+    // sector.mergedMeshGroup.createTreeIndexMap();
+    // sector.instancedMeshGroup.createTreeIndexMap();
 
     sceneStats.numSectors++;
     sector.primitiveGroups.forEach(primitiveGroup => {
