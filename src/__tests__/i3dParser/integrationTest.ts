@@ -27,11 +27,6 @@ function fileToArrayBuffer(filePath: string) {
   return asArrayBuffer;
 }
 
-class FakeMeshLoader {
-  constructor() {}
-  async loadGeometry(fileId: number) {}
-}
-
 describe('customFileIntegrationTest', () => {
   test('read any sector metadata', () => {
     const fileBuffer = fileToArrayBuffer(rootSectorFilePath);
@@ -99,7 +94,7 @@ describe('customFileIntegrationTest', () => {
 
   test('read multi-sector file', () => {
     const fileBuffer = fileToArrayBuffer(multiSectorFilePath);
-    const { rootSector, maps, sceneStats } = parseFullCustomFile(fileBuffer, new FakeMeshLoader());
+    const { rootSector, maps, sceneStats } = parseFullCustomFile(fileBuffer);
     Object.values(maps.sectors).forEach(sector => {
       sector.primitiveGroups.forEach(primitiveGroup => {
         expect(primitiveGroup.type).toBeDefined();
