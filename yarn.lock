@@ -5593,6 +5593,32 @@ statuses@~1.4.0:
   resolved "https://registry.yarnpkg.com/statuses/-/statuses-1.4.0.tgz#bb73d446da2796106efcc1b601a253d6c46bd087"
   integrity sha512-zhSCtt8v2NDrRlPQpCNtw/heZLtfUDqxBM1udqikb/Hbk52LK4nQSwr10u77iopCW5LsyHpuXS0GnEc48mLeew==
 
+ste-core@^1.6.1:
+  version "1.6.2"
+  resolved "https://registry.yarnpkg.com/ste-core/-/ste-core-1.6.2.tgz#51c38b9f05fba92a11280b2b96163aa401594acb"
+  integrity sha512-kAKOwrO1jSHxhzlX7UXKlYbA7GuDZ9OMII9FoAonw3ma1y4y1hgjBxCvLGUJLrd6JeR1Cbbn66zYjUZzfZASag==
+
+ste-events@^1.6.1:
+  version "1.6.2"
+  resolved "https://registry.yarnpkg.com/ste-events/-/ste-events-1.6.2.tgz#1433204df01fb17c72c8f5c8139578d4e3a8ebab"
+  integrity sha512-BgVvoyZhM77XFaFnoKO15DbpXaCOEaWSFl0assSaL1ygA7qYUqa0/zfGP0120lNgxrc+tjjidB7TYyHT6cIJjA==
+  dependencies:
+    ste-core "^1.6.1"
+
+ste-signals@^1.6.1:
+  version "1.6.2"
+  resolved "https://registry.yarnpkg.com/ste-signals/-/ste-signals-1.6.2.tgz#ff5bde4c4ada3b57ed8d78a48f7d01cccb681d0c"
+  integrity sha512-4SSWvM3HyyXD9NlSs1Qa7EarhMa8GdW3WCHM9O7zxlRDeCrFIAwFmKnVTezrhtQGyfb+w1sbyjgTglYKFAz0gw==
+  dependencies:
+    ste-core "^1.6.1"
+
+ste-simple-events@^1.6.1:
+  version "1.6.2"
+  resolved "https://registry.yarnpkg.com/ste-simple-events/-/ste-simple-events-1.6.2.tgz#97095217ecc06c4af82e9283c69843da174e5d41"
+  integrity sha512-BpZqZST4vcjQNBXo1MXQw9igngOCRMYhikkD74ZBVX4r2rUItPGaTtUw8uoH89zt6W1fIqqxYjLpj+VDAQDKjw==
+  dependencies:
+    ste-core "^1.6.1"
+
 stealthy-require@^1.1.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/stealthy-require/-/stealthy-require-1.1.1.tgz#35b09875b4ff49f26a777e509b3090a3226bf24b"
@@ -5704,6 +5730,16 @@ strip-json-comments@~2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/strip-json-comments/-/strip-json-comments-2.0.1.tgz#3c531942e908c2697c0ec344858c286c7ca0a60a"
   integrity sha1-PFMZQukIwml8DsNEhYwobHygpgo=
+
+strongly-typed-events@^1.6.2:
+  version "1.6.2"
+  resolved "https://registry.yarnpkg.com/strongly-typed-events/-/strongly-typed-events-1.6.2.tgz#5d3555faacc1d3989eb26cac06f75f3798c6aba5"
+  integrity sha512-TsOCVmoCoc4O6xs/n2uWk0wuKPisTfKxMn33VVco43XdcYEwgtaKzB+Z6/gSUGPfiVQTVux9SzwJJscUk9K81A==
+  dependencies:
+    ste-core "^1.6.1"
+    ste-events "^1.6.1"
+    ste-signals "^1.6.1"
+    ste-simple-events "^1.6.1"
 
 supports-color@^2.0.0:
   version "2.0.0"

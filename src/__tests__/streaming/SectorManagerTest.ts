@@ -1,3 +1,5 @@
+// Copyright 2019 Cognite AS
+
 import { SectorManagerImpl, SectorIdSet, createSectorIdSet, SectorId } from '../../streaming/SectorManager';
 import { SectorGeometryProvider } from '../../streaming/SectorGeometryProvider';
 import { SectorMetadataProvider } from '../../streaming/SectorMetadataProvider';
@@ -21,26 +23,16 @@ describe('SectorManagerImpl', () => {
     }
   }
 
-  class StubSectorGeometry implements SectorGeometry {
-    id: number;
-    primitiveGroups: PrimitiveGroup[];
-    mergedMeshGroup: MergedMeshGroup;
-    instancedMeshGroup: InstancedMeshGroup;
-
-    constructor(id: number) {
-      this.id = id;
-      this.primitiveGroups = [];
-      this.mergedMeshGroup = new MergedMeshGroup();
-      this.instancedMeshGroup = new InstancedMeshGroup();
-    }
-  }
-
   class MockSectorGeometryProvider implements SectorGeometryProvider {
     retrieve: (sectorId: number) => Promise<SectorGeometry>;
 
     constructor() {
       this.retrieve = (sectorId: SectorId) => {
-        return Promise.resolve(new StubSectorGeometry(sectorId));
+        const geometry: SectorGeometry = {
+          id: sectorId,
+          primitiveGroups: []
+        };
+        return Promise.resolve(geometry);
       };
     }
   }
