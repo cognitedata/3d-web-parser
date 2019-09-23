@@ -18,7 +18,7 @@ export default interface SectorManager {
   setActiveSectors(newActiveIds: SectorIdSet): Promise<SectorGeometry>[];
 }
 
-export class SectorManagerImpl implements SectorManager {
+export class DefaultSectorManager implements SectorManager {
   private readonly metadataProvider: SectorMetadataProvider;
   private readonly geometryProvider: SectorGeometryProvider;
 

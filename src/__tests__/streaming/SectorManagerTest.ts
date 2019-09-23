@@ -1,14 +1,13 @@
 // Copyright 2019 Cognite AS
 
-import { SectorManagerImpl, SectorIdSet, createSectorIdSet, SectorId } from '../../streaming/SectorManager';
+import { DefaultSectorManager, createSectorIdSet, SectorId } from '../../streaming/SectorManager';
 import { SectorGeometryProvider } from '../../streaming/SectorGeometryProvider';
 import { SectorMetadataProvider } from '../../streaming/SectorMetadataProvider';
 import { SectorGeometry } from '../../streaming/SectorGeometry';
 import { SectorMetadata } from '../../streaming/SectorMetadata';
 import * as THREE from 'three';
-import { PrimitiveGroup, MergedMeshGroup, InstancedMeshGroup, Sector } from '../..';
 
-describe('SectorManagerImpl', () => {
+describe('DefaultSectorManager', () => {
   class StubSectorMetadata implements SectorMetadata {
     id: number;
     depth: number;
@@ -48,17 +47,7 @@ describe('SectorManagerImpl', () => {
   const mockMetadataProvider = new MockSectorMetadataProvider();
   const mockGeometryProvider = new MockSectorGeometryProvider();
 
-  // const mockMetadataProvider: Mockify<SectorMetadataProvider> = {
-  //   readSectorTree: jest.fn(async () => {
-  //     return jest.fn<SectorMetadata>();
-  //   })
-  // };
-  // const mockGeometryProvider: Mockify<SectorGeometryProvider> = {
-  //   retrieve: jest.fn(async () => {
-  //     return jest.fn<SectorGeometry>();
-  //   })
-  // };
-  const manager = new SectorManagerImpl(mockMetadataProvider, mockGeometryProvider);
+  const manager = new DefaultSectorManager(mockMetadataProvider, mockGeometryProvider);
 
   test('initialize() retrieves metadata for sector tree', async () => {
     const readSectorTreeSpy = jest.spyOn(mockMetadataProvider, 'readSectorTree');
