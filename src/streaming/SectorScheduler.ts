@@ -1,66 +1,72 @@
 // Copyright 2019 Cognite AS
 
-import { EventDispatcher } from 'strongly-typed-events';
+import { Sema } from 'async-sema';
 import { SectorGeometry } from './SectorGeometry';
 import { SectorId } from './SectorManager';
-import { difference } from '../utils/setUtils';
 import { SectorGeometryLoader } from './SectorGeometryLoader';
 
 export interface SectorScheduler {
-  sectorLoaded: EventDispatcher<SectorScheduler, SectorGeometry>;
   /**
-   * Schedules the sectors provided for load and immediatly returns.
+   * Schedules the sector provided for load and immediatly returns.
    */
-  schedule(ids: SectorId[]): number;
+  schedule(id: SectorId): Promise<SectorGeometry>;
   /**
-   * Unschedules the sectors provided for load.
+   * Unschedules the sector provided for load. Returns true if
+   * the operation had any effect (i.e. it actually unscheduled
+   * an operation).
    */
-  unschedule(ids: SectorId[]): number;
+  unschedule(id: SectorId): boolean;
 }
 
 export class DefaultSectorScheduler implements SectorScheduler {
-  public sectorLoaded = new EventDispatcher<SectorScheduler, SectorGeometry>();
+  private static readonly DefaultConcurrentSectorsProcessings = 5;
 
   private readonly loader: SectorGeometryLoader;
+  private readonly scheduled = new Map<SectorId, Promise<SectorGeometry>>();
 
-  // Queued for processing
-  private queue: SectorId[] = [];
-  private queuedSet = new Set<SectorId>();
+  private readonly throttleSemaphore: Sema;
 
-  // Currently processing
-  private ongoing = new Set<SectorId>();
-
-  constructor(loader: SectorGeometryLoader) {
+  constructor(loader: SectorGeometryLoader, throttleSemaphore?: Sema) {
     this.loader = loader;
+    this.throttleSemaphore = throttleSemaphore || new Sema(DefaultSectorScheduler.DefaultConcurrentSectorsProcessings);
   }
 
-  schedule(ids: SectorId[]): number {
-    const newIds = difference(new Set<SectorId>(ids), this.queuedSet);
-    this.queue.push(...newIds);
-    for (const id of newIds) {
-      this.queuedSet.add(id);
+  schedule(id: SectorId): Promise<SectorGeometry> {
+    const alreadyScheduledPromise = this.scheduled.get(id);
+    if (alreadyScheduledPromise) {
+      return alreadyScheduledPromise;
     }
-    return newIds.size;
+
+    const operation = this.awaitTimeslotAndFetch(id);
+    this.scheduled.set(id, operation);
+    return operation;
   }
 
-  unschedule(ids: number[]): number {
-    const asSet = new Set<SectorId>(ids);
-    const countBeforeUnschedule = this.queuedSet.size;
-    this.queuedSet = difference(this.queuedSet, asSet);
-    this.queue = Array.from(this.queuedSet);
-    return countBeforeUnschedule - this.queuedSet.size;
-  }
-
-  startLoadingNextBatch(concurrentOngoing: number): number {
-    const toLoadCount = Math.max(0, Math.min(concurrentOngoing - this.ongoing.size, this.queue.length));
-
-    for (let i = 0; i < toLoadCount; ++i) {
-      const nextId = this.queue.pop()!;
-      this.queuedSet.delete(nextId);
-      this.ongoing.add(nextId);
-
-      this.loader.load(nextId).then(geometry => {}, error => {});
+  unschedule(id: SectorId): boolean {
+    // TODO 20190923 larsmoa: No way of canceling an ongoing promise. Could use
+    // bluebird.js or check a flag 'shouldCancel' within the promise logic.
+    if (this.scheduled.has(id)) {
+      this.scheduled.delete(id);
+      return true;
     }
-    return toLoadCount;
+    return false; // Not scheduled
+  }
+
+  private async awaitTimeslotAndFetch(id: SectorId): Promise<SectorGeometry> {
+    await this.throttleSemaphore.acquire();
+    try {
+      // TODO 20190923 larsmoa: Decide to use bluebird.js and use "promisify"
+      // to create a promise for load. Also: web worker.
+      const operation = new Promise<SectorGeometry>((resolve, reject) => {
+        try {
+          resolve(this.loader.load(id));
+        } catch (error) {
+          reject(error);
+        }
+      });
+      return await operation;
+    } finally {
+      this.throttleSemaphore.release();
+    }
   }
 }
