@@ -6,7 +6,7 @@ import { SectorMetadataProvider } from '../../streaming/SectorMetadataProvider';
 import { SectorGeometry } from '../../streaming/SectorGeometry';
 import { SectorMetadata } from '../../streaming/SectorMetadata';
 import * as THREE from 'three';
-import { PrimitiveGroup, MergedMeshGroup, InstancedMeshGroup } from '../..';
+import { PrimitiveGroup, MergedMeshGroup, InstancedMeshGroup, Sector } from '../..';
 
 describe('SectorManagerImpl', () => {
   class StubSectorMetadata implements SectorMetadata {
@@ -133,38 +133,45 @@ describe('SectorManagerImpl', () => {
       expect(retrieveSpy).toBeCalledWith(2);
     });
 
-    test('setActiveSectors() with one ID triggers sectorLoaded', async () => {
+    test('setActiveSectors() with one ID returns promises', async () => {
       // Arrange
       const ids = createSectorIdSet(0);
-      const sectorLoadedHandler = jest.fn();
-      manager.sectorLoaded.subscribe(sectorLoadedHandler);
       await manager.initialize();
 
       // Act
-      await manager.setActiveSectors(ids);
+      const promises = manager.setActiveSectors(ids);
 
       // Assert
-      expect(sectorLoadedHandler).toBeCalledTimes(1);
+      expect(promises.length).toBe(1);
     });
 
-    test('setActiveSensors() triggers sectorLoaded for successful sectors when some fails', async () => {
+    test('setActiveSensors() does not abort when one operation fails', async () => {
       // Arrange
       mockGeometryProvider.retrieve = jest.fn<Promise<SectorGeometry>>(async (id: number) => {
         if (id === 0xfa11) {
           throw new Error();
         }
-        return Promise.resolve(jest.fn<SectorGeometry>());
+        return jest.fn<SectorGeometry>();
       });
       const ids = createSectorIdSet(1, 0xfa11);
-      const sectorLoadedHandler = jest.fn();
-      manager.sectorLoaded.subscribe(sectorLoadedHandler);
       await manager.initialize();
+      let success = 0;
+      let failed = 0;
 
-      // Act & Assert
-      await expect(manager.setActiveSectors(ids)).rejects.toThrow();
+      // Act
+      const promises = manager.setActiveSectors(ids);
+      for (const p of promises) {
+        try {
+          await p;
+          success++;
+        } catch (error) {
+          failed++;
+        }
+      }
 
       // Assert
-      expect(sectorLoadedHandler).toBeCalledTimes(1);
+      expect(success).toBe(1);
+      expect(failed).toBe(1);
     });
   });
 });
