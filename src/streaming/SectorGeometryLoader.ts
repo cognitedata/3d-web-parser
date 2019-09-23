@@ -7,5 +7,5 @@ import { SectorId } from './SectorManager';
  * Interface for low level classes for loading sector geometry.
  */
 export interface SectorGeometryLoader {
-  load(id: SectorId): Promise<SectorGeometry>;
+  load(id: SectorId): SectorGeometry;
 }
