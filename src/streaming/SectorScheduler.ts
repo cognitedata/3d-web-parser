@@ -4,7 +4,7 @@ import { EventDispatcher } from 'strongly-typed-events';
 import { SectorGeometry } from './SectorGeometry';
 import { SectorId } from './SectorManager';
 import { difference } from '../utils/setUtils';
-import { SectorLoader } from './SectorLoader';
+import { SectorGeometryLoader } from './SectorGeometryLoader';
 
 export interface SectorScheduler {
   sectorLoaded: EventDispatcher<SectorScheduler, SectorGeometry>;
@@ -21,7 +21,7 @@ export interface SectorScheduler {
 export class DefaultSectorScheduler implements SectorScheduler {
   public sectorLoaded = new EventDispatcher<SectorScheduler, SectorGeometry>();
 
-  private readonly loader: SectorLoader;
+  private readonly loader: SectorGeometryLoader;
 
   // Queued for processing
   private queue: SectorId[] = [];
@@ -30,7 +30,7 @@ export class DefaultSectorScheduler implements SectorScheduler {
   // Currently processing
   private ongoing = new Set<SectorId>();
 
-  constructor(loader: SectorLoader) {
+  constructor(loader: SectorGeometryLoader) {
     this.loader = loader;
   }
 

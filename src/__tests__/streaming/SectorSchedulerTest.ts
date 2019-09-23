@@ -1,12 +1,12 @@
 // Copyright 2019 Cognite AS
 
-import { SectorLoader } from '../../streaming/SectorLoader';
+import { SectorGeometryLoader } from '../../streaming/SectorGeometryLoader';
 import { DefaultSectorScheduler } from '../../streaming/SectorScheduler';
 import { SectorGeometry } from '../../streaming/SectorGeometry';
 import { SectorId } from '../../streaming/SectorManager';
 
 describe('DefaultSectorScheduler', () => {
-  const loader: SectorLoader = {
+  const loader: SectorGeometryLoader = {
     load: jest.fn<SectorGeometry>(async (id: SectorId) => {
       const geometry: SectorGeometry = { id, primitiveGroups: [] };
       return geometry;
