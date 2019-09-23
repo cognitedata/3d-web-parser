@@ -3,7 +3,11 @@
 import { SimpleCache } from '../../utils/SimpleCache';
 
 describe('SimpleCache', () => {
-  const cache = new SimpleCache<number, object>();
+  let cache: SimpleCache<number, object>;
+
+  beforeEach(() => {
+    cache = new SimpleCache<number, object>();
+  });
 
   test('getOrAdd() adds new item on first add', async () => {
     // Arrange
@@ -37,6 +41,6 @@ describe('SimpleCache', () => {
     await cache.getOrAdd(2, factory);
 
     // Assert
-    expect(factory).toBeCalledTimes(2);
+    await expect(factory).toBeCalledTimes(2);
   });
 });
