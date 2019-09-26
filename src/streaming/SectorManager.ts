@@ -9,7 +9,7 @@ export type SectorsReadyCallback = (source: SectorManager) => void;
 export type SectorId = number;
 export type SectorIdSet = Set<SectorId>;
 
-export function createSectorIdSet(...ids: SectorId[]): SectorIdSet {
+export function createSectorIdSet(ids: Iterable<SectorId>): SectorIdSet {
   return new Set<number>(ids);
 }
 
@@ -42,6 +42,7 @@ export class DefaultSectorManager implements SectorManager {
 
   setActiveSectors(newActiveIds: SectorIdSet): Promise<SectorGeometry>[] {
     const promises: Promise<SectorGeometry>[] = [];
+    this.geometryProvider.prefetch(newActiveIds);
 
     for (const id of newActiveIds) {
       const operation = this.geometryProvider.retrieve(id);

@@ -2,10 +2,16 @@
 
 import { Sema } from 'async-sema';
 import { SectorGeometry } from './SectorGeometry';
-import { SectorId } from './SectorManager';
+import { SectorId, SectorIdSet, createSectorIdSet } from './SectorManager';
 import { SectorGeometryLoader } from './SectorGeometryLoader';
+import { CancellationError } from '../utils/CancellationError';
 
 export interface SectorScheduler {
+  /**
+   * Returns a list of currently scheduled, unfinished
+   * sectors.
+   */
+  readonly scheduled: SectorIdSet;
   /**
    * Schedules the sector provided for load and immediatly returns.
    */
@@ -22,9 +28,13 @@ export class DefaultSectorScheduler implements SectorScheduler {
   private static readonly DefaultConcurrentSectorsProcessings = 5;
 
   private readonly loader: SectorGeometryLoader;
-  private readonly scheduled = new Map<SectorId, Promise<SectorGeometry>>();
+  private readonly scheduledOperations = new Map<SectorId, Promise<SectorGeometry>>();
 
   private readonly throttleSemaphore: Sema;
+
+  get scheduled(): SectorIdSet {
+    return createSectorIdSet(this.scheduledOperations.keys());
+  }
 
   constructor(loader: SectorGeometryLoader, throttleSemaphore?: Sema) {
     this.loader = loader;
@@ -32,21 +42,21 @@ export class DefaultSectorScheduler implements SectorScheduler {
   }
 
   schedule(id: SectorId): Promise<SectorGeometry> {
-    const alreadyScheduledPromise = this.scheduled.get(id);
+    const alreadyScheduledPromise = this.scheduledOperations.get(id);
     if (alreadyScheduledPromise) {
       return alreadyScheduledPromise;
     }
 
     const operation = this.awaitTimeslotAndFetch(id);
-    this.scheduled.set(id, operation);
+    this.scheduledOperations.set(id, operation);
     return operation;
   }
 
   unschedule(id: SectorId): boolean {
     // TODO 20190923 larsmoa: No way of canceling an ongoing promise. Could use
     // bluebird.js or check a flag 'shouldCancel' within the promise logic.
-    if (this.scheduled.has(id)) {
-      this.scheduled.delete(id);
+    if (this.scheduledOperations.has(id)) {
+      this.scheduledOperations.delete(id);
       return true;
     }
     return false; // Not scheduled
@@ -59,6 +69,9 @@ export class DefaultSectorScheduler implements SectorScheduler {
       // to create a promise for load. Also: web worker.
       const operation = new Promise<SectorGeometry>((resolve, reject) => {
         try {
+          if (!this.isScheduled(id)) {
+            throw new CancellationError(`Sector ${id} has been unscheduled for load`);
+          }
           resolve(this.loader.load(id));
         } catch (error) {
           reject(error);
@@ -68,5 +81,9 @@ export class DefaultSectorScheduler implements SectorScheduler {
     } finally {
       this.throttleSemaphore.release();
     }
+  }
+
+  private isScheduled(id: SectorId): boolean {
+    return this.scheduledOperations.has(id);
   }
 }
