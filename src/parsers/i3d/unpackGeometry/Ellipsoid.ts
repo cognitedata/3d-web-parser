@@ -20,7 +20,7 @@ function addOpenEllipsoidSegment(
     data.normal,
     data.radiusA,
     data.radiusB,
-    data.radiusB * 2,
+    data.height,
     filterOptions
   );
 }
