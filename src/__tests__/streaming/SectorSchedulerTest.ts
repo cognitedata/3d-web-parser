@@ -52,11 +52,11 @@ describe('DefaultSectorScheduler', () => {
     await op1;
     // Load same again
     await scheduler.schedule(1);
-    expect(loader.load).toBeCalledWith(2);
+    expect(loader.load).toBeCalledTimes(2);
   });
 
   test('schedule() after unschedule() triggers new load', async () => {
-    await throttleSemaphore.acquire(); // Block load
+    await throttleSemaphore.acquire(); // Block load78
     try {
       const load1 = scheduler.schedule(1);
       scheduler.unschedule(1);

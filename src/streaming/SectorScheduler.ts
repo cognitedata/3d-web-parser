@@ -42,11 +42,14 @@ export class DefaultSectorScheduler implements SectorScheduler {
   }
 
   schedule(id: SectorId): Promise<SectorGeometry> {
+    console.log(`schedule(${id})`);
     const alreadyScheduledPromise = this.scheduledOperations.get(id);
     if (alreadyScheduledPromise) {
+      console.log(`already scheduled`);
       return alreadyScheduledPromise;
     }
 
+    console.log(`not scheduled`);
     const operation = this.awaitTimeslotAndFetch(id);
     this.scheduledOperations.set(id, operation);
     return operation;
@@ -79,6 +82,7 @@ export class DefaultSectorScheduler implements SectorScheduler {
       });
       return await operation;
     } finally {
+      this.scheduledOperations.delete(id);
       this.throttleSemaphore.release();
     }
   }
