@@ -4,12 +4,13 @@ import { DefaultSectorGeometryProvider } from '../../streaming/SectorGeometryPro
 import { SectorScheduler } from '../../streaming/SectorScheduler';
 import { SectorGeometry } from '../../streaming/SectorGeometry';
 import { Cache } from '../../utils/SimpleCache';
-import { SectorId } from '../../streaming/SectorManager';
+import { SectorId, createSectorIdSet } from '../../streaming/SectorManager';
 
 describe('DefaultSectorGeometryProvider', () => {
   const scheduler: SectorScheduler = {
+    scheduled: createSectorIdSet([]),
     schedule: jest.fn<SectorGeometry>(),
-    unschedule: jest.fn()
+    unschedule: jest.fn<boolean>()
   };
   const cache: Cache<SectorId, SectorGeometry> = {
     getOrAdd: jest.fn()
@@ -38,5 +39,16 @@ describe('DefaultSectorGeometryProvider', () => {
     // Assert
     expect(scheduler.schedule).not.toHaveBeenCalled();
     expect(result).toBe(stubGeometry);
+  });
+
+  test('prefetch() fetches all ids', async () => {
+    // Arrange
+    const getOrAddSpy = jest.spyOn(cache, 'getOrAdd');
+
+    // Act
+    provider.prefetch(new Set<SectorId>([1, 2, 3]));
+
+    // Assert
+    expect(getOrAddSpy).toBeCalledTimes(3);
   });
 });
