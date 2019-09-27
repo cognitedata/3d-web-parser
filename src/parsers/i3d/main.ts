@@ -14,6 +14,7 @@ function preloadMeshFiles(meshLoader: any, fileIds: number[]) {
   });
 }
 
+
 export function parseFullCustomFile(
   fileBuffer: ArrayBuffer,
   meshLoader: any,
