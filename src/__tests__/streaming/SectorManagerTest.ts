@@ -94,7 +94,7 @@ describe('DefaultSectorManager', () => {
       expect(sector).toEqual(rootSector);
     });
 
-    test('setActiveSectors() with empty array, retrieves nothing', async () => {
+    test('activateSectors() with empty array, retrieves nothing', async () => {
       // Arrange
       const retrieveSpy = jest.spyOn(mockGeometryProvider, 'retrieve');
       const emptyIdSet = createSectorIdSet([]);
@@ -107,7 +107,7 @@ describe('DefaultSectorManager', () => {
       expect(retrieveSpy).not.toBeCalled();
     });
 
-    test('setActiveSectors() with two IDs, retrieves geometry for each', async () => {
+    test('activateSectors() with two IDs, retrieves geometry for each', async () => {
       // Arrange
       const retrieveSpy = jest.spyOn(mockGeometryProvider, 'retrieve');
       const ids = createSectorIdSet([0, 2]);
@@ -121,7 +121,7 @@ describe('DefaultSectorManager', () => {
       expect(retrieveSpy).toBeCalledWith(2);
     });
 
-    test('setActiveSectors() with one ID returns promises', async () => {
+    test('activateSectors() with one ID returns promises', async () => {
       // Arrange
       const ids = createSectorIdSet([0]);
       await manager.initialize();
@@ -133,7 +133,36 @@ describe('DefaultSectorManager', () => {
       expect(promises.length).toBe(1);
     });
 
-    test('setActiveSensors() does not abort when one operation fails', async () => {
+    test('activateSectors() does not abort when one operation fails', async () => {
+      // Arrange
+      mockGeometryProvider.retrieve = jest.fn<Promise<SectorGeometry>>(async (id: number) => {
+        if (id === 0xfa11) {
+          throw new Error();
+        }
+        return jest.fn<SectorGeometry>();
+      });
+      const ids = createSectorIdSet([1, 0xfa11]);
+      await manager.initialize();
+      let success = 0;
+      let failed = 0;
+
+      // Act
+      const promises = manager.activateSectors(ids);
+      for (const p of promises) {
+        try {
+          await p;
+          success++;
+        } catch (error) {
+          failed++;
+        }
+      }
+
+      // Assert
+      expect(success).toBe(1);
+      expect(failed).toBe(1);
+    });
+
+    test('activateSectors() does not abort when one operation fails', async () => {
       // Arrange
       mockGeometryProvider.retrieve = jest.fn<Promise<SectorGeometry>>(async (id: number) => {
         if (id === 0xfa11) {

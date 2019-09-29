@@ -5,6 +5,7 @@ import { SectorScheduler } from '../../streaming/SectorScheduler';
 import { SectorGeometry } from '../../streaming/SectorGeometry';
 import { Cache } from '../../utils/SimpleCache';
 import { SectorId, createSectorIdSet } from '../../streaming/SectorManager';
+import { SectorGeometryParser } from '../../streaming/SectorGeometryParser';
 
 describe('DefaultSectorGeometryProvider', () => {
   const scheduler: SectorScheduler = {
@@ -12,11 +13,14 @@ describe('DefaultSectorGeometryProvider', () => {
     schedule: jest.fn<SectorGeometry>(),
     unschedule: jest.fn<boolean>()
   };
+  const parser: SectorGeometryParser = {
+    parseGeometry: jest.fn()
+  };
   const cache: Cache<SectorId, SectorGeometry> = {
     getOrAdd: jest.fn()
   };
 
-  const provider = new DefaultSectorGeometryProvider(scheduler, cache);
+  const provider = new DefaultSectorGeometryProvider(scheduler, parser, cache);
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -26,6 +30,7 @@ describe('DefaultSectorGeometryProvider', () => {
     cache.getOrAdd = (id, createCb) => createCb(id); // Cache miss
     await provider.retrieve(1);
     expect(scheduler.schedule).toBeCalledTimes(1);
+    expect(parser.parseGeometry).toBeCalledTimes(1);
   });
 
   test('retrieve() fetches from cache after sector has been loaded', async () => {

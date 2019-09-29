@@ -1,7 +1,6 @@
 // Copyright 2019 Cognite AS
 
 import { Sema } from 'async-sema';
-import { SectorGeometry } from './SectorGeometry';
 import { SectorId, SectorIdSet, createSectorIdSet } from './SectorManager';
 import { SectorGeometryLoader } from './SectorGeometryLoader';
 import { CancellationError } from '../utils/CancellationError';
@@ -15,7 +14,7 @@ export interface SectorScheduler {
   /**
    * Schedules the sector provided for load and immediatly returns.
    */
-  schedule(id: SectorId): Promise<SectorGeometry>;
+  schedule(id: SectorId): Promise<ArrayBuffer>;
   /**
    * Unschedules the sector provided for load. Returns true if
    * the operation had any effect (i.e. it actually unscheduled
@@ -28,7 +27,7 @@ export class DefaultSectorScheduler implements SectorScheduler {
   private static readonly DefaultConcurrentSectorsProcessings = 5;
 
   private readonly loader: SectorGeometryLoader;
-  private readonly scheduledOperations = new Map<SectorId, Promise<SectorGeometry>>();
+  private readonly scheduledOperations = new Map<SectorId, Promise<ArrayBuffer>>();
 
   private readonly throttleSemaphore: Sema;
 
@@ -41,7 +40,7 @@ export class DefaultSectorScheduler implements SectorScheduler {
     this.throttleSemaphore = throttleSemaphore || new Sema(DefaultSectorScheduler.DefaultConcurrentSectorsProcessings);
   }
 
-  schedule(id: SectorId): Promise<SectorGeometry> {
+  schedule(id: SectorId): Promise<ArrayBuffer> {
     console.log(`schedule(${id})`);
     const alreadyScheduledPromise = this.scheduledOperations.get(id);
     if (alreadyScheduledPromise) {
@@ -65,7 +64,7 @@ export class DefaultSectorScheduler implements SectorScheduler {
     return false; // Not scheduled
   }
 
-  private async awaitTimeslotAndFetch(id: SectorId): Promise<SectorGeometry> {
+  private async awaitTimeslotAndFetch(id: SectorId): Promise<ArrayBuffer> {
     await this.throttleSemaphore.acquire();
     try {
       // TODO 20190923 larsmoa: Decide to use bluebird.js and use "promisify"
@@ -73,7 +72,8 @@ export class DefaultSectorScheduler implements SectorScheduler {
       if (!this.isScheduled(id)) {
         throw new CancellationError(`Sector ${id} has been unscheduled for load`);
       }
-      return await this.loader.load(id);
+      const buffer = await this.loader.load(id);
+      return buffer;
     } finally {
       this.scheduledOperations.delete(id);
       this.throttleSemaphore.release();
