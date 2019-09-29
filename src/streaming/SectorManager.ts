@@ -10,12 +10,19 @@ export type SectorId = number;
 export type SectorIdSet = Set<SectorId>;
 
 export function createSectorIdSet(ids: Iterable<SectorId>): SectorIdSet {
-  return new Set<number>(ids);
+  return new Set<SectorId>(ids);
 }
 
-export default interface SectorManager {
+export function createSectorManager(
+  metadataProvider: SectorMetadataProvider,
+  geometryProvider: SectorGeometryProvider
+): SectorManager {
+  return new DefaultSectorManager(metadataProvider, geometryProvider);
+}
+
+export interface SectorManager {
   initialize(): Promise<SectorMetadata>;
-  setActiveSectors(newActiveIds: SectorIdSet): Promise<SectorGeometry>[];
+  activateSectors(newActiveIds: SectorIdSet): Promise<SectorGeometry>[];
 }
 
 export class DefaultSectorManager implements SectorManager {
@@ -40,7 +47,7 @@ export class DefaultSectorManager implements SectorManager {
     return rootSector;
   }
 
-  setActiveSectors(newActiveIds: SectorIdSet): Promise<SectorGeometry>[] {
+  activateSectors(newActiveIds: SectorIdSet): Promise<SectorGeometry>[] {
     const promises: Promise<SectorGeometry>[] = [];
     this.geometryProvider.prefetch(newActiveIds);
 

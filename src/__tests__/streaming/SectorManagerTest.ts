@@ -1,6 +1,6 @@
 // Copyright 2019 Cognite AS
 
-import { DefaultSectorManager, createSectorIdSet, SectorId } from '../../streaming/SectorManager';
+import { DefaultSectorManager, createSectorIdSet, SectorId, SectorIdSet } from '../../streaming/SectorManager';
 import { SectorGeometryProvider } from '../../streaming/SectorGeometryProvider';
 import { SectorMetadataProvider } from '../../streaming/SectorMetadataProvider';
 import { SectorGeometry } from '../../streaming/SectorGeometry';
@@ -24,6 +24,7 @@ describe('DefaultSectorManager', () => {
 
   class MockSectorGeometryProvider implements SectorGeometryProvider {
     retrieve: (sectorId: number) => Promise<SectorGeometry>;
+    prefetch: (sectorIds: SectorIdSet) => void;
 
     constructor() {
       this.retrieve = (sectorId: SectorId) => {
@@ -33,6 +34,7 @@ describe('DefaultSectorManager', () => {
         };
         return Promise.resolve(geometry);
       };
+      this.prefetch = (sectorIds: SectorIdSet) => {};
     }
   }
 
@@ -68,18 +70,15 @@ describe('DefaultSectorManager', () => {
     const unitBox = new THREE.Box3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(1, 1, 1));
     const rootSector: SectorMetadata = {
       id: 0,
-      depth: 2,
       bounds: unitBox,
       children: [
         {
           id: 1,
-          depth: 1,
           bounds: unitBox,
           children: []
         },
         {
           id: 2,
-          depth: 1,
           bounds: unitBox,
           children: []
         }
@@ -98,11 +97,11 @@ describe('DefaultSectorManager', () => {
     test('setActiveSectors() with empty array, retrieves nothing', async () => {
       // Arrange
       const retrieveSpy = jest.spyOn(mockGeometryProvider, 'retrieve');
-      const emptyIdSet = createSectorIdSet();
+      const emptyIdSet = createSectorIdSet([]);
       await manager.initialize();
 
       // Act
-      await manager.setActiveSectors(emptyIdSet);
+      await manager.activateSectors(emptyIdSet);
 
       // Assert
       expect(retrieveSpy).not.toBeCalled();
@@ -111,11 +110,11 @@ describe('DefaultSectorManager', () => {
     test('setActiveSectors() with two IDs, retrieves geometry for each', async () => {
       // Arrange
       const retrieveSpy = jest.spyOn(mockGeometryProvider, 'retrieve');
-      const ids = createSectorIdSet(0, 2);
+      const ids = createSectorIdSet([0, 2]);
       await manager.initialize();
 
       // Act
-      await manager.setActiveSectors(ids);
+      await manager.activateSectors(ids);
 
       // Assert
       expect(retrieveSpy).toBeCalledWith(0);
@@ -124,11 +123,11 @@ describe('DefaultSectorManager', () => {
 
     test('setActiveSectors() with one ID returns promises', async () => {
       // Arrange
-      const ids = createSectorIdSet(0);
+      const ids = createSectorIdSet([0]);
       await manager.initialize();
 
       // Act
-      const promises = manager.setActiveSectors(ids);
+      const promises = manager.activateSectors(ids);
 
       // Assert
       expect(promises.length).toBe(1);
@@ -142,13 +141,13 @@ describe('DefaultSectorManager', () => {
         }
         return jest.fn<SectorGeometry>();
       });
-      const ids = createSectorIdSet(1, 0xfa11);
+      const ids = createSectorIdSet([1, 0xfa11]);
       await manager.initialize();
       let success = 0;
       let failed = 0;
 
       // Act
-      const promises = manager.setActiveSectors(ids);
+      const promises = manager.activateSectors(ids);
       for (const p of promises) {
         try {
           await p;

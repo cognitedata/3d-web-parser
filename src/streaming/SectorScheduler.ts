@@ -70,17 +70,10 @@ export class DefaultSectorScheduler implements SectorScheduler {
     try {
       // TODO 20190923 larsmoa: Decide to use bluebird.js and use "promisify"
       // to create a promise for load. Also: web worker.
-      const operation = new Promise<SectorGeometry>((resolve, reject) => {
-        try {
-          if (!this.isScheduled(id)) {
-            throw new CancellationError(`Sector ${id} has been unscheduled for load`);
-          }
-          resolve(this.loader.load(id));
-        } catch (error) {
-          reject(error);
-        }
-      });
-      return await operation;
+      if (!this.isScheduled(id)) {
+        throw new CancellationError(`Sector ${id} has been unscheduled for load`);
+      }
+      return await this.loader.load(id);
     } finally {
       this.scheduledOperations.delete(id);
       this.throttleSemaphore.release();

@@ -1,6 +1,7 @@
 // Copyright 2019 Cognite AS
 
 import { SectorMetadata } from './SectorMetadata';
+import { Sector } from '..';
 
 export interface SectorMetadataProvider {
   /**
@@ -9,10 +10,18 @@ export interface SectorMetadataProvider {
   readSectorTree(): Promise<SectorMetadata>;
 }
 
-export class SectorMetadataProviderImpl implements SectorMetadataProvider {
-  constructor() {}
+export class PreloadedSectorMetadataProvider implements SectorMetadataProvider {
+  private readonly rootSector: SectorMetadata;
 
-  async readSectorTree(): Promise<SectorMetadata> {
-    throw new Error('Method not implemented.');
+  constructor(rootSector: SectorMetadata) {
+    this.rootSector = rootSector;
   }
+
+  readSectorTree(): Promise<SectorMetadata> {
+    return Promise.resolve(this.rootSector);
+  }
+}
+
+export function createSectorMetadataProviderFromTree(rootSector: SectorMetadata): SectorMetadataProvider {
+  return new PreloadedSectorMetadataProvider(rootSector);
 }

@@ -3,7 +3,8 @@
 import { SectorGeometry } from './SectorGeometry';
 import { SectorId, SectorIdSet } from './SectorManager';
 import { Cache, SimpleCache } from '../utils/SimpleCache';
-import { SectorScheduler } from './SectorScheduler';
+import { SectorScheduler, DefaultSectorScheduler } from './SectorScheduler';
+import { SectorGeometryLoader } from './SectorGeometryLoader';
 
 /**
  * Interface for classes that provide sector geometry given ID. The provider
@@ -24,6 +25,11 @@ export interface SectorGeometryProvider {
   retrieve(sectorId: SectorId): Promise<SectorGeometry>;
 }
 
+export function createSectorGeometryProvider(loader: SectorGeometryLoader): SectorGeometryProvider {
+  const scheduler = new DefaultSectorScheduler(loader);
+  return new DefaultSectorGeometryProvider(scheduler);
+}
+
 export class DefaultSectorGeometryProvider implements SectorGeometryProvider {
   private readonly cache: Cache<SectorId, SectorGeometry>;
   private readonly scheduler: SectorScheduler;
@@ -39,6 +45,6 @@ export class DefaultSectorGeometryProvider implements SectorGeometryProvider {
   }
 
   async retrieve(sectorId: SectorId): Promise<SectorGeometry> {
-    return await this.cache.getOrAdd(sectorId, this.scheduler.schedule);
+    return await this.cache.getOrAdd(sectorId, id => this.scheduler.schedule(id));
   }
 }
