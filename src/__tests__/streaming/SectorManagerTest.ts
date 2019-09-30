@@ -6,6 +6,7 @@ import { SectorMetadataProvider } from '../../streaming/SectorMetadataProvider';
 import { SectorGeometry } from '../../streaming/SectorGeometry';
 import { SectorMetadata } from '../../streaming/SectorMetadata';
 import * as THREE from 'three';
+import { DataMaps } from '../../parsers/parseUtils';
 
 describe('DefaultSectorManager', () => {
   class StubSectorMetadata implements SectorMetadata {
@@ -28,9 +29,16 @@ describe('DefaultSectorManager', () => {
 
     constructor() {
       this.retrieve = (sectorId: SectorId) => {
+        const stubDataMaps: DataMaps = {
+          treeIndexNodeIdMap: [],
+          colorMap: [],
+          nodeIdTreeIndexMap: new Map<number, number>(),
+          sectors: {}
+        };
         const geometry: SectorGeometry = {
           id: sectorId,
-          primitiveGroups: []
+          primitiveGroups: [],
+          dataMaps: stubDataMaps
         };
         return Promise.resolve(geometry);
       };

@@ -3,7 +3,9 @@
 import { SectorMetadata } from './SectorMetadata';
 import { SectorGeometry } from './SectorGeometry';
 import { SectorMetadataProvider } from './SectorMetadataProvider';
-import { SectorGeometryProvider } from './SectorGeometryProvider';
+import { SectorGeometryProvider, createSectorGeometryProvider } from './SectorGeometryProvider';
+import { SectorGeometryLoader } from './SectorGeometryLoader';
+import { createSectorGeometryParser } from './SectorGeometryParser';
 
 export type SectorsReadyCallback = (source: SectorManager) => void;
 export type SectorId = number;
@@ -14,9 +16,12 @@ export function createSectorIdSet(ids: Iterable<SectorId>): SectorIdSet {
 }
 
 export function createSectorManager(
+  sectorFileVersion: number,
   metadataProvider: SectorMetadataProvider,
-  geometryProvider: SectorGeometryProvider
+  geometryLoader: SectorGeometryLoader
 ): SectorManager {
+  const parser = createSectorGeometryParser(sectorFileVersion);
+  const geometryProvider = createSectorGeometryProvider(geometryLoader, parser);
   return new DefaultSectorManager(metadataProvider, geometryProvider);
 }
 

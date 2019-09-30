@@ -85,8 +85,4 @@ describe('DefaultSectorScheduler', () => {
       throttleSemaphore.release();
     }
   });
-
-  test('schedule() ', async () => {
-
-  });
 });

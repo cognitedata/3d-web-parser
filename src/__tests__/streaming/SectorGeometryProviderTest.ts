@@ -6,6 +6,7 @@ import { SectorGeometry } from '../../streaming/SectorGeometry';
 import { Cache } from '../../utils/SimpleCache';
 import { SectorId, createSectorIdSet } from '../../streaming/SectorManager';
 import { SectorGeometryParser } from '../../streaming/SectorGeometryParser';
+import { DataMaps } from '../../parsers/parseUtils';
 
 describe('DefaultSectorGeometryProvider', () => {
   const scheduler: SectorScheduler = {
@@ -35,7 +36,13 @@ describe('DefaultSectorGeometryProvider', () => {
 
   test('retrieve() fetches from cache after sector has been loaded', async () => {
     // Arrange
-    const stubGeometry: SectorGeometry = { id: 1, primitiveGroups: [] };
+    const stubDataMaps: DataMaps = {
+      treeIndexNodeIdMap: [],
+      colorMap: [],
+      nodeIdTreeIndexMap: new Map<number, number>(),
+      sectors: {}
+    };
+    const stubGeometry: SectorGeometry = { id: 1, primitiveGroups: [], dataMaps: stubDataMaps };
     cache.getOrAdd = () => Promise.resolve(stubGeometry);
 
     // Act

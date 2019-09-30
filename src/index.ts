@@ -38,3 +38,4 @@ export { SectorMetadataProvider, createSectorMetadataProviderFromTree } from './
 export { SectorGeometryProvider, createSectorGeometryProvider } from './streaming/SectorGeometryProvider';
 export { SectorGeometryLoader } from './streaming/SectorGeometryLoader';
 export { SectorGeometry } from './streaming/SectorGeometry';
+export { SectorGeometryParser, createSectorGeometryParser } from './streaming/SectorGeometryParser';
