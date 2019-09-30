@@ -74,6 +74,6 @@
   "dependencies": {
     "async-sema": "^3.0.1",
     "protobufjs": "^6.8.8",
-    "strongly-typed-events": "^1.6.2"
+    "reveal-utils": "./rust/pkg/"
   }
 }
