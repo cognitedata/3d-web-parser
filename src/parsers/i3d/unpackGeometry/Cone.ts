@@ -21,6 +21,7 @@ const globalVertex = new THREE.Vector3();
 const globalRotation = new THREE.Quaternion();
 const globalCapZAxis = new THREE.Vector3();
 const globalCapXAxis = new THREE.Vector3();
+const globalVector = new THREE.Vector3();
 
 export function addOpenCone(
   groups: { [name: string]: PrimitiveGroup },
@@ -62,6 +63,14 @@ export function addOpenEccentricCone(
     .copy(data.normal)
     .multiplyScalar(-data.height / 2)
     .add(data.center);
+
+  const capNormal = data.capNormal;
+
+  const dotProduct = capNormal.dot(globalVector.copy(globalCenterA).sub(globalCenterB));
+  if (dotProduct < 0) {
+    capNormal.negate();
+  }
+
   (groups.EccentricCone as EccentricConeGroup).add(
     data.nodeId,
     data.treeIndex,
@@ -70,7 +79,7 @@ export function addOpenEccentricCone(
     globalCenterB,
     data.radiusA,
     data.radiusB,
-    data.normal,
+    capNormal,
     filterOptions
   );
 }
@@ -112,7 +121,7 @@ export function addClosedEccentricCone(
     data.treeIndex,
     data.size,
     globalCenterA,
-    data.normal,
+    data.capNormal,
     data.radiusA,
     filterOptions
   );
@@ -121,7 +130,7 @@ export function addClosedEccentricCone(
     data.treeIndex,
     data.size,
     globalCenterB,
-    data.normal,
+    data.capNormal,
     data.radiusB,
     filterOptions
   );
