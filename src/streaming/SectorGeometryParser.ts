@@ -2,12 +2,18 @@
 import { SectorGeometry } from './SectorGeometry';
 import { SectorId } from './SectorManager';
 import parseProtobuf from '../parsers/protobuf/main';
+import { parseSceneI3D } from '../parsers/i3d/main';
 
 export interface SectorGeometryParser {
   parseGeometry(id: SectorId, buffer: ArrayBuffer): Promise<SectorGeometry>;
 }
 
+export const supportedGeometryFileVersions = [1, 2, 3, 7];
+
 export function createSectorGeometryParser(version: number): SectorGeometryParser {
+  if (!supportedGeometryFileVersions.includes(version)) {
+    throw new Error(`Unsupported file version: ${version} (Supported versions: ${supportedGeometryFileVersions})`);
+  }
   if (version <= 4) {
     return new ProtobufSectorGeometryParser();
   }
@@ -27,7 +33,13 @@ export class ProtobufSectorGeometryParser implements SectorGeometryParser {
 }
 
 export class I3DSectorGeometryParser implements SectorGeometryParser {
-  parseGeometry(id: number, buffer: ArrayBuffer): Promise<SectorGeometry> {
-    throw new Error('Not implemented.');
+  async parseGeometry(id: number, buffer: ArrayBuffer): Promise<SectorGeometry> {
+    const { rootSector, sceneStats, maps } = await parseSceneI3D(buffer);
+    return Promise.resolve<SectorGeometry>({
+      id: rootSector.id,
+      primitiveGroups: rootSector.primitiveGroups,
+      instancedMeshGroup: rootSector.instancedMeshGroup,
+      dataMaps: maps
+    });
   }
 }

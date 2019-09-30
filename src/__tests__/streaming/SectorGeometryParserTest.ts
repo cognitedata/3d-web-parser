@@ -1,6 +1,11 @@
 // Copyright 2019 Cognite AS
 
-import { ProtobufSectorGeometryParser } from '../../streaming/SectorGeometryParser';
+import {
+  ProtobufSectorGeometryParser,
+  I3DSectorGeometryParser,
+  createSectorGeometryParser,
+  supportedGeometryFileVersions
+} from '../../streaming/SectorGeometryParser';
 
 // https://stackoverflow.com/a/21797381/167251
 function base64ToArrayBuffer(base64: string): ArrayBuffer {
@@ -13,6 +18,11 @@ function base64ToArrayBuffer(base64: string): ArrayBuffer {
   return bytes.buffer as ArrayBuffer;
 }
 
+function isRunningUnderNodeJS(): boolean {
+  // https://github.com/flexdinesh/browser-or-node/blob/master/src/index.js
+  return typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
+}
+
 describe('ProtobufSectorGeometryParser', () => {
   const parser = new ProtobufSectorGeometryParser();
   const base64ValidData =
@@ -22,5 +32,33 @@ describe('ProtobufSectorGeometryParser', () => {
   test('parseGeometry() with valid buffer returns geometry', async () => {
     const geometry = await parser.parseGeometry(1, validProtobufSectorBuffer);
     expect(geometry).not.toBeNull();
+  });
+});
+
+describe('I3DSectorGeometryParser', () => {
+  const parser = new I3DSectorGeometryParser();
+  const base64ValidData =
+    'nwUAAEkzREYFAAAAAQAAAAAAAAAAAAAA///////////7p4PE1BaxxNS3F8MqPvlCAIDtRMK9/EMRAAAADwAAAATlGhoAgP9NAGZmTQBNTWYAM8xmAIAamQD//wAA/wD/AOXl5QCZmU0AgDNNAE1mTQAA//8AAP8AAAAA/wAUAAAABNj+rEOIsI1D7trnQzuqlUPVRr1DVPvhQzXlxUM4pKlDJYmyQzNbmkPM1KVDnyOwQ+a6O0TFZ7dD8CAIRIvHwEPAJ85DDmvaQ6ES30PzTblDBAAAAASZg6E0AACWwwAAFsQAAGHECgAAAAQAAOFEAIC7RAAAlkQAAGFEAAAWRAAAlkOyfggzAACWwwAAFsQAAGHEAQAAAASBEpO1BwAAAAwAAAAAAAAAAAAAgD+BWBG/h+lKP2uWYz6BWBE/h+lKv2uWY77lZus+laamPaNhYj8AAAAAAAAAAAAAgL9DH5O+AAAAABo0dT/gkVa/YtG8PrK+zT4BAAAABAAASEMFAAAABAAASEMAgLtCAAAvQvI8aUNfzlBDBQAAAAQAAMhCAABIQgAAoEEAAKBCAADIQRUAAAAEAAAAANsPyUBlg5BA2w9JQO6HBEA5Y+0+MzOzPgAAgD7bD7lA2w+ZQBfdukDjaQ4/8zQHPyZyqDzbD8m/C+yDv9HYKz/yNIc/RX/aPypVhkAY/ynAAgAAAAS4apLDrWAXxAIAAAAEpaSTxAAAlsQCAAAABNOYkkH6pZA/AQAAAAQWk5BCAQAAAARdFrVCAQAAAATEo8pCAgAAAAgfOawLAAAAAKOKBQsAAAAAAQIAAAALCwAAAD5Kq9PfXB5K3OQcbQQag40bT7/pxOP0//wCAgAAAAgHAAAA3owYjLyBEX9yACKYjwmy2/fRlv/wAwEAAAAKBQAAAEArNtFlXxeBk/n+8AQBAAAACQUAAAA3wiYw4UkeAYec/8AFAQAAAAsHAAAAiC2CuefFBy0Yux67eYAGAQAAAAoFAAAABV+TsICQDZjbez2ABwIAAAAMDAAAAC1+2j5ZyRd23EfuQVwaVnLce++zUZh8f94zCQEAAAAJBQAAAKgwLDz3bxwO02e3gAsCAAAACQgAAABwKRqSbU4eD5z8d+a+Dhju3vYmOzf7DAIAAAAKCgAAANQioVN4SwzVe7TLM+sDkZ5x/3yzO4994A0CAAAACgwAAABYQGyNPssMGKHEJoviEgOHO09+DCcMs0/8GA4BAAAACgUAAABDz2k7L+0ahk1ue94PAQAAAAkFAAAAWPHZU6BvHQYZ3PfgEAEAAAALBwAAADBQybyvLxcrR1mPmN4wEQEAAAAKBQAAAO5KDvTbFR2TG9+ewBQBAAAACQQAAAD/0Rkn+44JC7vP3hUCAAAACwsAAAAiwnqxui4c3P5r+tQuC057veOzS5/f4xmAFgIAAAAJCAAAAHClqnzF5Q7zN6fRhG0ZNN37eRps/3gXAgAAAAcHAAAAoKMvZ5lyHBKSyB10KQtd9n6neZ+AGAIAAAAJCgAAAIiNaUBB3Bj4W37eFmUJi5xnf445w7veMB4BAAAADwcAAADgaz5t4/4bq3Tx/+5zdh8BAAAADwgAAAAtnDV4wpQIrZse/3OYtWAgAgAAABARAAAAGd1UUo3DDv+BjCSqux+mzsPfntYZddDZMw/89rDTjCECAAAAEBIAAADxbGUC1CUON6OCsaSwHhGx4f+YzWGnGLc2Hvzs1hl1gCQCAAAAEQ8AAACvs/IE3gMDq0YjAcvPC0HXmv9579tHWu173nv2wCUCAAAAERAAAADQWwqXlQUXtd5fcOVPDCYMbXvedn7ZDBh6/3mM/bBkAQAAAAUFAAAAd/YW2d2JEHpBCNYMZQIAAAAPEgAAAHqOpvOdWh+XVtKiAtESSb1CWse9GT/0N6hLWrewOHL/';
+  const validI3DSectorBuffer = base64ToArrayBuffer(base64ValidData);
+
+  if (!isRunningUnderNodeJS()) {
+    // TODO 20190930 larsmoa: WASM loading does not currently work under NodeJS (v12.10)
+    // See https://rustwasm.github.io/docs/wasm-bindgen/reference/deployment.html#nodejs
+    test('parseGeometry() with valid buffer returns geometry', async () => {
+      const geometry = await parser.parseGeometry(1, validI3DSectorBuffer);
+      expect(geometry).not.toBeNull();
+    });
+  }
+});
+
+describe('createSectorGeometryParser', () => {
+  test('createSectorGeometryParser() throws error for unsupported version', () => {
+    expect(() => createSectorGeometryParser(4)).toThrowError();
+  });
+
+  test('createSectorGeometryParser() returns parser for all supported versions', () => {
+    supportedGeometryFileVersions.forEach(version => {
+      expect(createSectorGeometryParser(version)).not.toBeNull();
+    });
   });
 });
