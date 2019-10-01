@@ -41,14 +41,11 @@ export class DefaultSectorScheduler implements SectorScheduler {
   }
 
   schedule(id: SectorId): Promise<ArrayBuffer> {
-    console.log(`schedule(${id})`);
     const alreadyScheduledPromise = this.scheduledOperations.get(id);
     if (alreadyScheduledPromise) {
-      console.log(`already scheduled`);
       return alreadyScheduledPromise;
     }
 
-    console.log(`not scheduled`);
     const operation = this.awaitTimeslotAndFetch(id);
     this.scheduledOperations.set(id, operation);
     return operation;
