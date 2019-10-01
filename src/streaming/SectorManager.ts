@@ -28,6 +28,8 @@ export function createSectorManager(
 export interface SectorManager {
   initialize(): Promise<SectorMetadata>;
   activateSectors(newActiveIds: SectorIdSet): Promise<SectorGeometry>[];
+  traverseSectorsBreadthFirst(visitor: (sector: SectorMetadata) => boolean): void;
+  traverseSectorsDepthFirst(visitor: (sector: SectorMetadata) => boolean): void;
 }
 
 export class DefaultSectorManager implements SectorManager {
@@ -46,8 +48,9 @@ export class DefaultSectorManager implements SectorManager {
   async initialize(): Promise<SectorMetadata> {
     const rootSector = await this.metadataProvider.readSectorTree();
     this.rootSector = rootSector;
-    traverseSectorDepthFirst(this.rootSector, sector => {
+    traverseSectorsDepthFirst(this.rootSector, sector => {
       this.sectorById.set(sector.id, sector);
+      return true;
     });
     return rootSector;
   }
@@ -62,13 +65,40 @@ export class DefaultSectorManager implements SectorManager {
     }
     return promises;
   }
-}
 
-function traverseSectorDepthFirst(rootSector: SectorMetadata, visitor: (sector: SectorMetadata) => void) {
-  if (rootSector.children) {
-    for (const child of rootSector.children) {
-      traverseSectorDepthFirst(child, visitor);
+  traverseSectorsBreadthFirst(visitor: (sector: SectorMetadata) => boolean): void {
+    if (this.rootSector) {
+      traverseSectorsBreadthFirst(this.rootSector, visitor);
     }
   }
-  visitor(rootSector);
+
+  traverseSectorsDepthFirst(visitor: (sector: SectorMetadata) => boolean): void {
+    if (this.rootSector) {
+      traverseSectorsDepthFirst(this.rootSector, visitor);
+    }
+  }
+}
+
+function traverseSectorsDepthFirst(rootSector: SectorMetadata, visitor: (sector: SectorMetadata) => boolean): void {
+  if (!visitor(rootSector)) {
+    return;
+  }
+
+  if (rootSector.children) {
+    for (const child of rootSector.children) {
+      traverseSectorsDepthFirst(child, visitor);
+    }
+  }
+}
+
+function traverseSectorsBreadthFirst(root: SectorMetadata, visitor: (sector: SectorMetadata) => boolean): void {
+  const queue: SectorMetadata[] = [root];
+
+  let next: SectorMetadata | undefined = queue.shift();
+  while (next) {
+    if (visitor(next)) {
+      queue.push(...next.children);
+    }
+    next = queue.shift();
+  }
 }

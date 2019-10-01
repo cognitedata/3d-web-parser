@@ -11,13 +11,11 @@ import { DataMaps } from '../../parsers/parseUtils';
 describe('DefaultSectorManager', () => {
   class StubSectorMetadata implements SectorMetadata {
     id: number;
-    depth: number;
     bounds: THREE.Box3;
     children: SectorMetadata[];
 
-    constructor(id: number, depth: number, bounds?: THREE.Box3, children?: SectorMetadata[]) {
+    constructor(id: number, bounds?: THREE.Box3, children?: SectorMetadata[]) {
       this.id = id;
-      this.depth = depth;
       this.bounds = bounds || new THREE.Box3();
       this.children = children || [];
     }
@@ -50,7 +48,7 @@ describe('DefaultSectorManager', () => {
     readSectorTree: () => Promise<SectorMetadata>;
 
     constructor() {
-      this.readSectorTree = () => Promise.resolve(new StubSectorMetadata(0, 1));
+      this.readSectorTree = () => Promise.resolve(new StubSectorMetadata(0));
     }
   }
 
@@ -197,6 +195,98 @@ describe('DefaultSectorManager', () => {
       // Assert
       expect(success).toBe(1);
       expect(failed).toBe(1);
+    });
+
+    describe('traversal', () => {
+      const traverseDepthFirstName = DefaultSectorManager.prototype.traverseSectorsDepthFirst.name;
+      const traverseBreadthFirstName = DefaultSectorManager.prototype.traverseSectorsBreadthFirst.name;
+
+      beforeEach(async () => {
+        const root: SectorMetadata = {
+          id: 0,
+          bounds: unitBox,
+          children: [
+            {
+              id: 1,
+              bounds: unitBox,
+              children: [
+                {
+                  id: 3,
+                  bounds: unitBox,
+                  children: []
+                }
+              ]
+            },
+            {
+              id: 2,
+              bounds: unitBox,
+              children: []
+            }
+          ]
+        };
+        mockMetadataProvider.readSectorTree = jest.fn(() => root);
+        await manager.initialize();
+      });
+
+      test(`${traverseDepthFirstName} traverses in correct order`, async () => {
+        // Arrange
+        const visitedOrder: SectorId[] = [];
+        const visitor = (sector: SectorMetadata) => {
+          visitedOrder.push(sector.id);
+          return true;
+        };
+
+        // Act
+        manager.traverseSectorsDepthFirst(visitor);
+
+        // Assert
+        expect(visitedOrder.join(',')).toBe([0, 1, 3, 2].join(','));
+      });
+
+      test(`${traverseDepthFirstName} with cutoff, traverses in correct order`, async () => {
+        // Arrange
+        const visitedOrder: SectorId[] = [];
+        const visitor = (sector: SectorMetadata) => {
+          visitedOrder.push(sector.id);
+          return sector.id !== 1;
+        };
+
+        // Act
+        manager.traverseSectorsDepthFirst(visitor);
+
+        // Assert
+        expect(visitedOrder.join(',')).toBe([0, 1, 2].join(','));
+      });
+
+      test(`${traverseBreadthFirstName} traverses in correct order`, async () => {
+        // Arrange
+        const visitedOrder: SectorId[] = [];
+        const visitor = (sector: SectorMetadata) => {
+          visitedOrder.push(sector.id);
+          return true;
+        };
+
+        // Act
+        manager.traverseSectorsBreadthFirst(visitor);
+
+        // Assert
+        expect(visitedOrder.join(',')).toBe([0, 1, 2, 3].join(','));
+      });
+
+      test(`${traverseBreadthFirstName} with cutoff, stops processing subtree`, async () => {
+        // Arrange
+        const visitedOrder: SectorId[] = [];
+        const visitor = (sector: SectorMetadata) => {
+          visitedOrder.push(sector.id);
+          return sector.id !== 1;
+        };
+
+        // Act
+        manager.traverseSectorsBreadthFirst(visitor);
+
+        // Assert
+        expect(visitedOrder.join(',')).toBe([0, 1, 2].join(','));
+      });
     });
   });
 });
