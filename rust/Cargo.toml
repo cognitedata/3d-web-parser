@@ -19,7 +19,7 @@ serde-wasm-bindgen = "0.1.3"
 serde_bytes = "0.11.2"
 byteorder = "1.3.2"
 openctm = { git = "https://github.com/cognitedata/openctm-rs", rev="cbaf8e71b34485bde009cfe9ebf29d1e06233a8f" }
-i3df = { git = "https://github.com/cognitedata/reveal-rs", rev="4e8749d79158f7c0c624756b5ad91b1ea7b65942" }
+i3df = { path = "../../../../reveal-rs/dragly/more-geometries/i3df" }
 
 [dependencies.web-sys]
 version = "0.3.4"

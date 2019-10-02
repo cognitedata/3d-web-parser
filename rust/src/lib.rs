@@ -120,8 +120,6 @@ pub fn load_i3df(array_buffer_value: JsValue) -> Scene {
 
     assert!(array_buffer_value.is_instance_of::<ArrayBuffer>());
 
-    console_log!("HELLO WORLD");
-
     let uint8_array = Uint8Array::new(&array_buffer_value);
     let mut result = vec![0; uint8_array.byte_length() as usize];
     uint8_array.copy_to(&mut result);

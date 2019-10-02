@@ -7,7 +7,7 @@ import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
 import { SceneStats, createSceneStats } from '../../SceneStats';
 import { PerSectorCompressedData, UncompressedValues } from './sharedFileParserTypes';
 import { DataMaps, FilterOptions, ParseReturn } from '../parseUtils';
-import { BoxGroup, CircleGroup, ConeGroup, PrimitiveGroup } from '../../geometry/GeometryGroups';
+import { BoxGroup, CircleGroup, ConeGroup, EccentricConeGroup, PrimitiveGroup } from '../../geometry/GeometryGroups';
 import * as THREE from 'three';
 //import * as reveal from 'reveal-utils';
 const revealModule = import('reveal-utils');
@@ -60,7 +60,7 @@ export async function parseSceneI3D(
 
   const scene = reveal.load_i3df(fileBuffer);
   const sectorCount = scene.sector_count();
-  console.log("SCENE HELLO", scene);
+  console.log("SCENE HELLOs", scene);
   for (let i = 0; i < sectorCount; i++) {
     console.log("Loading sector", i);
     const sector_id = scene.sector_id(i);
@@ -119,6 +119,25 @@ export async function parseSceneI3D(
       group.data.arrays['angle'] = collection.angle();
       group.data.arrays['arcAngle'] = collection.arc_angle();
       group.data.arrays['localXAxis'] = collection.local_x_axis();
+
+      const nodeIds = collection.node_id();
+      const colors = collection.color();
+      setupMaps(group, maps, colors, nodeIds);
+
+      group.sort();
+      sector.primitiveGroups.push(group);
+    }
+    {
+      const group = new EccentricConeGroup(0);
+      const collection = fileSector.eccentric_cone_collection();
+      group.treeIndex = collection.tree_index();
+      group.data.count = group.treeIndex.length;
+      group.data.arrays['centerA'] = collection.center_a();
+      group.data.arrays['centerB'] = collection.center_b();
+      group.data.arrays['size'] = collection.size();
+      group.data.arrays['radiusA'] = collection.radius_a();
+      group.data.arrays['radiusB'] = collection.radius_b();
+      group.data.arrays['normal'] = collection.normal();
 
       const nodeIds = collection.node_id();
       const colors = collection.color();
