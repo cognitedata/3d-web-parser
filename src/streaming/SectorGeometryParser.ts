@@ -2,7 +2,7 @@
 import { SectorGeometry } from './SectorGeometry';
 import { SectorId } from './SectorManager';
 import parseProtobuf from '../parsers/protobuf/main';
-import { parseSceneI3D } from '../parsers/i3d/main';
+import { parseSceneI3D, parseMultipleCustomFiles } from '../parsers/i3d/main';
 
 export interface SectorGeometryParser {
   parseGeometry(id: SectorId, buffer: ArrayBuffer): Promise<SectorGeometry>;
@@ -35,10 +35,13 @@ export class ProtobufSectorGeometryParser implements SectorGeometryParser {
 export class I3DSectorGeometryParser implements SectorGeometryParser {
   async parseGeometry(id: number, buffer: ArrayBuffer): Promise<SectorGeometry> {
     const { rootSector, sceneStats, maps } = await parseSceneI3D(buffer);
+    // TODO 20191009 larsmoa: Horrible hack to account for that we always read sector 0 first.
+    const maxId = Math.max(...Object.values(maps.sectors).map(s => s.id));
+    const sector = maps.sectors[maxId];
     return Promise.resolve<SectorGeometry>({
-      id: rootSector.id,
-      primitiveGroups: rootSector.primitiveGroups,
-      instancedMeshGroup: rootSector.instancedMeshGroup,
+      id: sector.id,
+      primitiveGroups: sector.primitiveGroups,
+      instancedMeshGroup: sector.instancedMeshGroup,
       dataMaps: maps
     });
   }
