@@ -11,11 +11,13 @@ import { DataMaps } from '../../parsers/parseUtils';
 describe('DefaultSectorManager', () => {
   class StubSectorMetadata implements SectorMetadata {
     id: number;
+    path: string;
     bounds: THREE.Box3;
     children: SectorMetadata[];
 
-    constructor(id: number, bounds?: THREE.Box3, children?: SectorMetadata[]) {
+    constructor(id: number, path: string, bounds?: THREE.Box3, children?: SectorMetadata[]) {
       this.id = id;
+      this.path = path;
       this.bounds = bounds || new THREE.Box3();
       this.children = children || [];
     }
@@ -48,7 +50,7 @@ describe('DefaultSectorManager', () => {
     readSectorTree: () => Promise<SectorMetadata>;
 
     constructor() {
-      this.readSectorTree = () => Promise.resolve(new StubSectorMetadata(0));
+      this.readSectorTree = () => Promise.resolve(new StubSectorMetadata(0, '0/'));
     }
   }
 
@@ -76,15 +78,18 @@ describe('DefaultSectorManager', () => {
     const unitBox = new THREE.Box3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(1, 1, 1));
     const rootSector: SectorMetadata = {
       id: 0,
+      path: '0/',
       bounds: unitBox,
       children: [
         {
           id: 1,
+          path: '0/0/',
           bounds: unitBox,
           children: []
         },
         {
           id: 2,
+          path: '0/1/',
           bounds: unitBox,
           children: []
         }
@@ -198,27 +203,41 @@ describe('DefaultSectorManager', () => {
     });
 
     describe('traversal', () => {
-      const traverseDepthFirstName = DefaultSectorManager.prototype.traverseSectorsDepthFirst.name;
-      const traverseBreadthFirstName = DefaultSectorManager.prototype.traverseSectorsBreadthFirst.name;
-
       beforeEach(async () => {
         const root: SectorMetadata = {
           id: 0,
+          path: '0/',
           bounds: unitBox,
           children: [
             {
               id: 1,
+              path: '0/0/',
               bounds: unitBox,
               children: [
                 {
                   id: 3,
+                  path: '0/0/0/',
                   bounds: unitBox,
                   children: []
+                },
+                {
+                  id: 4,
+                  path: '0/0/1/',
+                  bounds: unitBox,
+                  children: [
+                    {
+                      id: 5,
+                      path: '0/0/1/0/',
+                      bounds: unitBox,
+                      children: []
+                    }
+                  ]
                 }
               ]
             },
             {
               id: 2,
+              path: '0/1/',
               bounds: unitBox,
               children: []
             }
@@ -228,7 +247,7 @@ describe('DefaultSectorManager', () => {
         await manager.initialize();
       });
 
-      test(`${traverseDepthFirstName} traverses in correct order`, async () => {
+      test(`traverseDepthFirst traverses in correct order`, async () => {
         // Arrange
         const visitedOrder: SectorId[] = [];
         const visitor = (sector: SectorMetadata) => {
@@ -240,10 +259,10 @@ describe('DefaultSectorManager', () => {
         manager.traverseSectorsDepthFirst(visitor);
 
         // Assert
-        expect(visitedOrder.join(',')).toBe([0, 1, 3, 2].join(','));
+        expect(visitedOrder.join(',')).toBe([0, 1, 3, 4, 5, 2].join(','));
       });
 
-      test(`${traverseDepthFirstName} with cutoff, traverses in correct order`, async () => {
+      test(`traverseDepthFirst with cutoff, traverses in correct order`, async () => {
         // Arrange
         const visitedOrder: SectorId[] = [];
         const visitor = (sector: SectorMetadata) => {
@@ -258,7 +277,22 @@ describe('DefaultSectorManager', () => {
         expect(visitedOrder.join(',')).toBe([0, 1, 2].join(','));
       });
 
-      test(`${traverseBreadthFirstName} traverses in correct order`, async () => {
+      test(`traverseDepthFirst with cutoff, does not stop processing sister`, async () => {
+        // Arrange
+        const visitedOrder: SectorId[] = [];
+        const visitor = (sector: SectorMetadata) => {
+          visitedOrder.push(sector.id);
+          return sector.id !== 3;
+        };
+
+        // Act
+        manager.traverseSectorsDepthFirst(visitor);
+
+        // Assert
+        expect(visitedOrder.join(',')).toBe([0, 1, 3, 4, 5, 2].join(','));
+      });
+
+      test(`traverseBreadthFirst traverses in correct order`, async () => {
         // Arrange
         const visitedOrder: SectorId[] = [];
         const visitor = (sector: SectorMetadata) => {
@@ -270,10 +304,10 @@ describe('DefaultSectorManager', () => {
         manager.traverseSectorsBreadthFirst(visitor);
 
         // Assert
-        expect(visitedOrder.join(',')).toBe([0, 1, 2, 3].join(','));
+        expect(visitedOrder.join(',')).toBe([0, 1, 2, 3, 4, 5].join(','));
       });
 
-      test(`${traverseBreadthFirstName} with cutoff, stops processing subtree`, async () => {
+      test(`traverseBreadthFirst with cutoff, stops processing subtree`, async () => {
         // Arrange
         const visitedOrder: SectorId[] = [];
         const visitor = (sector: SectorMetadata) => {

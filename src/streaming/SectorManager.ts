@@ -27,6 +27,7 @@ export function createSectorManager(
 
 export interface SectorManager {
   initialize(): Promise<SectorMetadata>;
+  findMetadata(id: SectorId): SectorMetadata | undefined;
   activateSectors(newActiveIds: SectorIdSet): Promise<SectorGeometry>[];
   traverseSectorsBreadthFirst(visitor: (sector: SectorMetadata) => boolean): void;
   traverseSectorsDepthFirst(visitor: (sector: SectorMetadata) => boolean): void;
@@ -53,6 +54,10 @@ export class DefaultSectorManager implements SectorManager {
       return true;
     });
     return rootSector;
+  }
+
+  findMetadata(id: SectorId): SectorMetadata | undefined {
+    return this.sectorById.get(id);
   }
 
   activateSectors(newActiveIds: SectorIdSet): Promise<SectorGeometry>[] {
