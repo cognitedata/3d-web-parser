@@ -7,6 +7,8 @@ import { SectorGeometry } from '../../streaming/SectorGeometry';
 import { SectorMetadata } from '../../streaming/SectorMetadata';
 import * as THREE from 'three';
 import { DataMaps } from '../../parsers/parseUtils';
+import 'jest-extended';
+import { expectSetEqual } from '../../TestUtils';
 
 describe('DefaultSectorManager', () => {
   class StubSectorMetadata implements SectorMetadata {
@@ -57,7 +59,11 @@ describe('DefaultSectorManager', () => {
   const mockMetadataProvider = new MockSectorMetadataProvider();
   const mockGeometryProvider = new MockSectorGeometryProvider();
 
-  const manager = new DefaultSectorManager(mockMetadataProvider, mockGeometryProvider);
+  const manager: DefaultSectorManager = new DefaultSectorManager(mockMetadataProvider, mockGeometryProvider);
+
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
 
   test('initialize() retrieves metadata for sector tree', async () => {
     const readSectorTreeSpy = jest.spyOn(mockMetadataProvider, 'readSectorTree');
@@ -132,16 +138,17 @@ describe('DefaultSectorManager', () => {
       expect(retrieveSpy).toBeCalledWith(2);
     });
 
-    test('activateSectors() with one ID returns promises', async () => {
+    test('activateSectors() with one ID returns one promise', async () => {
       // Arrange
       const ids = createSectorIdSet([0]);
       await manager.initialize();
 
       // Act
-      const promises = manager.activateSectors(ids);
+      const { newSectors, discardedSectorIds } = manager.activateSectors(ids);
 
       // Assert
-      expect(promises.length).toBe(1);
+      expect(newSectors.length).toBe(1);
+      expect(discardedSectorIds).toBeEmpty();
     });
 
     test('activateSectors() does not abort when one operation fails', async () => {
@@ -158,8 +165,8 @@ describe('DefaultSectorManager', () => {
       let failed = 0;
 
       // Act
-      const promises = manager.activateSectors(ids);
-      for (const p of promises) {
+      const { newSectors, discardedSectorIds } = manager.activateSectors(ids);
+      for (const p of newSectors) {
         try {
           await p;
           success++;
@@ -171,6 +178,7 @@ describe('DefaultSectorManager', () => {
       // Assert
       expect(success).toBe(1);
       expect(failed).toBe(1);
+      expect(discardedSectorIds).toBeEmpty();
     });
 
     test('activateSectors() does not abort when one operation fails', async () => {
@@ -187,8 +195,8 @@ describe('DefaultSectorManager', () => {
       let failed = 0;
 
       // Act
-      const promises = manager.activateSectors(ids);
-      for (const p of promises) {
+      const { newSectors, discardedSectorIds } = manager.activateSectors(ids);
+      for (const p of newSectors) {
         try {
           await p;
           success++;
@@ -200,6 +208,57 @@ describe('DefaultSectorManager', () => {
       // Assert
       expect(success).toBe(1);
       expect(failed).toBe(1);
+      expect(discardedSectorIds).toBeEmpty();
+    });
+
+    test('activateSectors() with already active set, schedules nothing', async () => {
+      // Arrange
+      const retrieveSpy = jest.spyOn(mockGeometryProvider, 'retrieve');
+      const ids = createSectorIdSet([1, 2, 3]);
+      await manager.initialize();
+      await manager.activateSectors(ids);
+      retrieveSpy.mockClear();
+
+      // Act
+      const { newSectors, discardedSectorIds } = manager.activateSectors(ids);
+
+      // Assert
+      expect(newSectors).toBeEmpty();
+      expect(retrieveSpy).not.toBeCalled();
+      expect(discardedSectorIds).toBeEmpty();
+    });
+
+    test('activateSectors() with some new ids, schedules only new and discards old', async () => {
+      // Arrange
+      const retrieveSpy = jest.spyOn(mockGeometryProvider, 'retrieve');
+      const ids = createSectorIdSet([1, 2, 3]);
+      await manager.initialize();
+      await manager.activateSectors(ids);
+      retrieveSpy.mockClear();
+
+      // Act
+      const newIds = createSectorIdSet([2, 3, 4]);
+      const { newSectors, discardedSectorIds } = manager.activateSectors(newIds);
+
+      // Assert
+      expect(newSectors.length).toBe(1);
+      expect(retrieveSpy).toBeCalledTimes(1);
+      expectSetEqual(discardedSectorIds, [1]);
+    });
+
+    test('activateSectors() with partially overlapping ids, discards unwanted sectors', async () => {
+      // Arrange
+      const ids = createSectorIdSet([1, 2, 3]);
+      await manager.initialize();
+      await manager.activateSectors(ids);
+
+      // Act
+      const newIds = createSectorIdSet([2, 3, 4, 5]);
+      const { newSectors, discardedSectorIds } = manager.activateSectors(newIds);
+
+      // Assert
+      expect(newSectors.length).toBe(2);
+      expectSetEqual(discardedSectorIds, [1]);
     });
 
     describe('traversal', () => {

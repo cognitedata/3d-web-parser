@@ -6,6 +6,7 @@ import { SectorMetadataProvider } from './SectorMetadataProvider';
 import { SectorGeometryProvider, createSectorGeometryProvider } from './SectorGeometryProvider';
 import { SectorGeometryLoader } from './SectorGeometryLoader';
 import { createSectorGeometryParser } from './SectorGeometryParser';
+import { setDifference } from '../utils/setUtils';
 
 export type SectorsReadyCallback = (source: SectorManager) => void;
 export type SectorId = number;
@@ -25,10 +26,21 @@ export function createSectorManager(
   return new DefaultSectorManager(metadataProvider, geometryProvider);
 }
 
+export type SectorDiff = {
+  /**
+   * Futures for sectors that are wanted, but not currently active.
+   */
+  newSectors: Promise<SectorGeometry>[];
+  /**
+   * Ids of sectors that should be discarded.
+   */
+  discardedSectorIds: SectorIdSet;
+};
+
 export interface SectorManager {
   initialize(): Promise<SectorMetadata>;
   findMetadata(id: SectorId): SectorMetadata | undefined;
-  activateSectors(newActiveIds: SectorIdSet): Promise<SectorGeometry>[];
+  activateSectors(wantedSectorIds: SectorIdSet): SectorDiff;
   traverseSectorsBreadthFirst(visitor: (sector: SectorMetadata) => boolean): void;
   traverseSectorsDepthFirst(visitor: (sector: SectorMetadata) => boolean): void;
 }
@@ -38,7 +50,8 @@ export class DefaultSectorManager implements SectorManager {
   private readonly geometryProvider: SectorGeometryProvider;
 
   private rootSector?: SectorMetadata;
-  private sectorById: Map<SectorId, SectorMetadata>;
+  private readonly sectorById: Map<SectorId, SectorMetadata>;
+  private activeSectorIds: SectorIdSet = createSectorIdSet([]);
 
   constructor(metadataProvider: SectorMetadataProvider, geometryProvider: SectorGeometryProvider) {
     this.metadataProvider = metadataProvider;
@@ -47,6 +60,7 @@ export class DefaultSectorManager implements SectorManager {
   }
 
   async initialize(): Promise<SectorMetadata> {
+    this.activeSectorIds = createSectorIdSet([]);
     const rootSector = await this.metadataProvider.readSectorTree();
     this.rootSector = rootSector;
     traverseSectorsDepthFirst(this.rootSector, sector => {
@@ -60,15 +74,18 @@ export class DefaultSectorManager implements SectorManager {
     return this.sectorById.get(id);
   }
 
-  activateSectors(newActiveIds: SectorIdSet): Promise<SectorGeometry>[] {
-    const promises: Promise<SectorGeometry>[] = [];
-    this.geometryProvider.prefetch(newActiveIds);
+  activateSectors(wantedSectorIds: SectorIdSet): SectorDiff {
+    const newIds = setDifference(wantedSectorIds, this.activeSectorIds);
+    const discardedSectorIds = setDifference(this.activeSectorIds, wantedSectorIds);
 
-    for (const id of newActiveIds) {
+    const promises: Promise<SectorGeometry>[] = [];
+    this.geometryProvider.prefetch(newIds);
+    for (const id of newIds) {
       const operation = this.geometryProvider.retrieve(id);
       promises.push(operation);
     }
-    return promises;
+    this.activeSectorIds = new Set<SectorId>(wantedSectorIds);
+    return { newSectors: promises, discardedSectorIds };
   }
 
   traverseSectorsBreadthFirst(visitor: (sector: SectorMetadata) => boolean): void {
