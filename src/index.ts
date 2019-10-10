@@ -32,7 +32,7 @@ export { TreeIndexNodeIdMap, ColorMap, SectorMap, DataMaps, ParseReturn } from '
 export { default as SceneStats } from './SceneStats';
 
 export { SectorId } from './streaming/SectorManager';
-export { SectorManager, createSectorManager, createSectorIdSet } from './streaming/SectorManager';
+export { SectorManager, createSectorManager, createSectorIdSet, SectorIdSet } from './streaming/SectorManager';
 export { SectorMetadata } from './streaming/SectorMetadata';
 export { SectorMetadataProvider, createSectorMetadataProviderFromTree } from './streaming/SectorMetadataProvider';
 export { SectorGeometryProvider, createSectorGeometryProvider } from './streaming/SectorGeometryProvider';
