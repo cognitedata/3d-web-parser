@@ -10,7 +10,7 @@ import { DataMaps, FilterOptions, ParseReturn } from '../parseUtils';
 import { BoxGroup, CircleGroup, ConeGroup, PrimitiveGroup } from '../../geometry/GeometryGroups';
 import * as THREE from 'three';
 //import * as reveal from 'reveal-utils';
-const revealModule = import('reveal-utils');
+const revealModule = import('../../../pkg');
 
 function preloadMeshFiles(meshLoader: any, fileIds: number[]) {
   fileIds.forEach(fileId => {
