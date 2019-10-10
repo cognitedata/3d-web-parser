@@ -45,7 +45,7 @@ export class DefaultSectorGeometryProvider implements SectorGeometryProvider {
     this.cache = cache || new SimpleCache<SectorId, SectorGeometry>();
   }
 
-  prefetch(sectorIds: Set<number>): void {
+  prefetch(sectorIds: Set<SectorId>): void {
     // Schedule all expected sectors for retrieval
     sectorIds.forEach(id => this.retrieve(id));
   }
