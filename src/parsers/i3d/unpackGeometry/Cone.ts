@@ -89,7 +89,7 @@ export function addClosedCone(
   data: PropertyLoader,
   filterOptions?: FilterOptions
 ) {
-  addOpenCone(groups, data);
+  addOpenCone(groups, data, filterOptions);
   (groups.Circle as CircleGroup).add(
     data.nodeId,
     data.treeIndex,
@@ -115,7 +115,7 @@ export function addClosedEccentricCone(
   data: PropertyLoader,
   filterOptions?: FilterOptions
 ) {
-  addOpenEccentricCone(groups, data);
+  addOpenEccentricCone(groups, data, filterOptions);
   (groups.Circle as CircleGroup).add(
     data.nodeId,
     data.treeIndex,
