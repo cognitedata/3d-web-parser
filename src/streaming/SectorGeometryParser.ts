@@ -2,7 +2,7 @@
 import { SectorGeometry } from './SectorGeometry';
 import { SectorId } from './SectorManager';
 import parseProtobuf from '../parsers/protobuf/main';
-import { parseSceneI3D, parseMultipleCustomFiles } from '../parsers/i3d/main';
+import { parseSceneI3D } from '../parsers/i3d/main';
 
 export interface SectorGeometryParser {
   parseGeometry(id: SectorId, buffer: ArrayBuffer): Promise<SectorGeometry>;
