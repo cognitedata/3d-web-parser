@@ -1,5 +1,7 @@
 // Copyright 2019 Cognite AS
 
+import 'jest-extended';
+
 interface Matrix4 {
   elements: Float32Array;
 }
@@ -54,4 +56,8 @@ export function expectColorValid(a: Color) {
 export function expectBoundingBoxEqual(a: BoundingBox, b: BoundingBox) {
   expectVector3Equal(a.min, b.min);
   expectVector3Equal(a.max, b.max);
+}
+
+export function expectSetEqual<T>(actual: Set<T>, expected: T[]) {
+  expect([...actual]).toIncludeSameMembers(expected);
 }
