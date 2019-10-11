@@ -38,7 +38,5 @@ module.exports = {
       TextEncoder: ['text-encoding', 'TextEncoder']
     })
   ],
-  //mode: 'production',
-  //target: 'node',
   mode: 'development'
 };

@@ -4,7 +4,7 @@
     "target": "es5",
     "declaration": true,
     "declarationDir": "dist",
-    "outDir": "dist-module",
+    "outDir": "not-in-use",
     "strict": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
