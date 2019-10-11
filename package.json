@@ -16,18 +16,22 @@
     "typescript"
   ],
   "files": [
-    "dist"
+      "dist",
+      "dist-module"
   ],
+  "module": "dist-module/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "clean": "rm -rf dist",
-    "prepublishOnly": "yarn build",
+    "prepublishOnly": "npm run build",
     "test": "jest --config=jest.config.js",
     "lint": "tslint -c tslint.json -p tsconfig.json",
     "lint:fix": "tslint -c tslint.json -p tsconfig.json --fix",
-    "build": "yarn clean && webpack -c && yarn esCheck",
-    "prepush": "yarn lint && yarn test",
+    "build": "npm run clean && tsc && webpack -c",
+    "buildold": "npm run clean && webpack -c && npm run esCheck",
+    "prepush": "npm run lint && npm run test",
     "esCheck": "es-check es5 './dist/index.js'",
-    "prepare": "yarn build",
+    "prepare": "npm run build",
     "serve": "webpack-dev-server"
   },
   "devDependencies": {
