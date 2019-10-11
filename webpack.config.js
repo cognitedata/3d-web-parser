@@ -2,9 +2,10 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 const WasmPackPlugin = require("@wasm-tool/wasm-pack-plugin");
+const nodeExternals = require('webpack-node-externals');
 
 module.exports = {
-  entry: './index.ts',
+  entry: './src/index.ts',
   module: {
     rules: [
       {
@@ -17,15 +18,15 @@ module.exports = {
       },
     ],
   },
+  externals: [nodeExternals()],
   resolve: {
-    extensions: [ '.tsx', '.ts', '.js' ],
+    extensions: [ '.tsx', '.ts', '.js', '.wasm' ],
   },
   output: {
     filename: 'index.js',
     path: path.resolve(__dirname, 'dist'),
   },
   plugins: [
-    new HtmlWebpackPlugin(),
     new WasmPackPlugin({
       crateDirectory: path.resolve(__dirname, ".")
     }),
@@ -38,5 +39,6 @@ module.exports = {
     })
   ],
   //mode: 'production',
+  //target: 'node',
   mode: 'development'
 };
