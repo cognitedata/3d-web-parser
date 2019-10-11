@@ -133,4 +133,57 @@ describe('GeneralCylinderGroup', () => {
     expect(group.data.getNumber('angle', 0)).toBeCloseTo(angle);
     expect(group.data.getNumber('arcAngle', 0)).toBeCloseTo(arcAngle);
   });
+
+  test(`add() maps angle input angle to range [-PI, PI] (RJ3D-460)`, () => {
+    const testCases: { inputAngle: number; expectedOutputAngle: number }[] = [
+      { inputAngle: 0.0, expectedOutputAngle: 0.0 },
+      { inputAngle: 1.0, expectedOutputAngle: 1.0 },
+      { inputAngle: -Math.PI / 2, expectedOutputAngle: -Math.PI / 2 },
+      { inputAngle: Math.PI + 0.2, expectedOutputAngle: -Math.PI + 0.2 },
+      { inputAngle: 2 * Math.PI, expectedOutputAngle: 0.0 },
+      { inputAngle: Math.PI, expectedOutputAngle: Math.PI },
+      { inputAngle: -Math.PI, expectedOutputAngle: -Math.PI }
+    ];
+    const nodeId = 1;
+    const treeIndex = 1;
+    const centerA = new THREE.Vector3(1, 2, 3);
+    const centerB = new THREE.Vector3(4, 5, 6);
+    const radius = 1.1;
+    const heightA = 2.1;
+    const heightB = 3.1;
+    const slopeA = 4.1;
+    const slopeB = 5.1;
+    const zAngleA = 6.1;
+    const zAngleB = 7.1;
+    const arcAngle = 1.05;
+    const size = Math.sqrt((2 * radius) ** 2 + centerA.distanceTo(centerB) ** 2);
+
+    for (const testCase of testCases) {
+      const group = new GeneralCylinderGroup(10);
+      group.add(
+        nodeId,
+        treeIndex,
+        size,
+        centerA,
+        centerB,
+        radius,
+        heightA,
+        heightB,
+        slopeA,
+        slopeB,
+        zAngleA,
+        zAngleB,
+        testCase.inputAngle,
+        arcAngle
+      );
+      group.setupAttributes();
+      const attributeIdx = group.attributes.findIndex(x => x.name === 'a_angle');
+
+      const dataOutputAngle = group.data.getNumber('angle', 0);
+      const attributeOutputAngle = group.attributes[attributeIdx].array[0];
+
+      expect(dataOutputAngle).toBeCloseTo(testCase.expectedOutputAngle);
+      expect(attributeOutputAngle).toBeCloseTo(testCase.expectedOutputAngle);
+    }
+  });
 });

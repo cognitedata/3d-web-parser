@@ -11,11 +11,11 @@ import {
   parsePrimitiveTreeIndex,
   getPrimitiveType,
   isPrimitive,
-  angleBetweenVector3s,
-  normalizeRadians
+  angleBetweenVector3s
 } from './protobufUtils';
 import { ParseData, FilterOptions } from '../parseUtils';
 import { xAxis, yAxis, zAxis } from '../../constants';
+import { normalizeRadians } from '../../MathUtils';
 
 const globalColor = new THREE.Color();
 const globalCenter = new THREE.Vector3();
