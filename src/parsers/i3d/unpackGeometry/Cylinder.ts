@@ -12,6 +12,7 @@ import {
   GeneralRingGroup
 } from '../../../geometry/GeometryGroups';
 import { FilterOptions } from '../../parseUtils';
+import { normalizeRadians } from '../../../MathUtils';
 
 const globalCenterA = new THREE.Vector3();
 const globalCenterB = new THREE.Vector3();
@@ -104,16 +105,6 @@ function angleBetweenVector3s(v1: THREE.Vector3, v2: THREE.Vector3, up: THREE.Ve
   const right = globalVector.copy(v1).cross(up);
   const moreThanPi = right.dot(v2) < 0;
   return normalizeRadians(moreThanPi ? 2 * Math.PI - angle : angle);
-}
-
-function normalizeRadians(angle: number, lowerBound = -Math.PI, upperBound = Math.PI): number {
-  while (angle < lowerBound) {
-    angle += 2 * Math.PI;
-  }
-  while (angle > upperBound) {
-    angle -= 2 * Math.PI;
-  }
-  return angle;
 }
 
 export function addOpenGeneralCylinder(
