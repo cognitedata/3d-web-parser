@@ -40,7 +40,7 @@
     "@types/node": "^10.12.12",
     "@types/three": "^0.93.28",
     "es-check": "^5.0.0",
-    "jest": "^23.6.0",
+    "jest": "^24.9.0",
     "prettier": "^1.15.2",
     "rollup": "^1.1.0",
     "rollup-plugin-json": "^3.1.0",

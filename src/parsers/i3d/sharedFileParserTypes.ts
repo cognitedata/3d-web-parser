@@ -73,7 +73,7 @@ export class NodeIdReader {
   nextNodeId(): number {
     let readValue = 0;
     for (let i = 0; i < BYTES_PER_NODE_ID; i++) {
-      readValue += this.dataView.getUint8(this.location + i) * Math.pow(2, 8 * (BYTES_PER_NODE_ID - 1 - i));
+      readValue += this.dataView.getUint8(this.location + i) * Math.pow(2, 8 * i);
     }
     this.location += BYTES_PER_NODE_ID;
     return readValue;

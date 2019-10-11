@@ -91,7 +91,7 @@ function addClosedExtrudedRingSegment(
   data: PropertyLoader,
   filterOptions?: FilterOptions
 ) {
-  addOpenExtrudedRingSegment(groups, data);
+  addOpenExtrudedRingSegment(groups, data, filterOptions);
 
   // quad 1
   globalQuadNorm
