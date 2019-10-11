@@ -1,5 +1,6 @@
 .rpt2_cache
 dist
+dist-module
 coverage
 node_modules
 src/geometry/*.js
