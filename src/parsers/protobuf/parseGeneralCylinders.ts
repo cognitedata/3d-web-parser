@@ -9,11 +9,11 @@ import {
   parsePrimitiveNodeId,
   parsePrimitiveTreeIndex,
   getPrimitiveType,
-  isPrimitive,
-  normalizeRadians
+  isPrimitive
 } from './protobufUtils';
 import { ParseData } from '../parseUtils';
 import { zAxis } from '../../constants';
+import { normalizeRadians } from '../../MathUtils';
 
 // reusable variables
 const color = new THREE.Color();
