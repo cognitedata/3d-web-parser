@@ -47,16 +47,19 @@ New patch releases are usually based on the release branch for the given minor v
     git checkout -b yourusername/release/x.y.z
     ```
 3. Cherry-pick your changes from the `master` branch or add new commits.
-4. Create a version commit by running.
+4. Update `package.json` with the correct version in the header.
+5. Push your branch
+    ```bash
+    git push
     ```
-    $ npm version patch
-    ```
-4. Push your branch with tags
-    ```
+6. Create a new pull requests from `yourusername/release/x.y.z` into the `release/x.y` branch.
+7. Wait for review and merge. After merge, switch to branch `release/x.y` and pull changes.
+8. Tag last commit with version, i.e. "vX.Y.Z".
+9. Push tag
+    ```bash
     git push --tags
     ```
-5. Create a new pull requests from `yourusername/release/x.y.z` into the `release/x.y` branch.
-6. A new version will be published when the PR is merged
+6. A new version will be published when the tag is pushed.
 
 ### How to release a new minor or major version
 
