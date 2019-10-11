@@ -45,16 +45,6 @@ export function isPrimitive(geometry: any): boolean {
   return geometry.primitiveInfo != null;
 }
 
-export function normalizeRadians(angle: number, lowerBound = -Math.PI, upperBound = Math.PI): number {
-  while (angle < lowerBound) {
-    angle += 2 * Math.PI;
-  }
-  while (angle > upperBound) {
-    angle -= 2 * Math.PI;
-  }
-  return angle;
-}
-
 // this returns angle between 0 and 2π
 export function angleBetweenVector3s(v1: THREE.Vector3, v2: THREE.Vector3, up: THREE.Vector3): number {
   const angle = v1.angleTo(v2);
