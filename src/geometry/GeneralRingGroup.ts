@@ -8,6 +8,7 @@ import PrimitiveGroupData from './PrimitiveGroupData';
 import { angleBetweenVector3s } from '../parsers/protobuf/protobufUtils';
 import { RenderedPrimitiveNameType } from './Types';
 import { normalize } from 'path';
+import { normalizeRadians } from '../MathUtils';
 
 // reusable variables
 const rotation = new THREE.Quaternion();
@@ -44,6 +45,7 @@ export default class GeneralRingGroup extends PrimitiveGroup {
     arcAngle: number,
     filterOptions?: FilterOptions
   ): boolean {
+    angle = normalizeRadians(angle);
     this.setTreeIndex(treeIndex, this.data.count);
     this.data.add({
       size,

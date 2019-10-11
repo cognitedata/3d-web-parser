@@ -9,6 +9,7 @@ import { computeEllipsoidBoundingBox } from './EllipsoidSegmentGroup';
 import { colorProperties } from './PrimitiveGroupDataParameters';
 import { RenderedPrimitiveNameType } from './Types';
 import { angleBetweenVector3s } from '../parsers/protobuf/protobufUtils';
+import { normalizeRadians } from '../MathUtils';
 
 const globalBox = new THREE.Box3();
 const normal = new THREE.Vector3();
@@ -65,6 +66,7 @@ export default class GeneralCylinderGroup extends PrimitiveGroup {
     arcAngle: number = Math.PI * 2.0,
     filterOptions?: FilterOptions
   ): boolean {
+    angle = normalizeRadians(angle);
     normal.subVectors(centerA, centerB).normalize();
     globalRotation.setFromUnitVectors(zAxis, normal);
 
