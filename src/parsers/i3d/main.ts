@@ -45,6 +45,17 @@ function setupMaps(group: PrimitiveGroup, maps: DataMaps, colors: Uint8Array, no
     }
 }
 
+export async function parseSectorI3D(
+  fileBuffer: ArrayBuffer,
+) {
+  const reveal = await revealModule;
+  const rootSector = reveal.parse_root_sector(fileBuffer);
+  const sector = reveal.parse_sector(rootSector, fileBuffer);
+  const renderableSector = reveal.convert_sector(sector);
+  console.log("YES!", renderableSector);
+  console.log("BOXES?", renderableSector.box_collection().center());
+}
+
 export async function parseSceneI3D(
   fileBuffer: ArrayBuffer,
   filterOptions?: FilterOptions, // TODO handle filterOptions

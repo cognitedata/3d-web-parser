@@ -19,7 +19,9 @@ use openctm;
 use serde_bytes;
 use serde;
 use byteorder::{ByteOrder, LittleEndian};
-use i3df::renderables::{Scene};
+
+#[macro_use]
+pub mod error;
 
 macro_rules! console_log {
     // Note that this is using the `log` function imported above during
@@ -113,19 +115,85 @@ pub fn load_ctm(array_buffer_value: JsValue) -> Result<JsValue, JsValue> {
 }
 
 #[wasm_bindgen]
-pub fn load_i3df(array_buffer_value: JsValue) -> Scene {
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct SectorHandle {
+    sector: i3df::Sector,
+}
+
+#[wasm_bindgen]
+pub fn parse_root_sector(array_buffer_value: JsValue) -> Result<SectorHandle, JsValue> {
     // TODO read https://rustwasm.github.io/docs/wasm-pack/tutorials/npm-browser-packages/building-your-project.html
     // and see if this can be moved to one common place
     panic::set_hook(Box::new(console_error_panic_hook::hook));
 
     assert!(array_buffer_value.is_instance_of::<ArrayBuffer>());
 
-    console_log!("HELLO WORLD");
+    let uint8_array = Uint8Array::new(&array_buffer_value);
+    let mut result = vec![0; uint8_array.byte_length() as usize];
+    uint8_array.copy_to(&mut result);
+    let cursor = std::io::Cursor::new(result);
+
+    // TODO see if it is possible to simplify this so we can use the ? operator instead
+    let sector = match i3df::parse_root_sector(cursor) {
+        Ok(x) => x,
+        Err(e) => return Err(JsValue::from(error::ParserError::from(e)))
+    };
+    Ok(SectorHandle {
+        sector
+    })
+}
+
+#[wasm_bindgen]
+pub fn parse_sector(root_sector: &SectorHandle, array_buffer_value: JsValue) -> Result<SectorHandle, JsValue> {
+    // TODO read https://rustwasm.github.io/docs/wasm-pack/tutorials/npm-browser-packages/building-your-project.html
+    // and see if this can be moved to one common place
+    panic::set_hook(Box::new(console_error_panic_hook::hook));
+
+    assert!(array_buffer_value.is_instance_of::<ArrayBuffer>());
 
     let uint8_array = Uint8Array::new(&array_buffer_value);
     let mut result = vec![0; uint8_array.byte_length() as usize];
     uint8_array.copy_to(&mut result);
-    let scene = i3df::parse_scene_to_renderables(std::io::Cursor::new(result)).unwrap();
-    scene
+    let cursor = std::io::Cursor::new(result);
+
+    let attributes = match &root_sector.sector.header.attributes {
+        Some(x) => x,
+        None => return Err(error!("Attributes missing on root sector")),
+    };
+
+    let sector = match i3df::parse_sector(attributes, cursor) {
+        Ok(x) => x,
+        Err(e) => return Err(JsValue::from(error::ParserError::from(e)))
+    };
+    Ok(SectorHandle {
+        sector
+    })
+}
+
+#[wasm_bindgen]
+pub fn convert_sector(sector: &SectorHandle) -> i3df::renderables::Sector {
+    i3df::renderables::convert_sector(&sector.sector)
+}
+
+#[wasm_bindgen]
+pub fn load_i3df(array_buffer_value: JsValue) -> Result<i3df::renderables::Scene, JsValue> {
+    // TODO read https://rustwasm.github.io/docs/wasm-pack/tutorials/npm-browser-packages/building-your-project.html
+    // and see if this can be moved to one common place
+    panic::set_hook(Box::new(console_error_panic_hook::hook));
+
+    assert!(array_buffer_value.is_instance_of::<ArrayBuffer>());
+
+    let uint8_array = Uint8Array::new(&array_buffer_value);
+    let mut result = vec![0; uint8_array.byte_length() as usize];
+    uint8_array.copy_to(&mut result);
+    let cursor = std::io::Cursor::new(result);
+
+    let file_scene = match i3df::parse_scene(cursor) {
+        Ok(x) => x,
+        Err(e) => return Err(JsValue::from(error::ParserError::from(e)))
+    };
+
+    let scene = i3df::renderables::convert_scene(&file_scene);
+    Ok(scene)
 }
 
