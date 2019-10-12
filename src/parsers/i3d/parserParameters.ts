@@ -479,7 +479,7 @@ export const renderedPrimitiveToAddFunction: {
     groups: { [name: string]: PrimitiveGroup },
     data: PropertyLoader,
     filterOptions?: FilterOptions
-  ) => void
+  ) => void;
 } = {
   Box: addBox,
   Circle: addCircle,
