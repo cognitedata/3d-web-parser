@@ -139,9 +139,9 @@
     minimist "^1.2.0"
 
 "@cognite/tslint-config-cognite-3d@^1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@cognite/tslint-config-cognite-3d/-/tslint-config-cognite-3d-1.0.3.tgz#ac939aaf77b008916a28a4015e41d854160f6581"
-  integrity sha512-mBGBbXyhoyNDLNBrC9t30hEudYEBCrApQMMsP7WPXkQ4K6bVEVMpm0FFeLCkNYfd9rvag3JKhD2nEBhYcOJDdQ==
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@cognite/tslint-config-cognite-3d/-/tslint-config-cognite-3d-1.0.4.tgz#14c1f9286da47e77aeb964219e298a6532530b52"
+  integrity sha512-xmjrpD3VOULgVkIZPF2hGQU0lK4IkCceCAhvD1PxuZW+pOqtDUkG8e3XFJlcizuPVj0zj03NBEamhEAWoZkSpA==
 
 "@jest/console@^24.7.1", "@jest/console@^24.9.0":
   version "24.9.0"
