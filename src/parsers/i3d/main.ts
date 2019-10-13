@@ -7,7 +7,7 @@ import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
 import { SceneStats, createSceneStats } from '../../SceneStats';
 import { PerSectorCompressedData, UncompressedValues } from './sharedFileParserTypes';
 import { DataMaps, FilterOptions, ParseReturn } from '../parseUtils';
-import { BoxGroup, CircleGroup, ConeGroup, PrimitiveGroup } from '../../geometry/GeometryGroups';
+import { BoxGroup, CircleGroup, ConeGroup, GeneralRingGroup, PrimitiveGroup, QuadGroup } from '../../geometry/GeometryGroups';
 import * as THREE from 'three';
 //import * as reveal from 'reveal-utils';
 const revealModule = import('../../../pkg');
@@ -123,16 +123,55 @@ export async function parseSceneI3D(
       const collection = fileSector.cone_collection();
       group.treeIndex = collection.tree_index();
       group.data.count = group.treeIndex.length;
+      group.data.arrays['size'] = collection.size();
       group.data.arrays['centerA'] = collection.center_a();
       group.data.arrays['centerB'] = collection.center_b();
-      group.data.arrays['size'] = collection.size();
       group.data.arrays['radiusA'] = collection.radius_a();
       group.data.arrays['radiusB'] = collection.radius_b();
       group.data.arrays['angle'] = collection.angle();
       group.data.arrays['arcAngle'] = collection.arc_angle();
       group.data.arrays['localXAxis'] = collection.local_x_axis();
 
-      const nodeIds = collection.node_id();
+      const nodeIds = [].slice.call(collection.node_id());
+      const colors = collection.color();
+      setupMaps(group, maps, colors, nodeIds);
+
+      group.sort();
+      sector.primitiveGroups.push(group);
+    }
+    {
+      const group = new GeneralRingGroup(0);
+      const collection = fileSector.general_ring_collection();
+      group.treeIndex = collection.tree_index();
+      group.data.count = group.treeIndex.length;
+      group.data.arrays['size'] = collection.size();
+      group.data.arrays['center'] = collection.center();
+      group.data.arrays['normal'] = collection.normal();
+      group.data.arrays['localXAxis'] = collection.local_x_axis();
+      group.data.arrays['radiusA'] = collection.radius_x();
+      group.data.arrays['radiusB'] = collection.radius_y();
+      group.data.arrays['thickness'] = collection.thickness();
+      group.data.arrays['angle'] = collection.angle();
+      group.data.arrays['arcAngle'] = collection.arc_angle();
+
+      const nodeIds = [].slice.call(collection.node_id());
+      const colors = collection.color();
+      setupMaps(group, maps, colors, nodeIds);
+
+      group.sort();
+      sector.primitiveGroups.push(group);
+    }
+    {
+      const group = new QuadGroup(0);
+      const collection = fileSector.quad_collection();
+      group.treeIndex = collection.tree_index();
+      group.data.count = group.treeIndex.length;
+      group.data.arrays['size'] = collection.size();
+      group.data.arrays['vertex1'] = collection.vertex_1();
+      group.data.arrays['vertex2'] = collection.vertex_2();
+      group.data.arrays['vertex3'] = collection.vertex_3();
+
+      const nodeIds = [].slice.call(collection.node_id());
       const colors = collection.color();
       setupMaps(group, maps, colors, nodeIds);
 

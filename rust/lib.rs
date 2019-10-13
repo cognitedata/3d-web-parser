@@ -190,7 +190,10 @@ pub fn load_i3df(array_buffer_value: JsValue) -> Result<i3df::renderables::Scene
 
     let file_scene = match i3df::parse_scene(cursor) {
         Ok(x) => x,
-        Err(e) => return Err(JsValue::from(error::ParserError::from(e)))
+        Err(e) => {
+            console_log!("ERROR {}", e);
+            return Err(JsValue::from(error::ParserError::from(e)))
+        }
     };
 
     let scene = i3df::renderables::convert_scene(&file_scene);
