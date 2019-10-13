@@ -16,8 +16,8 @@
     "typescript"
   ],
   "files": [
-      "dist",
-      "pkg"
+    "dist",
+    "pkg"
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -35,7 +35,7 @@
   "devDependencies": {
     "@cognite/tslint-config-cognite-3d": "^1.0.3",
     "@types/jest": "^23.3.12",
-    "@types/node": "^10.12.12",
+    "@types/node": "^12.7.12",
     "@types/three": "^0.93.28",
     "@wasm-tool/wasm-pack-plugin": "1.0.1",
     "es-check": "^5.0.0",
@@ -47,7 +47,7 @@
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.0.1",
-    "typescript": "^3.1.6"
+    "typescript": "^3.6.4"
   },
   "publishConfig": {
     "access": "public",
@@ -63,6 +63,7 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "protobufjs": "^6.8.8"
+    "protobufjs": "^6.8.8",
+    "text-encoding": "^0.7.0"
   }
 }
