@@ -79,7 +79,8 @@ export async function parseSceneI3D(
     const bbox_min = scene.sector_bbox_min(i);
     const bbox_max = scene.sector_bbox_max(i);
     console.log("Bbox", bbox_min, bbox_max);
-    const sector = new Sector(sector_id, new THREE.Vector3(bbox_min.x, bbox_min.y, bbox_min.z), new THREE.Vector3(bbox_max.x, bbox_max.y, bbox_max.z));
+    const sector = new Sector(sector_id, new THREE.Vector3(bbox_min[0], bbox_min[1], bbox_min[2]), new THREE.Vector3(bbox_max[0], bbox_max[1], bbox_max[2]));
+    console.log("SECTOR", sector.min.clone(), sector.max.clone());
     const fileSector = scene.sector(i);
 
     {
