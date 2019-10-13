@@ -32,8 +32,8 @@ function setupMaps(group: PrimitiveGroup, maps: DataMaps, colors: Uint8Array, no
     for (let i = 0; i < group.treeIndex.length; i++) {
       const treeIndex = group.treeIndex[i];
       const nodeId = nodeIds[i];
-      console.log("TREE INDEX", treeIndex);
-      console.log("NODE ID", nodeId);
+      //console.log("TREE INDEX", treeIndex);
+      //console.log("NODE ID", nodeId);
       const r = colors[i * 4 + 0] / 255;
       const g = colors[i * 4 + 1] / 255;
       const b = colors[i * 4 + 2] / 255;
