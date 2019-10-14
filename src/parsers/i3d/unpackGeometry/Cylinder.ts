@@ -12,6 +12,7 @@ import {
   GeneralRingGroup
 } from '../../../geometry/GeometryGroups';
 import { FilterOptions } from '../../parseUtils';
+import { normalizeRadians } from '../../../MathUtils';
 
 const globalCenterA = new THREE.Vector3();
 const globalCenterB = new THREE.Vector3();
@@ -106,16 +107,6 @@ function angleBetweenVector3s(v1: THREE.Vector3, v2: THREE.Vector3, up: THREE.Ve
   return normalizeRadians(moreThanPi ? 2 * Math.PI - angle : angle);
 }
 
-function normalizeRadians(angle: number, lowerBound = -Math.PI, upperBound = Math.PI): number {
-  while (angle < lowerBound) {
-    angle += 2 * Math.PI;
-  }
-  while (angle > upperBound) {
-    angle -= 2 * Math.PI;
-  }
-  return angle;
-}
-
 export function addOpenGeneralCylinder(
   groups: { [name: string]: PrimitiveGroup },
   data: PropertyLoader,
@@ -162,71 +153,83 @@ export function addOpenGeneralCylinder(
   );
 }
 
+function addCap(
+  groups: { [name: string]: PrimitiveGroup },
+  data: PropertyLoader,
+  isA: boolean,
+  thickness: number,
+  filterOptions?: FilterOptions
+) {
+  const center = isA ? globalCenterA : globalCenterB;
+  const slope = isA ? data.slopeA : data.slopeB;
+  const zAngle = isA ? data.zAngleA : data.zAngleB;
+
+  globalRotation.setFromUnitVectors(zAxis, data.normal);
+  globalSlicingPlaneNormal
+    .copy(zAxis)
+    .applyAxisAngle(yAxis, slope)
+    .applyAxisAngle(zAxis, zAngle)
+    .applyQuaternion(globalRotation);
+
+  const plane = globalPlanes[Number(Boolean(isA))];
+  plane.setFromNormalAndCoplanarPoint(globalSlicingPlaneNormal, center);
+
+  const capXAxis = xAxis
+    .clone()
+    .applyAxisAngle(yAxis, slope)
+    .applyAxisAngle(zAxis, zAngle)
+    .applyQuaternion(globalRotation)
+    .normalize();
+
+  globalVertex
+    .set(Math.cos(data.rotationAngle), Math.sin(data.rotationAngle), 0)
+    .applyQuaternion(globalRotation)
+    .normalize();
+
+  globalLineStart
+    .copy(globalVertex)
+    .multiplyScalar(data.radiusA)
+    .add(globalExtB)
+    .sub(data.normal);
+  globalLineEnd
+    .copy(globalVertex)
+    .multiplyScalar(data.radiusA)
+    .add(globalExtA)
+    .add(data.normal);
+  globalLine.set(globalLineStart, globalLineEnd);
+  plane.intersectLine(globalLine, globalVertex);
+
+  const capAngleAxis = globalVertex.sub(center).normalize();
+  const capAngle = angleBetweenVector3s(capAngleAxis, capXAxis, globalSlicingPlaneNormal);
+
+  (groups.GeneralRing as GeneralRingGroup).add(
+    data.nodeId,
+    data.treeIndex,
+    data.size,
+    center,
+    globalSlicingPlaneNormal,
+    capXAxis,
+    data.radiusA / Math.abs(Math.cos(slope)),
+    data.radiusA,
+    thickness,
+    capAngle,
+    data.arcAngle,
+    filterOptions
+  );
+}
 export function addClosedGeneralCylinder(
   groups: { [name: string]: PrimitiveGroup },
   data: PropertyLoader,
   filterOptions?: FilterOptions
 ) {
+  // TODO do not assume that the global objects are set by calling the function for open general
+  // cylinder - instead, everything should be set in here
   addOpenGeneralCylinder(groups, data, filterOptions);
-
+  // NOTE: the thickness of the closed general cylinder is not given from the file since it is
+  // always the radius of the cylinder
+  const thickness = data.radiusA;
   [true, false].forEach(isA => {
-    const center = isA ? globalCenterA : globalCenterB;
-    const slope = isA ? data.slopeA : data.slopeB;
-    const zAngle = isA ? data.zAngleA : data.zAngleB;
-    const radius = isA ? data.radiusA : data.radiusB;
-
-    globalRotation.setFromUnitVectors(zAxis, data.normal);
-    globalSlicingPlaneNormal
-      .copy(zAxis)
-      .applyAxisAngle(yAxis, slope)
-      .applyAxisAngle(zAxis, zAngle)
-      .applyQuaternion(globalRotation);
-
-    const plane = globalPlanes[Number(Boolean(isA))];
-    plane.setFromNormalAndCoplanarPoint(globalSlicingPlaneNormal, center);
-
-    const capXAxis = xAxis
-      .clone()
-      .applyAxisAngle(yAxis, slope)
-      .applyAxisAngle(zAxis, zAngle)
-      .applyQuaternion(globalRotation)
-      .normalize();
-
-    globalVertex
-      .set(Math.cos(data.rotationAngle), Math.sin(data.rotationAngle), 0)
-      .applyQuaternion(globalRotation)
-      .normalize();
-
-    globalLineStart
-      .copy(globalVertex)
-      .multiplyScalar(data.radiusA)
-      .add(globalExtB)
-      .sub(data.normal);
-    globalLineEnd
-      .copy(globalVertex)
-      .multiplyScalar(data.radiusA)
-      .add(globalExtA)
-      .add(data.normal);
-    globalLine.set(globalLineStart, globalLineEnd);
-    plane.intersectLine(globalLine, globalVertex);
-
-    const capAngleAxis = globalVertex.sub(center).normalize();
-    const capAngle = angleBetweenVector3s(capAngleAxis, capXAxis, globalSlicingPlaneNormal);
-
-    (groups.GeneralRing as GeneralRingGroup).add(
-      data.nodeId,
-      data.treeIndex,
-      data.size,
-      center,
-      globalSlicingPlaneNormal,
-      capXAxis,
-      radius / Math.abs(Math.cos(slope)),
-      radius,
-      data.thickness,
-      capAngle,
-      data.arcAngle,
-      filterOptions
-    );
+    addCap(groups, data, isA, thickness, filterOptions);
   });
 }
 
@@ -235,7 +238,10 @@ export function addSolidOpenGeneralCylinder(
   data: PropertyLoader,
   filterOptions?: FilterOptions
 ) {
-  addClosedGeneralCylinder(groups, data, filterOptions);
+  addOpenGeneralCylinder(groups, data, filterOptions);
+  [true, false].forEach(isA => {
+    addCap(groups, data, isA, data.thickness, filterOptions);
+  });
   const distFromBToExtB = data.radiusA * Math.tan(data.slopeB);
   const heightA = distFromBToExtB + data.height;
   const heightB = distFromBToExtB;

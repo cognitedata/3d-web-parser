@@ -7,10 +7,10 @@ import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
 import { SceneStats, createSceneStats } from '../../SceneStats';
 import { PerSectorCompressedData, UncompressedValues } from './sharedFileParserTypes';
 import { DataMaps, FilterOptions, ParseReturn } from '../parseUtils';
-import { BoxGroup, CircleGroup, ConeGroup, PrimitiveGroup } from '../../geometry/GeometryGroups';
+import { BoxGroup, CircleGroup, ConeGroup, GeneralRingGroup, PrimitiveGroup, QuadGroup } from '../../geometry/GeometryGroups';
 import * as THREE from 'three';
 //import * as reveal from 'reveal-utils';
-const revealModule = import('reveal-utils');
+const revealModule = import('../../../pkg');
 
 function preloadMeshFiles(meshLoader: any, fileIds: number[]) {
   fileIds.forEach(fileId => {
@@ -32,8 +32,8 @@ function setupMaps(group: PrimitiveGroup, maps: DataMaps, colors: Uint8Array, no
     for (let i = 0; i < group.treeIndex.length; i++) {
       const treeIndex = group.treeIndex[i];
       const nodeId = nodeIds[i];
-      console.log("TREE INDEX", treeIndex);
-      console.log("NODE ID", nodeId);
+      //console.log("TREE INDEX", treeIndex);
+      //console.log("NODE ID", nodeId);
       const r = colors[i * 4 + 0] / 255;
       const g = colors[i * 4 + 1] / 255;
       const b = colors[i * 4 + 2] / 255;
@@ -43,6 +43,17 @@ function setupMaps(group: PrimitiveGroup, maps: DataMaps, colors: Uint8Array, no
       maps.nodeIdTreeIndexMap[nodeId] = treeIndex;
       maps.treeIndexNodeIdMap[treeIndex] = nodeId;
     }
+}
+
+export async function parseSectorI3D(
+  fileBuffer: ArrayBuffer,
+) {
+  const reveal = await revealModule;
+  const rootSector = reveal.parse_root_sector(fileBuffer);
+  const sector = reveal.parse_sector(rootSector, fileBuffer);
+  const renderableSector = reveal.convert_sector(sector);
+  console.log("YES!", renderableSector);
+  console.log("BOXES?", renderableSector.box_collection().center());
 }
 
 export async function parseSceneI3D(
@@ -68,7 +79,8 @@ export async function parseSceneI3D(
     const bbox_min = scene.sector_bbox_min(i);
     const bbox_max = scene.sector_bbox_max(i);
     console.log("Bbox", bbox_min, bbox_max);
-    const sector = new Sector(sector_id, new THREE.Vector3(bbox_min.x, bbox_min.y, bbox_min.z), new THREE.Vector3(bbox_max.x, bbox_max.y, bbox_max.z));
+    const sector = new Sector(sector_id, new THREE.Vector3(bbox_min[0], bbox_min[1], bbox_min[2]), new THREE.Vector3(bbox_max[0], bbox_max[1], bbox_max[2]));
+    console.log("SECTOR", sector.min.clone(), sector.max.clone());
     const fileSector = scene.sector(i);
 
     {
@@ -82,7 +94,7 @@ export async function parseSceneI3D(
       group.data.arrays['angle'] = collection.rotation_angle();
       group.data.arrays['delta'] = collection.delta();
 
-      const nodeIds = collection.node_id();
+      const nodeIds = [].slice.call(collection.node_id());
       const colors = collection.color();
       setupMaps(group, maps, colors, nodeIds);
 
@@ -99,7 +111,7 @@ export async function parseSceneI3D(
       group.data.arrays['normal'] = collection.normal();
       group.data.arrays['radiusA'] = collection.radius();
 
-      const nodeIds = collection.node_id();
+      const nodeIds = [].slice.call(collection.node_id());
       const colors = collection.color();
       setupMaps(group, maps, colors, nodeIds);
 
@@ -111,16 +123,55 @@ export async function parseSceneI3D(
       const collection = fileSector.cone_collection();
       group.treeIndex = collection.tree_index();
       group.data.count = group.treeIndex.length;
+      group.data.arrays['size'] = collection.size();
       group.data.arrays['centerA'] = collection.center_a();
       group.data.arrays['centerB'] = collection.center_b();
-      group.data.arrays['size'] = collection.size();
       group.data.arrays['radiusA'] = collection.radius_a();
       group.data.arrays['radiusB'] = collection.radius_b();
       group.data.arrays['angle'] = collection.angle();
       group.data.arrays['arcAngle'] = collection.arc_angle();
       group.data.arrays['localXAxis'] = collection.local_x_axis();
 
-      const nodeIds = collection.node_id();
+      const nodeIds = [].slice.call(collection.node_id());
+      const colors = collection.color();
+      setupMaps(group, maps, colors, nodeIds);
+
+      group.sort();
+      sector.primitiveGroups.push(group);
+    }
+    {
+      const group = new GeneralRingGroup(0);
+      const collection = fileSector.general_ring_collection();
+      group.treeIndex = collection.tree_index();
+      group.data.count = group.treeIndex.length;
+      group.data.arrays['size'] = collection.size();
+      group.data.arrays['center'] = collection.center();
+      group.data.arrays['normal'] = collection.normal();
+      group.data.arrays['localXAxis'] = collection.local_x_axis();
+      group.data.arrays['radiusA'] = collection.radius_x();
+      group.data.arrays['radiusB'] = collection.radius_y();
+      group.data.arrays['thickness'] = collection.thickness();
+      group.data.arrays['angle'] = collection.angle();
+      group.data.arrays['arcAngle'] = collection.arc_angle();
+
+      const nodeIds = [].slice.call(collection.node_id());
+      const colors = collection.color();
+      setupMaps(group, maps, colors, nodeIds);
+
+      group.sort();
+      sector.primitiveGroups.push(group);
+    }
+    {
+      const group = new QuadGroup(0);
+      const collection = fileSector.quad_collection();
+      group.treeIndex = collection.tree_index();
+      group.data.count = group.treeIndex.length;
+      group.data.arrays['size'] = collection.size();
+      group.data.arrays['vertex1'] = collection.vertex_1();
+      group.data.arrays['vertex2'] = collection.vertex_2();
+      group.data.arrays['vertex3'] = collection.vertex_3();
+
+      const nodeIds = [].slice.call(collection.node_id());
       const colors = collection.color();
       setupMaps(group, maps, colors, nodeIds);
 

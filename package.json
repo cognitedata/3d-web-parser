@@ -22,37 +22,40 @@
     "parser",
     "typescript"
   ],
+  "files": [
+    "dist",
+    "pkg"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "clean": "rm -rf dist",
     "prepublishOnly": "yarn build",
     "test": "jest --config=jest.config.js",
     "lint": "tslint -c tslint.json -p tsconfig.json",
     "lint:fix": "tslint -c tslint.json -p tsconfig.json --fix",
-    "build": "yarn clean && rollup -c && yarn esCheck",
-    "watch": "rollup -cw",
+    "build": "yarn clean && wasm-pack build && tsc && yarn esCheck",
     "prepush": "yarn lint && yarn test",
-    "esCheck": "es-check es5 './dist/index.js'",
+    "esCheck": "es-check --module es6 './dist/index.js'",
     "prepare": "yarn build"
   },
   "devDependencies": {
     "@cognite/tslint-config-cognite-3d": "^1.0.3",
     "@types/jest": "^23.3.12",
-    "@types/node": "^10.12.12",
+    "@types/node": "^12.7.12",
     "@types/three": "^0.93.28",
+    "@wasm-tool/wasm-pack-plugin": "1.0.1",
     "es-check": "^5.0.0",
-    "jest": "^23.6.0",
+    "jest": "^24.9.0",
     "jest-extended": "^0.11.2",
     "prettier": "^1.15.2",
-    "rollup": "^1.1.0",
-    "rollup-plugin-json": "^3.1.0",
-    "rollup-plugin-typescript2": "^0.19.0",
     "three": "^0.98.0",
     "ts-jest": "^23.10.5",
     "ts-loader": "^5.3.0",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.0.1",
-    "typescript": "^3.6.3",
+    "typescript": "^3.6.4",
     "webpack": "^4.26.0",
     "webpack-cli": "^3.1.2",
     "webpack-dev-server": "^3.1.14",
@@ -75,6 +78,7 @@
   "dependencies": {
     "async-sema": "^3.0.1",
     "protobufjs": "^6.8.8",
+    "text-encoding": "^0.7.0",
     "reveal-utils": "./rust/pkg/"
   }
 }
