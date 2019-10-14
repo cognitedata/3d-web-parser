@@ -7,7 +7,7 @@ import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
 import { SceneStats, createSceneStats } from '../../SceneStats';
 import { PerSectorCompressedData, UncompressedValues } from './sharedFileParserTypes';
 import { DataMaps, FilterOptions, ParseReturn } from '../parseUtils';
-import { BoxGroup, CircleGroup, ConeGroup, GeneralRingGroup, PrimitiveGroup, QuadGroup } from '../../geometry/GeometryGroups';
+import { BoxGroup, CircleGroup, ConeGroup, GeneralCylinderGroup, GeneralRingGroup, NutGroup, PrimitiveGroup, QuadGroup, SphericalSegmentGroup, TorusSegmentGroup } from '../../geometry/GeometryGroups';
 import * as THREE from 'three';
 //import * as reveal from 'reveal-utils';
 const revealModule = import('../../../pkg');
@@ -140,6 +140,36 @@ export async function parseSceneI3D(
       sector.primitiveGroups.push(group);
     }
     {
+      const group = new GeneralCylinderGroup(0);
+      const collection = fileSector.general_cylinder_collection();
+      group.treeIndex = collection.tree_index();
+      group.data.count = group.treeIndex.length;
+      group.data.arrays['size'] = collection.size();
+      group.data.arrays['centerA'] = collection.center_a();
+      group.data.arrays['centerB'] = collection.center_b();
+      group.data.arrays['radiusA'] = collection.radius();
+      group.data.arrays['heightA'] = collection.height_a();
+      group.data.arrays['heightB'] = collection.height_b();
+      group.data.arrays['slopeA'] = collection.slope_a();
+      group.data.arrays['slopeB'] = collection.slope_b();
+      group.data.arrays['zAngleA'] = collection.z_angle_a();
+      group.data.arrays['zAngleB'] = collection.z_angle_b();
+      group.data.arrays['angle'] = collection.angle();
+      group.data.arrays['planeA'] = collection.plane_a();
+      group.data.arrays['planeB'] = collection.plane_b();
+      group.data.arrays['arcAngle'] = collection.arc_angle();
+      group.data.arrays['capNormalA'] = collection.cap_normal_a();
+      group.data.arrays['capNormalB'] = collection.cap_normal_b();
+      group.data.arrays['localXAxis'] = collection.local_x_axis();
+
+      const nodeIds = [].slice.call(collection.node_id());
+      const colors = collection.color();
+      setupMaps(group, maps, colors, nodeIds);
+
+      group.sort();
+      sector.primitiveGroups.push(group);
+    }
+    {
       const group = new GeneralRingGroup(0);
       const collection = fileSector.general_ring_collection();
       group.treeIndex = collection.tree_index();
@@ -162,6 +192,24 @@ export async function parseSceneI3D(
       sector.primitiveGroups.push(group);
     }
     {
+      const group = new NutGroup(0);
+      const collection = fileSector.nut_collection();
+      group.treeIndex = collection.tree_index();
+      group.data.count = group.treeIndex.length;
+      group.data.arrays['size'] = collection.size();
+      group.data.arrays['centerA'] = collection.center_a();
+      group.data.arrays['centerB'] = collection.center_b();
+      group.data.arrays['radiusA'] = collection.radius();
+      group.data.arrays['rotationAngle'] = collection.rotation_angle();
+
+      const nodeIds = [].slice.call(collection.node_id());
+      const colors = collection.color();
+      setupMaps(group, maps, colors, nodeIds);
+
+      group.sort();
+      sector.primitiveGroups.push(group);
+    }
+    {
       const group = new QuadGroup(0);
       const collection = fileSector.quad_collection();
       group.treeIndex = collection.tree_index();
@@ -170,6 +218,44 @@ export async function parseSceneI3D(
       group.data.arrays['vertex1'] = collection.vertex_1();
       group.data.arrays['vertex2'] = collection.vertex_2();
       group.data.arrays['vertex3'] = collection.vertex_3();
+
+      const nodeIds = [].slice.call(collection.node_id());
+      const colors = collection.color();
+      setupMaps(group, maps, colors, nodeIds);
+
+      group.sort();
+      sector.primitiveGroups.push(group);
+    }
+    {
+      const group = new SphericalSegmentGroup(0);
+      const collection = fileSector.spherical_segment_collection();
+      group.treeIndex = collection.tree_index();
+      group.data.count = group.treeIndex.length;
+      group.data.arrays['size'] = collection.size();
+      group.data.arrays['center'] = collection.center();
+      group.data.arrays['normal'] = collection.normal();
+      group.data.arrays['hRadius'] = collection.radius();
+      group.data.arrays['height'] = collection.height();
+
+      const nodeIds = [].slice.call(collection.node_id());
+      const colors = collection.color();
+      setupMaps(group, maps, colors, nodeIds);
+
+      group.sort();
+      sector.primitiveGroups.push(group);
+    }
+    {
+      const group = new TorusSegmentGroup(0);
+      const collection = fileSector.torus_segment_collection();
+      group.treeIndex = collection.tree_index();
+      group.data.count = group.treeIndex.length;
+      group.data.arrays['size'] = collection.size();
+      group.data.arrays['center'] = collection.center();
+      group.data.arrays['normal'] = collection.normal();
+      group.data.arrays['radius'] = collection.radius();
+      group.data.arrays['tubeRadius'] = collection.tube_radius();
+      group.data.arrays['angle'] = collection.rotation_angle();
+      group.data.arrays['arcAngle'] = collection.arc_angle();
 
       const nodeIds = [].slice.call(collection.node_id());
       const colors = collection.color();
