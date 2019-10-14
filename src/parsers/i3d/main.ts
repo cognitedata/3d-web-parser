@@ -94,7 +94,7 @@ export async function parseSceneI3D(
       group.data.arrays['angle'] = collection.rotation_angle();
       group.data.arrays['delta'] = collection.delta();
 
-      const nodeIds = collection.node_id();
+      const nodeIds = [].slice.call(collection.node_id());
       const colors = collection.color();
       setupMaps(group, maps, colors, nodeIds);
 
@@ -111,7 +111,7 @@ export async function parseSceneI3D(
       group.data.arrays['normal'] = collection.normal();
       group.data.arrays['radiusA'] = collection.radius();
 
-      const nodeIds = collection.node_id();
+      const nodeIds = [].slice.call(collection.node_id());
       const colors = collection.color();
       setupMaps(group, maps, colors, nodeIds);
 
