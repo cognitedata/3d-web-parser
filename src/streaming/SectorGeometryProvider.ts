@@ -26,21 +26,15 @@ export interface SectorGeometryProvider {
   retrieve(sectorId: SectorId): Promise<SectorGeometry>;
 }
 
-export function createSectorGeometryProvider(
-  loader: SectorGeometryLoader,
-  parser: SectorGeometryParser
-): SectorGeometryProvider {
-  const scheduler = new DefaultSectorScheduler(loader);
-  return new DefaultSectorGeometryProvider(scheduler, parser);
+export function createSectorGeometryProvider(parser: SectorGeometryParser): SectorGeometryProvider {
+  return new DefaultSectorGeometryProvider(parser);
 }
 
 export class DefaultSectorGeometryProvider implements SectorGeometryProvider {
   private readonly cache: Cache<SectorId, SectorGeometry>;
-  private readonly scheduler: SectorScheduler;
   private readonly parser: SectorGeometryParser;
 
-  constructor(scheduler: SectorScheduler, parser: SectorGeometryParser, cache?: Cache<SectorId, SectorGeometry>) {
-    this.scheduler = scheduler;
+  constructor(parser: SectorGeometryParser, cache?: Cache<SectorId, SectorGeometry>) {
     this.parser = parser;
     this.cache = cache || new SimpleCache<SectorId, SectorGeometry>();
   }
@@ -52,8 +46,8 @@ export class DefaultSectorGeometryProvider implements SectorGeometryProvider {
 
   async retrieve(sectorId: SectorId): Promise<SectorGeometry> {
     return await this.cache.getOrAdd(sectorId, async (id: SectorId) => {
-      const buffer = await this.scheduler.schedule(id);
-      return await this.parser.parseGeometry(id, buffer);
+      const geometry = await this.parser.parseGeometry(id);
+      return geometry;
     });
   }
 }

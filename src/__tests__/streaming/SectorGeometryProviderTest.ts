@@ -1,19 +1,13 @@
 // Copyright 2019 Cognite AS
 
 import { DefaultSectorGeometryProvider } from '../../streaming/SectorGeometryProvider';
-import { SectorScheduler } from '../../streaming/SectorScheduler';
 import { SectorGeometry } from '../../streaming/SectorGeometry';
 import { Cache } from '../../utils/SimpleCache';
-import { SectorId, createSectorIdSet } from '../../streaming/SectorManager';
+import { SectorId } from '../../streaming/SectorManager';
 import { SectorGeometryParser } from '../../streaming/SectorGeometryParser';
 import { DataMaps } from '../../parsers/parseUtils';
 
 describe('DefaultSectorGeometryProvider', () => {
-  const scheduler: SectorScheduler = {
-    scheduled: createSectorIdSet([]),
-    schedule: jest.fn<SectorGeometry>(),
-    unschedule: jest.fn<boolean>()
-  };
   const parser: SectorGeometryParser = {
     parseGeometry: jest.fn()
   };
@@ -21,7 +15,7 @@ describe('DefaultSectorGeometryProvider', () => {
     getOrAdd: jest.fn()
   };
 
-  const provider = new DefaultSectorGeometryProvider(scheduler, parser, cache);
+  const provider = new DefaultSectorGeometryProvider(parser, cache);
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -30,7 +24,6 @@ describe('DefaultSectorGeometryProvider', () => {
   test('retrieve() schedules load on first call for a sector', async () => {
     cache.getOrAdd = (id, createCb) => createCb(id); // Cache miss
     await provider.retrieve(1);
-    expect(scheduler.schedule).toBeCalledTimes(1);
     expect(parser.parseGeometry).toBeCalledTimes(1);
   });
 
@@ -49,7 +42,6 @@ describe('DefaultSectorGeometryProvider', () => {
     const result = await provider.retrieve(1);
 
     // Assert
-    expect(scheduler.schedule).not.toHaveBeenCalled();
     expect(result).toBe(stubGeometry);
   });
 

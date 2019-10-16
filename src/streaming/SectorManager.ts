@@ -7,6 +7,7 @@ import { SectorGeometryProvider, createSectorGeometryProvider } from './SectorGe
 import { SectorGeometryLoader } from './SectorGeometryLoader';
 import { createSectorGeometryParser } from './SectorGeometryParser';
 import { setDifference } from '../utils/setUtils';
+import { DefaultSectorScheduler } from './SectorScheduler';
 
 export type SectorsReadyCallback = (source: SectorManager) => void;
 export type SectorId = number;
@@ -17,12 +18,15 @@ export function createSectorIdSet(ids: Iterable<SectorId>): SectorIdSet {
 }
 
 export function createSectorManager(
+  rootSectorId: SectorId,
   sectorFileVersion: number,
   metadataProvider: SectorMetadataProvider,
   geometryLoader: SectorGeometryLoader
 ): SectorManager {
-  const parser = createSectorGeometryParser(sectorFileVersion);
-  const geometryProvider = createSectorGeometryProvider(geometryLoader, parser);
+  const scheduler = new DefaultSectorScheduler(geometryLoader);
+  const callback = (id: SectorId) => scheduler.schedule(id);
+  const parser = createSectorGeometryParser(rootSectorId, sectorFileVersion, callback);
+  const geometryProvider = createSectorGeometryProvider(parser);
   return new DefaultSectorManager(metadataProvider, geometryProvider);
 }
 
