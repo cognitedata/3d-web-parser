@@ -2,7 +2,7 @@
 import { SectorGeometry } from './SectorGeometry';
 import { SectorId } from './SectorManager';
 import parseProtobuf from '../parsers/protobuf/main';
-import { parseSceneI3D } from '../parsers/i3d/main';
+import { parseRootSector, convertSector, parseSector, WasmSectorHandle } from '../parsers/i3d/parser';
 
 export interface SectorGeometryParser {
   parseGeometry(id: SectorId, buffer: ArrayBuffer): Promise<SectorGeometry>;
@@ -33,16 +33,26 @@ export class ProtobufSectorGeometryParser implements SectorGeometryParser {
 }
 
 export class I3DSectorGeometryParser implements SectorGeometryParser {
+  private rootSectorHandle?: WasmSectorHandle;
+
+  dispose() {
+    if (this.rootSectorHandle) {
+      this.rootSectorHandle.free();
+    }
+  }
+
   async parseGeometry(id: number, buffer: ArrayBuffer): Promise<SectorGeometry> {
-    const { rootSector, sceneStats, maps } = await parseSceneI3D(buffer);
-    // TODO 20191009 larsmoa: Horrible hack to account for that we always read sector 0 first.
-    const maxId = Math.max(...Object.values(maps.sectors).map(s => s.id));
-    const sector = maps.sectors[maxId];
-    return Promise.resolve<SectorGeometry>({
-      id: sector.id,
-      primitiveGroups: sector.primitiveGroups,
-      instancedMeshGroup: sector.instancedMeshGroup,
-      dataMaps: maps
-    });
+    if (!this.rootSectorHandle) {
+      this.rootSectorHandle = await parseRootSector(buffer);
+      return await convertSector(this.rootSectorHandle!);
+    }
+
+    const sectorHandle = await parseSector(this.rootSectorHandle, buffer);
+    try {
+      const geometry = await convertSector(sectorHandle);
+      return geometry;
+    } finally {
+      sectorHandle.free();
+    }
   }
 }
