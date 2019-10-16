@@ -7,7 +7,7 @@ import mergeInstancedMeshes from '../../optimizations/mergeInstancedMeshes';
 import { SceneStats, createSceneStats } from '../../SceneStats';
 import { PerSectorCompressedData, UncompressedValues } from './sharedFileParserTypes';
 import { DataMaps, FilterOptions, ParseReturn } from '../parseUtils';
-import { BoxGroup, CircleGroup, ConeGroup, GeneralCylinderGroup, GeneralRingGroup, NutGroup, PrimitiveGroup, QuadGroup, SphericalSegmentGroup, TorusSegmentGroup, TrapeziumGroup } from '../../geometry/GeometryGroups';
+import { BoxGroup, CircleGroup, ConeGroup, EccentricConeGroup, EllipsoidSegmentGroup, GeneralCylinderGroup, GeneralRingGroup, NutGroup, PrimitiveGroup, QuadGroup, SphericalSegmentGroup, TorusSegmentGroup, TrapeziumGroup } from '../../geometry/GeometryGroups';
 import * as THREE from 'three';
 //import * as reveal from 'reveal-utils';
 const revealModule = import('../../../pkg');
@@ -71,16 +71,16 @@ export async function parseSceneI3D(
 
   const scene = reveal.load_i3df(fileBuffer);
   const sectorCount = scene.sector_count();
-  console.log("SCENE HELLO", scene);
+  //console.log("SCENE HELLO", scene);
   for (let i = 0; i < sectorCount; i++) {
-    console.log("Loading sector", i);
+    //console.log("Loading sector", i);
     const sector_id = scene.sector_id(i);
     const parent_id = scene.sector_parent_id(i);
     const bbox_min = scene.sector_bbox_min(i);
     const bbox_max = scene.sector_bbox_max(i);
-    console.log("Bbox", bbox_min, bbox_max);
+    //console.log("Bbox", bbox_min, bbox_max);
     const sector = new Sector(sector_id, new THREE.Vector3(bbox_min[0], bbox_min[1], bbox_min[2]), new THREE.Vector3(bbox_max[0], bbox_max[1], bbox_max[2]));
-    console.log("SECTOR", sector.min.clone(), sector.max.clone());
+    //console.log("SECTOR", sector.min.clone(), sector.max.clone());
     const fileSector = scene.sector(i);
 
     {
@@ -131,6 +131,44 @@ export async function parseSceneI3D(
       group.data.arrays['angle'] = collection.angle();
       group.data.arrays['arcAngle'] = collection.arc_angle();
       group.data.arrays['localXAxis'] = collection.local_x_axis();
+
+      const nodeIds = [].slice.call(collection.node_id());
+      const colors = collection.color();
+      setupMaps(group, maps, colors, nodeIds);
+
+      group.sort();
+      sector.primitiveGroups.push(group);
+    }
+    {
+      const group = new EccentricConeGroup(0);
+      const collection = fileSector.eccentric_cone_collection();
+      group.treeIndex = collection.tree_index();
+      group.data.count = group.treeIndex.length;
+      group.data.arrays['size'] = collection.size();
+      group.data.arrays['centerA'] = collection.center_a();
+      group.data.arrays['centerB'] = collection.center_b();
+      group.data.arrays['radiusA'] = collection.radius_a();
+      group.data.arrays['radiusB'] = collection.radius_b();
+      group.data.arrays['normal'] = collection.normal();
+
+      const nodeIds = [].slice.call(collection.node_id());
+      const colors = collection.color();
+      setupMaps(group, maps, colors, nodeIds);
+
+      group.sort();
+      sector.primitiveGroups.push(group);
+    }
+    {
+      const group = new EllipsoidSegmentGroup(0);
+      const collection = fileSector.ellipsoid_segment_collection();
+      group.treeIndex = collection.tree_index();
+      group.data.count = group.treeIndex.length;
+      group.data.arrays['size'] = collection.size();
+      group.data.arrays['center'] = collection.center();
+      group.data.arrays['normal'] = collection.normal();
+      group.data.arrays['hRadius'] = collection.horizontal_radius();
+      group.data.arrays['vRadius'] = collection.vertical_radius();
+      group.data.arrays['height'] = collection.height();
 
       const nodeIds = [].slice.call(collection.node_id());
       const colors = collection.color();
@@ -236,6 +274,14 @@ export async function parseSceneI3D(
       group.data.arrays['normal'] = collection.normal();
       group.data.arrays['hRadius'] = collection.radius();
       group.data.arrays['height'] = collection.height();
+
+      // Workaround for the hack in SphericalSegmentGroup's constructor (SphericalSegmentGroup.ts:34)
+      for (const attr of group.attributes) {
+        if (attr.name != "a_vRadius") {
+          continue;
+        }
+        attr.array = collection.radius();
+      }
 
       const nodeIds = [].slice.call(collection.node_id());
       const colors = collection.color();
