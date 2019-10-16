@@ -60,6 +60,8 @@ export async function parseSceneI3D(
   fileBuffer: ArrayBuffer,
   filterOptions?: FilterOptions, // TODO handle filterOptions
 ): Promise<ParseReturn> {
+  console.log("PARSE SCENE I3D");
+
   const reveal = await revealModule;
 
   const maps: DataMaps = {
@@ -69,7 +71,9 @@ export async function parseSceneI3D(
     sectors: {}
   };
 
+  console.log("LOAD I3DF");
   const scene = reveal.load_i3df(fileBuffer);
+  console.log("DONE LOADING I3DF");
   const sectorCount = scene.sector_count();
   //console.log("SCENE HELLO", scene);
   for (let i = 0; i < sectorCount; i++) {
@@ -358,6 +362,9 @@ export async function parseSceneI3D(
   //const rootSector = new Sector(r.id, r.bbox_min, r.bbox_max);
   //const rootSector = new Sector(0, new THREE.Vector3(), new THREE.Vector3());
   //maps.sectors[rootSector.id] = rootSector;
+
+  console.log("SCENE COMPLETE");
+
   return {
     rootSector,
     sceneStats: createSceneStats(),
@@ -370,6 +377,8 @@ export function parseFullCustomFile(
   meshLoader: any,
   filterOptions?: FilterOptions
 ): ParseReturn {
+  console.log("PARSE FULL CUSTOM");
+
   const fileReader = new CustomFileReader(fileBuffer);
   const maps: DataMaps = {
     treeIndexNodeIdMap: [],

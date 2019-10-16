@@ -183,15 +183,15 @@ export default abstract class PrimitiveGroup extends GeometryGroup {
   }
 
   sort() {
-    const newIndices = this.data.sort();
-    this.capacity = this.data.count;
+    //const newIndices = this.data.sort();
+    //this.capacity = this.data.count;
 
-    const newTreeIndices = new Float32Array(this.capacity);
-    newIndices.forEach((index, i) => {
-      newTreeIndices[i] = this.treeIndex[index];
-    });
-    this.treeIndex = newTreeIndices;
-    this.buildTreeIndexMap();
+    //const newTreeIndices = new Float32Array(this.capacity);
+    //newIndices.forEach((index, i) => {
+      //newTreeIndices[i] = this.treeIndex[index];
+    //});
+    //this.treeIndex = newTreeIndices;
+    //this.buildTreeIndexMap();
 
     this.setupAttributes();
     this.sorted = true;
