@@ -22,10 +22,11 @@ export class SimpleCache<TKey, TValue> implements Cache<TKey, TValue> {
         this.idToKey.delete(id);
       }
     }
-    const value = await createCb(id);
     key = { id };
-    this.cache.set(key, value);
     this.idToKey.set(id, key);
+
+    const value = await createCb(id);
+    this.cache.set(key, value);
     return value;
   }
 }
