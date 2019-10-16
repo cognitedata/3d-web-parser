@@ -10,3 +10,4 @@
 /.vscode
 rust/target
 rust/pkg
+target
