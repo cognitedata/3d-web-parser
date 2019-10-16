@@ -37,7 +37,8 @@
     "build": "yarn clean && wasm-pack build && tsc && yarn esCheck",
     "prepush": "yarn lint && yarn test",
     "esCheck": "es-check --module es6 './dist/index.js'",
-    "prepare": "yarn build"
+    "prepare": "yarn build",
+    "build-watch": "yarn run watch 'wasm-pack build && time tsc --incremental && echo \"[`date +%H:%M.%S`] Build successful!\"' src/ rust/"
   },
   "devDependencies": {
     "@cognite/tslint-config-cognite-3d": "^1.0.3",
