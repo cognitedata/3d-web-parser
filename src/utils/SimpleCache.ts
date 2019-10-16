@@ -5,6 +5,9 @@ export interface Cache<TKey, TValue> {
 }
 
 export class SimpleCache<TKey, TValue> implements Cache<TKey, TValue> {
+  // TODO 20191016 larsmoa: idToKey seems to take a lot of memory for some reason.
+  // Check memory dump in Chrome and figure out why and how to avoid (possible by just
+  // replacing this bad cache).
   private readonly idToKey = new Map<TKey, object>();
   private readonly cache = new WeakMap<object, TValue>();
 
