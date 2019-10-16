@@ -35,14 +35,10 @@ export class ProtobufSectorGeometryParser implements SectorGeometryParser {
 export class I3DSectorGeometryParser implements SectorGeometryParser {
   private rootSectorHandle?: WasmSectorHandle;
 
-  dispose() {
-    if (this.rootSectorHandle) {
-      this.rootSectorHandle.free();
-    }
-  }
-
   async parseGeometry(id: number, buffer: ArrayBuffer): Promise<SectorGeometry> {
     if (!this.rootSectorHandle) {
+      // Note! root sector is never freed. Probably not a big issue, but should
+      // be handled if models are unloaded.
       this.rootSectorHandle = await parseRootSector(buffer);
       return await convertSector(this.rootSectorHandle!);
     }
