@@ -357,7 +357,6 @@ export async function parseSceneI3D(
       for (const fileId of fileIds) {
         meshCounts[fileId] = meshCounts[fileId] !== undefined ? meshCounts[fileId] + 1 : 1;
       }
-      console.log("Mesh counts", meshCounts);
       const mergedMeshes: { [fileId: string]: MergedMesh } = {};
       Object.keys(meshCounts).forEach(fileId => {
         if (meshCounts[fileId] == 0) {
@@ -380,7 +379,6 @@ export async function parseSceneI3D(
       setupMaps(group, maps, colors, nodeIds, treeIndexes);
       for (let i = 0; i < nodeIds.length; i++) {
         triangleOffsets[fileIds[i]] = triangleOffsets[fileIds[i]] ? triangleOffsets[fileIds[i]] : 0;
-        console.log("Looking up", fileIds[i], "in", mergedMeshes);
         mergedMeshes[fileIds[i]].mappings.add(
           triangleOffsets[fileIds[i]],
           triangleCounts[i],
@@ -432,7 +430,6 @@ export async function parseSceneI3D(
           : { count: 0, triangleCount: triangleCount };
         meshCounts[fileId][triangleOffset].count++;
       }
-      console.log("Instanced Mesh counts", meshCounts);
 
       // Create mesh collections for each file Id and triangle offset
       const collections: { [fileId: string]: { [triangleOffset: string]: InstancedMeshCollection } } = {};
