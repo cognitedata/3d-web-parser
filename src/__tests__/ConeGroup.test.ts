@@ -59,4 +59,39 @@ describe('ConeGroup', () => {
     expect(group.data.getNumber('angle', 0)).toBeCloseTo(angle);
     expect(group.data.getNumber('arcAngle', 0)).toBeCloseTo(arcAngle);
   });
+
+  test(`add() maps angle input angle to range [-PI, PI] (RJ3D-460)`, () => {
+    const testCases: { inputAngle: number; expectedOutputAngle: number }[] = [
+      { inputAngle: 0.0, expectedOutputAngle: 0.0 },
+      { inputAngle: 1.0, expectedOutputAngle: 1.0 },
+      { inputAngle: -Math.PI / 2, expectedOutputAngle: -Math.PI / 2 },
+      { inputAngle: Math.PI + 0.2, expectedOutputAngle: -Math.PI + 0.2 },
+      { inputAngle: 2 * Math.PI, expectedOutputAngle: 0.0 },
+      { inputAngle: Math.PI, expectedOutputAngle: Math.PI },
+      { inputAngle: -Math.PI, expectedOutputAngle: -Math.PI }
+    ];
+
+    for (const testCase of testCases) {
+      const group = new ConeGroup(10);
+      group.add(
+        1,
+        1,
+        1.0,
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(0, 0, 0),
+        10.0,
+        10.0,
+        testCase.inputAngle,
+        Math.PI / 4
+      );
+      group.setupAttributes();
+      const attributeIdx = group.attributes.findIndex(x => x.name === 'a_angle');
+
+      const dataOutputAngle = group.data.getNumber('angle', 0);
+      const attributeOutputAngle = group.attributes[attributeIdx].array[0];
+
+      expect(dataOutputAngle).toBeCloseTo(testCase.expectedOutputAngle);
+      expect(attributeOutputAngle).toBeCloseTo(testCase.expectedOutputAngle);
+    }
+  });
 });

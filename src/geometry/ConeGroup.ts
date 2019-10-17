@@ -7,6 +7,7 @@ import { xAxis, zAxis } from '../constants';
 import { FilterOptions } from '../parsers/parseUtils';
 import { RenderedPrimitiveNameType } from './Types';
 import PrimitiveGroupData from './PrimitiveGroupData';
+import { normalizeRadians } from '../MathUtils';
 
 // reusable variables
 const vector1 = new THREE.Vector3();
@@ -44,6 +45,7 @@ export default class ConeGroup extends PrimitiveGroup {
     normal.subVectors(centerA, centerB).normalize();
     rotation.setFromUnitVectors(zAxis, normal);
     localXAxis.copy(xAxis).applyQuaternion(rotation);
+    angle = normalizeRadians(angle);
 
     this.data.add({
       size,

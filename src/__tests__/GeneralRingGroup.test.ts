@@ -69,7 +69,7 @@ describe('GeneralRingGroup', () => {
     const yRadius = 2.0;
     const localXAxis = new THREE.Vector3(10, 20, 30);
     const thickness = 3.0;
-    const angle = 4.0;
+    const angle = (3.0 * Math.PI) / 4.0;
     const arcAngle = 5.0;
     const size = Math.sqrt((2 * yRadius) ** 2 + 2 * yRadius);
 
@@ -96,5 +96,42 @@ describe('GeneralRingGroup', () => {
     expect(group.data.getNumber('thickness', 0)).toBeCloseTo(thickness / yRadius);
     expect(group.data.getNumber('angle', 0)).toBeCloseTo(angle);
     expect(group.data.getNumber('arcAngle', 0)).toBeCloseTo(arcAngle);
+  });
+
+  test(`add() maps angle input angle to range [-PI, PI] (RJ3D-460)`, () => {
+    const testCases: { inputAngle: number; expectedOutputAngle: number }[] = [
+      { inputAngle: 0.0, expectedOutputAngle: 0.0 },
+      { inputAngle: 1.0, expectedOutputAngle: 1.0 },
+      { inputAngle: -Math.PI / 2, expectedOutputAngle: -Math.PI / 2 },
+      { inputAngle: Math.PI + 0.2, expectedOutputAngle: -Math.PI + 0.2 },
+      { inputAngle: 2 * Math.PI, expectedOutputAngle: 0.0 },
+      { inputAngle: Math.PI, expectedOutputAngle: Math.PI },
+      { inputAngle: -Math.PI, expectedOutputAngle: -Math.PI }
+    ];
+
+    for (const testCase of testCases) {
+      const group = new GeneralRingGroup(10);
+      group.add(
+        1,
+        1,
+        1.0,
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(0, 1, 0),
+        new THREE.Vector3(0, 1, 0),
+        10.0,
+        5.0,
+        1.0,
+        testCase.inputAngle,
+        Math.PI / 4
+      );
+      group.setupAttributes();
+      const attributeIdx = group.attributes.findIndex(x => x.name === 'a_angle');
+
+      const dataOutputAngle = group.data.getNumber('angle', 0);
+      const attributeOutputAngle = group.attributes[attributeIdx].array[0];
+
+      expect(dataOutputAngle).toBeCloseTo(testCase.expectedOutputAngle);
+      expect(attributeOutputAngle).toBeCloseTo(testCase.expectedOutputAngle);
+    }
   });
 });
