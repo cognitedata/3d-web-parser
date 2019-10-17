@@ -342,7 +342,6 @@ export async function parseSceneI3D(
       group.sort();
       sector.primitiveGroups.push(group);
     }
-    console.log("BUILDING merged meshes");
     {
       const group = new MergedMeshGroup();
       const collection = fileSector.triangle_mesh_collection();
@@ -403,7 +402,6 @@ export async function parseSceneI3D(
         throw Error('Parent sector not found');
       }
     }
-    console.log("BUILDING instanced meshes");
     {
       const group = new InstancedMeshGroup();
       const collection = fileSector.instanced_mesh_collection();
@@ -485,6 +483,10 @@ export async function parseSceneI3D(
     maps.sectors[sector_id] = sector;
   }
   const rootSector = maps.sectors[scene.root_sector_id];
+  console.log("MERGING INSTANCED MESHES");
+  const sceneStats = createSceneStats();
+  mergeInstancedMeshes(rootSector, sceneStats);
+  console.log("DONE MERGING");
 
   //for (const sector of scene.sectors) {
     //for (const primitive_group_name in sector.primitive_groups) {
