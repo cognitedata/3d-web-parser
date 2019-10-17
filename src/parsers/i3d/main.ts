@@ -8,9 +8,19 @@ import { SceneStats, createSceneStats } from '../../SceneStats';
 import { PerSectorCompressedData, UncompressedValues } from './sharedFileParserTypes';
 import { DataMaps, FilterOptions, ParseReturn } from '../parseUtils';
 import { BoxGroup, CircleGroup, ConeGroup, EccentricConeGroup, EllipsoidSegmentGroup, GeneralCylinderGroup, GeneralRingGroup, NutGroup, PrimitiveGroup, QuadGroup, SphericalSegmentGroup, TorusSegmentGroup, TrapeziumGroup } from '../../geometry/GeometryGroups';
+import { MergedMesh, MergedMeshGroup } from '../../geometry/MergedMeshGroup';
+import { InstancedMesh, InstancedMeshGroup, InstancedMeshCollection, InstancedMeshMappings } from '../../geometry/InstancedMeshGroup';
+import { xAxis, yAxis, zAxis } from '../../constants';
+import GeometryGroup from '../../geometry/GeometryGroup';
 import * as THREE from 'three';
 //import * as reveal from 'reveal-utils';
 const revealModule = import('../../../pkg');
+
+const matrix = new THREE.Matrix4();
+const rotation = new THREE.Matrix4();
+const rotation3 = new THREE.Vector3();
+const translation3 = new THREE.Vector3();
+const scale3 = new THREE.Vector3();
 
 function preloadMeshFiles(meshLoader: any, fileIds: number[]) {
   fileIds.forEach(fileId => {
@@ -28,9 +38,9 @@ function convertBuffer(name: String, array: Uint8Array): (Uint8Array | Float32Ar
 };
 
 // TODO should be Number[] and not Float32Array!
-function setupMaps(group: PrimitiveGroup, maps: DataMaps, colors: Uint8Array, nodeIds: number[]) {
-    for (let i = 0; i < group.treeIndex.length; i++) {
-      const treeIndex = group.treeIndex[i];
+function setupMaps(group: GeometryGroup, maps: DataMaps, colors: Uint8Array, nodeIds: number[], treeIndexes: Float32Array) {
+    for (let i = 0; i < treeIndexes.length; i++) {
+      const treeIndex = treeIndexes[i];
       const nodeId = nodeIds[i];
       //console.log("TREE INDEX", treeIndex);
       //console.log("NODE ID", nodeId);
@@ -100,7 +110,7 @@ export async function parseSceneI3D(
 
       const nodeIds = [].slice.call(collection.node_id());
       const colors = collection.color();
-      setupMaps(group, maps, colors, nodeIds);
+      setupMaps(group, maps, colors, nodeIds, group.treeIndex);
 
       group.sort();
       sector.primitiveGroups.push(group);
@@ -117,7 +127,7 @@ export async function parseSceneI3D(
 
       const nodeIds = [].slice.call(collection.node_id());
       const colors = collection.color();
-      setupMaps(group, maps, colors, nodeIds);
+      setupMaps(group, maps, colors, nodeIds, group.treeIndex);
 
       group.sort();
       sector.primitiveGroups.push(group);
@@ -138,7 +148,7 @@ export async function parseSceneI3D(
 
       const nodeIds = [].slice.call(collection.node_id());
       const colors = collection.color();
-      setupMaps(group, maps, colors, nodeIds);
+      setupMaps(group, maps, colors, nodeIds, group.treeIndex);
 
       group.sort();
       sector.primitiveGroups.push(group);
@@ -157,7 +167,7 @@ export async function parseSceneI3D(
 
       const nodeIds = [].slice.call(collection.node_id());
       const colors = collection.color();
-      setupMaps(group, maps, colors, nodeIds);
+      setupMaps(group, maps, colors, nodeIds, group.treeIndex);
 
       group.sort();
       sector.primitiveGroups.push(group);
@@ -176,7 +186,7 @@ export async function parseSceneI3D(
 
       const nodeIds = [].slice.call(collection.node_id());
       const colors = collection.color();
-      setupMaps(group, maps, colors, nodeIds);
+      setupMaps(group, maps, colors, nodeIds, group.treeIndex);
 
       group.sort();
       sector.primitiveGroups.push(group);
@@ -206,7 +216,7 @@ export async function parseSceneI3D(
 
       const nodeIds = [].slice.call(collection.node_id());
       const colors = collection.color();
-      setupMaps(group, maps, colors, nodeIds);
+      setupMaps(group, maps, colors, nodeIds, group.treeIndex);
 
       group.sort();
       sector.primitiveGroups.push(group);
@@ -228,7 +238,7 @@ export async function parseSceneI3D(
 
       const nodeIds = [].slice.call(collection.node_id());
       const colors = collection.color();
-      setupMaps(group, maps, colors, nodeIds);
+      setupMaps(group, maps, colors, nodeIds, group.treeIndex);
 
       group.sort();
       sector.primitiveGroups.push(group);
@@ -246,7 +256,7 @@ export async function parseSceneI3D(
 
       const nodeIds = [].slice.call(collection.node_id());
       const colors = collection.color();
-      setupMaps(group, maps, colors, nodeIds);
+      setupMaps(group, maps, colors, nodeIds, group.treeIndex);
 
       group.sort();
       sector.primitiveGroups.push(group);
@@ -263,7 +273,7 @@ export async function parseSceneI3D(
 
       const nodeIds = [].slice.call(collection.node_id());
       const colors = collection.color();
-      setupMaps(group, maps, colors, nodeIds);
+      setupMaps(group, maps, colors, nodeIds, group.treeIndex);
 
       group.sort();
       sector.primitiveGroups.push(group);
@@ -289,7 +299,7 @@ export async function parseSceneI3D(
 
       const nodeIds = [].slice.call(collection.node_id());
       const colors = collection.color();
-      setupMaps(group, maps, colors, nodeIds);
+      setupMaps(group, maps, colors, nodeIds, group.treeIndex);
 
       group.sort();
       sector.primitiveGroups.push(group);
@@ -309,7 +319,7 @@ export async function parseSceneI3D(
 
       const nodeIds = [].slice.call(collection.node_id());
       const colors = collection.color();
-      setupMaps(group, maps, colors, nodeIds);
+      setupMaps(group, maps, colors, nodeIds, group.treeIndex);
 
       group.sort();
       sector.primitiveGroups.push(group);
@@ -327,10 +337,63 @@ export async function parseSceneI3D(
 
       const nodeIds = [].slice.call(collection.node_id());
       const colors = collection.color();
-      setupMaps(group, maps, colors, nodeIds);
+      setupMaps(group, maps, colors, nodeIds, group.treeIndex);
 
       group.sort();
       sector.primitiveGroups.push(group);
+    }
+    console.log("BUILDING merged meshes");
+    {
+      const group = new MergedMeshGroup();
+      const collection = fileSector.triangle_mesh_collection();
+      const fileIds = collection.file_id();
+      const nodeIds = [].slice.call(collection.node_id());
+      const treeIndexes = collection.tree_index();
+      const colors = collection.color();
+      const triangleCounts = collection.triangle_count();
+      const sizes = collection.size();
+
+      const meshCounts: { [fileId: string]: number } = {};
+      for (const fileId of fileIds) {
+        meshCounts[fileId] = meshCounts[fileId] !== undefined ? meshCounts[fileId] + 1 : 1;
+      }
+      console.log("Mesh counts", meshCounts);
+      const mergedMeshes: { [fileId: string]: MergedMesh } = {};
+      Object.keys(meshCounts).forEach(fileId => {
+        if (meshCounts[fileId] == 0) {
+          return;
+        }
+        mergedMeshes[fileId] = new MergedMesh(
+          meshCounts[fileId],
+          parseInt(fileId, 10),
+          false,
+          // TODO add back textures
+          //data.diffuseTexture,
+          //data.specularTexture,
+          //data.ambientTexture,
+          //data.normalTexture,
+          //data.bumpTexture
+        );
+      });
+      // create mappings while calculating running triangle offsets
+      const triangleOffsets: { [fileId: string]: number } = {};
+      setupMaps(group, maps, colors, nodeIds, treeIndexes);
+      for (let i = 0; i < nodeIds.length; i++) {
+        triangleOffsets[fileIds[i]] = triangleOffsets[fileIds[i]] ? triangleOffsets[fileIds[i]] : 0;
+        console.log("Looking up", fileIds[i], "in", mergedMeshes);
+        mergedMeshes[fileIds[i]].mappings.add(
+          triangleOffsets[fileIds[i]],
+          triangleCounts[i],
+          treeIndexes[i],
+          sizes[i],
+        );
+        triangleOffsets[fileIds[i]] += triangleCounts[i];
+      }
+
+      // add meshes to groups
+      Object.keys(mergedMeshes).forEach(fileId => {
+        sector.mergedMeshGroup.addMesh(mergedMeshes[fileId]);
+      });
     }
 
     if (parent_id !== undefined) {
@@ -341,6 +404,85 @@ export async function parseSceneI3D(
       } else {
         throw Error('Parent sector not found');
       }
+    }
+    console.log("BUILDING instanced meshes");
+    {
+      const group = new InstancedMeshGroup();
+      const collection = fileSector.instanced_mesh_collection();
+      const fileIds = collection.file_id();
+      const nodeIds = [].slice.call(collection.node_id());
+      const treeIndexes = collection.tree_index();
+      const colors = collection.color();
+      const triangleCounts = collection.triangle_count();
+      const triangleOffsets = collection.triangle_offset();
+      const sizes = collection.size();
+      const translations = collection.translation();
+      const rotations = collection.rotation();
+      const scales = collection.scale();
+      // NOTE this almost duplicate of the same code for merged meshes
+      const meshCounts: { [fileId: string]: { [triangleOffset: string]: { count: number; triangleCount: number } } } = {};
+      for (let i = 0; i < fileIds.length; i++) {
+        const fileId = fileIds[i];
+        const triangleOffset = triangleOffsets[i];
+        const triangleCount = triangleCounts[i];
+
+        meshCounts[fileId] = meshCounts[fileId] ? meshCounts[fileId] : {};
+        meshCounts[fileId][triangleOffset] = meshCounts[fileId][triangleOffset]
+          ? meshCounts[fileId][triangleOffset]
+          : { count: 0, triangleCount: triangleCount };
+        meshCounts[fileId][triangleOffset].count++;
+      }
+      console.log("Instanced Mesh counts", meshCounts);
+
+      // Create mesh collections for each file Id and triangle offset
+      const collections: { [fileId: string]: { [triangleOffset: string]: InstancedMeshCollection } } = {};
+      Object.keys(meshCounts).forEach(fileId => {
+        collections[fileId] = collections[fileId] !== undefined ? collections[fileId] : {};
+        Object.keys(meshCounts[fileId]).forEach(triangleOffset => {
+          const { count, triangleCount } = meshCounts[fileId][triangleOffset];
+          collections[fileId][triangleOffset] = new InstancedMeshCollection(
+            parseInt(triangleOffset, 10),
+            triangleCount,
+            count
+          );
+        });
+      });
+
+      setupMaps(group, maps, colors, nodeIds, treeIndexes);
+
+
+      // TODO move this logic to Rust for improved speed
+      // Fill mesh collections with matrix data
+      for (let i = 0; i < fileIds.length; i++) {
+        const fileId = fileIds[i];
+        const treeIndex = treeIndexes[i];
+        const nodeId = nodeIds[i];
+        const triangleOffset = triangleOffsets[i];
+        const triangleCount = triangleCounts[i];
+        const color = colors[i];
+        const size = sizes[i];
+
+        translation3.set(translations[i * 3 + 0],translations[i * 3 + 1], translations[i * 3 + 2]);
+        rotation3.set(rotations[i * 3 + 0], rotations[i * 3 + 1], rotations[i * 3 + 2]);
+        scale3.set(scales[i * 3 + 0], scales[i * 3 + 1], scales[i * 3 + 2]);
+
+        maps.treeIndexNodeIdMap[treeIndex] = nodeId;
+        matrix.identity().setPosition(translation3);
+        matrix.multiply(rotation.makeRotationAxis(zAxis, rotation3.z));
+        matrix.multiply(rotation.makeRotationAxis(yAxis, rotation3.y));
+        matrix.multiply(rotation.makeRotationAxis(xAxis, rotation3.x));
+        matrix.scale(scale3);
+        collections[fileId][triangleOffset].addMapping(nodeId, treeIndex, size, matrix);
+      }
+
+      // Add collections to sector group
+      Object.keys(collections).forEach(fileId => {
+        const instancedMesh = new InstancedMesh(parseInt(fileId, 10));
+        Object.keys(collections[fileId]).forEach(triangleOffset => {
+          instancedMesh.addCollection(collections[fileId][triangleOffset]);
+        });
+        sector.instancedMeshGroup.addMesh(instancedMesh);
+      });
     }
 
     maps.sectors[sector_id] = sector;
