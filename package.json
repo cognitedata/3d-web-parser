@@ -16,7 +16,7 @@
     "typescript"
   ],
   "files": [
-      "dist"
+    "dist"
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -34,7 +34,7 @@
   "devDependencies": {
     "@cognite/tslint-config-cognite-3d": "^1.0.3",
     "@types/jest": "^23.3.12",
-    "@types/node": "^10.12.12",
+    "@types/node": "^12.11.1",
     "@types/three": "^0.93.28",
     "es-check": "^5.0.0",
     "jest": "^24.9.0",
