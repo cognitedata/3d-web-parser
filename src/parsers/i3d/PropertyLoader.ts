@@ -49,9 +49,9 @@ export default class PropertyLoader {
     color: indices => {
       const index = indices.nextValue();
       if (index === 0) {
-        this.color                              = DEFAULT_COLOR;
+        this.color.copy(DEFAULT_COLOR);
       } else {
-        this.color                              = this.values.color![index - 1];
+        this.color.copy(this.values.color![index - 1]);
       }},
     center: indices => {
       const centerX                             = this.values.centerX![indices.nextValue()];
@@ -99,11 +99,11 @@ export default class PropertyLoader {
     fileId:         indices => { this.fileId    = this.values.fileId![indices.nextValue()]; },
     size:   indices => {
       this.size = this.values.size![indices.nextValue()]; },
-    diffuseTexture:   indices => { this.diffuseTexture  = this.values.texture![indices.nextValue() - 1]; },
-    specularTexture:  indices => { this.specularTexture = this.values.texture![indices.nextValue() - 1]; },
-    ambientTexture:   indices => { this.ambientTexture  = this.values.texture![indices.nextValue() - 1]; },
-    normalTexture:    indices => { this.normalTexture   = this.values.texture![indices.nextValue() - 1]; },
-    bumpTexture:      indices => { this.bumpTexture     = this.values.texture![indices.nextValue() - 1]; },
+    diffuseTexture:   indices => { this.diffuseTexture  = {...this.values.texture![indices.nextValue() - 1]}; },
+    specularTexture:  indices => { this.specularTexture = {...this.values.texture![indices.nextValue() - 1]}; },
+    ambientTexture:   indices => { this.ambientTexture  = {...this.values.texture![indices.nextValue() - 1]}; },
+    normalTexture:    indices => { this.normalTexture   = {...this.values.texture![indices.nextValue() - 1]}; },
+    bumpTexture:      indices => { this.bumpTexture     = {...this.values.texture![indices.nextValue() - 1]}; },
     // tslint:enable:prettier
   };
 
