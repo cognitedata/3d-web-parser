@@ -58,7 +58,7 @@ export default class PropertyLoader {
       const centerY                             = this.values.centerY![indices.nextValue()];
       const centerZ                             = this.values.centerZ![indices.nextValue()];
       this.center.set(centerX, centerY, centerZ); },
-    normal: indices => { this.normal  = this.values.normal! [indices.nextValue()]; },
+    normal: indices => { this.normal.copy(this.values.normal! [indices.nextValue()]); },
     delta:  indices => {
       const deltaX                              = this.values.delta!  [indices.nextValue()];
       const deltaY                              = this.values.delta!  [indices.nextValue()];
@@ -68,7 +68,7 @@ export default class PropertyLoader {
     height:        indices => { this.height        = this.values.height![indices.nextValue()]; },
     radiusA:       indices => { this.radiusA       = this.values.radius![indices.nextValue()]; },
     radiusB:       indices => { this.radiusB       = this.values.radius![indices.nextValue()]; },
-    capNormal:     indices => { this.capNormal     = this.values.normal![indices.nextValue()]; },
+    capNormal:     indices => { this.capNormal.copy(this.values.normal![indices.nextValue()]); },
     arcAngle:      indices => { this.arcAngle      = this.values.angle! [indices.nextValue()]; },
     rotationAngle: indices => { this.rotationAngle = this.values.angle! [indices.nextValue()]; },
     slopeA:        indices => { this.slopeA        = this.values.angle! [indices.nextValue()]; },
