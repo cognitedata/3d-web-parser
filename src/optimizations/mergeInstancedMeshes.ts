@@ -59,4 +59,8 @@ export default function mergeInstancedMeshes(rootSector: Sector, sceneStats: Sce
       }
     }
   }
+
+  for (const sector of rootSector.traverseSectors()) {
+    sector.mergedMeshGroup.createTreeIndexMap();
+  }
 }
