@@ -231,6 +231,15 @@ export class MergedMeshGroup extends GeometryGroup {
   computeBoundingBox(matrix: THREE.Matrix4, box: THREE.Box3, treeIndex: number): THREE.Box3 {
     box.makeEmpty();
 
+    if (!this.treeIndexMap[treeIndex]) {
+      // tslint:disable-next-line:no-console
+      console.warn(
+        `WARNING: Requested treeIndex ${treeIndex} not found in treeIndexMap of ${this}. ` +
+          `The computed bounding box will be empty`
+      );
+      return new THREE.Box3();
+    }
+
     this.treeIndexMap[treeIndex].forEach(mesh => {
       const { meshIndex, mappingIndex } = mesh;
       const mergedMesh = this.meshes[meshIndex];
