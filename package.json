@@ -39,7 +39,7 @@
     "es-check": "^5.0.0",
     "jest": "^24.9.0",
     "prettier": "^1.15.2",
-    "three": "^0.110.0",
+    "three": "^0.117.0",
     "ts-jest": "^24.1.0",
     "ts-loader": "^6.2.1",
     "tslint": "^5.11.0",
@@ -53,7 +53,7 @@
   },
   "peerDependencies": {
     "protobufjs": "^6.8.8",
-    "three": "^0.110.0"
+    "three": "^0.117.0"
   },
   "repository": {
     "type": "git",
