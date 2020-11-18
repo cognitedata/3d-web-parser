@@ -34,7 +34,7 @@
   "devDependencies": {
     "@cognite/tslint-config-cognite-3d": "^1.0.3",
     "@types/jest": "^24.0.19",
-    "@types/node": "^12.11.1",
+    "@types/node": "^14.14.8",
     "@types/three": "^0.93.28",
     "es-check": "^5.0.0",
     "jest": "^24.9.0",
