@@ -8,12 +8,6 @@
   ],
   "author": "Anders Hafreager (anders.hafreager@cognite.com)",
   "license": "Apache-2.0",
-  "files": [
-    "dist"
-  ],
-  "main": "dist/index.js",
-  "module": "dist/index.es.js",
-  "types": "dist/index.d.ts",
   "keywords": [
     "cognite",
     "THREE",
@@ -21,41 +15,37 @@
     "parser",
     "typescript"
   ],
+  "files": [
+    "dist"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "clean": "rm -rf dist",
     "prepublishOnly": "yarn build",
     "test": "jest --config=jest.config.js",
     "lint": "tslint -c tslint.json -p tsconfig.json",
     "lint:fix": "tslint -c tslint.json -p tsconfig.json --fix",
-    "build": "yarn clean && rollup -c && yarn esCheck",
-    "watch": "rollup -cw",
+    "build": "yarn clean && tsc && yarn esCheck",
     "prepush": "yarn lint && yarn test",
-    "esCheck": "es-check es5 './dist/index.js'",
+    "esCheck": "es-check --module es6 './dist/index.js'",
     "prepare": "yarn build"
   },
   "devDependencies": {
     "@cognite/tslint-config-cognite-3d": "^1.0.3",
-    "@types/jest": "^23.3.12",
-    "@types/node": "^10.12.12",
+    "@types/jest": "^24.0.19",
+    "@types/node": "^12.11.1",
     "@types/three": "^0.93.28",
     "es-check": "^5.0.0",
-    "jest": "^23.6.0",
+    "jest": "^24.9.0",
     "prettier": "^1.15.2",
-    "rollup": "^1.1.0",
-    "rollup-plugin-json": "^3.1.0",
-    "rollup-plugin-typescript2": "^0.19.0",
-    "three": "^0.98.0",
-    "ts-jest": "^23.10.5",
-    "ts-loader": "^5.3.0",
+    "three": "^0.110.0",
+    "ts-jest": "^24.1.0",
+    "ts-loader": "^6.2.1",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.0.1",
-    "typescript": "^3.1.6",
-    "webpack": "^4.26.0",
-    "webpack-cli": "^3.1.2",
-    "webpack-dev-server": "^3.1.14",
-    "webpack-merge": "^4.1.4",
-    "webpack-node-externals": "^1.7.2"
+    "typescript": "^3.1.6"
   },
   "publishConfig": {
     "access": "public",
@@ -63,7 +53,7 @@
   },
   "peerDependencies": {
     "protobufjs": "^6.8.8",
-    "three": ">=0.96.0"
+    "three": "^0.110.0"
   },
   "repository": {
     "type": "git",

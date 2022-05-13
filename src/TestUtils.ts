@@ -1,8 +1,5 @@
 // Copyright 2019 Cognite AS
-
-interface Matrix4 {
-  elements: Float32Array;
-}
+import * as THREE from 'three';
 
 interface Vector3 {
   x: number;
@@ -27,7 +24,7 @@ export function expectVector3Equal(a: Vector3, b: Vector3) {
   expect(a.z).toBeCloseTo(b.z);
 }
 
-export function expectMatrix4Equal(a: Matrix4, b: Matrix4) {
+export function expectMatrix4Equal(a: THREE.Matrix4, b: THREE.Matrix4) {
   for (let i = 0; i < 16; i++) {
     expect(a.elements[i]).toBeCloseTo(b.elements[i]);
   }
