@@ -52,7 +52,6 @@
     "registry": "https://registry.npmjs.org/"
   },
   "peerDependencies": {
-    "protobufjs": "^6.8.8",
     "three": "^0.110.0"
   },
   "repository": {
