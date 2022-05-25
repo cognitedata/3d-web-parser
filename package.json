@@ -1,6 +1,6 @@
 {
   "name": "@cognite/3d-web-parser",
-  "version": "0.13.6",
+  "version": "0.13.7",
   "description": "Parser for Cognite 3D viewer",
   "contributors": [
     "Anders Hafreager <anders.hafreager@cognite.com>",
